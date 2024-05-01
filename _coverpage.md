@@ -4,8 +4,8 @@
 
 - Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Chinese name is Li Wenpeng(李文鹏). Born(90s) and raised in Xinxiang, China. Can speak English, Chinese(Mandarin and Henan dialect), Dutch(Learning), and German(Learned for 1 year). Like tech-product, assassinate creed, league of legends, Fast and Furious, Godfather series, traveling, photography and vlogging. Now work and live in Hoofddorp, AMS, Netherlands. 
 
-## Life is simple.You make choices and you don't look back.
-## Want to catch the big fish, deep water to get. 
+## Want to catch the big fish, deep water to get. Life is simple.You make choices and you don't look back.
+
 
 [**LinkMe**](https://flying2322.github.io/dominicli.github.io/)
 [**KnowledgeRepo**](README.md)
