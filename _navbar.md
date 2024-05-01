@@ -1,4 +1,41 @@
-- Dev
+- 1 ACA
+  - [**01 Intro. to Linear Optimization**](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
+  - [**02 Linear and Nonlinear Programming**](https://web.stanford.edu/class/msande310/310trialtext.pdf)
+  - [**03 Convex Optimization**](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+  - [**04 Integer and Combinatorial Optimization**](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
+- 2 ENG
+  - [**01 Google News**](https://news.google.com/home?hl=en-US&gl=US&ceid=US:en)
+  - [**02 Eudic Ting**](https://dict.eudic.net/ting)
+  - [**03 扇贝🐚**](https://web.shanbay.com/web/main)
+- 3 COD
+  - [**01 Online Compiler**](https://www.onlinegdb.com/online_c++_compiler)  
+  - [**02 C++ Official**](https://cplusplus.com/doc/)
+  - [**03 JDK 15**](https://docs.oracle.com/en/java/javase/15/index.html)
+- 4 TOOL
+  - [**01 Internet Archive**](https://archive.org/details/CSPAN_20190525_043800_President_Trump_White_House_Departure/start/180/end/240)
+  - [**02 Miro**](https://miro.com/app/dashboard/)
+  - [**03 短信轰炸**](https://www.ahhhhfs.com/28756/)
+- 5 BOO
+  - [**01 孔夫子旧书网**](https://www.kongfz.com/)
+  - [**02 方格子**](https://vocus.cc/become_creator)
+  - [**03 Zlibrary**](https://zh.zlibrary-nl.se/?ref=www.tboxn.com)
+- 6 ED
+  - [**01 Notion**](https://www.notion.so/b1e4a95e4b0447efbaa1467b58ae2f32)
+  - [**02 Overleaf**](https://www.overleaf.com/project)
+  - [**03 飞书梓潼**](https://b7ofrxge0k.feishu.cn/drive/home/)
+- 7 HR
+  - [**01 Gitlab**](https://git.hairoutech.com/users/sign_in)
+  - [**02 JIRA**](https://jira.hairoutech.com/secure/Dashboard.jspa)
+  - [**03 Wiki Software**](http://wiki.hairoutech.com/)
+- 8 NL
+  - [**01 RDW**](https://digid.nl/inloggen)
+  - [**02 Skyscanner**](https://www.skyscanner.nl/?previousCultureSource=GEO_LOCATION&redirectedFrom=www.skyscanner.net)
+  - [**03 SalaryHR**](https://werknemer.loket.nl/#/login?returnUrl=%2Fpersoon)
+- 9 EDO
+  - [**01 iCloud**](https://www.icloud.com/calendar/)
+  - [**02 limeStart**](https://limestart.cn/)
+  - [**03 Gmail**](https://mail.google.com/mail/u/0/#inbox)
+- 0 Dev
   - [**ASCII**](http://www.fly63.com/tool/ascii/)
   - [**Regexr**](https://regexr.com/)
   - [**RegexUI**](https://jex.im/regulex/)
@@ -28,7 +65,7 @@
   - [**RandomNumGen**](https://www.zxgj.cn/g/suijishu)
   - [**CRunoob**](https://c.runoob.com/)
   - [**textDiff**](http://www.fly63.com/tool/textdiff/)
-- DrawType
+- A DrawType
   - [**processon**](https://www.processon.com/)
   - [**mindline**](http://www.mindline.cn/webapp)
   - [**eteste**](https://www.eteste.com/)
@@ -59,7 +96,7 @@
   - [**Shimo**](ttps://shimo.im/)
   - [**Weizhi**](https://www.wiz.cn/)
   - [**YuQue**](https://www.yuque.com/)
-- IDLE
+- B IDLE
   - [**Bilibili**](https://www.bilibili.com/)
   - [**Mofish**](https://mo.fish/)
   - [**MazeGen**](http://www.mazegenerator.net/)
@@ -77,7 +114,7 @@
   - [**NokiaMessage**](https://zzkia.noddl.me/)
   - [**0x00000010**](https://www.dgtle.com/)
   - [**0x00000011**](https://sspai.com/)
-- Official
+- C Official
   - [**Git-Chinese**](https://git-scm.com/book/zh/v2)
   - [**SVN-Chinese**](http://svnbook.red-bean.com/nightly/zh/index.html)
   - [**jQuery API**](https://jquery.cuishifeng.cn/)
