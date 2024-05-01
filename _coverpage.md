@@ -6,6 +6,7 @@
 
 ## Life is simple.You make choices and you don't look back.
 ## Want to catch the big fish, deep water to get. 
+
 [**LinkMe**](https://flying2322.github.io/dominicli.github.io/)
 [**KnowledgeRepo**](README.md)
 [**Github Profile**](https://github.com/flying2322)
