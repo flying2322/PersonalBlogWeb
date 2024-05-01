@@ -1,12 +1,11 @@
 
 
-<img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="105%" height="105%">
+<img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="90%" height="90%">
 
-- Hi, This is **Dominic Li** , a algorithm engineer of Operations Research in a robotic company in China. My insterest lie in Operations Research in Logistics, especially in warehouses. 
+- Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Chinese name is Li Wenpeng(李文鹏). Born(90s) and raised in Xinxiang, China. Can speak English, Chinese(Mandarin and Henan dialect), Dutch(Learning), and German(Learned for 1 year). Like tech-product, assassinate creed, league of legends, Fast and Furious, Godfather series, traveling, photography and vlogging. Now work and live in Hoofddorp, AMS, Netherlands. 
 
-
-## Empower every warehouse and factory with logistic robots.
-
-[**LinkMe**](https://github.com/rd2coding/Road2Coding)
+## Life is simple.You make choices and you don't look back.
+## Want to catch the big fish, deep water to get. 
+[**LinkMe**](https://flying2322.github.io/dominicli.github.io/)
 [**KnowledgeRepo**](README.md)
-[**Dominic Li**](https://github.com/flying2322)
+[**Github Profile**](https://github.com/flying2322)
