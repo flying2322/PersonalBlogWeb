@@ -7,9 +7,9 @@
 
 
 <p align="center">
-  <!-- <a href="https://github.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/github-PersonalBlogWeb-blue"></a>
-  <a href="https://gitee.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/Gitee-r2coding-blue.svg"></a>
-  <a href="https://space.bilibili.com/384068749" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a> -->
+  <a href="https://github.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/github-PersonalBlogWeb-blue"></a>
+  <a href="https://gitee.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/Gitee-PersonalBlogWeb-blue.svg"></a>
+  <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
   <a href="https://mp.weixin.qq.com/s/ePhaYezFblgt0NgbvtWqww" target="_blank">
     <img src="https://img.shields.io/badge/微信联系作者-WeChat-green.svg" alt="微信联系">
   </a>
