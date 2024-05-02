@@ -7,11 +7,11 @@
 
 
 <p align="center">
-  <a href="https://github.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/github-PersonalBlogWeb-blue"></a>
-  <a href="https://gitee.com/rd2coding/Road2Coding" target="_blank"><img src="https://img.shields.io/badge/Gitee-PersonalBlogWeb-blue.svg"></a>
+  <a href="https://blog.csdn.net/weixin_43464653?type=blog" target="_blank"><img src="https://img.shields.io/badge/CSDN-熊猫鹏_梓潼-grey"></a>
+  <a href="https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Wenpeng Li-blue.svg"></a>
   <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
   <a href="https://mp.weixin.qq.com/s/ePhaYezFblgt0NgbvtWqww" target="_blank">
-    <img src="https://img.shields.io/badge/微信联系作者-WeChat-green.svg" alt="微信联系">
+    <img src="https://img.shields.io/badge/WeChat-dominicli316-green.svg" alt="微信联系">
   </a>
 </p>
 
