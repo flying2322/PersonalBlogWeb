@@ -6,7 +6,7 @@
 
 <p align="center">
     <a href="http://121.40.143.58/#/" target="_blank"> 
-        <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" style="width: 150px; height: 150px; border-radius: 50%;" alt="Avatar"/>
+        <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" style="width: 150px; height: 150px; border-radius: 70%;" alt="Avatar"/>
     </a>
 </p>
 
