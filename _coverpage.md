@@ -1,6 +1,12 @@
-<p align="center">
+<!-- <p align="center">
     <a href="http://121.40.143.58/#/" target="_blank">
         <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" width="80"/>
+    </a>
+</p> -->
+
+<p align="center">
+    <a href="http://121.40.143.58/#/" target="_blank">
+        <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" style="width: 100px; border-radius: 50%;" alt="Avatar"/>
     </a>
 </p>
 
