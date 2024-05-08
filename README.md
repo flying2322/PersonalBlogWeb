@@ -7,7 +7,7 @@
 <!-- ![20240419-170121.jpg](https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg) -->
 
 <p align="center">
-  <a href="https://blog.csdn.net/weixin_43464653?type=blog" target="_blank"><img src="https://img.shields.io/badge/CSDN-熊猫鹏_梓潼-grey"></a>
+  <a href="https://blog.csdn.net/weixin_43464653?type=blog" target="_blank"><img src="https://img.shields.io/badge/CSDN-熊猫鹏_梓潼-yellow"></a>
   <a href="https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Wenpeng Li-blue.svg"></a>
   <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
   <a href="" target="_blank">
