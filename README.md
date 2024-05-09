@@ -34,3 +34,4 @@
 ---
 # **1. BOOKMARKS**
 This is  all the content in [Microsoft Edge](./Bookmarks.md).
+[Google Chrome](./Boomarks_chrome.md) and [Microsoft edge for work](./bookmarks_hr.md)

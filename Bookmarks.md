@@ -1,3 +1,8 @@
+
+<img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="90%" height="90%">
+
+
+
 With time going by, I found my bookmarks folder is almost full. No matter I use Safari on macOS, or Microsoft Edge, Chrome on Windows, Firefox, or other Internet browser like Palemoon in Liunx. It's always not perfact for me to import or login to sync all the bookmarks together. For different system or devices might have different account and their real time operation cannot sync real time. So I build this website to sort out all of my bookmarks and refresh them in one place.
 
 Hope some content might be also helpful to your workflow.
@@ -10,39 +15,39 @@ Bookmarks
 
 
 ### 1 Academic TEXTBOOK
-    - [**01 Intro. to Linear Optimization**](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
-    - [**02 Linear and Nonlinear Programming**](https://web.stanford.edu/class/msande310/310trialtext.pdf)
-    - [**03 Convex Optimization**](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
-    - [**04 Integer and Combinatorial Optimization**](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
-    - [**05 Lectures on Convex Optimization**](https://link.springer.com/book/10.1007/978-3-319-91578-4)
-    - [**07\. Robust Optimization**](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
-    - [**08\. Network Flows Theory Algorithms and Applications**](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf)
-    - [09\. Introduction to Online Convex Optimization](https://arxiv.org/abs/1909.05207)
-    - [10\. Lectures on Modern Convex Optimization](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)
-    - [11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
-    - [12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF)
-    - [13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
-    - [14\. Convex Analysis-slides for vision](https://vision.in.tum.de/_media/teaching/ss2015/multiscale_methods/chapter_1.pdf)
-    - [15\. Variational Analysis变分分析](https://sites.math.washington.edu/~rtr/papers/rtr169-VarAnalysis-RockWets.pdf)
-    - [16\. Nonlinear Programming](https://www.researchgate.net/publication/230872616_Nonlinear_Programming)
-    - [17\. Convex Optimization Theory](http://web.mit.edu/dimitrib/www/Convex_Theory_Entire_Book.pdf)
-    - [18\. Convex Optimization Algorithms](https://www.pdfdrive.com/convex-optimization-algorithms-d188753307.html)
-    - [19\. Introduction to Probability](https://ece307.cankaya.edu.tr/uploads/files/introduction%20to%20probability%20(bertsekas,%202nd,%202008).pdf)
-    - [20\. Probability: theory and examples](https://compress-pdf.bcad.info/)
-    - [21\. Bandit Algorithms](https://tor-lattimore.com/downloads/book/book.pdf)
-    - [22\. Introduction to Multi-Armed Bandits](https://click.endnote.com/viewer?doi=10.48550%2Farxiv.1904.07272&token=WzE1MzIwNzUsIjEwLjQ4NTUwL2FyeGl2LjE5MDQuMDcyNzIiXQ._g86yhUmLbl9rcQYUVZfGd98axY)
-    - [23\. Neuro-Dynamic Programming神经驱动的动态规划](https://www.researchgate.net/publication/216722122_Neuro-Dynamic_Programming)
-    - [24\. Dynamic\_Programming\_and\_Optimal\_Control](http://www.mit.edu/~dimitrib/DP2_Chapter%204_UPDATED.pdf)
-    - [25\. Abstract dynamic programming](https://web.mit.edu/dimitrib/www/Abstract_DP_2ND_EDITION_Complete.pdf)
-    - [26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality, 2nd Edition | Wiley](https://www.wiley.com/en-us/Approximate+Dynamic+Programming%3A+Solving+the+Curses+of+Dimensionality%2C+2nd+Edition-p-9780470604458)
-    - [26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality](https://castlelab.princeton.edu/html/Presentations/Powell_ADP_tutorialOctober2008.pdf)
-    - [27\. The elements of Statistical Learning](https://hastie.su.domains/Papers/ESLII.pdf)
-    - [28\. Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
-    - [29\. High-Dimensional Statistics](https://www.cambridge.org/core/books/highdimensional-statistics/8A91ECEEC38F46DAB53E9FF8757C7A4E)
-    - [30\. High dimentional statistics](https://math.mit.edu/~rigollet/PDFs/RigNotes17.pdf)
-    - [31\. Introductory Econometrics: A Modern Approach](https://economics.ut.ac.ir/documents/3030266/14100645/Jeffrey_M._Wooldridge_Introductory_Econometrics_A_Modern_Approach__2012.pdf)
-    - [32\. Introduction-to-econometric-2nd.pdf](https://jigjids.files.wordpress.com/2011/05/introduction-to-econometric-2nd.pdf)
-    - [33\. Computational Geometry计算几何学](https://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf)
+[**01 Intro. to Linear Optimization**](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
+[**02 Linear and Nonlinear Programming**](https://web.stanford.edu/class/msande310/310trialtext.pdf)
+[**03 Convex Optimization**](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+[**04 Integer and Combinatorial Optimization**](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
+[**05 Lectures on Convex Optimization**](https://link.springer.com/book/10.1007/978-3-319-91578-4)
+[**07\. Robust Optimization**](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
+[**08\. Network Flows Theory Algorithms and Applications**](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf)
+[09\. Introduction to Online Convex Optimization](https://arxiv.org/abs/1909.05207)
+[10\. Lectures on Modern Convex Optimization](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)
+[11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
+[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF)
+[13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
+[14\. Convex Analysis-slides for vision](https://vision.in.tum.de/_media/teaching/ss2015/multiscale_methods/chapter_1.pdf)
+[15\. Variational Analysis变分分析](https://sites.math.washington.edu/~rtr/papers/rtr169-VarAnalysis-RockWets.pdf)
+[16\. Nonlinear Programming](https://www.researchgate.net/publication/230872616_Nonlinear_Programming)
+[17\. Convex Optimization Theory](http://web.mit.edu/dimitrib/www/Convex_Theory_Entire_Book.pdf)
+[18\. Convex Optimization Algorithms](https://www.pdfdrive.com/convex-optimization-algorithms-d188753307.html)
+[19\. Introduction to Probability](https://ece307.cankaya.edu.tr/uploads/files/introduction%20to%20probability%20(bertsekas,%202nd,%202008).pdf)
+[20\. Probability: theory and examples](https://compress-pdf.bcad.info/)
+[21\. Bandit Algorithms](https://tor-lattimore.com/downloads/book/book.pdf)
+[22\. Introduction to Multi-Armed Bandits](https://click.endnote.com/viewer?doi=10.48550%2Farxiv.1904.07272&token=WzE1MzIwNzUsIjEwLjQ4NTUwL2FyeGl2LjE5MDQuMDcyNzIiXQ._g86yhUmLbl9rcQYUVZfGd98axY)
+[23\. Neuro-Dynamic Programming神经驱动的动态规划](https://www.researchgate.net/publication/216722122_Neuro-Dynamic_Programming)
+[24\. Dynamic\_Programming\_and\_Optimal\_Control](http://www.mit.edu/~dimitrib/DP2_Chapter%204_UPDATED.pdf)
+[25\. Abstract dynamic programming](https://web.mit.edu/dimitrib/www/Abstract_DP_2ND_EDITION_Complete.pdf)
+[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality, 2nd Edition | Wiley](https://www.wiley.com/en-us/Approximate+Dynamic+Programming%3A+Solving+the+Curses+of+Dimensionality%2C+2nd+Edition-p-9780470604458)
+[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality](https://castlelab.princeton.edu/html/Presentations/Powell_ADP_tutorialOctober2008.pdf)
+[27\. The elements of Statistical Learning](https://hastie.su.domains/Papers/ESLII.pdf)
+[28\. Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
+[29\. High-Dimensional Statistics](https://www.cambridge.org/core/books/highdimensional-statistics/8A91ECEEC38F46DAB53E9FF8757C7A4E)
+[30\. High dimentional statistics](https://math.mit.edu/~rigollet/PDFs/RigNotes17.pdf)
+[31\. Introductory Econometrics: A Modern Approach](https://economics.ut.ac.ir/documents/3030266/14100645/Jeffrey_M._Wooldridge_Introductory_Econometrics_A_Modern_Approach__2012.pdf)
+[32\. Introduction-to-econometric-2nd.pdf](https://jigjids.files.wordpress.com/2011/05/introduction-to-econometric-2nd.pdf)
+[33\. Computational Geometry计算几何学](https://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf)
 
 ### 1.1 Scholars-OR
 

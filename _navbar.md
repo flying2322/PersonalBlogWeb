@@ -1,6 +1,6 @@
 - 1 EDO
-  - [**01 🔓**](https://limestart.cn/)
-  - [**02 🔛**](https://translate.google.com/)
+  - [**01 👀**](https://limestart.cn/)
+  - [**02 🪽**](https://translate.google.com/)
   - [**03 📫**](https://mail.google.com/mail/u/0/#inbox)
   - [**04 💬*](https://chat.openai.com/chat)
   - [**05 🙈**](https://www.google.com/)
@@ -8,20 +8,20 @@
   - [**07 🕊**](https://b7ofrxge0k.feishu.cn/drive/home/)
 
 - 2 ENG
-  - [**01 Google News**](https://news.google.com/home?hl=en-US&gl=US&ceid=US:en)
-  - [**02 Eudic Ting**](https://dict.eudic.net/ting)
+  - [**01 📰**](https://news.google.com/home?hl=en-US&gl=US&ceid=US:en)
+  - [**02 👂**](https://dict.eudic.net/ting)
   - [**03 🐚**](https://web.shanbay.com/web/main)
 - 3 COD
-  - [**01 Online Compiler**](https://www.onlinegdb.com/online_c++_compiler)  
-  - [**02 C++ Official**](https://cplusplus.com/doc/)
-  - [**03 JDK 15**](https://docs.oracle.com/en/java/javase/15/index.html)
+  - [**01 🧬**](https://www.onlinegdb.com/online_c++_compiler)  
+  - [**02 🧮**](https://cplusplus.com/doc/)
+  - [**03 🍵**](https://docs.oracle.com/en/java/javase/15/index.html)
 - 4 TOOL
-  - [**01 Internet Archive**](https://archive.org/details/CSPAN_20190525_043800_President_Trump_White_House_Departure/start/180/end/240)
+  - [**01 🧧**](https://archive.org/details/CSPAN_20190525_043800_President_Trump_White_House_Departure/start/180/end/240)
   - [**02 Miro**](https://miro.com/app/dashboard/)
-  - [**03 短信轰炸**](https://www.ahhhhfs.com/28756/)
+  - [**03 MessageBOOM**](https://www.ahhhhfs.com/28756/)
 - 5 BOO
-  - [**01 孔夫子旧书网**](https://www.kongfz.com/)
-  - [**02 方格子**](https://vocus.cc/become_creator)
+  - [**01 Kongfz**](https://www.kongfz.com/)
+  - [**02 Vocus**](https://vocus.cc/become_creator)
   - [**03 Zlibrary**](https://zh.zlibrary-nl.se/?ref=www.tboxn.com)
 - 6 ED
   - [**01 Notion**](https://www.notion.so/b1e4a95e4b0447efbaa1467b58ae2f32)
