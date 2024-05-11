@@ -19,7 +19,7 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-> [!TIP]
+> 🌟
 >  This website is used for the knowledge base of Operations Research. Inspired by the personal knowledeg project of CodeSheep. And you can check the r2coding content [here](./r2coding.md)
 >  The mainly Content of this website is:
 >  
