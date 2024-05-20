@@ -1,13 +1,18 @@
 
 <img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="90%" height="90%">
 
-
+---
 
 Over time, I noticed that my bookmarks folder had become almost full. Regardless of whether I use Safari on macOS, Microsoft Edge, Chrome on Windows, Firefox, or other browsers like Palemoon on Linux, it’s never perfect to import or sync all my bookmarks together seamlessly. Different systems and devices often require different accounts, and real-time synchronization is not always possible.
 
 To address this, I created this website to organize and update all of my bookmarks in one central location.
 
 I hope you find some of the content useful for your workflow as well.
+
+<p style="text-align: right;">
+    Dominic@AMS, NL
+    May, 2024
+</p>
 
 BOOKMARKS IN FAVORITES FOLDER
 =========
