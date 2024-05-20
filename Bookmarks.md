@@ -10,98 +10,14 @@ Hope some content might be also helpful to your workflow.
 Bookmarks
 =========
 
-### 0 Favorites bar
+### A ACADEMIC
 
+Research is to see what everybody else has seen, and to think what nobody else has thought.                           
+ - Albert Szent-Györgyi
 
+---
 
-### 1 Academic TEXTBOOK
-[**01 Intro. to Linear Optimization**](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
-[**02 Linear and Nonlinear Programming**](https://web.stanford.edu/class/msande310/310trialtext.pdf)
-[**03 Convex Optimization**](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
-[**04 Integer and Combinatorial Optimization**](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
-[**05 Lectures on Convex Optimization**](https://link.springer.com/book/10.1007/978-3-319-91578-4)
-[**07\. Robust Optimization**](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
-[**08\. Network Flows Theory Algorithms and Applications**](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf)
-[09\. Introduction to Online Convex Optimization](https://arxiv.org/abs/1909.05207)
-[10\. Lectures on Modern Convex Optimization](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)
-[11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
-[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF)
-[13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
-[14\. Convex Analysis-slides for vision](https://vision.in.tum.de/_media/teaching/ss2015/multiscale_methods/chapter_1.pdf)
-[15\. Variational Analysis变分分析](https://sites.math.washington.edu/~rtr/papers/rtr169-VarAnalysis-RockWets.pdf)
-[16\. Nonlinear Programming](https://www.researchgate.net/publication/230872616_Nonlinear_Programming)
-[17\. Convex Optimization Theory](http://web.mit.edu/dimitrib/www/Convex_Theory_Entire_Book.pdf)
-[18\. Convex Optimization Algorithms](https://www.pdfdrive.com/convex-optimization-algorithms-d188753307.html)
-[19\. Introduction to Probability](https://ece307.cankaya.edu.tr/uploads/files/introduction%20to%20probability%20(bertsekas,%202nd,%202008).pdf)
-[20\. Probability: theory and examples](https://compress-pdf.bcad.info/)
-[21\. Bandit Algorithms](https://tor-lattimore.com/downloads/book/book.pdf)
-[22\. Introduction to Multi-Armed Bandits](https://click.endnote.com/viewer?doi=10.48550%2Farxiv.1904.07272&token=WzE1MzIwNzUsIjEwLjQ4NTUwL2FyeGl2LjE5MDQuMDcyNzIiXQ._g86yhUmLbl9rcQYUVZfGd98axY)
-[23\. Neuro-Dynamic Programming神经驱动的动态规划](https://www.researchgate.net/publication/216722122_Neuro-Dynamic_Programming)
-[24\. Dynamic\_Programming\_and\_Optimal\_Control](http://www.mit.edu/~dimitrib/DP2_Chapter%204_UPDATED.pdf)
-[25\. Abstract dynamic programming](https://web.mit.edu/dimitrib/www/Abstract_DP_2ND_EDITION_Complete.pdf)
-[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality, 2nd Edition | Wiley](https://www.wiley.com/en-us/Approximate+Dynamic+Programming%3A+Solving+the+Curses+of+Dimensionality%2C+2nd+Edition-p-9780470604458)
-[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality](https://castlelab.princeton.edu/html/Presentations/Powell_ADP_tutorialOctober2008.pdf)
-[27\. The elements of Statistical Learning](https://hastie.su.domains/Papers/ESLII.pdf)
-[28\. Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
-[29\. High-Dimensional Statistics](https://www.cambridge.org/core/books/highdimensional-statistics/8A91ECEEC38F46DAB53E9FF8757C7A4E)
-[30\. High dimentional statistics](https://math.mit.edu/~rigollet/PDFs/RigNotes17.pdf)
-[31\. Introductory Econometrics: A Modern Approach](https://economics.ut.ac.ir/documents/3030266/14100645/Jeffrey_M._Wooldridge_Introductory_Econometrics_A_Modern_Approach__2012.pdf)
-[32\. Introduction-to-econometric-2nd.pdf](https://jigjids.files.wordpress.com/2011/05/introduction-to-econometric-2nd.pdf)
-[33\. Computational Geometry计算几何学](https://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf)
-
-### 1.1 Scholars-OR
-
-[Sven Koenig](http://idm-lab.org/)
-
-[Chase Murray](https://www.chasemurray.com/)
-
-[Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3)
-
-[Louis-Martin Rousseau](https://scholar.google.com/citations?user=DVZF0PIAAAAJ&hl=en&oi=ao)
-
-[Rousseau, Louis-Martin | Directory of Experts](https://www.polymtl.ca/expertises/en/rousseau-louis-martin)
-
-[‪Chun Cheng](https://scholar.google.com/citations?user=tyHyCW4AAAAJ&hl=en&oi=ao)
-
-[Chun Cheng](https://sites.google.com/site/chun123cheng/home)
-
-[Liu Changchun](http://orcid.org/0000-0002-3269-5009)
-
-### 1.2 Self\_Improve
-
-[edX | Free Online Courses by Harvard, MIT, & more | edX](https://www.edx.org/)
-
-[教师资格证报名](http://ntce.neea.edu.cn/)
-
-[Coursera | Build Skills with Online Courses from Top Institutions](https://www.coursera.org/)
-
-### 1.3 ACAD
-
-[北京大学讲座网](http://lecture.pku.edu.cn/?action=today&year=2013&month=3&date=22)
-
-[Web of Science \[v.5.30\] - 所有数据库 基本检索](https://apps.webofknowledge.com/UA_GeneralSearch_input.do?product=UA&search_mode=GeneralSearch&SID=5DcXtGoYXPnbdCkNhPr&preferencesSaved=)
-
-[百度学术 - 保持学习的态度](http://xueshu.baidu.com/)
-
-[烂番薯学术搜索](https://scholar.lanfanshu.cn/)
-
-[Library Genesis](http://gen.lib.rus.ec/)
-
-[人类学家的使命\_CNKI学问](http://xuewen.cnki.net/CCND-RMRH200007280013.html)
-
-[Libgen数据提交-自主获取文献-Donwload Papers](http://www.toukey.com/)
-
-[爱科学 - 为科学工作者导航](https://www.iikx.com/)
-
-[IJSIMM](http://www.ijsimm.com/)
-
-[小木虫 - 学术 科研 互动社区](http://muchong.com/)
-
-[Chase Murray | UAVs and Operations Research | Optimization for Industrial & Military Applications](https://www.chasemurray.com/)
-
-[tex2solver](https://tex2solver.com/)
-
-### 1.4 OR textbook
+####   1 Academic Textbook
 
 [01\. Introduction to Linear Optimization](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
 
@@ -171,9 +87,54 @@ Bookmarks
 
 [33\. Computational Geometry计算几何学](https://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf)
 
-### 1.8 PHD
 
-### A. QueenMary
+---
+
+####   2 Scholars
+
+[01. Sven Koenig](http://idm-lab.org/)
+
+[02. Chase Murray](https://www.chasemurray.com/)
+
+[03. Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3)
+
+[04. Google Scholar - Louis-Martin Rousseau](https://scholar.google.com/citations?user=DVZF0PIAAAAJ&hl=en&oi=ao)
+
+[05. Rousseau, Louis-Martin](https://www.polymtl.ca/expertises/en/rousseau-louis-martin)
+
+[06. Google Scholar - Chun Cheng](https://scholar.google.com/citations?user=tyHyCW4AAAAJ&hl=en&oi=ao)
+
+[07. Githubio - Chun Cheng](https://sites.google.com/site/chun123cheng/home)
+
+[08. Liu Changchun](http://orcid.org/0000-0002-3269-5009)
+
+[09. Yutong’s website](https://yutongli.me/)
+
+####   3 Courses
+
+
+[01. edX| edX](https://www.edx.org/)
+
+[02. 教师资格证报名](http://ntce.neea.edu.cn/)
+
+[03. Coursera ](https://www.coursera.org/)
+
+
+[04. 北京大学讲座网](http://lecture.pku.edu.cn/?action=today&year=2013&month=3&date=22)
+
+[05. Web of Science](https://apps.webofknowledge.com/UA_GeneralSearch_input.do?product=UA&search_mode=GeneralSearch&SID=5DcXtGoYXPnbdCkNhPr&preferencesSaved=)
+
+[06. 百度学术](http://xueshu.baidu.com/)
+
+[07. 烂番薯学术搜索](https://scholar.lanfanshu.cn/)
+
+[08. Library Genesis](http://gen.lib.rus.ec/)
+
+[09. 人类学家的使命-CNKI学问](http://xuewen.cnki.net/CCND-RMRH200007280013.html)
+
+[10. 爱科学](https://www.iikx.com/)
+下面网站可以用来在手机端求解线性规划问题
+[11. tex2solver](https://tex2solver.com/)
 
 [International - Advice and Counselling Service](https://www.welfare.qmul.ac.uk/international/)
 
@@ -184,6 +145,10 @@ Bookmarks
 [Arrivals Term 1 - Accommodation](https://www.qmul.ac.uk/residences/college/arrival/)
 
 [消息中心 - 哔哩哔哩弹幕视频网 - ( ゜- ゜)つロ 乾杯~ - bilibili](https://message.bilibili.com/#/whisper/mid270405831)
+
+---
+
+####   4. QMUL
 
 [Fill in your passenger locator form - GOV.UK](https://www.gov.uk/provide-journey-contact-details-before-travel-uk)
 
@@ -207,7 +172,9 @@ Bookmarks
 
 [Rousseau, Louis-Martin | Directory of Experts](https://www.polymtl.ca/expertises/en/rousseau-louis-martin)
 
-### C. PolyMon
+---
+
+####   5 PolyMon
 
 [01\. 入学指引](https://www.polymtl.ca/gopoly/parcours-du-nouvel-etudiant/parcours-du-nouvel-etudiant-aux-etudes-superieures)
 
@@ -219,45 +186,50 @@ Bookmarks
 
 [05\. 注册Computer tools | GO-POLY](https://www.polymtl.ca/gopoly/les-essentiels-de-la-rentree/outils-informatiques#code-dacces-informatique)
 
-[Study Costs and Financial Aid | DESS, Master's, PhD](https://www.polymtl.ca/futur/en/es/finances)
+[06\. Study Costs and Financial Aid | DESS, Master's, PhD](https://www.polymtl.ca/futur/en/es/finances)
 
-[GO-POLY |](https://www.polymtl.ca/gopoly/en)
+[07\. GO-POLY |](https://www.polymtl.ca/gopoly/en)
 
-[Moodle : Polytechnique Montréal](https://moodle.polymtl.ca/)
+[08\. Moodle : Polytechnique Montréal](https://moodle.polymtl.ca/)
 
-[Confirmation of registration and course schedule | GO-POLY](https://www.polymtl.ca/gopoly/confirmation-dinscription-et-horaire-de-cours#confirmation-dinscription)
+[09\. Confirmation of registration and course schedule | GO-POLY](https://www.polymtl.ca/gopoly/confirmation-dinscription-et-horaire-de-cours#confirmation-dinscription)
 
-[Webinars and Welcome Activities | GO-POLY](https://www.polymtl.ca/gopoly/en/back-school-essentials/webinars-and-welcome-activities)
+[10\. Webinars and Welcome Activities | GO-POLY](https://www.polymtl.ca/gopoly/en/back-school-essentials/webinars-and-welcome-activities)
 
-[BCI](https://www.bci-qc.ca/)
+[11\. BCI](https://www.bci-qc.ca/)
 
-[神州学人](http://www.chisa.edu.cn/)
+[12\. 神州学人](http://www.chisa.edu.cn/)
 
-[Log in to MySIS](https://mysis.qmul.ac.uk/urd/sits.urd/run/siw_lgn)
+[13\. Log in to MySIS](https://mysis.qmul.ac.uk/urd/sits.urd/run/siw_lgn)
 
-[下载文件 - CleverPDF.com](https://www.cleverpdf.com/cn/downSplit)
+[14\. 下载文件 - CleverPDF.com](https://www.cleverpdf.com/cn/downSplit)
 
-[Polytechnique Montreal - Online Admission](https://admission.polymtl.ca/admission-main-web/pages/admission-dashboard.xhtml)
+[15\. Polytechnique Montreal - Online Admission](https://admission.polymtl.ca/admission-main-web/pages/admission-dashboard.xhtml)
 
-[10 个步骤 | 国际学生](https://www.polymtl.ca/etudiants-internationaux/preparatifs-de-sejour/10-etapes-suivre)
+[16\. 10 个步骤 | 国际学生](https://www.polymtl.ca/etudiants-internationaux/preparatifs-de-sejour/10-etapes-suivre)
 
-[Submitting an application for temporary selection to study in Québec | Government of Quebec](https://www.quebec.ca/education/etudier-quebec/demande-selection-temporaire)
+[17\. Submitting an application for temporary selection to study in Québec | Government of Quebec](https://www.quebec.ca/education/etudier-quebec/demande-selection-temporaire)
 
-[Engineering Mathematics option | Study programs](https://www.polymtl.ca/programmes/programmes/option-mathematiques-de-lingenieur)
+[18\. Engineering Mathematics option | Study programs](https://www.polymtl.ca/programmes/programmes/option-mathematiques-de-lingenieur)
 
-[Step 4 - Curriculum](https://www.form.services.micc.gouv.qc.ca/dcae/faces/pages/programmeEtud1.jspx?_afPfm=10&lang=fr)
+[19\. Step 4 - Curriculum](https://www.form.services.micc.gouv.qc.ca/dcae/faces/pages/programmeEtud1.jspx?_afPfm=10&lang=fr)
 
-[CAQapply](https://www.quebec.ca/en/education/study-quebec)
+[20\. CAQapply](https://www.quebec.ca/en/education/study-quebec)
 
-[Arrima](https://www.quebec.ca/en/immigration/online-immigration-services)
+[21\. Arrima](https://www.quebec.ca/en/immigration/online-immigration-services)
 
-[1\. Initial Requests for Documents From Outside Canada | International Students](https://www.polymtl.ca/etudiants-internationaux/en/preparing-your-stay/1-initial-requests-documents-outside-canada)
+[22\. Initial Requests for Documents From Outside Canada | International Students](https://www.polymtl.ca/etudiants-internationaux/en/preparing-your-stay/1-initial-requests-documents-outside-canada)
 
-[Home - Canada.ca](https://www.canada.ca/en.html)
+[23\. Home - Canada.ca](https://www.canada.ca/en.html)
 
-[国家公派留学管理信息平台](https://sa.csc.edu.cn/student/#/login?redirect=%2Fitems-change)
+[24\. 国家公派留学管理信息平台](https://sa.csc.edu.cn/student/#/login?redirect=%2Fitems-change)
 
-[首页](http://www.cscse.edu.cn/)
+[25\. CSC](http://www.cscse.edu.cn/)
+
+
+---
+
+### B PAPER REVIEW
 
 [01\. Sci-Hub](https://sci-hub.wf/)
 
@@ -269,235 +241,73 @@ Bookmarks
 
 [05\. EndNoteOnlineReview](https://www.myendnoteweb.com/EndNoteWeb.html?cat=myrefs&)
 
-[目录-小时百科](https://wuli.wiki/online/index.html)
+[06\. 目录-小时百科](https://wuli.wiki/online/index.html)
 
-[中国优秀硕士学位论文全文数据库](http://gb.oversea.cnki.net/kns55/brief/result.aspx?dbPrefix=CMFD)
+[07\. 中国优秀硕士学位论文全文数据库](http://gb.oversea.cnki.net/kns55/brief/result.aspx?dbPrefix=CMFD)
 
-[中国知网](http://www.cnki.net/)
+[08\. 中国知网](http://www.cnki.net/)
 
-[萌娘百科 万物皆可萌的百科全书 - zh.moegirl.org.cn](https://zh.moegirl.org.cn/Mainpage)
+[09\. 萌娘百科 万物皆可萌的百科全书 - zh.moegirl.org.cn](https://zh.moegirl.org.cn/Mainpage)
 
-[Amit’s Game Programming Information](http://www-cs-students.stanford.edu/~amitp/gameprog.html#Paths)
+[10\. Amit’s Game Programming Information](http://www-cs-students.stanford.edu/~amitp/gameprog.html#Paths)
 
-[NTU: Academic Profile: Asst Prof Yan Zhenzhen](http://research.ntu.edu.sg/expertise/academicprofile/Pages/StaffProfile.aspx?ST_EMAILID=YANZZ)
+[11\. NTU: Academic Profile: Asst Prof Yan Zhenzhen](http://research.ntu.edu.sg/expertise/academicprofile/Pages/StaffProfile.aspx?ST_EMAILID=YANZZ)
 
-[Operations Research Group Bologna |](http://or.dei.unibo.it/)
+[12\. Operations Research Group Bologna |](http://or.dei.unibo.it/)
 
-[Library Genesis](http://gen.lib.rus.ec/)
+[13\. Library Genesis](http://gen.lib.rus.ec/)
 
-[OR-LIBRARY](http://people.brunel.ac.uk/~mastjjb/jeb/info.html)
+[14\. OR-LIBRARY](http://people.brunel.ac.uk/~mastjjb/jeb/info.html)
 
-[Libgen数据提交-自主获取文献-Donwload Papers](http://www.toukey.com/)
+[15\. Libgen数据提交-自主获取文献-Donwload Papers](http://www.toukey.com/)
 
-[Scimago Journal & Country Rank](https://www.scimagojr.com/index.php)
+[16\. Scimago Journal & Country Rank](https://www.scimagojr.com/index.php)
 
-[《教您高效的用好知云文献翻译》20200813.pdf · 语雀](https://www.yuque.com/office/yuque/0/2020/pdf/2344247/1599539030613-41ae17a8-c8cf-4134-aaee-b13be7509946.pdf?from=https%3A%2F%2Fwww.yuque.com%2Fxtranslator%2Fzy%2Fnffawe)
+[17\. 《教您高效的用好知云文献翻译》20200813.pdf · 语雀](https://www.yuque.com/office/yuque/0/2020/pdf/2344247/1599539030613-41ae17a8-c8cf-4134-aaee-b13be7509946.pdf?from=https%3A%2F%2Fwww.yuque.com%2Fxtranslator%2Fzy%2Fnffawe)
 
-[百度学术 - 保持学习的态度](https://xueshu.baidu.com/)
+[18\. 百度学术](https://xueshu.baidu.com/)
 
-[https://www.baidu.com/link?url=Is\_PjhrWjkxmsa2HT79YwPzt4AY28tNHw-ea5FnGF1O&wd=&eqid=94c6f40700135d8b00000006606c6976](https://www.baidu.com/link?url=Is_PjhrWjkxmsa2HT79YwPzt4AY28tNHw-ea5FnGF1O&wd=&eqid=94c6f40700135d8b00000006606c6976)
+[19\. Bing 学术](https://cn.bing.com/academic)
 
-[Bing 学术](https://cn.bing.com/academic)
 
-[About me - Yutong’s website](https://yutongli.me/)
 
-### Scholars-OR
+### C LAUGUAGE（ENGLISH，DUTCH）
 
-[Sven Koenig](http://idm-lab.org/)
+####   1 Blocked site in CN
 
-[Chase Murray](https://www.chasemurray.com/)
+[1. 资讯](https://news.google.com/)
 
-[Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3)
+[2. Twitter](https://twitter.com/waylybaye)
 
-[Louis-Martin Rousseau](https://scholar.google.com/citations?user=DVZF0PIAAAAJ&hl=en&oi=ao)
+[3. Instagram](https://www.instagram.com/dannisheee/)
 
-[Rousseau, Louis-Martin | Directory of Experts](https://www.polymtl.ca/expertises/en/rousseau-louis-martin)
+[4. Netflix](https://www.netflix.com/browse)
 
-[‪Chun Cheng](https://scholar.google.com/citations?user=tyHyCW4AAAAJ&hl=en&oi=ao)
+[5. Facebook](https://www.facebook.com/)
 
-[Chun Cheng](https://sites.google.com/site/chun123cheng/home)
+[6. Quora](https://www.quora.com/)
 
-[MIT Theses](https://dspace.mit.edu/handle/1721.1/7582)
+[7. Google Translate](https://translate.google.com/)
 
-[清华大学学位论文服务系统](http://166.111.120.42/Thesis/Thesis/ThesisSearch/Search_DataInit.aspx?dbid=7&Code=etdqh&nsukey=i8ezEDxGuggs7BU%2B9iyE%2BHs5WBezdRQZItXS35xkE9%2BqkqwwUY%2BkcV5LLErYrMGthRfbfBB8qIha%2Fb24cTqIWAtBHJcmtUOZVYEQRVoSXFNo76wzABAKyo4saY0RXZmfaCJtlAqcGNRai8TDUmqoWLZwG0Bo7GGxIduwtp7LV8HjAV8DE9nv9E4s34K0QsrtHTNMuifvyzBiGMzE3epJYg%3D%3D)
+[8. google map](https://maps.google.com/)
 
-[THU\_lib](http://www.lib.tsinghua.edu.cn/index.html)
+####   2 **Dictionaries:** 
 
-[CORIDM](https://coridm.d2d.ai/lecture)
+[9. Oxford Learner's Dictionarie](https://www.oxfordlearnersdictionaries.com/)
 
-### OR-textbook
+[10. Cambridge - English to Mandarin Chinese](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/)
 
-[01\. Introduction to Linear Optimization](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
+[11. Dictionary by Merriam-Webster: America's most-trusted online dictionary](https://www.merriam-webster.com/)
 
-[02\. Linear and nonlinear programming](https://web.stanford.edu/class/msande310/310trialtext.pdf)
+[12.  The Free Dictionary](https://www.thefreedictionary.com/)
 
-[03\. Convex optimization](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+[13. Macmillan Dictionary](https://www.macmillandictionary.com/)
 
-[04\. Numerical Optimization](https://www.csie.ntu.edu.tw/~r97002/temp/num_optimization.pdf)
+[14. Spotify Music](https://open.spotify.com/search/%E8%AE%B8%E5%B5%A9)
 
-[05\. Integer and Combinatorial Optimization](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
+[15. China Daily](https://tophub.today/n/3adqR13eng)
 
-[06\. Lectures on Convex Optimization](https://link.springer.com/book/10.1007/978-3-319-91578-4)
-
-[07\. Robust Optimization](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
-
-[08\. Network Flows Theory Algorithms and Applications](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf)
-
-[09\. Introduction to Online Convex Optimization](https://arxiv.org/abs/1909.05207)
-
-[10\. Lectures on Modern Convex Optimization](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)
-
-[11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
-
-[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF)
-
-[13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
-
-[14\. Convex Analysis-slides for vision](https://vision.in.tum.de/_media/teaching/ss2015/multiscale_methods/chapter_1.pdf)
-
-[15\. Variational Analysis变分分析](https://sites.math.washington.edu/~rtr/papers/rtr169-VarAnalysis-RockWets.pdf)
-
-[16\. Nonlinear Programming](https://www.researchgate.net/publication/230872616_Nonlinear_Programming)
-
-[17\. Convex Optimization Theory](http://web.mit.edu/dimitrib/www/Convex_Theory_Entire_Book.pdf)
-
-[18\. Convex Optimization Algorithms](https://www.pdfdrive.com/convex-optimization-algorithms-d188753307.html)
-
-[19\. Introduction to Probability](https://ece307.cankaya.edu.tr/uploads/files/introduction%20to%20probability%20(bertsekas,%202nd,%202008).pdf)
-
-[20\. Probability: theory and examples](https://compress-pdf.bcad.info/)
-
-[21\. Bandit Algorithms](https://tor-lattimore.com/downloads/book/book.pdf)
-
-[22\. Introduction to Multi-Armed Bandits](https://click.endnote.com/viewer?doi=10.48550%2Farxiv.1904.07272&token=WzE1MzIwNzUsIjEwLjQ4NTUwL2FyeGl2LjE5MDQuMDcyNzIiXQ._g86yhUmLbl9rcQYUVZfGd98axY)
-
-[23\. Neuro-Dynamic Programming神经驱动的动态规划](https://www.researchgate.net/publication/216722122_Neuro-Dynamic_Programming)
-
-[24\. Dynamic\_Programming\_and\_Optimal\_Control](http://www.mit.edu/~dimitrib/DP2_Chapter%204_UPDATED.pdf)
-
-[25\. Abstract dynamic programming](https://web.mit.edu/dimitrib/www/Abstract_DP_2ND_EDITION_Complete.pdf)
-
-[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality, 2nd Edition | Wiley](https://www.wiley.com/en-us/Approximate+Dynamic+Programming%3A+Solving+the+Curses+of+Dimensionality%2C+2nd+Edition-p-9780470604458)
-
-[26\. Approximate Dynamic Programming: Solving the Curses of Dimensionality](https://castlelab.princeton.edu/html/Presentations/Powell_ADP_tutorialOctober2008.pdf)
-
-[27\. The elements of Statistical Learning](https://hastie.su.domains/Papers/ESLII.pdf)
-
-[28\. Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/uploads/prod/2006/01/Bishop-Pattern-Recognition-and-Machine-Learning-2006.pdf)
-
-[29\. High-Dimensional Statistics](https://www.cambridge.org/core/books/highdimensional-statistics/8A91ECEEC38F46DAB53E9FF8757C7A4E)
-
-[30\. High dimentional statistics](https://math.mit.edu/~rigollet/PDFs/RigNotes17.pdf)
-
-[31\. Introductory Econometrics: A Modern Approach](https://economics.ut.ac.ir/documents/3030266/14100645/Jeffrey_M._Wooldridge_Introductory_Econometrics_A_Modern_Approach__2012.pdf)
-
-[32\. Introduction-to-econometric-2nd.pdf](https://jigjids.files.wordpress.com/2011/05/introduction-to-econometric-2nd.pdf)
-
-[33\. Computational Geometry计算几何学](https://people.inf.elte.hu/fekete/algoritmusok_msc/terinfo_geom/konyvek/Computational%20Geometry%20-%20Algorithms%20and%20Applications,%203rd%20Ed.pdf)
-
-### PHD
-
-### PolyMon
-
-[01\. 入学指引](https://www.polymtl.ca/gopoly/parcours-du-nouvel-etudiant/parcours-du-nouvel-etudiant-aux-etudes-superieures)
-
-[02\. Home | AEIP](https://aeipsuccess.ca/)
-
-[03\. 边境服务署Canada Border Services Agency](https://www.cbsa-asfc.gc.ca/menu-eng.html)
-
-[04\. 推迟一学期入学](https://www.polymtl.ca/gopoly/offre-dadmission/etudes-superieures#reporter)
-
-[05\. 注册Computer tools | GO-POLY](https://www.polymtl.ca/gopoly/les-essentiels-de-la-rentree/outils-informatiques#code-dacces-informatique)
-
-[Study Costs and Financial Aid | DESS, Master's, PhD](https://www.polymtl.ca/futur/en/es/finances)
-
-[GO-POLY |](https://www.polymtl.ca/gopoly/en)
-
-[Moodle : Polytechnique Montréal](https://moodle.polymtl.ca/)
-
-[Confirmation of registration and course schedule | GO-POLY](https://www.polymtl.ca/gopoly/confirmation-dinscription-et-horaire-de-cours#confirmation-dinscription)
-
-[Webinars and Welcome Activities | GO-POLY](https://www.polymtl.ca/gopoly/en/back-school-essentials/webinars-and-welcome-activities)
-
-[BCI](https://www.bci-qc.ca/)
-
-[神州学人](http://www.chisa.edu.cn/)
-
-[Log in to MySIS](https://mysis.qmul.ac.uk/urd/sits.urd/run/siw_lgn)
-
-[下载文件 - CleverPDF.com](https://www.cleverpdf.com/cn/downSplit)
-
-[Polytechnique Montreal - Online Admission](https://admission.polymtl.ca/admission-main-web/pages/admission-dashboard.xhtml)
-
-[10 个步骤 | 国际学生](https://www.polymtl.ca/etudiants-internationaux/preparatifs-de-sejour/10-etapes-suivre)
-
-[Submitting an application for temporary selection to study in Québec | Government of Quebec](https://www.quebec.ca/education/etudier-quebec/demande-selection-temporaire)
-
-[Engineering Mathematics option | Study programs](https://www.polymtl.ca/programmes/programmes/option-mathematiques-de-lingenieur)
-
-[Step 4 - Curriculum](https://www.form.services.micc.gouv.qc.ca/dcae/faces/pages/programmeEtud1.jspx?_afPfm=10&lang=fr)
-
-[CAQapply](https://www.quebec.ca/en/education/study-quebec)
-
-[Arrima](https://www.quebec.ca/en/immigration/online-immigration-services)
-
-[1\. Initial Requests for Documents From Outside Canada | International Students](https://www.polymtl.ca/etudiants-internationaux/en/preparing-your-stay/1-initial-requests-documents-outside-canada)
-
-[Home - Canada.ca](https://www.canada.ca/en.html)
-
-[01\. EndNote](https://www.myendnoteweb.com/EndNoteWeb.html)
-
-[](https://scholar.google.com/)
-
-[](https://sci-hub.wf/)
-
-### 2 ENG
-
-### Blocked
-
-[资讯](https://news.google.com/)
-
-[Twitter](https://twitter.com/waylybaye)
-
-[Instagram](https://www.instagram.com/dannisheee/)
-
-[Netflix](https://www.netflix.com/browse)
-
-[Facebook](https://www.facebook.com/)
-
-[Quora](https://www.quora.com/)
-
-[翻译](https://translate.google.com/)
-
-[google地图](https://maps.google.com/)
-
-[](https://maps.google.com/)
-
-[Oxford Learner's Dictionaries | Find definitions, translations, and grammar explanations at Oxford Learner's Dictionaries](https://www.oxfordlearnersdictionaries.com/)
-
-[Cambridge English–Chinese (Simplified) Dictionary: English to Mandarin Chinese](https://dictionary.cambridge.org/dictionary/english-chinese-simplified/)
-
-[Dictionary by Merriam-Webster: America's most-trusted online dictionary](https://www.merriam-webster.com/)
-
-[Dictionary, Encyclopedia and Thesaurus - The Free Dictionary](https://www.thefreedictionary.com/)
-
-[Macmillan Dictionary](https://www.macmillandictionary.com/)
-
-[每日英语听力](https://dict.eudic.net/ting)
-
-[有何不可 · 許嵩](https://open.spotify.com/search/%E8%AE%B8%E5%B5%A9)
-
-[China Daily](https://tophub.today/n/3adqR13eng)
-
-[CrossWall](https://www.fanqiangzhe.com/software/)
-
-[扇贝，知道你在改变](https://www.shanbay.com/bdc/review/)
-
-[英语脑筋急转弯](https://ceretrain.com/)
-
-[Subtitles Portal • Download SRT and ASS for Movies and TV Programs](https://subsaga.com/)
-
-[A Study in Pink ‹ Series 1 ‹ Sherlock](https://subsaga.com/bbc/drama/sherlock/series-1/1-a-study-in-pink.html)
+[17. 英语脑筋急转弯](https://ceretrain.com/)
 
 [Amazon.com. Spend less. Smile more.](https://www.amazon.com/)
 
@@ -1618,10 +1428,6 @@ Bookmarks
 [09\. LanQiao](https://www.lanqiao.cn/courses/)
 
 [10\. lofi hip hop radio](https://www.youtube.com/watch?v=jfKfPfyJRdk)
-
-[edX | Free Online Courses by Harvard, MIT, & more | edX](https://www.edx.org/)
-
-[Coursera | Build Skills with Online Courses from Top Institutions](https://www.coursera.org/)
 
 [06\. MOOC-CN](https://www.icourse163.org/)
 
