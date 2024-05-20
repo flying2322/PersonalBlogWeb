@@ -29,10 +29,10 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ##   1 Academic Textbook
 
-这里根据知乎问题 [有哪些适合入门且较全面的运筹学书籍可以推荐一下吗？](https://www.zhihu.com/question/24620225/answer/1837628198) 整理而成。
+这里根据知乎问题 [有哪些适合入门且较全面的运筹学书籍可以推荐一下吗？](https://www.zhihu.com/question/24620225/answer/1837628198) 整理而成。主要作者覃含章、王源、留德华教授等，这些内容非常详尽，对于想一窥“运筹优化-管理科学”的研究内容和方法的学者窃以为很有价值。再次整理希望使内容更有层次和条理。
 
 
-<a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization</a>
+<a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization; Bertsimas, Dimitris, and John N. Tsitsiklis. Vol. 6. Belmont, MA: Athena Scientific, 1997. </a> 这本书可以在线借阅。推荐指数：★★★★★ 难度：★★★
 
 
 [02\. Linear and nonlinear programming](https://web.stanford.edu/class/msande310/310trialtext.pdf)
