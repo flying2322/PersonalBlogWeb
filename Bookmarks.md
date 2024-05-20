@@ -29,7 +29,7 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ##   1 Academic Textbook
 
-[01\. Introduction to Linear Optimization](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
+[01\. Introduction to Linear Optimization](files/Introduction_to_Linear_Optimization.pdf)
 
 [02\. Linear and nonlinear programming](https://web.stanford.edu/class/msande310/310trialtext.pdf)
 
