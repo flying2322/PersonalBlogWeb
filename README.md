@@ -36,11 +36,11 @@ TEST PDF insert:
 
 这是我的PDF文件的链接，你可以点击查看：
 
-[查看PDF文件]("files/1.pdf")
+[查看PDF文件](files/1.pdf)
 
 或者你可以在页面中直接查看PDF文件：
 
-<embed src="files/1.pdf" type="application/pdf">
+<embed src="files/1.pdf" width="1000" height="1500" type="application/pdf">
 
 
 ---
