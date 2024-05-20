@@ -14,13 +14,17 @@ I hope you find some of the content useful for your workflow as well.
     May, 2024
 </p>
 
+---
 BOOKMARKS IN FAVORITES FOLDER
 =========
 
 # A ACADEMIC
+<p style="text-align: right;">
+Research is to see what everybody else has seen, and to think what nobody else has thought.      
 
-Research is to see what everybody else has seen, and to think what nobody else has thought.                           
- - Albert Szent-Györgyi
+     - Albert Szent-Györgyi
+</p>                     
+
 
 ---
 
