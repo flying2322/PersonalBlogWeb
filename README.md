@@ -170,7 +170,7 @@ TEST PDF insert:
   }
 </style>
 
-### Table test with comment for each iterm
+### Table test with comments
 
 这是我整理的收藏网站：
 
