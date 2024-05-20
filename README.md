@@ -33,6 +33,7 @@
 TEST PDF insert: 
 <!-- <embed src="files/building-a-second-brain-a-proven-method-to-organize-your-digital-life-and-unlock-your-creative-potential-1982167386-9781982167387_compress.pdf" width="600" height="400" type="application/pdf"> -->
 
+# TEST 1
 
 这是我的PDF文件的链接，你可以点击查看：
 
@@ -42,6 +43,13 @@ TEST PDF insert:
 
 <embed src="files/1.pdf" width="1000" height="1500" type="application/pdf">
 
+
+# TEST 2
+
+
+这是我的PDF文件的链接，你可以点击查看：
+
+<a href="files/1.pdf" target="_blank">点击这里查看PDF文件</a>
 
 ---
 # **1. BOOKMARKS**
