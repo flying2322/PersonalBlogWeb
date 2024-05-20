@@ -33,7 +33,7 @@
 TEST PDF insert: 
 <!-- <embed src="files/building-a-second-brain-a-proven-method-to-organize-your-digital-life-and-unlock-your-creative-potential-1982167386-9781982167387_compress.pdf" width="600" height="400" type="application/pdf"> -->
 
-# __TEST 1 - pdf
+## TEST 1 - pdf
 
 这是我的PDF文件的链接，你可以点击查看：
 
@@ -44,14 +44,14 @@ TEST PDF insert:
 <embed src="files/1.pdf" width="1000" height="500" type="application/pdf">
 
 
-# __TEST 2 - pdf 
+## TEST 2 - pdf 
 
 
 这是我的PDF文件的链接，你可以点击查看：
 
 <a href="files/1.pdf" target="_blank">点击这里查看PDF文件</a>
 
-# __TEST 3 - table insert
+## TEST 3 - table insert
 
 <style>
   .no-border-table {
@@ -66,7 +66,7 @@ TEST PDF insert:
   }
 </style>
 
-## ____A
+### table test A
 
 这是我整理的收藏网站：
 
@@ -115,15 +115,15 @@ TEST PDF insert:
   }
 </style>
 
-## ____B
+### table test B with titles
 
 这是我整理的收藏网站：
 
 <table class="no-border-table">
   <tr>
-    <th>网站组 1</th>
-    <th>网站组 2</th>
-    <th>网站组 3</th>
+    <th>Every day open</th>
+    <th>Academic</th>
+    <th>Operations Research</th>
   </tr>
   <tr>
     <td>
@@ -149,6 +149,66 @@ TEST PDF insert:
     </td>
   </tr>
 </table>
+
+
+<style>
+  .no-border-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .no-border-table td, .no-border-table th {
+    border: none;
+    padding: 8px;
+    text-align: left;
+  }
+
+  .no-border-table th {
+    font-weight: bold;
+    text-align: left;
+    background-color: #f2f2f2; /* 可选：设置表头背景颜色 */
+  }
+</style>
+
+### Table test with comment for each iterm
+
+这是我整理的收藏网站：
+
+<table class="no-border-table">
+  <thead>
+    <tr>
+      <th>编号</th>
+      <th>网址链接</th>
+      <th>评注</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>01</td>
+      <td><a href="https://google.com" target="_blank">Google</a></td>
+      <td>这是第一个网站的评注。</td>
+    </tr>
+    <tr>
+      <td>02</td>
+      <td><a href="https://youtube.com" target="_blank">Youtube</a></td>
+      <td>这是第二个网站的评注。</td>
+    </tr>
+    <tr>
+      <td>03</td>
+      <td><a href="https://baidu.com" target="_blank">Baidu</a></td>
+      <td>这是第三个网站的评注。</td>
+    </tr>
+    <!-- 可以根据需要继续添加更多行 -->
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
 
 
 ---
