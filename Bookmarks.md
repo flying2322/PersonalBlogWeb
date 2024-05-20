@@ -31,19 +31,22 @@ BOOKMARKS IN FAVORITES FOLDER
 
 这里根据知乎问题 [有哪些适合入门且较全面的运筹学书籍可以推荐一下吗？](https://www.zhihu.com/question/24620225/answer/1837628198) 整理而成。主要作者覃含章、王源、留德华教授等，这些内容非常详尽，对于想一窥“运筹优化-管理科学”的研究内容和方法的学者窃以为很有价值。再次整理希望使内容更有层次和条理。
 
+![Operations Research Books(Highly recommended)](_media/4books.png)
 
-<a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization; Bertsimas, Dimitris, and John N. Tsitsiklis. Vol. 6. Belmont, MA: Athena Scientific, 1997. </a> 这本书可以在线借阅。推荐指数：★★★★★ 难度：★★★
+
+<a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization; Bertsimas, Dimitris, and John N. Tsitsiklis. Vol. 6. Belmont, MA: Athena Scientific, 1997. </a> 推荐指数：★★★★★ 难度：★★★  这本书可以在线借阅。
+
+[02\. Linear and nonlinear programming;Luenberger, David G., and Yinyu Ye. 1984](https://web.stanford.edu/class/msande310/310trialtext.pdf) 推荐指数：★★★★ 难度：★★★★
+
+[03\. Convex optimization;Boyd, Stephen, Stephen P. Boyd and Lieven Vantenberghe, 2004](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf) 推荐指数：★★★★ 难度：★★★
+
+[04\. Numerical Optimization; Jorge Nocedal 01 Google, Stephen Wright, 2006](https://www.csie.ntu.edu.tw/~r97002/temp/num_optimization.pdf) 推荐指数：★★★ 难度：★★★★
+
+[05\. Integer and Combinatorial Optimization; Laurence A. Wolsey , George L. Nemhauser, 1999](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)推荐指数：★★★★ 难度：★★★★★
 
 
-[02\. Linear and nonlinear programming](https://web.stanford.edu/class/msande310/310trialtext.pdf)
 
-[03\. Convex optimization](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
-
-[04\. Numerical Optimization](https://www.csie.ntu.edu.tw/~r97002/temp/num_optimization.pdf)
-
-[05\. Integer and Combinatorial Optimization](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)
-
-[06\. Lectures on Convex Optimization](https://link.springer.com/book/10.1007/978-3-319-91578-4)
+[06\. Lectures on Convex Optimization; Yurii Nesterov; 2018 Edition](https://link.springer.com/book/10.1007/978-3-319-91578-4)推荐指数：★★★★ 难度：★★★★
 
 [07\. Robust Optimization](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
 
