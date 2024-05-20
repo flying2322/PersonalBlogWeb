@@ -29,7 +29,10 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ##   1 Academic Textbook
 
-<a href="files/Introduction_to_Linear_Optimization.pdf" target="_blank">01\. Introduction to Linear Optimization</a>
+这里根据知乎问题 [有哪些适合入门且较全面的运筹学书籍可以推荐一下吗？](https://www.zhihu.com/question/24620225/answer/1837628198) 整理而成。
+
+
+<a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization</a>
 
 
 [02\. Linear and nonlinear programming](https://web.stanford.edu/class/msande310/310trialtext.pdf)
