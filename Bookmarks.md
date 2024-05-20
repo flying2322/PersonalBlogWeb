@@ -3,21 +3,23 @@
 
 
 
-With time going by, I found my bookmarks folder is almost full. No matter I use Safari on macOS, or Microsoft Edge, Chrome on Windows, Firefox, or other Internet browser like Palemoon in Liunx. It's always not perfact for me to import or login to sync all the bookmarks together. For different system or devices might have different account and their real time operation cannot sync real time. So I build this website to sort out all of my bookmarks and refresh them in one place.
+Over time, I noticed that my bookmarks folder had become almost full. Regardless of whether I use Safari on macOS, Microsoft Edge, Chrome on Windows, Firefox, or other browsers like Palemoon on Linux, it’s never perfect to import or sync all my bookmarks together seamlessly. Different systems and devices often require different accounts, and real-time synchronization is not always possible.
 
-Hope some content might be also helpful to your workflow.
+To address this, I created this website to organize and update all of my bookmarks in one central location.
 
-Bookmarks
+I hope you find some of the content useful for your workflow as well.
+
+BOOKMARKS IN FAVORITES FOLDER
 =========
 
-### A ACADEMIC
+# A ACADEMIC
 
 Research is to see what everybody else has seen, and to think what nobody else has thought.                           
  - Albert Szent-Györgyi
 
 ---
 
-####   1 Academic Textbook
+##   1 Academic Textbook
 
 [01\. Introduction to Linear Optimization](https://docplayer.net/17422949-Introduction-to-linear-optimization.html)
 
