@@ -20,9 +20,8 @@ BOOKMARKS IN FAVORITES FOLDER
 
 # A ACADEMIC
 <p style="text-align: right;">
-Research is to see what everybody else has seen, and to think what nobody else has thought.      
-
-     - Albert Szent-Györgyi
+    Research is to see what everybody else has seen, and to think what nobody else has thought.      
+    - Albert Szent-Györgyi
 </p>                     
 
 
