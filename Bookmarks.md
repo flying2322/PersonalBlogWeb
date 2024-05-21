@@ -61,7 +61,7 @@ BOOKMARKS IN FAVORITES FOLDER
 
 [11\. Lectures on Stochestic Programming: modeling and theory(随机规划讲义); Alexander Shapiro , Darinka Dentcheva , Andrzej Ruszczynski ](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf) 推荐指数：★★★ 难度：★★★★★ 覃含章在推荐词中提到这是随机优化届的扛鼎之作。
 
-[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF) 推荐词中提到了何炳生老师的研究，其中ADMM（The Alternating direction method of multipliers)是何老师的主要研究兴趣之一。
+[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF) 推荐词中提到了何炳生老师的研究，其中ADMM（The Alternating direction method of multipliers乘子交替方向法)是何老师的主要研究兴趣之一。
 
 [13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
 
