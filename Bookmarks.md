@@ -45,21 +45,23 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ---
 
-[05\. Integer and Combinatorial Optimization; Laurence A. Wolsey , George L. Nemhauser, 1999](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)推荐指数：★★★★ 难度：★★★★★
+[05\. Integer and Combinatorial Optimization; Laurence A. Wolsey , George L. Nemhauser, 1999](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html) 推荐指数：★★★★ 难度：★★★★★
 
-[06\. Lectures on Convex Optimization; Yurii Nesterov; 2018 Edition](https://link.springer.com/book/10.1007/978-3-319-91578-4)推荐指数：★★★★ 难度：★★★★
+[06\. Lectures on Convex Optimization; Yurii Nesterov; 2018 Edition](https://link.springer.com/book/10.1007/978-3-319-91578-4) 推荐指数：★★★★ 难度：★★★★
 
-[07\. Robust Optimization(鲁棒优化); Ben-Tal, Aharon, Laurent El Ghaoui, and Arkadi Nemirovski. 2009](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)推荐指数：★★ 难度：★★★★ 
+[07\. Robust Optimization(鲁棒优化); Ben-Tal, Aharon, Laurent El Ghaoui, and Arkadi Nemirovski. 2009](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf) 推荐指数：★★ 难度：★★★★ 
 
 [08\. Network Flows Theory Algorithms and Applications; Ravindra Ahuja , Thomas Magnanti , James Orlin ](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf) 推荐指数：★★★ 难度：★★★★
 
 [09\. Introduction to Online Convex Optimization(在线凸优化导论); Hazan, Elad. 2019](https://arxiv.org/abs/1909.05207) 推荐指数：★★★★★ 难度：★★★★
 
-[10\. Lectures on Modern Convex Optimization(现代凸优化讲义); Aharon Ben-Tal , Arkadi Nemirovski ](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)推荐指数：★ 难度：★★★★★
+[10\. Lectures on Modern Convex Optimization(现代凸优化讲义); Aharon Ben-Tal , Arkadi Nemirovski ](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf) 推荐指数：★ 难度：★★★★★
 
-[11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
+---
 
-[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF)
+[11\. Lectures on Stochestic Programming: modeling and theory(随机规划讲义); Alexander Shapiro , Darinka Dentcheva , Andrzej Ruszczynski ](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf) 推荐指数：★★★ 难度：★★★★★ 覃含章在推荐词中提到这是随机优化届的扛鼎之作。
+
+[12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF) 推荐词中提到了何炳生老师的研究，其中ADMM（The Alternating direction method of multipliers)是何老师的主要研究兴趣之一。
 
 [13\. Semidefinite optimization and convex algebraic geometry](http://www.mit.edu/~parrilo/sdocag/SIAMBookFinalvNov12-2012.pdf)
 
@@ -112,11 +114,11 @@ BOOKMARKS IN FAVORITES FOLDER
 
 在一路的运筹学习道路上遇到了很多研究兴趣相近或很有意思的主题，这部分的收藏主要关注这些学者的研究和兴趣。 <br>
 
-[00. R. Tyrrell Rockafellar](https://sites.math.washington.edu/~rtr/mypage.html) 凸优化和变量分析的作者，这是其个人主页，
+[00. R. Tyrrell Rockafellar](https://sites.math.washington.edu/~rtr/mypage.html) 凸优化和变分分析的作者，这是其个人主页，老爷子的针对初学者的几个视频应该对凸优化和变分分析有兴趣的学者有价值。将其放到00是因为其对运筹的印象和贡献。
 
-[01. Sven Koenig](http://idm-lab.org/)
+[01. Sven Koenig](http://idm-lab.org/) 研究MAPF问题的南加州课题组，对路径规划感兴趣的学者一定不陌生。
 
-[02. Chase Murray](https://www.chasemurray.com/)
+[02. Chase Murray](https://www.chasemurray.com/) 研究联合无人机配送系统的开山作者。论文很多方法论仍然很有启发，用数学规划比较早期的建立了模型并进行了求解。
 
 [03. Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3)
 
