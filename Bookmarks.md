@@ -33,6 +33,7 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ![Operations Research Books(Highly recommended)](_media/4books.png)
 
+---
 
 <a href="https://archive.org/details/introductiontoli0000bert/page/n9/mode/2up" target="_blank">01\. Introduction to Linear Optimization; Bertsimas, Dimitris, and John N. Tsitsiklis. Vol. 6. Belmont, MA: Athena Scientific, 1997. </a> 推荐指数：★★★★★ 难度：★★★  这本书可以在线借阅。
 
@@ -42,19 +43,19 @@ BOOKMARKS IN FAVORITES FOLDER
 
 [04\. Numerical Optimization; Jorge Nocedal 01 Google, Stephen Wright, 2006](https://www.csie.ntu.edu.tw/~r97002/temp/num_optimization.pdf) 推荐指数：★★★ 难度：★★★★
 
+---
+
 [05\. Integer and Combinatorial Optimization; Laurence A. Wolsey , George L. Nemhauser, 1999](https://www.pdfdrive.com/integer-and-combinatorial-optimization-d175219871.html)推荐指数：★★★★ 难度：★★★★★
-
-
 
 [06\. Lectures on Convex Optimization; Yurii Nesterov; 2018 Edition](https://link.springer.com/book/10.1007/978-3-319-91578-4)推荐指数：★★★★ 难度：★★★★
 
-[07\. Robust Optimization](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)
+[07\. Robust Optimization(鲁棒优化); Ben-Tal, Aharon, Laurent El Ghaoui, and Arkadi Nemirovski. 2009](https://www2.isye.gatech.edu/~nemirovs/FullBookDec11.pdf)推荐指数：★★ 难度：★★★★ 
 
-[08\. Network Flows Theory Algorithms and Applications](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf)
+[08\. Network Flows Theory Algorithms and Applications; Ravindra Ahuja , Thomas Magnanti , James Orlin ](http://yalma.fime.uanl.mx/~roger/work/teaching/class_NetworkFlowProgramming/books/network%20flows-Ahuja.pdf) 推荐指数：★★★ 难度：★★★★
 
-[09\. Introduction to Online Convex Optimization](https://arxiv.org/abs/1909.05207)
+[09\. Introduction to Online Convex Optimization(在线凸优化导论); Hazan, Elad. 2019](https://arxiv.org/abs/1909.05207) 推荐指数：★★★★★ 难度：★★★★
 
-[10\. Lectures on Modern Convex Optimization](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)
+[10\. Lectures on Modern Convex Optimization(现代凸优化讲义); Aharon Ben-Tal , Arkadi Nemirovski ](https://www2.isye.gatech.edu/~nemirovs/LMCOBookSIAM.pdf)推荐指数：★ 难度：★★★★★
 
 [11\. Lectures on Stochestic Programming: modeling and theory](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf)
 
@@ -108,6 +109,10 @@ BOOKMARKS IN FAVORITES FOLDER
 ---
 
 ####   2 Scholars
+
+在一路的运筹学习道路上遇到了很多研究兴趣相近或很有意思的主题，这部分的收藏主要关注这些学者的研究和兴趣。 <br>
+
+[00. R. Tyrrell Rockafellar](https://sites.math.washington.edu/~rtr/mypage.html) 凸优化和变量分析的作者，这是其个人主页，
 
 [01. Sven Koenig](http://idm-lab.org/)
 
