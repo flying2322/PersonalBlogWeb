@@ -59,7 +59,7 @@ BOOKMARKS IN FAVORITES FOLDER
 
 ---
 
-[11\. Lectures on Stochestic Programming: modeling and theory(随机规划讲义); Alexander Shapiro , Darinka Dentcheva , Andrzej Ruszczynski ](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf) 推荐指数：★★★ 难度：★★★★★ 覃含章在推荐词中提到这是随机优化届的扛鼎之作。
+[11\. Lectures on Stochestic Programming: modeling and theory(随机规划讲义); Alexander Shapiro , Darinka Dentcheva , Andrzej Ruszczynski ](https://cpn-us-w2.wpmucdn.com/sites.gatech.edu/dist/4/1470/files/2021/03/SPbook.pdf) 推荐指数：★★★ 难度：★★★★★ 随机优化界的扛鼎之作。
 
 [12\. Finite-dimentional variational inequalities and complementarity problems](https://www.gbv.de/dms/ilmenau/toc/362594643.PDF) 推荐词中提到了何炳生老师的研究，其中ADMM（The Alternating direction method of multipliers乘子交替方向法)是何老师的主要研究兴趣之一。
 
@@ -120,17 +120,17 @@ BOOKMARKS IN FAVORITES FOLDER
 
 [02. Chase Murray](https://www.chasemurray.com/) 研究联合无人机配送系统的开山作者。论文很多方法论仍然很有启发，用数学规划比较早期的建立了模型并进行了求解。
 
-[03. Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3)
+[03. Jimmy S. Ren 任思捷](http://www.jimmyren.com/index.html#t3) 深研院人工智能实践课的校外指导老师。
 
-[04. Google Scholar - Louis-Martin Rousseau](https://scholar.google.com/citations?user=DVZF0PIAAAAJ&hl=en&oi=ao)
+[04. Google Scholar - Louis-Martin Rousseau](https://scholar.google.com/citations?user=DVZF0PIAAAAJ&hl=en&oi=ao) 蒙特利尔OR教授Martin
 
-[05. Rousseau, Louis-Martin](https://www.polymtl.ca/expertises/en/rousseau-louis-martin)
+[05. Rousseau, Louis-Martin](https://www.polymtl.ca/expertises/en/rousseau-louis-martin) 校内网教授主页
 
-[06. Google Scholar - Chun Cheng](https://scholar.google.com/citations?user=tyHyCW4AAAAJ&hl=en&oi=ao)
+[06. Google Scholar - Chun Cheng](https://scholar.google.com/citations?user=tyHyCW4AAAAJ&hl=en&oi=ao) 鲁棒优化
 
-[07. Githubio - Chun Cheng](https://sites.google.com/site/chun123cheng/home)
+[07. Githubio - Chun Cheng](https://sites.google.com/site/chun123cheng/home) 个人网站
 
-[08. Liu Changchun](http://orcid.org/0000-0002-3269-5009)
+[08. Liu Changchun](http://orcid.org/0000-0002-3269-5009) 
 
 [09. Yutong’s website](https://yutongli.me/)
 
