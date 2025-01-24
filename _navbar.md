@@ -1,11 +1,11 @@
 - 1 EDO
-  - [**01 👀**](https://limestart.cn/)
-  - [**02 🪽**](https://translate.google.com/)
-  - [**03 📫**](https://mail.google.com/mail/u/0/#inbox)
-  - [**04 💬**](https://chat.openai.com/chat)
-  - [**05 🙈**](https://www.google.com/)
-  - [**06 🍎☁**](https://www.icloud.com/calendar/)
-  - [**07 🕊**](https://b7ofrxge0k.feishu.cn/drive/home/)
+  - [**01 👀limestart**](https://limestart.cn/)
+  - [**02 🪽ggtrans**](https://translate.google.com/)
+  - [**03 📫gmail**](https://mail.google.com/mail/u/0/#inbox)
+  - [**04 💬chatGPT**](https://chat.openai.com/chat)
+  - [**05 🙈google**](https://www.google.com/)
+  - [**06 🍎Calender**](https://www.icloud.com/calendar/)
+  - [**07 🕊Lark**](https://b7ofrxge0k.feishu.cn/drive/home/)
 
 - 2 ENG
   - [**01 📰**](https://news.google.com/home?hl=en-US&gl=US&ceid=US:en)
