@@ -31,8 +31,8 @@
 
   Inspired by the personal knowledeg project of CodeSheep. And you can check the r2coding content [here](./r2coding.md)
 
+---
 
-TEST PDF insert: 
 <!-- <embed src="files/building-a-second-brain-a-proven-method-to-organize-your-digital-life-and-unlock-your-creative-potential-1982167386-9781982167387_compress.pdf" width="600" height="400" type="application/pdf"> -->
 
 

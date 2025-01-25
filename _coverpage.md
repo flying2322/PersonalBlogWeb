@@ -9,12 +9,12 @@
 <!-- <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" alt="selfie.png" width="10%" height="10%"> -->
 
 
-- Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Chinese name is Li Wenpeng(李文鹏). Born(90s) and raised in China. Now work and live in Hoofddorp, AMS, Netherlands. 
-- Language: English, Chinese(Mandarin and Henan dialect), Dutch(Learning), and German(Learned for 1 year). 
+- Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Chinese name is Li Wenpeng(李文鹏). Born(90s) and raised in China. 
 - Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, traveling, photography and vlogging. 
 
 ## Life is simple.You make choices and you don't look back.  --Fast and Furious
 
+---
 
 [**LinkMe**](https://flying2322.github.io/dominicli.github.io/)
 [**KnowledgeRepo**](README.md)
