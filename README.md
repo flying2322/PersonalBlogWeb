@@ -19,7 +19,7 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-**# 1. Why write mainly in English?**
+**1. Why write mainly in English?**
 <br> 
 Let’s keep it real—I’m a little lazy when it comes to switching input methods! But honestly, there’s a more practical reason too: when I want to jot down thoughts (especially tech-related ones), so many keywords or terms only feel natural in English. Writing in English lets me skip the hassle of translating back and forth, so I can just focus on getting my ideas down easily.  
 <br> 
