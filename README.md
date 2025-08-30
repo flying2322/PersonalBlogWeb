@@ -11,7 +11,7 @@
   <a href="https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Wenpeng Li-blue.svg"></a>
   <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
   <a href="" target="_blank">
-    <img src="https://img.shields.io/badge/WeChat-dominicli316-green.svg" alt="微信联系">
+    <img src="domilicli.bio" alt="微信联系">
   </a>
 </p>
 
@@ -19,7 +19,7 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
+As an OR algorithm engineer, life for me is always something magic. For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
 
 - When I’m not deep in data or model tuning, you’ll probably find me immersed in one of these:
 
@@ -30,7 +30,7 @@ For me, work is all about turning complex optimization problems into actionable 
   - This blog is where I’ll share bits of my journey—from tech insights and project takeaways to travel diaries and hobby musings. Thanks again for stopping by, and feel free to reach out if you want to connect!
 
 
-
+<br><br><br> 
 
 
 
