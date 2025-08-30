@@ -11,7 +11,7 @@
   <a href="https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Wenpeng Li-blue.svg"></a>
   <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
   <a href="" target="_blank">
-    <img src="domilicli.bio" alt="微信联系">
+    <img src="https://domilicli.bio" alt="微信联系">
   </a>
 </p>
 
@@ -19,7 +19,17 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-As an OR algorithm engineer, life for me is always something magic. For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
+1. Why mainly by English?
+I'm lazy. I don't like input method switch. Frankly speaking it's not easy for someone who wanna write something only by Chinese, for there always some Keywords or Terms only have English version. So for me, I can just note whereever in English for a easy writing.
+
+2. What's your attitude about OR?
+Operations Research is a sub-branch of Applied Mathmematics. I love math and Engineering, I think there is a room for Math be applied in our real life. and Operations Research is just the one that fully suits my love.
+
+3. What's your idea about Open World?
+I object the info walls anywhere in the world.
+
+4. Oh, my friend, tell us more about your work or attitude to life, pls.
+For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
 
 - When I’m not deep in data or model tuning, you’ll probably find me immersed in one of these:
 
