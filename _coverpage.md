@@ -11,10 +11,24 @@
 
 - So happy that you found me here ~~~~ Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Live in Shenzhen, China. You can reach me from dominicli.bio
 
-- Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, traveling, photography and vlogging. 🚗 🎮 🎬 🚴🏻‍♂️ 🏄🏻 🛼 🏓 🍜 🍏 🥝 
+- Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, Traveling, Photography and Vlogging. 
+
+- 🚗 🎮 🎬 
 -  
+- 🚴🏻‍♂️ 🏄🏻 🛼
 -
--
+- 🏓 🍜 🍏
+
+
+
+
+
+
+
+
+
+
+
 
 ## Life is simple.You make choices and you don't look back.  --Fast and Furious
 
