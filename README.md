@@ -19,29 +19,31 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-**1. Why mainly by English?**
+**# 1. Why write mainly in English?**
 <br> 
-- I'm lazy. I don't like input method switch. Frankly speaking it's not easy for someone who wanna write something only by Chinese, for there always some Keywords or Terms only have English version. So for me, I can just note whereever in English for a easy writing.
+Let’s keep it real—I’m a little lazy when it comes to switching input methods! But honestly, there’s a more practical reason too: when I want to jot down thoughts (especially tech-related ones), so many keywords or terms only feel natural in English. Writing in English lets me skip the hassle of translating back and forth, so I can just focus on getting my ideas down easily.  
 <br> 
-**2. What's your attitude about OR?**
-<br> 
-- Operations Research is a sub-branch of Applied Mathmematics. I love math and Engineering, I think there is a room for Math be applied in our real life. and Operations Research is just the one that fully suits my love.
-<br> 
-**3. What's your idea about Open World?**
-<br> 
-- I object the info walls anywhere in the world.
-<br> 
-**4. Oh, my friend, tell us more about your work or attitude to life, pls.**
-<br> 
-- For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
 
-- When I’m not deep in data or model tuning, you’ll probably find me immersed in one of these:
-
-  - Geeking out over the latest tech products (I can spend hours dissecting a new gadget’s design or functionality);
-  Diving into immersive worlds—whether it’s climbing rooftops in Assassin’s Creed, teaming up for a match in League of Legends, or revisiting classics like the Fast and Furious franchise or The Godfather series (yes, I’ve rewatched the latter more times than I’d admit publicly);<br> 
-  - Chasing moments outside the screen: I love traveling to off-the-beaten-path spots, capturing stories with my camera through photography, and turning those adventures into short snippets via vlogging (still learning, but having a blast with it!).
+**2. What’s your take on Operations Research (OR)?**  
 <br> 
-  - This blog is where I’ll share bits of my journey—from tech insights and project takeaways to travel diaries and hobby musings. Thanks again for stopping by, and feel free to reach out if you want to connect!
+To me, OR is basically a super cool subfield of applied math—one that lets me blend two things I love: math and engineering. I’ve always thought math shouldn’t just live in textbooks; it should *do* something in real life. And that’s exactly what OR is for! It takes those tricky optimization problems we face daily and turns them into solutions that actually work. It’s like the perfect sweet spot for my interests.  
+<br> 
+
+**3. What do you think about the “Open World” (of information)?**
+<br> 
+I’m totally against information walls—anywhere in the world. Ideas, knowledge, and stories are meant to flow freely, right? When there are barriers keeping people from accessing or sharing info, we all miss out. I’d much rather live in a space where curiosity doesn’t hit a wall.  
+<br> 
+
+**4. Hey friend, tell us more about your work or life mindset!**  
+<br> 
+For work: My days are mostly about turning messy, complex optimization problems into solutions that people can actually use. But I’m just as excited to step out of that “algorithm bubble” for real, laid-back chats. If you’re in Shenzhen (even just passing through!), I’d love to grab a coffee—no stuffy agendas, just rambling about tech, life, or whatever’s on your mind.  
+
+When I’m not buried in data or tweaking models? You’ll find me geeking out over one of these:  
+- Obsessing over the latest tech gadgets (I’ve definitely lost hours picking apart a new device’s design or how it works);  
+- Getting lost in fictional worlds—climbing rooftops in *Assassin’s Creed*, teaming up for a *League of Legends* match, or rewatching classics like *Fast and Furious* (for the 100th time) or *The Godfather* (don’t judge how many times I’ve replayed those scenes);  
+- Chasing real-life adventures: I love traveling to spots that aren’t on every tourist list, snapping photos to capture little moments, or messing around with vlogging (I’m still learning, but it’s so much fun).  
+
+This blog’s where I’ll share bits of all that—tech takeaways from projects, travel stories, random hobby thoughts, and everything in between. Thanks for stopping by, and if you ever want to chat or connect, just holler!
 
 
 <br><br><br> 
