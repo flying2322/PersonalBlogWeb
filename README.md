@@ -10,9 +10,9 @@
   <a href="https://blog.csdn.net/weixin_43464653?type=blog" target="_blank"><img src="https://img.shields.io/badge/CSDN-熊猫鹏_梓潼-yellow"></a>
   <a href="https://www.linkedin.com/feed/?trk=guest_homepage-basic_nav-header-signin" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Wenpeng Li-blue.svg"></a>
   <a href="https://space.bilibili.com/13180854" target="_blank"><img src="https://img.shields.io/badge/bilibili-哔哩哔哩-critical"></a>
-  <a href="" target="_blank">
+  <!-- <a href="" target="_blank">
     <img src="https://domilicli.bio" alt="微信联系">
-  </a>
+  </a> -->
 </p>
 
 ---
