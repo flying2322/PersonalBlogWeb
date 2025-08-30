@@ -9,25 +9,23 @@
 <!-- <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" alt="selfie.png" width="10%" height="10%"> -->
 
 - Hello, I’m **Dominic Li** 👋
+
+<br><br><br> 
 - So glad our paths crossed here—thanks for pausing to say hi!
 
-- I’m an Operations Research Algorithm Engineer based in the dynamic city of Shenzhen, China. 
+- I’m an Operations Research Algorithm Engineer based in the dynamic city of Shenzhen, China. -Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, Traveling, Photography and Vlogging.
+
+- 🚗 🎮 🎬 🚴🏻‍♂️ 🏄🏻 🛼 🏓 🍜 🍏
 
 
-- 🚗 🎮 🎬 
--  
-- 🚴🏻‍♂️ 🏄🏻 🛼
--
-- 🏓 🍜 🍏
 
-<br><br><br> 
 
 
 
 <br><br><br> 
 
 
-
+<br><br><br> 
 
 
 
