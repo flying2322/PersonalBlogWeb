@@ -36,6 +36,7 @@
 <!-- <embed src="files/building-a-second-brain-a-proven-method-to-organize-your-digital-life-and-unlock-your-creative-potential-1982167386-9781982167387_compress.pdf" width="600" height="400" type="application/pdf"> -->
 
 
+
 这是一个开源的个人知识网站，主要目的是用来整理公开的笔记和PDF文档，使记录和阅读更方便。
 相当于我的第二大脑，希望这个网站实现的功能有：
 # 1. 🔗 PDF阅读直接阅读

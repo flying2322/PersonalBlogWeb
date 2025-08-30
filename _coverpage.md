@@ -9,13 +9,8 @@
 <!-- <img src="https://s2.loli.net/2024/05/07/CqXjK9WdtsbEegv.jpg" alt="selfie.png" width="10%" height="10%"> -->
 
 
-- Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Chinese name is Li Wenpeng(李文鹏). Born and raised in China. Nice to meet you and sooooo nice to show you something wonderful here.
-- Places of Visited: Singapore, Hong Kong, Macau, Netherlands, Belgium, Gemany, France, Spain, United Kingdom, Denmark, Sweden, Norway, Switzerland, Italy, Vatican, Egypt, Czech Republic, Slovakia, Austria, Hungary, Serbia, Bulgaria, Turkey, Georgia, Russia, Monguria ...
-  - 🇸🇬 🇭🇰 🇲🇴 🇳🇱 🇧🇬
-  - 🇩🇪 🇫🇷 🇪🇸 🇬🇧 🇩🇰 
-  - 🇸🇪 🇳🇴 🇨🇭 🇮🇹 🇻🇦 
-  - 🇪🇬 🇨🇿 🇸🇰 🇦🇹 🇭🇺
-  - 🇷🇸 🇧🇬 🇹🇷 🇬🇪 🇷🇺 🇲🇳
+- So happy that you found me here ~~~~ Hi, This is **Dominic Li** , an algorithm engineer of Operations Research. Live in Shenzhen, China. You can reach me from dominicli.bio
+
 - Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, traveling, photography and vlogging. 🚗 🎮 🎬 🚴🏻‍♂️ 🏄🏻 🛼 🏓 🍜 🍏 🥝 
 -  
 -
