@@ -19,24 +19,28 @@
 # **0. INTRO. OF THIS WEBSITE**
 ---
 
-1. Why mainly by English?
-I'm lazy. I don't like input method switch. Frankly speaking it's not easy for someone who wanna write something only by Chinese, for there always some Keywords or Terms only have English version. So for me, I can just note whereever in English for a easy writing.
-
-2. What's your attitude about OR?
-Operations Research is a sub-branch of Applied Mathmematics. I love math and Engineering, I think there is a room for Math be applied in our real life. and Operations Research is just the one that fully suits my love.
-
-3. What's your idea about Open World?
-I object the info walls anywhere in the world.
-
-4. Oh, my friend, tell us more about your work or attitude to life, pls.
-For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
+**1. Why mainly by English?**
+<br> 
+- I'm lazy. I don't like input method switch. Frankly speaking it's not easy for someone who wanna write something only by Chinese, for there always some Keywords or Terms only have English version. So for me, I can just note whereever in English for a easy writing.
+<br> 
+**2. What's your attitude about OR?**
+<br> 
+- Operations Research is a sub-branch of Applied Mathmematics. I love math and Engineering, I think there is a room for Math be applied in our real life. and Operations Research is just the one that fully suits my love.
+<br> 
+**3. What's your idea about Open World?**
+<br> 
+- I object the info walls anywhere in the world.
+<br> 
+**4. Oh, my friend, tell us more about your work or attitude to life, pls.**
+<br> 
+- For me, work is all about turning complex optimization problems into actionable solutions, but I’m just as eager to step out of the “algorithm zone” for real, casual chats. If you’re in town (or even just passing through), I’d love to grab a coffee, swap thoughts on tech, life, or anything in between—no formal agendas, just good conversation.
 
 - When I’m not deep in data or model tuning, you’ll probably find me immersed in one of these:
 
   - Geeking out over the latest tech products (I can spend hours dissecting a new gadget’s design or functionality);
-  Diving into immersive worlds—whether it’s climbing rooftops in Assassin’s Creed, teaming up for a match in League of Legends, or revisiting classics like the Fast and Furious franchise or The Godfather series (yes, I’ve rewatched the latter more times than I’d admit publicly);
+  Diving into immersive worlds—whether it’s climbing rooftops in Assassin’s Creed, teaming up for a match in League of Legends, or revisiting classics like the Fast and Furious franchise or The Godfather series (yes, I’ve rewatched the latter more times than I’d admit publicly);<br> 
   - Chasing moments outside the screen: I love traveling to off-the-beaten-path spots, capturing stories with my camera through photography, and turning those adventures into short snippets via vlogging (still learning, but having a blast with it!).
-
+<br> 
   - This blog is where I’ll share bits of my journey—from tech insights and project takeaways to travel diaries and hobby musings. Thanks again for stopping by, and feel free to reach out if you want to connect!
 
 
