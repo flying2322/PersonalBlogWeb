@@ -24,8 +24,6 @@
 <br><br><br> 
 
 
-<br><br><br> 
-
 
 
 ## Life is simple.You make choices and you don't look back.  --Fast and Furious
