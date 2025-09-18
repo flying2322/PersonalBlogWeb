@@ -97,3 +97,7 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 # **1. BOOKMARKS**
 This is  all the content in [Microsoft Edge](./Bookmarks.md).
 [Google Chrome](./Boomarks_chrome.md) and [Microsoft edge for work](./bookmarks_hr.md)
+
+
+# **2. TECH NOTES**
+[1.neo vim on window11 and colemak user](./mdnote/neovimTutorial.md)

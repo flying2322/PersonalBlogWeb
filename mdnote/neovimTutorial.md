@@ -1,15 +1,35 @@
 
 Neovim Toturial for truely beginners on win11 and colemak users
 
-# 1. neovim install
-1. SMFT network and PC install for DEV test
+
+As a vim user for a long time, I realized that it's time to move froward and learn the export usage now. the reason that I live Vim-based IDE instead of VS code or Jetbrain all in one are:
+1. Esay to use and trully cutomizable for my usage.
+2. Clean and simple size
+3. Beaultiful and professional
+4. Server embeded editor
+5. Efficient
+
+
+## 1. Neovim install
+Without any ado, let's jump to a truely beginner friendly tutorial at 2025.
+
+### 1. SMFT network and PC install for DEV test
 `winget install neovim`
 
-2. check the path of neovim position
+### 2. check the path of neovim position
 `echo $env:LOCALAPPDATA\nvim`
+
 Reply:  `D:\Users\liwp001\AppData\Local\nvim`
 
-3. create a basic config(init.lua) at `D:\Users\liwp001\AppData\Local\nvim\init.lua`
+### 3. create a basic config(init.lua) 
+
+`mkdir $env:LOCALAPPDATA\nvim`
+
+`notepad $env:LOCALAPPDATA\nvim\init.lua`
+
+`D:\Users\liwp001\AppData\Local\nvim\init.lua`
+
+File details:
 
 ```lua
 -- Basic settings
@@ -116,10 +136,21 @@ require'nvim-treesitter.configs'.setup {
     },
   highlight = { enable = true },
 }
-
 ```
+Save and close it.
+
+## 2. Essential Plugins to Start With
+
+Lazy.nvim → plugin manager
+
+telescope.nvim → fuzzy finder (<leader>ff to find files)
+
+nvim-treesitter → better syntax highlighting
+
+nvim-lspconfig → language server support (intellisense/autocomplete)
 
 
+## 3. Trouble Shooting
 
 
 ===
@@ -128,13 +159,34 @@ Error detected while processing D:\Users\liwp001\AppData\Local\nvim\init.lua:   
 
 ===
 
-# 4. Github repo clone issue
+## 4. Usage Tips for Neovim
+Run `:checkhealth` → diagnose missing dependencies.
+
+Use `:Lazy sync` → install/update plugins.
+
+With LSP:
+
+`gd` → go to definition
+
+`K` → hover docs
+
+`<leader>rn` → rename symbol
+
+Telescope quick start:
+
+`<leader>ff` → find files
+
+`<leader>fg` → live grep
+
+`<leader>fb` → buffers
+
+Github repo clone issue
 If github issue exists:
 `$env:HTTPS_PROXY="http://127.0.0.1:7890"; $env:HTTP_PROXY="http://127.0.0.1:7890"; git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim`
 
 
 
-# 5. Intall GCC(MinGW）
+## 5. Intall GCC(MinGW）
 
 1. Follow the installation on website: https://www.msys2.org/
 ![gcc install success](../img/neovim.png)
@@ -171,7 +223,7 @@ Then we can back to the GCC installation.
 up to now, the gcc installation successfully commpleted.
 
 
-# Finally checking the output of :checkhealth
+## Finally checking the output of :checkhealth
 
 ```\
 ==============================================================================
