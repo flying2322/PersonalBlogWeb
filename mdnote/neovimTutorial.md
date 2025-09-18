@@ -195,10 +195,15 @@ Telescope quick start:
 
 ## 5. Intall GCC(MinGW）
 
-1. Follow the installation on website: https://www.msys2.org/
+### 5.1. Follow the installation guide
+
+on website: https://www.msys2.org/
+
 ![gcc install success](../img/neovim.png)
 
 the follow the procedures:`pacman -S mingw-w64-ucrt-x86_64-gcc`
+
+### 5.2 Trouble shooting for user in mainland China
 
 ![gcc error](../img/gccerror.png)
 
@@ -230,7 +235,9 @@ Then we can back to the GCC installation.
 up to now, the gcc installation successfully commpleted.
 
 
-### Finally checking the output of :checkhealth
+## 6 Finally back to continue our journey
+
+### 6.1 checking the output of :checkhealth
 
 ```\
 ==============================================================================
@@ -419,11 +426,9 @@ Treesitter parsers ~
 - ✅ OK Parser: vimdoc                    ABI: 15, path: C:\Program Files\Neovim\lib\nvim\parser\vimdoc.dll
 - ✅ OK Parser: yaml                      ABI: 14, path: D:\Users\liwp001\AppData\Local\nvim-data\lazy\nvim-treesitter\parser\yaml.so
 
-
-
 ```
 
-### Trouble-Shooting
+### 6.2 Trouble-Shooting
 太好了 🎉，你的 Neovim 已经能正常跑了，`:checkhealth` 里显示的那些 **❌/⚠️** 基本都是 *可选依赖*，不影响核心功能。我们逐条看一下：
 
 ---
