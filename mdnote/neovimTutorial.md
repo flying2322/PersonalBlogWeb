@@ -1,27 +1,31 @@
 
 Neovim Toturial for truely beginners on win11 and colemak users
 
+---
 
-As a vim user for a long time, I realized that it's time to move froward and learn the export usage now. the reason that I live Vim-based IDE instead of VS code or Jetbrain all in one are:
-1. Esay to use and trully cutomizable for my usage.
-2. Clean and simple size
-3. Beaultiful and professional
-4. Server embeded editor
-5. Efficient
+As a long-time Vim user, I'm now ready to learn more about its export capabilities. I prefer Vim-based IDEs over VS Code or JetBrains all-in-one solutions because they are:
+
+1. Easy to use and truly customizable to my workflow
+2. Clean, simple, and lightweight
+3. Aesthetically pleasing yet professional
+4. Server-ready (no local installation required)
+5. Highly efficient
 
 
 ## 1. Neovim install
+
 Without any ado, let's jump to a truely beginner friendly tutorial at 2025.
 
-### 1. SMFT network and PC install for DEV test
-`winget install neovim`
+### 1.1 Neovim install on win11
+Administrator authority needed.
+`winget install neovim` 
 
-### 2. check the path of neovim position
+### 1.2 check the path of neovim position
 `echo $env:LOCALAPPDATA\nvim`
 
 Reply:  `D:\Users\liwp001\AppData\Local\nvim`
 
-### 3. create a basic config(init.lua) 
+### 1.3 create a basic config(init.lua) 
 
 `mkdir $env:LOCALAPPDATA\nvim`
 
@@ -159,6 +163,13 @@ Error detected while processing D:\Users\liwp001\AppData\Local\nvim\init.lua:   
 
 ===
 
+Github repo clone issue
+If github issue exists:
+`$env:HTTPS_PROXY="http://127.0.0.1:7890"; $env:HTTP_PROXY="http://127.0.0.1:7890"; git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim`
+
+
+
+
 ## 4. Usage Tips for Neovim
 Run `:checkhealth` → diagnose missing dependencies.
 
@@ -179,10 +190,6 @@ Telescope quick start:
 `<leader>fg` → live grep
 
 `<leader>fb` → buffers
-
-Github repo clone issue
-If github issue exists:
-`$env:HTTPS_PROXY="http://127.0.0.1:7890"; $env:HTTP_PROXY="http://127.0.0.1:7890"; git clone https://github.com/LazyVim/starter $env:LOCALAPPDATA\nvim`
 
 
 
@@ -223,7 +230,7 @@ Then we can back to the GCC installation.
 up to now, the gcc installation successfully commpleted.
 
 
-## Finally checking the output of :checkhealth
+### Finally checking the output of :checkhealth
 
 ```\
 ==============================================================================
@@ -416,12 +423,12 @@ Treesitter parsers ~
 
 ```
 
-## Trouble-Shooting
+### Trouble-Shooting
 太好了 🎉，你的 Neovim 已经能正常跑了，`:checkhealth` 里显示的那些 **❌/⚠️** 基本都是 *可选依赖*，不影响核心功能。我们逐条看一下：
 
 ---
 
-## 🔍 1. `luarocks` 相关
+#### 🔍 1. `luarocks` 相关
 
 ```
 ❌ luarocks not installed
@@ -445,7 +452,7 @@ Treesitter parsers ~
 
 ---
 
-## 🔍 2. Treesitter 警告
+#### 🔍 2. Treesitter 警告
 
 ```
 ⚠️ tree-sitter executable not found
@@ -462,7 +469,7 @@ Treesitter parsers ~
 
 ---
 
-## 🔍 3. Telescope 缺少工具
+#### 🔍 3. Telescope 缺少工具
 
 ```
 ❌ rg not found
@@ -485,7 +492,7 @@ winget install sharkdp.fd
 
 ---
 
-## 🔍 4. Provider 警告
+#### 🔍 4. Provider 警告
 
 ```
 ⚠️ Node.js not found
@@ -511,15 +518,12 @@ winget install sharkdp.fd
 
 ---
 
-## ✅ 总结
+#### ✅ 总结
 
 * **必须解决的**：`rg` 和 `fd`（Telescope 核心功能依赖）。
 * **建议解决的**：安装 Node.js（前端 / LSP 很常用），安装 Python 的 `pynvim`。
 * **可以忽略的**：LuaRocks、Perl、Ruby、tree-sitter 警告。
 
----
-
-要不要我帮你写一份 **Win11 专用的 Neovim 环境安装清单**（包括 `winget`/`scoop` 一键装好 `ripgrep, fd, node, python, zig` 等），这样以后不会再被 `:checkhealth` 的红叉吓到？
 
 
 
