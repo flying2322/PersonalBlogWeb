@@ -12,7 +12,9 @@
 
 - So glad our paths crossed here—thanks for pausing to say hi!
 
-- I’m an Operations Research Algorithm Engineer based in the dynamic city of Shenzhen, China. -Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, Traveling, Photography and Vlogging.
+- I’m an Operations Research Algorithm Engineer based in the dynamic city of Shenzhen, China. 
+
+- Hobbies: Tech-products, Assassinate creed, League of legends, Fast and Furious, Godfather series, Traveling, Photography and Vlogging.
 
 - 🚗 🎮 🎬 🚴🏻‍♂️ 🏄🏻 🛼 🏓 🍜 🍏
 
@@ -26,7 +28,7 @@
 
 ## Life is simple.You make choices and you don't look back.  --Fast and Furious
 
----
+<br><br>
 
 [**LinkMe**](https://dominicli.bio/)
 [**KnowledgeRepo**](README.md)

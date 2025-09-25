@@ -95,9 +95,13 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 
 ---
 # **1. BOOKMARKS**
-This is  all the content in [Microsoft Edge](./Bookmarks.md).
-[Google Chrome](./Boomarks_chrome.md) and [Microsoft edge for work](./bookmarks_hr.md)
+This is  all the content in <br>
+[1.Microsoft Edge](./Bookmarks.md)<br>
+[2.Google Chrome](./Boomarks_chrome.md)<br>
+[3.Microsoft edge for work](./bookmarks_hr.md)<br>
 
 
 # **2. TECH NOTES**
-[1.neo vim on window11 and colemak user](./mdnote/neovimTutorial.md)
+[1.neo vim on window11 and colemak user](./mdnote/neovimTutorial.md)<br>
+[2.Representative allocation of container terminal](./mdnote/bapyap.md)<br>
+[3.Term: hinterland](./mdnote/hinterland.md)<br>
