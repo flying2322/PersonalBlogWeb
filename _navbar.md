@@ -6,6 +6,7 @@
   - [**05 🙈google**](https://www.google.com/)
   - [**06 🍎Calender**](https://www.icloud.com/calendar/)
   - [**07 🕊Lark**](https://b7ofrxge0k.feishu.cn/drive/home/)
+  - [**08 🍎Youtube**](https://www.youtube.com/)
 
 - 2 ENG
   - [**01 📰**](https://news.google.com/home?hl=en-US&gl=US&ceid=US:en)
@@ -26,7 +27,7 @@
 - 6 ED
   - [**01 Notion**](https://www.notion.so/b1e4a95e4b0447efbaa1467b58ae2f32)
   - [**02 Overleaf**](https://www.overleaf.com/project)
-  - [**03 飞书梓潼**](https://b7ofrxge0k.feishu.cn/drive/home/)
+  <!-- - [**03 飞书梓潼**](https://b7ofrxge0k.feishu.cn/drive/home/) -->
 - 7 HR
   - [**01 Gitlab**](https://git.hairoutech.com/users/sign_in)
   - [**02 JIRA**](https://jira.hairoutech.com/secure/Dashboard.jspa)
@@ -35,7 +36,7 @@
   - [**01 RDW**](https://digid.nl/inloggen)
   - [**02 Skyscanner**](https://www.skyscanner.nl/?previousCultureSource=GEO_LOCATION&redirectedFrom=www.skyscanner.net)
   - [**03 SalaryHR**](https://werknemer.loket.nl/#/login?returnUrl=%2Fpersoon)
-- 0 Dev
+<!-- - 0 Dev
   - [**ASCII**](http://www.fly63.com/tool/ascii/)
   - [**Regexr**](https://regexr.com/)
   - [**RegexUI**](https://jex.im/regulex/)
@@ -141,4 +142,4 @@
   - [**Thymeleaf**](https://www.thymeleaf.org/documentation.html)
   - [**Vue.js**](https://cn.vuejs.org/v2/guide/)
   - [**React.js**](https://reactjs.org/docs/getting-started.html)
-  - [**Jenkins**](https://www.jenkins.io/zh/doc/)
+  - [**Jenkins**](https://www.jenkins.io/zh/doc/) -->
