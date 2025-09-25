@@ -31,7 +31,13 @@ To me, OR is basically a super cool subfield of applied math—one that lets me 
 
 **3. What do you think about the “Open World” (of information)?**
 <br> 
-I’m totally against information walls—anywhere in the world. Ideas, knowledge, and stories are meant to flow freely, right? When there are barriers keeping people from accessing or sharing info, we all miss out. I’d much rather live in a space where curiosity doesn’t hit a wall.  
+I’m totally against information walls—anywhere in the world. Ideas, knowledge, and stories are meant to flow freely, right? When there are barriers keeping people from accessing or sharing info, we all miss out. I’d much rather live in a space where curiosity doesn’t hit a wall.
+
+If someone can take responsibility for what they say and do, and they don’t hurt others, then I believe no one else has the right to limit their expression or silence them.
+
+One of the main reasons I created this website was to encompass all the things I wish to share with you. I prefer not to rely on other companies; I trust only my own.
+
+
 <br> 
 
 **4. Hey friend, tell us more about your work or life mindset!**  
@@ -82,26 +88,35 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 
 
 
-  Inspired by the personal knowledeg project of CodeSheep. And you can check the original template websites r2coding content [here](./r2coding.md)
+
 
 ---
 
 <!-- <embed src="files/building-a-second-brain-a-proven-method-to-organize-your-digital-life-and-unlock-your-creative-potential-1982167386-9781982167387_compress.pdf" width="600" height="400" type="application/pdf"> -->
 
-
-
-
-
-
 ---
+
+<br><br><br> 
+
 # **1. BOOKMARKS**
 This is  all the content in <br>
-[1.Microsoft Edge](./Bookmarks.md)<br>
-[2.Google Chrome](./Boomarks_chrome.md)<br>
-[3.Microsoft edge for work](./bookmarks_hr.md)<br>
+[1.Microsoft Edge](./mdnote/Bookmarks.md)<br>
+[2.Google Chrome](./mdnote/Boomarks_chrome.md)<br>
+[3.Microsoft edge for work](./mdnote/bookmarks_hr.md)<br>
+
+<br><br><br> 
 
 
 # **2. TECH NOTES**
 [1.neo vim on window11 and colemak user](./mdnote/neovimTutorial.md)<br>
 [2.Representative allocation of container terminal](./mdnote/bapyap.md)<br>
 [3.Term: hinterland](./mdnote/hinterland.md)<br>
+[4.Hendriks 2009 PhD thesis](./mdnote/001.md)<br>
+
+
+
+
+
+<br><br><br> 
+
+  Inspired by the personal knowledeg project of CodeSheep. And you can check the original template websites r2coding content [here](./r2coding.md)
