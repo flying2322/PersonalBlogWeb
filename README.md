@@ -113,7 +113,7 @@ This is  all the content in <br>
 [3.Term: hinterland](./mdnote/hinterland.md)<br>
 [4.Hendriks 2009 PhD thesis](./mdnote/001.md)<br>
 [5.Solve matrix reverse](./mdnote/revmatrix.md)<br>
-[6.Clash for Ubuntu](./mdnote/Clash for Ubuntu.md)<br>
+[6.Clash for Ubuntu](./mdnote/cla.md)<br>
 
 
 
