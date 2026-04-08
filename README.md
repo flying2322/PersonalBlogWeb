@@ -101,9 +101,10 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 # **1. INDEX**
 This is  all the content in <br>
 [0.**Index to ME everywhere you like**](./mdnote/liwenpeng.md)
-[1.Microsoft Edge](./mdnote/Bookmarks.md)<br>
-[2.Google Chrome](./mdnote/Boomarks_chrome.md)<br>
-[3.Microsoft edge for work](./mdnote/bookmarks_hr.md)<br>
+
+[1.BOOKMARK: Microsoft Edge](./mdnote/Bookmarks.md)<br>
+[2.BOOKMARK: Google Chrome](./mdnote/Boomarks_chrome.md)<br>
+[3.BOOKMARK: Microsoft edge for work](./mdnote/bookmarks_hr.md)<br>
 
 <br><br><br> 
 
