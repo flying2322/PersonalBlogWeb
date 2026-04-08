@@ -100,8 +100,7 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 
 # **1. INDEX**
 This is  all the content in <br>
-[0.**Index to ME everywhere you like**](./mdnote/liwenpeng.md)
-
+[0.Index to ME ](./mdnote/liwenpeng.md)
 [1.BOOKMARK: Microsoft Edge](./mdnote/Bookmarks.md)<br>
 [2.BOOKMARK: Google Chrome](./mdnote/Boomarks_chrome.md)<br>
 [3.BOOKMARK: Microsoft edge for work](./mdnote/bookmarks_hr.md)<br>
@@ -120,341 +119,319 @@ This is  all the content in <br>
 
 # **3. BUCKET LIST**
 
-> *"人总是要死的，但在死之前，我想把想做的事都做一遍。"*
+> *"We are all going to die, but before we do, I want to do everything I've ever wanted to do."*
 > 
-> 这是一份写给自己的人生清单。不为炫耀，只为在迷茫时提醒自己还有多少未竟之事，在懈怠时逼迫自己继续向前。每打上一个勾，就是离完整的自己又近了一步。
+> This is a bucket list written for myself. Not to show off, but to remind myself of how much is left undone when I feel lost, and to push myself forward when I feel slack. Every checkmark is one step closer to the complete version of myself.
 >
-> 标注说明：`[ ]` 未完成 ｜ `[x]` 已完成 ｜ 可在括号内补充完成时间，如 `[x] 2028-05-20`
-
+> Legend: `[ ]` Incomplete ｜ `[x]` Completed ｜ You can add the completion date in brackets, e.g., `[x] 2028-05-20`
 ---
-
-## 一、🌍 环游世界：国家与地区篇
-
-*目标：踏足世界上的每一个国家和地区（持续更新中）*
-
-### 中国（所有省级行政区）
-- [x] 河南：新乡/郑州/洛阳/开封/登封/南阳
-- [x] 北京：海淀/亦庄/大兴
-- [ ] 上海
-- [x] 广东：深圳/广州/珠海/顺德/佛山/中山
-- [x] 香港
-- [x] 澳门
-- [ ] 台湾
-- [ ] 西藏
-- [ ] 新疆
-- [x] 湖南：长沙/衡山
-- [x] 湖北：武汉/十堰
-- [x] 河北：三河/承德
-- [x] 福建：厦门/泉州
-- [x] 广西：桂林/阳朔
-- [x] 甘肃：天水
-- [x] 江西：吉安
-### 亚洲（4/47）
-- [ ] 日本
-- [ ] 韩国
-- [x] 蒙古
-- [ ] 朝鲜
-- [ ] 越南
-- [ ] 老挝
-- [ ] 柬埔寨
-- [ ] 泰国
-- [ ] 缅甸
-- [ ] 马来西亚
-- [x] 新加坡
-- [ ] 印度尼西亚
-- [ ] 菲律宾
-- [ ] 文莱
-- [ ] 东帝汶
-- [ ] 印度
-- [ ] 斯里兰卡
-- [ ] 马尔代夫
-- [ ] 巴基斯坦
-- [ ] 孟加拉国
-- [ ] 尼泊尔
-- [ ] 不丹
-- [ ] 哈萨克斯坦
-- [ ] 乌兹别克斯坦
-- [ ] 吉尔吉斯斯坦
-- [ ] 塔吉克斯坦
-- [ ] 土库曼斯坦
-- [ ] 阿富汗
-- [ ] 伊朗
-- [ ] 伊拉克
-- [ ] 叙利亚
-- [ ] 约旦
-- [ ] 黎巴嫩
-- [ ] 以色列
-- [ ] 巴勒斯坦
-- [ ] 沙特阿拉伯
-- [ ] 也门
-- [ ] 阿曼
-- [ ] 阿联酋
-- [ ] 卡塔尔
-- [ ] 巴林
-- [ ] 科威特
-- [x] 格鲁吉亚
-- [ ] 亚美尼亚
-- [ ] 阿塞拜疆
-- [x] 土耳其
-- [ ] 塞浦路斯
-
-### 欧洲(20/44)
-- [x] 英国
-- [x] 法国
-- [x] 德国
-- [x] 意大利
-- [x] 西班牙
-- [ ] 葡萄牙
-- [x] 荷兰
-- [x] 比利时
-- [x] 卢森堡
-- [x] 瑞士
-- [x] 奥地利
-- [ ] 列支敦士登
-- [ ] 爱尔兰
-- [ ] 冰岛
-- [x] 丹麦
-- [x] 挪威
-- [x] 瑞典
-- [ ] 芬兰
-- [ ] 波兰
-- [x] 捷克
-- [x] 斯洛伐克
-- [x] 匈牙利
-- [ ] 希腊
-- [ ] 克罗地亚
-- [ ] 斯洛文尼亚
-- [ ] 波黑
-- [x] 塞尔维亚
-- [ ] 黑山
-- [ ] 北马其顿
-- [ ] 阿尔巴尼亚
-- [x] 保加利亚
-- [ ] 罗马尼亚
-- [ ] 摩尔多瓦
-- [ ] 乌克兰
-- [ ] 白俄罗斯
-- [ ] 爱沙尼亚
-- [ ] 拉脱维亚
-- [ ] 立陶宛
-- [x] 俄罗斯
-- [ ] 马耳他
-- [ ] 摩纳哥
-- [ ] 安道尔
-- [ ] 圣马力诺
-- [x] 梵蒂冈
-
-### 非洲(1/53)
-- [x] 埃及
-- [ ] 利比亚
-- [ ] 突尼斯
-- [ ] 阿尔及利亚
-- [ ] 摩洛哥
-- [ ] 毛里塔尼亚
-- [ ] 塞内加尔
-- [ ] 冈比亚
-- [ ] 马里
-- [ ] 布基纳法索
-- [ ] 几内亚
-- [ ] 几内亚比绍
-- [ ] 塞拉利昂
-- [ ] 利比里亚
-- [ ] 科特迪瓦
-- [ ] 加纳
-- [ ] 多哥
-- [ ] 贝宁
-- [ ] 尼日尔
-- [ ] 尼日利亚
-- [ ] 乍得
-- [ ] 喀麦隆
-- [ ] 赤道几内亚
-- [ ] 加蓬
-- [ ] 刚果（布）
-- [ ] 刚果（金）
-- [ ] 中非
-- [ ] 圣多美和普林西比
-- [ ] 苏丹
-- [ ] 南苏丹
-- [ ] 埃塞俄比亚
-- [ ] 厄立特里亚
-- [ ] 吉布提
-- [ ] 索马里
-- [ ] 肯尼亚
-- [ ] 乌干达
-- [ ] 坦桑尼亚
-- [ ] 卢旺达
-- [ ] 布隆迪
-- [ ] 莫桑比克
-- [ ] 马达加斯加
-- [ ] 科摩罗
-- [ ] 毛里求斯
-- [ ] 塞舌尔
-- [ ] 安哥拉
-- [ ] 赞比亚
-- [ ] 津巴布韦
-- [ ] 马拉维
-- [ ] 博茨瓦纳
-- [ ] 纳米比亚
-- [ ] 南非
-- [ ] 斯威士兰
-- [ ] 莱索托
-
-### 北美洲(1/23)
-- [x] 美国
-- [ ] 加拿大
-- [ ] 墨西哥
-- [ ] 危地马拉
-- [ ] 伯利兹
-- [ ] 萨尔瓦多
-- [ ] 洪都拉斯
-- [ ] 尼加拉瓜
-- [ ] 哥斯达黎加
-- [ ] 巴拿马
-- [ ] 古巴
-- [ ] 牙买加
-- [ ] 海地
-- [ ] 多米尼加
-- [ ] 巴哈马
-- [ ] 特立尼达和多巴哥
-- [ ] 巴巴多斯
-- [ ] 安提瓜和巴布达
-- [ ] 圣基茨和尼维斯
-- [ ] 多米尼克
-- [ ] 圣卢西亚
-- [ ] 圣文森特和格林纳丁斯
-- [ ] 格林纳达
-
-### 南美洲
-- [ ] 哥伦比亚
-- [ ] 委内瑞拉
-- [ ] 圭亚那
-- [ ] 苏里南
-- [ ] 厄瓜多尔
-- [ ] 秘鲁
-- [ ] 巴西
-- [ ] 玻利维亚
-- [ ] 智利
-- [ ] 阿根廷
-- [ ] 巴拉圭
-- [ ] 乌拉圭
-
-### 大洋洲
-- [ ] 澳大利亚
-- [ ] 新西兰
-- [ ] 巴布亚新几内亚
-- [ ] 斐济
-- [ ] 萨摩亚
-- [ ] 汤加
-- [ ] 瓦努阿图
-- [ ] 所罗门群岛
-- [ ] 基里巴斯
-- [ ] 图瓦卢
-- [ ] 瑙鲁
-- [ ] 帕劳
-- [ ] 马绍尔群岛
-- [ ] 密克罗尼西亚联邦
-
+## I. 🌍 Travel the World: Countries & Regions
+*Goal: Set foot in every country and region in the world (Continuously updating)*
+### China (All Provincial-Level Administrative Regions)
+- [x] Henan: Xinxiang/Zhengzhou/Luoyang/Kaifeng/Dengfeng/Nanyang
+- [x] Beijing: Haidian/Yizhuang/Daxing
+- [ ] Tianjin: Hohai University, Tianjin University, Nankai University, Italian Style Town
+- [ ] Shanghai: Oriental Pearl Tower
+- [x] Guangdong: Shenzhen/Guangzhou/Zhuhai/Shunde/Foshan/Zhongshan
+- [x] Hong Kong: Victoria Harbour
+- [x] Macau: University of Macau
+- [ ] Taiwan: Taipei 101, Sun Moon Lake, National Tsing Hua University (Hsinchu), City God Temple
+- [ ] Tibet: Potala Palace/Nyingchi
+- [ ] Xinjiang: Westernmost Point of China, Tianshan Mountains, Kunlun Mountains, Kashgar, Urumqi, Altay
+- [x] Hunan: Changsha/Mount Heng
+- [x] Hubei: Wuhan/Shiyan
+- [x] Hebei: Sanhe/Chengde
+- [x] Fujian: Xiamen/Quanzhou
+- [x] Guangxi: Guilin/Yangshuo
+- [x] Gansu: Tianshui
+- [x] Jiangxi: Ji'an
+- [ ] Shandong: Mount Tai, Qingdao, Weihai
+- [x] Jiangsu: Nanjing
+- [ ] Hebei: Shijiazhuang/Xingtai/Baoding/Langfang
+- [ ] Shanxi: Yungang Grottoes (Datong), Zhaozhou Bridge
+- [ ] Shaanxi: Xi'an, Terracotta Warriors/Huaqing Pool/Xianyang/Bell and Drum Towers
+### Asia (4/47)
+- [ ] Japan
+- [ ] South Korea
+- [x] Mongolia
+- [ ] North Korea
+- [ ] Vietnam
+- [ ] Laos
+- [ ] Cambodia
+- [ ] Thailand
+- [ ] Myanmar
+- [ ] Malaysia
+- [x] Singapore
+- [ ] Indonesia
+- [ ] Philippines
+- [ ] Brunei
+- [ ] Timor-Leste
+- [ ] India
+- [ ] Sri Lanka
+- [ ] Maldives
+- [ ] Pakistan
+- [ ] Bangladesh
+- [ ] Nepal
+- [ ] Bhutan
+- [ ] Kazakhstan
+- [ ] Uzbekistan
+- [ ] Kyrgyzstan
+- [ ] Tajikistan
+- [ ] Turkmenistan
+- [ ] Afghanistan
+- [ ] Iran
+- [ ] Iraq
+- [ ] Syria
+- [ ] Jordan
+- [ ] Lebanon
+- [ ] Israel
+- [ ] Palestine
+- [ ] Saudi Arabia
+- [ ] Yemen
+- [ ] Oman
+- [ ] United Arab Emirates
+- [ ] Qatar
+- [ ] Bahrain
+- [ ] Kuwait
+- [x] Georgia
+- [ ] Armenia
+- [ ] Azerbaijan
+- [x] Turkey
+- [ ] Cyprus
+### Europe (20/44)
+- [x] United Kingdom
+- [x] France
+- [x] Germany
+- [x] Italy
+- [x] Spain
+- [ ] Portugal
+- [x] Netherlands
+- [x] Belgium
+- [x] Luxembourg
+- [x] Switzerland
+- [x] Austria
+- [ ] Liechtenstein
+- [ ] Ireland
+- [ ] Iceland
+- [x] Denmark
+- [x] Norway
+- [x] Sweden
+- [ ] Finland
+- [ ] Poland
+- [x] Czech Republic
+- [x] Slovakia
+- [x] Hungary
+- [ ] Greece
+- [ ] Croatia
+- [ ] Slovenia
+- [ ] Bosnia and Herzegovina
+- [x] Serbia
+- [ ] Montenegro
+- [ ] North Macedonia
+- [ ] Albania
+- [x] Bulgaria
+- [ ] Romania
+- [ ] Moldova
+- [ ] Ukraine
+- [ ] Belarus
+- [ ] Estonia
+- [ ] Latvia
+- [ ] Lithuania
+- [x] Russia
+- [ ] Malta
+- [ ] Monaco
+- [ ] Andorra
+- [ ] San Marino
+- [x] Vatican City
+### Africa (1/53)
+- [x] Egypt
+- [ ] Libya
+- [ ] Tunisia
+- [ ] Algeria
+- [ ] Morocco
+- [ ] Mauritania
+- [ ] Senegal
+- [ ] Gambia
+- [ ] Mali
+- [ ] Burkina Faso
+- [ ] Guinea
+- [ ] Guinea-Bissau
+- [ ] Sierra Leone
+- [ ] Liberia
+- [ ] Ivory Coast
+- [ ] Ghana
+- [ ] Togo
+- [ ] Benin
+- [ ] Niger
+- [ ] Nigeria
+- [ ] Chad
+- [ ] Cameroon
+- [ ] Equatorial Guinea
+- [ ] Gabon
+- [ ] Congo (Brazzaville)
+- [ ] Congo (Kinshasa)
+- [ ] Central African Republic
+- [ ] São Tomé and Príncipe
+- [ ] Sudan
+- [ ] South Sudan
+- [ ] Ethiopia
+- [ ] Eritrea
+- [ ] Djibouti
+- [ ] Somalia
+- [ ] Kenya
+- [ ] Uganda
+- [ ] Tanzania
+- [ ] Rwanda
+- [ ] Burundi
+- [ ] Mozambique
+- [ ] Madagascar
+- [ ] Comoros
+- [ ] Mauritius
+- [ ] Seychelles
+- [ ] Angola
+- [ ] Zambia
+- [ ] Zimbabwe
+- [ ] Malawi
+- [ ] Botswana
+- [ ] Namibia
+- [ ] South Africa
+- [ ] Eswatini
+- [ ] Lesotho
+### North America (1/23)
+- [x] United States (Mar 2026): San Francisco
+- [ ] Canada
+- [ ] Mexico
+- [ ] Guatemala
+- [ ] Belize
+- [ ] El Salvador
+- [ ] Honduras
+- [ ] Nicaragua
+- [ ] Costa Rica
+- [ ] Panama
+- [ ] Cuba
+- [ ] Jamaica
+- [ ] Haiti
+- [ ] Dominican Republic
+- [ ] Bahamas
+- [ ] Trinidad and Tobago
+- [ ] Barbados
+- [ ] Antigua and Barbuda
+- [ ] Saint Kitts and Nevis
+- [ ] Dominica
+- [ ] Saint Lucia
+- [ ] Saint Vincent and the Grenadines
+- [ ] Grenada
+### South America
+- [ ] Colombia
+- [ ] Venezuela
+- [ ] Guyana
+- [ ] Suriname
+- [ ] Ecuador
+- [ ] Peru
+- [ ] Brazil
+- [ ] Bolivia
+- [ ] Chile
+- [ ] Argentina
+- [ ] Paraguay
+- [ ] Uruguay
+### Oceania
+- [ ] Australia
+- [ ] New Zealand
+- [ ] Papua New Guinea
+- [ ] Fiji
+- [ ] Samoa
+- [ ] Tonga
+- [ ] Vanuatu
+- [ ] Solomon Islands
+- [ ] Kiribati
+- [ ] Tuvalu
+- [ ] Nauru
+- [ ] Palau
+- [ ] Marshall Islands
+- [ ] Federated States of Micronesia
 ---
-
-## 二、✍️ 创作与表达篇
-
-- [ ] 出版一本旅行书：自驾经历和人文交流记录
-- [ ] 出版一本小说
-- [ ] 出版一本技术书籍
-- [ ] 写一首歌词并被正式演唱/发行(借助AI)
-- [ ] 拍摄一部完整的纪录片
-- [x] 在国家级/国际级期刊发表一篇学术论文
-- [ ] 写一封给50年后自己的信并密封保存
-- [ ] 完成一个拥有超过10万字的个人博客体系
-- [ ] 做一次TED或类似级别的公开演讲
-
+## II. ✍️ Creation & Expression
+- [ ] Publish a travel book: Road trip experiences and cultural exchange records
+- [ ] Publish a novel
+- [ ] Publish a technical book
+- [ ] Write lyrics that get officially performed/released (with the help of AI)
+- [ ] Shoot a complete documentary film
+- [x] Publish an academic paper in a national/international journal
+- [ ] Write a letter to myself 50 years from now and seal it
+- [ ] Build a personal blog system with over 100,000 words
+- [ ] Give a TED or equivalent level public speech
 ---
-
-## 三、💼 事业与商业篇
-
-- [x] 成立一家属于自己的公司
-- [ ] 把公司做到上市（IPO）
-- [ ] 创造 10,000 个就业岗位
-- [ ] 打造一款日活用户超过 100 万的产品
-- [ ] 完成一次成功的跨国并购
-- [ ] 公司年营收突破 10 亿
-- [ ] 个人净资产达到 1 亿
-- [ ] 建立一个持续盈利的被动收入体系
-- [ ] 投资并扶持至少 10 家初创公司
-- [ ] 在一次重大的商业谈判中力挽狂澜
-
+## III. 💼 Career & Business
+- [x] Start my own company
+- [ ] Take the company public (IPO)
+- [ ] Create 10,000 jobs
+- [ ] Build a product with over 1 million Daily Active Users (DAU)
+- [ ] Complete a successful cross-border M&A
+- [ ] Reach an annual company revenue of 1 billion
+- [ ] Reach a personal net worth of 100 million
+- [ ] Build a continuously profitable passive income system
+- [ ] Invest in and support at least 10 startups
+- [ ] Turn the tide in a major business negotiation
 ---
-
-## 四、🧗 极限与体验篇
-
-- [ ] 跳伞（至少 5000 米高空）
-- [ ] 蹦极
-- [ ] 潜水（考取 PADI AOW 及以上证书）
-- [ ] 完成一次全程马拉松（42.195km）
-- [ ] 登顶一座海拔 7000 米以上的雪山
-- [ ] 驾驶帆船完成一次远航
-- [ ] 学会开直升机或小型飞机
-- [ ] 在零下 30 度的环境露营一晚
-- [ ] 徒步完成一条国际长距离步道（如 ATP、PCT 等）
-- [ ] 参加一次铁人三项比赛
-
+## IV. 🧗 Extreme & Experiences
+- [ ] Skydive (from at least 5,000 meters)
+- [ ] Bungee jump
+- [ ] Scuba dive (obtain PADI AOW or above certification)
+- [ ] Complete a full marathon (42.195km)
+- [ ] Summit a snow mountain over 7,000 meters in altitude
+- [ ] Sail a yacht on a long voyage
+- [ ] Learn to fly a helicopter or a light aircraft
+- [ ] Camp overnight in an environment of -30°C
+- [ ] Hike an international long-distance trail (e.g., AT, PCT, etc.)
+- [ ] Participate in a triathlon
 ---
-
-## 五、🎓 学习与技能篇
-
-- [ ] 熟练掌握 5 门以上外语（达到流利对话水平）
-    - [x] 英语
-    - [ ] 日语
-    - [ ] 法语
-    - [ ] 西班牙语
-    - [ ] 阿拉伯语
-    - [ ] 俄语
-    - [ ] 德语
-- [ ] 掌握一种乐器并达到可以登台演出的水平
-- [ ] 拿到一张飞行员执照（PPL）
-- [ ] 学会至少 5 道足以拿得出手的国宴级硬菜
-- [ ] 掌握一种武术并拿到黑带/高段位
-- [ ] 能够独立完成一辆汽车的发动机大修
-- [ ] 学会冲浪并能在浪高 1 米以上的海面持续站立
-- [ ] 读完 1000 本非虚构类经典著作
-- [ ] 通过 CFA 三级全部考试
-- [ ] 能够手写一个完整的操作系统内核
-
+## V. 🎓 Learning & Skills
+- [ ] Master 5 or more foreign languages (conversational fluency)
+    - [x] English
+    - [ ] Japanese
+    - [ ] French
+    - [ ] Spanish
+    - [ ] Arabic
+    - [ ] Russian
+    - [ ] German
+- [ ] Master a musical instrument to a level capable of performing on stage
+- [ ] Obtain a Private Pilot License (PPL)
+- [ ] Learn to cook at least 5 state-banquet-level signature dishes
+- [ ] Master a martial art and obtain a black belt / high dan rank
+- [ ] Independently complete a full car engine overhaul
+- [ ] Learn to surf and sustain a stand on waves over 1 meter high
+- [ ] Read 1,000 classic non-fiction books
+- [ ] Pass all three levels of the CFA exam
+- [ ] Hand-code a complete operating system kernel
 ---
-
-## 六、❤️ 情感与人生篇
-
-- [ ] 和真正相爱的人步入婚姻
-- [ ] 亲眼见证自己的孩子出生
-- [ ] 带父母去一次他们最想去的地方旅行
-- [ ] 为父母买一套他们真正喜欢的房子
-- [ ] 拥有一间属于自己的完美书房/工作室
-- [ ] 养一只陪伴自己超过 15 年的宠物
-- [ ] 和多年未见的老友来一次说走就走的旅行
-- [ ] 参加一次陌生人的婚礼并送上真诚的祝福
-- [ ] 在街头流浪汉最冷的时候送一次热饭
-- [ ] 原谅一个曾经深深伤害过自己的人
-
+## VI. ❤️ Emotions & Life
+- [ ] Marry the person I truly love
+- [ ] Witness the birth of my own child with my own eyes
+- [ ] Take my parents on a trip to the place they want to visit the most
+- [ ] Buy a house that my parents truly love
+- [ ] Have a perfect study/workspace of my own
+- [ ] Raise a pet that accompanies me for over 15 years
+- [ ] Go on a spontaneous trip with an old friend I haven't seen in years
+- [ ] Attend a stranger's wedding and give sincere blessings
+- [ ] Give a hot meal to a homeless person on the coldest day
+- [ ] Forgive someone who once deeply hurt me
 ---
-
-## 七、🌍 贡献与遗产篇
-
-- [ ] 成立一个个人名义的慈善基金会
-- [ ] 捐建至少 10 所希望小学
-- [ ] 资助至少 100 名贫困学生完成大学学业
-- [ ] 种下 10,000 棵树并形成一片真正的森林
-- [ ] 为开源社区贡献一个被广泛使用的项目（Star > 10k）
-- [ ] 推动一项对行业有实质性改变的行业标准或提案
-- [ ] 捐献自己的部分器官（签署协议）
-- [ ] 留下一份完整的自传
-- [ ] 做一件"改变至少一个人命运"的事并永远不告诉对方
-- [ ] 在自己离开后，让这个世界因为我来过而变得哪怕好一点点
-
+## VII. 🌍 Contribution & Legacy
+- [ ] Establish a charitable foundation in my own name
+- [ ] Help fund the construction of at least 10 Hope Primary Schools
+- [ ] Sponsor at least 100 underprivileged students to complete their university education
+- [ ] Plant 10,000 trees and form a real forest
+- [ ] Contribute a widely-used project to the open-source community (Star > 10k)
+- [ ] Drive an industry standard or proposal that substantially changes the industry
+- [ ] Donate my organs (sign the agreement)
+- [ ] Leave behind a complete autobiography
+- [ ] Do something that "changes at least one person's fate" and never tell them about it
+- [ ] Make the world a little bit better just because I was here
 ---
-
-> *最后更新：2026-04-03*
+> *Last Updated: 2026-04-03*
 > 
-> *"我们终此一生，就是要摆脱他人的期待，找到真正的自己。"——《无声告白》*
+> *"Everything I Never Told You" — Celeste Ng*
+
 
 
 <br><br><br> 
