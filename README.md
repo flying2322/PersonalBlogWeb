@@ -130,7 +130,7 @@ This is  all the content in <br>
 ### China (All Provincial-Level Administrative Regions)
 - [x] Henan: Xinxiang/Zhengzhou/Luoyang/Kaifeng/Dengfeng/Nanyang
 - [x] Beijing: Haidian/Yizhuang/Daxing
-- [ ] Tianjin: Hohai University, Tianjin University, Nankai University, Italian Style Town
+- [ ] Tianjin: Hohai, Tianjin University, Nankai University, Italian Style Town
 - [ ] Shanghai: Oriental Pearl Tower
 - [x] Guangdong: Shenzhen/Guangzhou/Zhuhai/Shunde/Foshan/Zhongshan
 - [x] Hong Kong: Victoria Harbour
