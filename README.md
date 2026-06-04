@@ -122,8 +122,7 @@ This is  all the content in <br>
 > *"We are all going to die, but before we do, I want to do everything I've ever wanted to do."*
 > 
 > This is a bucket list written for myself. Not to show off, but to remind myself of how much is left undone when I feel lost, and to push myself forward when I feel slack. Every checkmark is one step closer to the complete version of myself.
->
-> Legend: `[ ]` Incomplete ｜ `[x]` Completed ｜ You can add the completion date in brackets, e.g., `[x] 2028-05-20`
+
 ---
 ## I. 🌍 Travel the World: Countries & Regions
 *Goal: Set foot in every country and region in the world (Continuously updating)*
