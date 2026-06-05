@@ -117,6 +117,18 @@ This is  all the content in <br>
 [6.Clash for Ubuntu](./mdnote/cla.md)<br>
 
 
+
+
+
+
+
+
+
+
+
+
+
+
 # **3. BUCKET LIST**
 
 > *"We are all going to die, but before we do, I want to do everything I've ever wanted to do."*
