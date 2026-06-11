@@ -12,7 +12,7 @@ struct Signal {
     std::atomic_bool trafficAutoDoorAreaUpdate;             // 交管自动门区域配置更新
     std::atomic_bool trafficAirShowerAreaUpdate;            // 交管风淋门区域配置更新
     std::atomic_bool trafficElevatordoorAreaUpdate;         // 交管电梯门区域配置更新
-    
+
     /// @brief 初始化数据
     void init() {
         chargingConfigUpdate.store(false);

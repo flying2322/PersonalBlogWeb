@@ -37,17 +37,23 @@ Read [](file:///home/wp/Matrix/core/module/traffic/include/traffic/regulations/p
 我已查看代码并定位到下发逻辑，实现点见下面的要点与代码位置说明（快速参考后再读细节）。下一步：把关键字段与流程按条件和例子解释清楚。
 
 **主要代码位置**
+
 - `Control` 结构：control_block.hpp  
+
 - 下发逻辑：`applyRoadLines`：traffic_control_service_regulation.cpp  
+
 - 发送/步进限制与规则：`TrafficRegulationContext` / 规则处理：traffic_regulation.hpp  
+
 - 参数定义（默认值）：traffic_control_service_regulation.hpp
 
 - sendIndex/stepId/limitIndex 含义（来自 `Control`）：
+  
   - **`sendIndex`**：最后已经“下发”的路段索引（初始为 -1，表示还未下发任何段）。见 `Control` 中定义。  
   - **`stepId`**：车辆当前位置对应的路段索引（由当前位置更新，表示车辆正在/刚通过的段）。  
-  - **`limitIndex`**：当前允许下发的最远路段索引，由交通规则处理器（各类 `Yield` 规则）决定，默认初始化为整条路的末端，然后规则可能把它缩短以限制下发。
+  - **`limitIndex`**：当前允许下发的最远路段索引，由交通规则处理器（各类 `Yield` 规则）决定，默认初始化为整条路的末端，然后规则可能把它缩短以限制下发。i
 
 **什么时候会下发新的路段（总体条件）**
+
 - 在 `updateRoutes()` 中会调用 `applyRoadLines()`，真正决定下发。主要前置条件（函数内检查）：
   - 车辆不是手动控制（`controlMode != MANUAL`）。  
   - `control` 非空 且 `control->roadLines` 非空。  
@@ -58,40 +64,45 @@ Read [](file:///home/wp/Matrix/core/module/traffic/include/traffic/regulations/p
 （参见 `applyRoadLines` 里的这些判断：traffic_control_service_regulation.cpp）
 
 **每次下发多远 / 下发多少段**
+
 - 单次循环最多追加 `maxApplyRoadLineCount_` 段（默认 `maxApplyRoadLineCount_ = 5`）。  
 - 实际下发的段数还会被下列条件截断：到达 `limitIndex`、到达路段结尾（`roadCount - 1`）、或满足其它中止条件（如 `sendDock`）。  
 - 算法上每次迭代在加入路段前会 `++sendIndex`，因此 `sendIndex` 在下发后指向“最新已下发”的那一段的索引（初始 -1，第一次下发后变为 0）。
 
 **规则如何影响“下发最远索引（limitIndex）”**
+
 - 在 `updateRoutes()` 前会构造 `TrafficRegulationContext(vehicle, control)` 并交给规则处理器 `ruleProcessor_.process(context)`。各类规则（区域、占位、路段冲突、依赖关系等）会计算并通过 `context.setLimitIndex()` 调整允许下发的最远索引。默认若无限制则为整条路线末端。见：`TrafficRegulationContext` 与规则处理器实现。  
 - 规则可把 `limitIndex` 缩短到某个索引（并保证不小于 `sendIndex`），从而限制 `applyRoadLines` 本轮实际能下发到哪一段。
 
 **stepId / sendIndex 的交互（防止提前下发过多）**
+
 - `stepId` 会在车辆位置改变时通过 `updateVehilceStepId()` 更新（匹配当前 `position` 对应的路段索引）。  
 - 条件 `(sendIndex - stepId >= passedRoadLineCount_)` 用来保证“已下发的最远段” 不会比车辆当前位置提前太多段，避免给车辆分配过远的命令（默认允许提前 3 段）。  
 
 **其它细节**
+
 - 对加载/充电任务：当即将下发到倒数第 1 段（`sendIndex == roadCount - 2`）且为 `LOAD`/`CHARGE`，会设置 `dockId` 以触发后续的对接/充电命令。  
 - 初次下发（`sendIndex == -1`）会被视为“第一段下发”，函数 `fillFirstRoadLine` 还有额外处理以确保首段角度/位置平滑衔接。  
 - 若某次规则决定 `limitIndex <= sendIndex`（意味着不能再下发新段），处理器会早期返回并把 `control->limitIndex` 设置为规则选定值；随后 `applyRoadLines` 会看到 `sendIndex >= limitIndex` 而不下发。
 
 **举例（示意）**
+
 - 设 `passedRoadLineCount_ = 3`，`maxApplyRoadLineCount_ = 5`，车辆 `stepId = 4`，当前 `sendIndex = 5`，`limitIndex = 12`：
   - 计算 `sendIndex - stepId = 1 < 3`，允许下发。`applyRoadLines` 会尝试在本次调用中把 `sendIndex` 逐次 ++ 并追加最多 5 段（但若在第 3 次 ++ 之后 `sendIndex` 达到 `limitIndex` 或到达路尾，就会停止）。  
 - 若规则把 `limitIndex` 缩短为 6，则本次最多只会下发到索引 6（即只允许再下发 1 段）。
 
 总结：下发由 `applyRoadLines` 控制，受三类约束共同决定：
+
 - 规则限制：`limitIndex`（由规则计算并设置）；  
 - 位置差距限制：`sendIndex - stepId < passedRoadLineCount_`（默认 3）；  
 - 单次数量限制：`maxApplyRoadLineCount_`（默认 5），以及路尾或对接等特殊中止条件。
 
 如果你要我：
+
 - 标注出代码中这些关键判断的具体行号并在代码中增加注释，或者  
 - 用几个具体运行时场景（带真实字段值）生成步进/下发序列示例，
 
 告诉我你更想要哪种，我会直接在仓库里做并给出改动或示例。
-
-
 
 # LogicalMap 是什么
 
@@ -118,12 +129,12 @@ inline void to_json(json& j, const LogicalMap& v) {
 
 ## 数据结构组成
 
-| 字段 | JSON 键名 | 含义 |
-|------|-----------|------|
-| `advancedPoints` | `advancedPointList` | 高级点：动作点、充电点、停靠点等 |
-| `advancedCurves` | `advancedCurveList` | 路径曲线：直线、贝塞尔等 |
-| `binLocations` | `binLocationList` / `binLocationsList` | 库位 |
-| `advancedAreas` | `advancedAreaList` | 地图内区域（如禁行区 `BlockArea`） |
+| 字段               | JSON 键名                                | 含义                      |
+| ---------------- | -------------------------------------- | ----------------------- |
+| `advancedPoints` | `advancedPointList`                    | 高级点：动作点、充电点、停靠点等        |
+| `advancedCurves` | `advancedCurveList`                    | 路径曲线：直线、贝塞尔等            |
+| `binLocations`   | `binLocationList` / `binLocationsList` | 库位                      |
+| `advancedAreas`  | `advancedAreaList`                     | 地图内区域（如禁行区 `BlockArea`） |
 
 ### 1. AdvancedPoint（高级点）
 
@@ -233,12 +244,12 @@ flowchart TB
 
 ### 3. Web UI 层
 
-| 页面 | 用途 |
-|------|------|
-| `home/www.vue`、`home/index.vue` | 实时监控：渲染点、曲线、库位 |
-| `scenarioConfiguration/editMap.vue` | 地图编辑：加载/展示逻辑地图，配合点云背景 |
+| 页面                                        | 用途                                                        |
+| ----------------------------------------- | --------------------------------------------------------- |
+| `home/www.vue`、`home/index.vue`           | 实时监控：渲染点、曲线、库位                                            |
+| `scenarioConfiguration/editMap.vue`       | 地图编辑：加载/展示逻辑地图，配合点云背景                                     |
 | `scenarioConfiguration/configuration.vue` | 从 `advancedPointList` 提取 `ParkPoint`、`ChargePoint` 做机器人绑定 |
-| `replayMonitoring/` | 回放监控 |
+| `replayMonitoring/`                       | 回放监控                                                      |
 
 典型前端解析方式：
 
@@ -254,9 +265,9 @@ binLocationsList.value = (data.binLocationsList || []).flatMap(g => g.binLocatio
 
 容易混淆的两套概念：
 
-| 概念 | 位置 | 作用 |
-|------|------|------|
-| **LogicalMap** | 地图文件内 | 路网拓扑（点、线、库位、区域） |
+| 概念                                            | 位置                    | 作用                   |
+| --------------------------------------------- | --------------------- | -------------------- |
+| **LogicalMap**                                | 地图文件内                 | 路网拓扑（点、线、库位、区域）      |
 | **Scene.Area.advancedPoints / advancedAreas** | 场景 JSON（`scene.json`） | 场景级叠加配置（如业务高级点、禁行区等） |
 
 场景加载时会**主动剥离**场景文件里内嵌的 `logicalMap`，避免和地图文件重复：
@@ -287,8 +298,8 @@ for (auto& area : data["areas"]) {
 如果你还想深入某一块（比如 `AdvancedPoint` 的 `property` 字段，或 LogicalMap 与路径规划的具体衔接），可以说一下关注点，我可以按那条链路展开。
 
 ---
-# Files Read
 
+# Files Read
 
 Matrix 是 **Engine（C#）+ Core（C++）** 两层启动。下面按启动顺序说明会读哪些文件、各自用途，并区分「必定读取」和「按场景/按需读取」。
 
@@ -313,12 +324,12 @@ flowchart TD
 
 ## 一、Engine 层（必定读取）
 
-| 文件 | 路径 | 目的 |
-|------|------|------|
-| **appsettings.json** | 程序目录 | Kestrel 端口、JWT 密钥、Swagger 等 ASP.NET 配置 |
-| **log4net.config** | 程序目录 | 日志输出配置 |
-| **version** | 程序目录 | 应用版本信息，写入 `AppGlobalCache` |
-| **Resources/*.json** | `Resources/zh.json`、`en.json` 等 | Engine 层多语言（API 异常、校验提示等） |
+| 文件                   | 路径                              | 目的                                     |
+| -------------------- | ------------------------------- | -------------------------------------- |
+| **appsettings.json** | 程序目录                            | Kestrel 端口、JWT 密钥、Swagger 等 ASP.NET 配置 |
+| **log4net.config**   | 程序目录                            | 日志输出配置                                 |
+| **version**          | 程序目录                            | 应用版本信息，写入 `AppGlobalCache`             |
+| **Resources/*.json** | `Resources/zh.json`、`en.json` 等 | Engine 层多语言（API 异常、校验提示等）              |
 
 ---
 
@@ -326,10 +337,10 @@ flowchart TD
 
 Core 启动时 `scenePath` 为空，**不会直接加载场景**；场景由 Engine 的 `InitSceneAsync` 后续通过 `AddScene` 注入。
 
-| 文件 | 路径 | 目的 |
-|------|------|------|
+| 文件                    | 路径                                               | 目的                                                                |
+| --------------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
 | **systemParams.json** | `/etc/sinevaAGV/matrix/config/systemParams.json` | Core 调度参数：订单、充电、交管、路径规划等（`ConfigManager` 只取 `moduleName=core` 的项） |
-| **language/** 下各语言文件 | `/etc/sinevaAGV/matrix/config/language/*` | Core API 错误码多语言文案（`Internationalization`） |
+| **language/** 下各语言文件  | `/etc/sinevaAGV/matrix/config/language/*`        | Core API 错误码多语言文案（`Internationalization`）                         |
 
 对应代码：
 
@@ -347,11 +358,11 @@ Core 启动时 `scenePath` 为空，**不会直接加载场景**；场景由 Eng
 
 ### 1. 场景相关（核心，数量不固定）
 
-| 文件 | 路径 | 目的 |
-|------|------|------|
-| **sceneList.json** | `/etc/sinevaAGV/matrix/scene/sceneList.json` | 场景清单及 `IsEnabled` 开关 |
-| **scene.json** | `/etc/sinevaAGV/matrix/scene/{场景名}/scene.json` | 每个**已启用**场景的配置：区域、机器人组、门/电梯、绑点等 |
-| **地图文件** | `scene.json` 中 `areas[].maps[].mapName` 指向的文件（如 `.smap`） | 路网拓扑：站点、路径、库位；解析为 `RoadNetMap` 供调度，并提取 LogicalMap / PointCloud |
+| 文件                 | 路径                                                       | 目的                                                             |
+| ------------------ | -------------------------------------------------------- | -------------------------------------------------------------- |
+| **sceneList.json** | `/etc/sinevaAGV/matrix/scene/sceneList.json`             | 场景清单及 `IsEnabled` 开关                                           |
+| **scene.json**     | `/etc/sinevaAGV/matrix/scene/{场景名}/scene.json`           | 每个**已启用**场景的配置：区域、机器人组、门/电梯、绑点等                                |
+| **地图文件**           | `scene.json` 中 `areas[].maps[].mapName` 指向的文件（如 `.smap`） | 路网拓扑：站点、路径、库位；解析为 `RoadNetMap` 供调度，并提取 LogicalMap / PointCloud |
 
 场景加载链路：
 
@@ -379,38 +390,38 @@ Core 启动时 `scenePath` 为空，**不会直接加载场景**；场景由 Eng
 
 ### 2. 配置类 JSON（固定几类）
 
-| 文件 | 路径 | 目的 |
-|------|------|------|
+| 文件                    | 路径                                               | 目的                                                                 |
+| --------------------- | ------------------------------------------------ | ------------------------------------------------------------------ |
 | **systemParams.json** | `/etc/sinevaAGV/matrix/config/systemParams.json` | Engine 侧系统参数（与 Core 共用；不存在时从 `DefaultConfig/systemParams.json` 生成） |
-| **dynamicCache.json** | `/etc/sinevaAGV/matrix/config/dynamicCache.json` | 任务运行时动态缓存持久化（`DynamicCache` 单例构造时加载） |
-| **plcDevice.json** | `.../config/plcDevice.json` | PLC 设备定义 |
-| **plcPanel.json** | `.../config/plcPanel.json` | PLC 面板配置 |
-| **pagerConfig.json** | `.../config/pagerConfig.json` | 呼叫器配置 |
+| **dynamicCache.json** | `/etc/sinevaAGV/matrix/config/dynamicCache.json` | 任务运行时动态缓存持久化（`DynamicCache` 单例构造时加载）                               |
+| **plcDevice.json**    | `.../config/plcDevice.json`                      | PLC 设备定义                                                           |
+| **plcPanel.json**     | `.../config/plcPanel.json`                       | PLC 面板配置                                                           |
+| **pagerConfig.json**  | `.../config/pagerConfig.json`                    | 呼叫器配置                                                              |
 
 ### 3. 数据库（非文件，但启动时必读）
 
-| 数据源 | 目的 |
-|--------|------|
+| 数据源                       | 目的                                                 |
+| ------------------------- | -------------------------------------------------- |
 | **MySQL `sineva_matrix`** | 迁移表结构；种子 admin 用户、内置任务模板；加载未完成任务、未清除报警、机器人统计等到内存缓存 |
 
 ---
 
 ## 四、后台服务 / 定时器启动时（稍后读取）
 
-| 文件 | 路径 | 目的 |
-|------|------|------|
+| 文件                         | 路径                                                    | 目的                                 |
+| -------------------------- | ----------------------------------------------------- | ---------------------------------- |
 | **randomOrderConfig.json** | `/etc/sinevaAGV/matrix/config/randomOrderConfig.json` | 随机发单配置（`RandomOrderService` 启动时读取） |
 
 ---
 
 ## 五、启动时不读、按需读取
 
-| 文件/目录 | 何时读 | 目的 |
-|-----------|--------|------|
-| `config/taskConfig/` | 创建/执行任务时 | 任务模板 |
-| `config/interfaceConfig/` | 调用外部接口时 | 接口定义 |
-| `/etc/chrony/chrony.conf` | 配置时间同步时 | NTP 配置 |
-| 场景 `maps/` 下机器人定位图 | 机器人连接后 | 单车定位地图（扫描目录，非启动必读） |
+| 文件/目录                     | 何时读      | 目的                 |
+| ------------------------- | -------- | ------------------ |
+| `config/taskConfig/`      | 创建/执行任务时 | 任务模板               |
+| `config/interfaceConfig/` | 调用外部接口时  | 接口定义               |
+| `/etc/chrony/chrony.conf` | 配置时间同步时  | NTP 配置             |
+| 场景 `maps/` 下机器人定位图        | 机器人连接后   | 单车定位地图（扫描目录，非启动必读） |
 
 ---
 
@@ -418,13 +429,13 @@ Core 启动时 `scenePath` 为空，**不会直接加载场景**；场景由 Eng
 
 假设 **1 个启用场景、2 个区域、每区域 1 张地图**：
 
-| 类别 | 大约文件数 |
-|------|-----------|
-| Engine 内置配置 | 3～5（appsettings、log4net、version、语言资源） |
-| 全局 config | 6～7（systemParams、dynamicCache、plc×2、pager、randomOrder） |
-| 场景 | 2（sceneList + scene.json） |
-| 地图 | N（scene.json 中引用的地图数） |
-| 数据库 | 1 个 MySQL 实例（多表） |
+| 类别          | 大约文件数                                                  |
+| ----------- | ------------------------------------------------------ |
+| Engine 内置配置 | 3～5（appsettings、log4net、version、语言资源）                  |
+| 全局 config   | 6～7（systemParams、dynamicCache、plc×2、pager、randomOrder） |
+| 场景          | 2（sceneList + scene.json）                              |
+| 地图          | N（scene.json 中引用的地图数）                                  |
+| 数据库         | 1 个 MySQL 实例（多表）                                       |
 
 **合计：约 12～15 个文件 + N 张地图 + MySQL**，N 由场景配置决定。
 
@@ -451,8 +462,8 @@ Core 启动时 `scenePath` 为空，**不会直接加载场景**；场景由 Eng
 
 如果你关心的是某个具体场景目录（例如 `BJ5Lab`）里实际有哪些文件，可以说一下场景名，我可以按该目录帮你列一份清单。
 
-
 # Core Top 10
+
 下面聚焦 **Core C++ 调度层**，按「整体流水线 → 调用关系图 → Top 10 类 → Top 10 函数 → 时序关系」组织，方便你快速定位代码。
 
 ---
@@ -559,18 +570,18 @@ flowchart TD
 
 ## 三、最重要的 10 个类
 
-| # | 类 | 文件 | 职责 |
-|---|-----|------|------|
-| 1 | **Application** | `core/src/application.hpp` | 总入口：初始化所有单例，启动/停止调度循环 |
-| 2 | **TaskAssignService** | `core/module/task_assign/include/task_assign/task_assign_service.hpp` | **任务分配中枢**：1Hz 循环，订单选车 + Block 下发交管 |
-| 3 | **RegulationTrafficControlService** | `core/module/traffic/include/traffic/traffic_control_service_regulation.hpp` | **交管中枢**：1Hz 循环，路径规划、让行、运动指令 |
-| 4 | **OptimizeTaskAssigner** | `core/module/task_assign/src/task_assigner_optimize.cpp` | 订单→车辆匹配（路径代价、电量、容量、分组约束） |
-| 5 | **SceneManager** | `core/module/scene/include/scene/scene_manager.hpp` | 加载 scene.json、地图、机器人、设备，驱动场景激活 |
-| 6 | **MapManager** | `core/module/domain/include/maps/map_manager.hpp` | 路网图（Position/RoadLine）、充电/闲置点占用状态 |
-| 7 | **VehicleManager** | `core/module/domain/include/vehicles/vehicle_manager.hpp` | 机器人注册表、io_context 线程、100ms 通信定时器 |
-| 8 | **OrderManager** | `core/module/domain/include/orders/order_manager.hpp` | 内存订单队列（按优先级排序） |
-| 9 | **VehicleCommandSender** | `core/module/domain/include/vehicles/vehicle_command_sender.hpp` | 协议层：把交管决策转成移动/装卸/充电/停靠指令 |
-| 10 | **ChargingManager** | `core/module/task_generate/include/charging/charging_manager.hpp` | 1Hz 检测低电量空闲车，自动生成充电订单 |
+| #   | 类                                   | 文件                                                                           | 职责                                  |
+| --- | ----------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------- |
+| 1   | **Application**                     | `core/src/application.hpp`                                                   | 总入口：初始化所有单例，启动/停止调度循环               |
+| 2   | **TaskAssignService**               | `core/module/task_assign/include/task_assign/task_assign_service.hpp`        | **任务分配中枢**：1Hz 循环，订单选车 + Block 下发交管 |
+| 3   | **RegulationTrafficControlService** | `core/module/traffic/include/traffic/traffic_control_service_regulation.hpp` | **交管中枢**：1Hz 循环，路径规划、让行、运动指令        |
+| 4   | **OptimizeTaskAssigner**            | `core/module/task_assign/src/task_assigner_optimize.cpp`                     | 订单→车辆匹配（路径代价、电量、容量、分组约束）            |
+| 5   | **SceneManager**                    | `core/module/scene/include/scene/scene_manager.hpp`                          | 加载 scene.json、地图、机器人、设备，驱动场景激活      |
+| 6   | **MapManager**                      | `core/module/domain/include/maps/map_manager.hpp`                            | 路网图（Position/RoadLine）、充电/闲置点占用状态   |
+| 7   | **VehicleManager**                  | `core/module/domain/include/vehicles/vehicle_manager.hpp`                    | 机器人注册表、io_context 线程、100ms 通信定时器    |
+| 8   | **OrderManager**                    | `core/module/domain/include/orders/order_manager.hpp`                        | 内存订单队列（按优先级排序）                      |
+| 9   | **VehicleCommandSender**            | `core/module/domain/include/vehicles/vehicle_command_sender.hpp`             | 协议层：把交管决策转成移动/装卸/充电/停靠指令            |
+| 10  | **ChargingManager**                 | `core/module/task_generate/include/charging/charging_manager.hpp`            | 1Hz 检测低电量空闲车，自动生成充电订单               |
 
 > 紧挨 Top 10 的辅助类：`VehicleTaskManager`（每车订单队列）、`TrafficControlBlockManager`（每车 Block 路由状态）、`OrderRepository`（MySQL 持久化）。
 
@@ -578,18 +589,18 @@ flowchart TD
 
 ## 四、最重要的 10 个核心逻辑函数
 
-| # | 函数 | 文件 | 作用 |
-|---|------|------|------|
-| 1 | **`TaskAssignService::doWork()`** | `task_assign_service.cpp:39` | 分配主循环：清完成单 → `dispatchOrders` → `dispatchBlockTasks` |
-| 2 | **`OptimizeTaskAssigner::assign()`** | `task_assigner_optimize.cpp:31` | 按 externalId 分组，约束选车，绑定到 `VehicleTaskManager` |
-| 3 | **`TaskAssignService::dispatchBlockTasks()`** | `task_assign_service.cpp:323` | 筛选可调度车辆，取下一 Block，必要时推空闲车，调用 `dispatchTask` |
-| 4 | **`TaskAssignService::dispatchTask()`** | `task_assign_service.cpp:484` | Block 状态 → DISPATCHED，调用 `trafficControl_->addVehicleTask()` |
-| 5 | **`RegulationTrafficControlService::doVehicleTraffic()`** | `traffic_control_service_regulation.cpp:224` | 交管单周期流水线（规划→位置→路段→下发→绕路） |
-| 6 | **`RegulationTrafficControlService::runBlockTask()`** | `traffic_control_service_regulation.cpp:1127` | 对新 Block 做 `getPlanResult()` 全局规划，写入路由控制 |
-| 7 | **`RegulationTrafficControlService::updateRoutes()`** | `traffic_control_service_regulation.cpp:688` | 让行规则处理 → `applyRoadLines` → `VehicleCommandSender::startMovement` |
-| 8 | **`RegulationTrafficControlService::addVehicleTask()`** | `traffic_control_service_regulation.cpp:79` | 接收 Block，注册到 `TrafficControlBlockManager` 等待执行 |
-| 9 | **`SceneManager::updateSceneInternal()`** | `scene_manager.cpp:888` | 加载地图、注册机器人、初始化充电/闲置点、场景区域 |
-| 10 | **`CoreApplication::addOrder()` / `addBlocks()`** | `core_application.cpp` | 外部 API 入口：创建 Order + Block，送入 `TaskAssignService` |
+| #   | 函数                                                        | 文件                                            | 作用                                                                |
+| --- | --------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
+| 1   | **`TaskAssignService::doWork()`**                         | `task_assign_service.cpp:39`                  | 分配主循环：清完成单 → `dispatchOrders` → `dispatchBlockTasks`              |
+| 2   | **`OptimizeTaskAssigner::assign()`**                      | `task_assigner_optimize.cpp:31`               | 按 externalId 分组，约束选车，绑定到 `VehicleTaskManager`                     |
+| 3   | **`TaskAssignService::dispatchBlockTasks()`**             | `task_assign_service.cpp:323`                 | 筛选可调度车辆，取下一 Block，必要时推空闲车，调用 `dispatchTask`                       |
+| 4   | **`TaskAssignService::dispatchTask()`**                   | `task_assign_service.cpp:484`                 | Block 状态 → DISPATCHED，调用 `trafficControl_->addVehicleTask()`      |
+| 5   | **`RegulationTrafficControlService::doVehicleTraffic()`** | `traffic_control_service_regulation.cpp:224`  | 交管单周期流水线（规划→位置→路段→下发→绕路）                                          |
+| 6   | **`RegulationTrafficControlService::runBlockTask()`**     | `traffic_control_service_regulation.cpp:1127` | 对新 Block 做 `getPlanResult()` 全局规划，写入路由控制                          |
+| 7   | **`RegulationTrafficControlService::updateRoutes()`**     | `traffic_control_service_regulation.cpp:688`  | 让行规则处理 → `applyRoadLines` → `VehicleCommandSender::startMovement` |
+| 8   | **`RegulationTrafficControlService::addVehicleTask()`**   | `traffic_control_service_regulation.cpp:79`   | 接收 Block，注册到 `TrafficControlBlockManager` 等待执行                    |
+| 9   | **`SceneManager::updateSceneInternal()`**                 | `scene_manager.cpp:888`                       | 加载地图、注册机器人、初始化充电/闲置点、场景区域                                         |
+| 10  | **`CoreApplication::addOrder()` / `addBlocks()`**         | `core_application.cpp`                        | 外部 API 入口：创建 Order + Block，送入 `TaskAssignService`                 |
 
 ---
 
@@ -643,9 +654,10 @@ Vehicle 状态更新
 ## 六、三个关键设计点（读代码时留意）
 
 **1. 两阶段解耦**  
+
 - **分配阶段**（TaskAssign）：决定「哪辆车做哪个订单」  
 - **执行阶段**（Traffic）：决定「怎么走、何时动、何时作业」  
-交接点是 `addVehicleTask()`。
+  交接点是 `addVehicleTask()`。
 
 **2. Order 与 Block 分离**  
 `addOrder` 只建订单壳；必须有 `addBlocks`（或充电/闲置管理器）挂上带目标点的 `BlockTask`，调度才能真正动起来。
@@ -657,12 +669,207 @@ Vehicle 状态更新
 
 ## 七、建议阅读路径（最快上手）
 
-| 顺序 | 文件 | 关注点 |
-|------|------|--------|
-| 1 | `core/src/application.hpp` | 启动了哪些服务 |
-| 2 | `core/module/task_assign/src/task_assign_service.cpp` | `doWork`、`dispatchBlockTasks`、`dispatchTask` |
-| 3 | `core/module/traffic/src/traffic_control_service_regulation.cpp` | `doVehicleTraffic`、`runBlockTask`、`updateRoutes` |
-| 4 | `core/module/task_assign/src/task_assigner_optimize.cpp` | 选车约束逻辑 |
-| 5 | `core/module/scene/src/scene_manager.cpp` | `updateSceneInternal` 场景如何驱动地图和机器人 |
+| 顺序  | 文件                                                               | 关注点                                              |
+| --- | ---------------------------------------------------------------- | ------------------------------------------------ |
+| 1   | `core/src/application.hpp`                                       | 启动了哪些服务                                          |
+| 2   | `core/module/task_assign/src/task_assign_service.cpp`            | `doWork`、`dispatchBlockTasks`、`dispatchTask`     |
+| 3   | `core/module/traffic/src/traffic_control_service_regulation.cpp` | `doVehicleTraffic`、`runBlockTask`、`updateRoutes` |
+| 4   | `core/module/task_assign/src/task_assigner_optimize.cpp`         | 选车约束逻辑                                           |
+| 5   | `core/module/scene/src/scene_manager.cpp`                        | `updateSceneInternal` 场景如何驱动地图和机器人               |
 
 如果你接下来想深入某一段（比如让行规则、`OptimizeTaskAssigner` 约束、或 Block 状态机），可以说一下，我可以按那条链路把类和函数再展开一层。
+
+
+
+# 车辆交互
+
+根据代码，车辆和 Matrix 的交互频率可以分成三层来看：**车辆↔Core 通信**、**Core 调度消费**、**Engine/WebUI 展示**。
+
+---
+
+## 一、总览
+
+| 层级             | 关键机制                              | 频率                                      |
+| -------------- | --------------------------------- | --------------------------------------- |
+| Core ↔ 车辆 TCP  | `VehicleManager::scheduleSend`    | 基础循环 **100ms（10Hz）**                    |
+| 车辆状态写入 Core    | 协议相关（见下）                          | **SEER 10Hz 拉取** / **SINEVA 心跳 10s**    |
+| 任务分配           | `TaskAssignService`               | **1Hz**                                 |
+| 交管调度           | `RegulationTrafficControlService` | **约 2Hz**（每轮 `doTraffic` 后 sleep 500ms） |
+| 仿真车辆           | `SimulationService`               | **约 10Hz**                              |
+| Engine → WebUI | `RobotsStatusTimer`               | **10Hz（100ms）**                         |
+
+---
+
+## 二、车辆 ↔ Core：通信主循环 10Hz
+
+Core 启动后，`VehicleManager` 用 **100ms** 定时器驱动与车辆的交互：
+
+```567:567:core/module/domain/src/vehicle_manager.cpp
+    sendTimer_->expires_after(std::chrono::milliseconds(100));
+```
+
+每 100ms 执行一次 `SendToVehicle()`：
+
+```589:631:core/module/domain/src/vehicle_manager.cpp
+void VehicleManager::SendToVehicle() {
+    ...
+        if (!vehicle->loggedIn() && loopCount_ % 50 == 0) {
+            vehicle->sendLogin();          // 未登录：每 50 轮 = 5s
+        }
+
+        if (vehicle->loggedIn() && loopCount_ % 100 == 0) {
+            vehicle->sendHeartbeat();      // 已登录：每 100 轮 = 10s
+            loopCount_.store(0);
+        }
+
+        if (ProtocolType::SEER == vehicle->protocol) {
+            vehicle->sendVehicleStatusAll();  // SEER：每轮都查 = 10Hz
+        }
+    ...
+    ++loopCount_;
+}
+```
+
+### 按协议区分
+
+**协议判定**（`scene_manager.cpp`）：车辆 `port == 5005`（默认）→ **SINEVA**；其他端口 → **SEER**。
+
+| 协议                  | Core 主动行为                       | 等效频率              |
+| ------------------- | ------------------------------- | ----------------- |
+| **SINEVA**（默认 5005） | 心跳 `CMD_HEARTBEATS_UPDATE`      | **每 10s 一次**      |
+| **SINEVA**          | 未登录时重试 `sendLogin`              | **每 5s 一次**       |
+| **SEER**（19204 等）   | `sendVehicleStatusAll()` 查询全车状态 | **10Hz（每 100ms）** |
+
+协议里心跳的注释与实现一致：
+
+```145:145:core/module/domain/src/main.proto
+    CMD_HEARTBEATS_UPDATE = 0x01; // 心跳信息更新，10s发送一次
+```
+
+`scene.json` 里 `systems.basic.heartbeats: 10` 与这个 **10 秒心跳周期**一致（在 Core C++ 里未看到单独读取该字段，实际以 `scheduleSend` 逻辑为准）。
+
+---
+
+## 三、车辆信息多久上报/更新一次？
+
+要区分 **「Core 向车发什么」** 和 **「车辆状态何时进 Core 内存」**。
+
+### 1. SEER 协议：Core 主动轮询，约 10Hz
+
+每 100ms 发 `buildQueryStatusAll()`，车辆回复 `ROBOT_STATUS_ALL1_RES` 后更新：
+
+```1365:1368:core/module/domain/src/vehicle.cpp
+    } else if (SeerResponseType::ROBOT_STATUS_ALL1_RES == type) {
+        if (vehicleRealtimeData_) {
+            vehicleRealtimeData_->updateSeerVehicle(packet.payload);
+```
+
+**结论：SEER 车辆状态在 Core 里大约每 100ms 刷新一次（10Hz）。**
+
+> 注：SEER 推送端口 `19301`（`onSeerPush`）在代码里被注释掉，当前走的是**轮询**而不是被动推送。
+
+### 2. SINEVA 协议：状态更新路径较稀疏
+
+SINEVA 状态通过 `RESPONSE_VEHCILE_BASE_STATE` 写入：
+
+```1275:1281:core/module/domain/src/vehicle.cpp
+        if (responseType == proto::Response::RESPONSE_VEHCILE_BASE_STATE) {
+            ...
+            vehicleRealtimeData_->updateSinevaVehicle(msg);
+```
+
+Core 有 `sendVehicleBaseState()`（主动拉状态），但**全仓库没有任何调用点**。
+
+当前 `SendToVehicle` 对 SINEVA 只周期性发：
+
+- 登录（5s）
+- 心跳（10s，仅 `RESPONSE_HEARTBEATS_UPDATE` 确认，**不含完整车体状态**）
+
+协议里虽定义了 `REQUEST_STATE`（注释写 **10Hz 定频上传**），但 Core **未实现/未调用**该请求。
+
+**结论（SINEVA）：**
+
+- Core 侧**确认的周期性交互**是 **10s 心跳**；
+- 完整 `VehicleBaseState` 是否更高频更新，取决于**车端是否主动推送** `RESPONSE_VEHCILE_BASE_STATE`（TCP 异步接收），Core 没有再做 10Hz 轮询；
+- 若车端不主动推，状态刷新可能**明显低于 10Hz**，这是当前实现里值得注意的一点。
+
+---
+
+## 四、Core 调度层多久用一次车辆数据？
+
+车辆数据进 `VehicleRealtimeData` 后，调度服务按自己的周期读取，**不等于**车辆上报频率：
+
+| 服务                                | 周期                | 作用                      |
+| --------------------------------- | ----------------- | ----------------------- |
+| `TaskAssignService::doWork`       | **1000ms（1Hz）**   | 派单、`dispatchBlockTasks` |
+| `RegulationTrafficControlService` | **~500ms（约 2Hz）** | 交管、`doTraffic`、路径下发     |
+| `SimulationService`               | **~100ms（10Hz）**  | 仿真车运动                   |
+| `DeviceService`                   | **1000ms（1Hz）**   | 外围设备                    |
+| `TrafficFlowPredictService`       | **10s**           | 车流预测                    |
+
+交管循环：
+
+```49:62:core/module/traffic/src/traffic_control_service_regulation.cpp
+        while (task.ok()) {
+            ...
+            doTraffic();
+            ...
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+```
+
+所以：**即使车辆 10Hz 上报，调度决策目前最快也只约 2Hz 消费一次**；任务分配是 1Hz。
+
+---
+
+## 五、Engine / WebUI 展示频率
+
+`RobotsStatusTimer` 每 **100ms** 从 Core 读 `vehicleStatus()` 并通过 WebSocket 推给前端：
+
+```40:40:engine/Sineva.Matrix.Engine.Service/BackService/Timers/RobotsStatusTimer.cs
+        public RobotsStatusTimer(...) : base(100)
+```
+
+这是**读 Core 内存快照**的频率（10Hz），不是车辆直连 Engine 的频率。
+
+---
+
+## 六、数据流示意
+
+```mermaid
+flowchart TB
+    subgraph Vehicle["实车 / 仿真车"]
+        V1["SEER: 响应状态查询"]
+        V2["SINEVA: 回心跳 / 可能主动推状态"]
+    end
+
+    subgraph Core["Matrix Core"]
+        VM["VehicleManager scheduleSend 100ms"]
+        VRD["VehicleRealtimeData"]
+        TA["TaskAssign 1Hz"]
+        TC["Traffic 2Hz"]
+    end
+
+    subgraph Engine["Engine / WebUI"]
+        RT["RobotsStatusTimer 100ms"]
+        WS["WebSocket 前端"]
+    end
+
+    VM -->|"SEER 10Hz 查询"| V1
+    VM -->|"SINEVA 10s 心跳"| V2
+    V1 --> VRD
+    V2 --> VRD
+    VRD --> TA
+    VRD --> TC
+    VRD --> RT --> WS
+```
+
+---
+
+## 七、结合你们场景的建议
+
+1. **默认 SINEVA（port 5005）**：Core 与车的心跳是 **10s**；调度 **1~2Hz**。若站间距 80cm、需要更密交互，当前瓶颈可能在 **SINEVA 状态刷新** 和 **交管 2Hz**，而不只是路径算法。
+2. **SEER 协议车**：状态 **10Hz** 拉取，与交管 2Hz 基本匹配尚可。
+3. **若要提高 SINEVA 状态频率**：需要在 `SendToVehicle` 里周期性调用 `sendVehicleBaseState()`，或实现 `REQUEST_STATE`（协议标注 10Hz），并确认车端支持。
+
+如果你告诉我现场车辆是 **SINEVA 还是 SEER**、以及 **port 配置**，我可以按你的实际协议给出更精确的「位姿/站点/id 多久变一次」的结论。
