@@ -1138,8 +1138,6 @@ public:
 
 **核心记忆**：`sleep_for` 是线程的"暂停"功能，让出 CPU 给其他线程执行。适合毫秒级以上的延时，不适合高精度定时（纳秒/微秒级）。在需要可中断睡眠的场景，建议使用分段睡眠或 `condition_variable::wait_for`。
 
-
-
 # STATIC ASSERT ARITHMETIC
 
 ```cpp
