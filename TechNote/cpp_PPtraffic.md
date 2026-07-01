@@ -133,10 +133,6 @@ Starting: *Provide runtime scenarios and step-by-step sequences* (3/3)
 
 Made changes.
 
-
-
-
-
 # 3. 旋转/直线行走
 
 下面用你们项目里的**实际公式和默认参数**做量化计算。
@@ -149,12 +145,9 @@ Made changes.
 
 ${\text{travel}} = \frac{D}{\text{vehicleTravelSpeedFactor} \times \text{maxSpeed}}$
 
-
 **旋转时间代价（90° 拐弯时，内角为 90°，\(|π - \frac{π}{2}| = \frac{π}{2}\)）：**
 
 ${\text{rotate}} = \frac{\text{vehicleRotateFactor} \times \frac{\pi}{2}}{\text{vehicleRotationalSpeedFactor} \times \text{maxRotationalSpeed}}$
-
-
 
 **等效直线距离**（规划器眼里「转 90° 相当于多走多少米」）：
 
@@ -177,9 +170,7 @@ ${\text{equiv}} = T_{\text{rotate}} \times \text{vehicleTravelSpeedFactor} \time
 
 ## 核心结果：转 90° 相当于多走多少米？
 
-
 $T_{90°} = \frac{π/2}{0.1} \approx 15.71 \text{ 秒}$
-
 
 $D_{\text{equiv}} = 15.71 \times 1.0 = \mathbf{15.7 \text{ 米}}$
 
@@ -291,8 +282,6 @@ $T_{90°} = \frac{π/2}{0.785} \approx 2.0 \text{ s}, \quad D_{\text{equiv}} = 2
 | 快速验证        | 用公式：$D_{\text{equiv}} = \frac{\frac{\pi}{2} \times \text{maxSpeed}}{\text{maxRotationalSpeed}} \times \frac{\text{rotateFactor}}{\text{rotationalSpeedFactor} \times \text{travelSpeedFactor}}$ |
 
 如果你能提供实车的**最大线速度**和**原地旋转 90° 实测耗时**，我可以反推一组更合理的 `maxSpeed` / `maxRotationalSpeed` / 三个 factor 配置。
-
-
 
 # 4. Normalize Radian
 
