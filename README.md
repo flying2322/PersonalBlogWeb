@@ -99,22 +99,31 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
 <br><br><br> 
 
 # **1. INDEX**
-This is  all the content in <br>
-[0.Index to ME ](./mdnote/liwenpeng.md)
-[1.BOOKMARK: Microsoft Edge](./mdnote/Bookmarks.md)<br>
-[2.BOOKMARK: Google Chrome](./mdnote/Boomarks_chrome.md)<br>
-[3.BOOKMARK: Microsoft edge for work](./mdnote/bookmarks_hr.md)<br>
 
-<br><br><br> 
+Personal pages and quick links. **Full catalog of all notes → [§4 ALL NOTES INDEX](#4-all-notes-index)** (250 files).
 
+| | |
+|---|---|
+| [Index to ME](./mdnote/liwenpeng.md) | Personal platform links |
+| [Bookmarks — Edge](./mdnote/Bookmarks.md) | Microsoft Edge bookmarks |
+| [Bookmarks — Chrome](./mdnote/Boomarks_chrome.md) | Google Chrome bookmarks |
+| [Bookmarks — Work](./mdnote/bookmarks_hr.md) | Work Edge bookmarks |
 
-# **2. TECH NOTES**
-[1.neo vim on window11 and colemak user](./mdnote/neovimTutorial.md)<br>
-[2.Representative allocation of container terminal](./mdnote/bapyap.md)<br>
-[3.Term: hinterland](./mdnote/hinterland.md)<br>
-[4.Hendriks 2009 PhD thesis](./mdnote/001.md)<br>
-[5.Solve matrix reverse](./mdnote/revmatrix.md)<br>
-[6.Clash for Ubuntu](./mdnote/cla.md)<br>
+<br><br><br>
+
+# **2. TECH NOTES (highlights)**
+
+Curated entry points. See **[§4 ALL NOTES INDEX](#4-all-notes-index)** for every note.
+
+| Topic | Link |
+|---|---|
+| C++ / Matrix Core | [cpp_Matrix](./TechNote/cpp_Matrix.md) · [matrix-core loop](./TechNote/cpp_matrixcore_loop_service.md) · [cpp_basic](./TechNote/cpp_basic.md) |
+| Dev & debugging | [dev_stuck](./TechNote/dev_stuck.md) · [core_turnaround2charge](./TechNote/core_turnaround2charge.md) |
+| Java & backend | [Java 基础](./TechNote/Java_note/Java 基础.md) · [Java 并发](./TechNote/Java_note/Java 并发.md) |
+| LeetCode | [题解目录](./notes-2024/Leetcode 题解 - 目录.md) |
+| 剑指 Offer | [题解目录](./TechNote/Java_note/剑指 Offer 题解 - 目录.md) |
+| OR / research | [Hendriks thesis](./mdnote/001.md) · [container terminal](./mdnote/bapyap.md) |
+| Tools | [Neovim](./mdnote/neovimTutorial.md) · [Clash Ubuntu](./mdnote/cla.md) |
 
 
 
@@ -444,8 +453,326 @@ This is  all the content in <br>
 > *"Everything I Never Told You" — Celeste Ng*
 
 
+---
 
-<br><br><br> 
+# **4. ALL NOTES INDEX**
 
-  Inspired by the personal knowledeg project of CodeSheep. 
-  <!-- And you can check the original template websites r2coding content [here](./r2coding.md) -->
+Complete navigation to every markdown note in this repository (**250** files), grouped by folder.
+
+## Quick Jump
+- [Root](#root)
+- [mdnote](#mdnote)
+- [TechNote](#technote)
+- [notes-2024](#notes-2024)
+- [XuetangX](#xuetangx)
+- [SinevaWorkLog](#sinevaworklog)
+
+## Root
+
+- [20260530_interview_overWork](./20260530_interview_overWork.md)
+- [dev_autodoor](./dev_autodoor.md)
+- [doStartMovement](./doStartMovement.md)
+- [matrix-core](./matrix-core.md)
+- [路径下发逻辑](./路径下发逻辑.md)
+
+## mdnote
+
+Personal memos, bookmarks, and research notes.
+
+- [001](./mdnote/001.md)
+- [Bookmarks](./mdnote/Bookmarks.md)
+- [Boomarks_chrome](./mdnote/Boomarks_chrome.md)
+- [bapyap](./mdnote/bapyap.md)
+- [bookmarks_hr](./mdnote/bookmarks_hr.md)
+- [cla](./mdnote/cla.md)
+- [format](./mdnote/format.md)
+- [ft_port_alloc](./mdnote/ft_port_alloc.md)
+- [hinterland](./mdnote/hinterland.md)
+- [liwenpeng](./mdnote/liwenpeng.md)
+- [neovimTutorial](./mdnote/neovimTutorial.md)
+- [projectProfile](./mdnote/projectProfile.md)
+- [r2coding](./mdnote/r2coding.md)
+- [revmatrix](./mdnote/revmatrix.md)
+- [travel](./mdnote/travel.md)
+
+## TechNote
+
+### C++ & Matrix Core
+
+- [bash_basics](./TechNote/bash_basics.md)
+- [core_costStrategy](./TechNote/core_costStrategy.md)
+- [core_cppcs](./TechNote/core_cppcs.md)
+- [core_turnaround2charge](./TechNote/core_turnaround2charge.md)
+- [core_updateRoutes](./TechNote/core_updateRoutes.md)
+- [cpp_Matrix](./TechNote/cpp_Matrix.md)
+- [cpp_PPtraffic](./TechNote/cpp_PPtraffic.md)
+- [cpp_SPDLOG](./TechNote/cpp_SPDLOG.md)
+- [cpp_atomic](./TechNote/cpp_atomic.md)
+- [cpp_basic](./TechNote/cpp_basic.md)
+- [cpp_boost](./TechNote/cpp_boost.md)
+- [cpp_chrono](./TechNote/cpp_chrono.md)
+- [cpp_doxygen](./TechNote/cpp_doxygen.md)
+- [cpp_functional](./TechNote/cpp_functional.md)
+- [cpp_matrixcore_loop_service](./TechNote/cpp_matrixcore_loop_service.md)
+- [cpp_nlohmann](./TechNote/cpp_nlohmann.md)
+- [cpp_pointer](./TechNote/cpp_pointer.md)
+- [cpp_sharedUnique_ptr](./TechNote/cpp_sharedUnique_ptr.md)
+- [cpp_singleton](./TechNote/cpp_singleton.md)
+- [cpp_stdMutex](./TechNote/cpp_stdMutex.md)
+- [cpp_unsorted](./TechNote/cpp_unsorted.md)
+- [cpp_usignTypedef](./TechNote/cpp_usignTypedef.md)
+- [cpp_utils_Stopwatch](./TechNote/cpp_utils_Stopwatch.md)
+- [dev_libmatrix_so_link_issue](./TechNote/dev_libmatrix_so_link_issue.md)
+- [protobuf_basics](./TechNote/protobuf_basics.md)
+
+### Dev & Work Notes
+
+- [dev_binTask](./TechNote/dev_binTask.md)
+- [dev_didntSendScript](./TechNote/dev_didntSendScript.md)
+- [dev_errorParam](./TechNote/dev_errorParam.md)
+- [dev_latencyOpt](./TechNote/dev_latencyOpt.md)
+- [dev_moveTaskCharge](./TechNote/dev_moveTaskCharge.md)
+- [dev_stuck](./TechNote/dev_stuck.md)
+- [dev_uninstall](./TechNote/dev_uninstall.md)
+- [stoptimeOpt](./TechNote/stoptimeOpt.md)
+- [ubuntu2604note](./TechNote/ubuntu2604note.md)
+- [ubuntu_basics](./TechNote/ubuntu_basics.md)
+
+### Java
+
+- [AKKA](./TechNote/Java_note/AKKA.md)
+- [Docker](./TechNote/Java_note/Docker.md)
+- [Git](./TechNote/Java_note/Git.md)
+- [HTTP](./TechNote/Java_note/HTTP.md)
+- [Java IO](./TechNote/Java_note/Java IO.md)
+- [Java 基础](./TechNote/Java_note/Java 基础.md)
+- [Java 容器](./TechNote/Java_note/Java 容器.md)
+- [Java 并发](./TechNote/Java_note/Java 并发.md)
+- [Java 虚拟机](./TechNote/Java_note/Java 虚拟机.md)
+- [Linux](./TechNote/Java_note/Linux.md)
+- [MySQL](./TechNote/Java_note/MySQL.md)
+- [0-JifengPlan](./TechNote/Java_note/ProgramDesignBasics/0-JifengPlan.md)
+- [1](./TechNote/Java_note/ProgramDesignBasics/1.md)
+- [2](./TechNote/Java_note/ProgramDesignBasics/2.md)
+- [Redis](./TechNote/Java_note/Redis.md)
+- [SQL 练习](./TechNote/Java_note/SQL 练习.md)
+- [SQL 语法](./TechNote/Java_note/SQL 语法.md)
+- [SQL](./TechNote/Java_note/SQL.md)
+- [Socket](./TechNote/Java_note/Socket.md)
+- [testToc](./TechNote/Java_note/testToc.md)
+- [代码可读性](./TechNote/Java_note/代码可读性.md)
+- [代码风格规范](./TechNote/Java_note/代码风格规范.md)
+- [分布式](./TechNote/Java_note/分布式.md)
+- [剑指 Offer 题解 - 目录](./TechNote/Java_note/剑指 Offer 题解 - 目录.md)
+- [剑指 offer 题解](./TechNote/Java_note/剑指 offer 题解.md)
+- [攻击技术](./TechNote/Java_note/攻击技术.md)
+- [数据库系统原理](./TechNote/Java_note/数据库系统原理.md)
+- [构建工具](./TechNote/Java_note/构建工具.md)
+- [正则表达式](./TechNote/Java_note/正则表达式.md)
+- [消息队列](./TechNote/Java_note/消息队列.md)
+- [系统设计基础](./TechNote/Java_note/系统设计基础.md)
+- [缓存](./TechNote/Java_note/缓存.md)
+- [集群](./TechNote/Java_note/集群.md)
+
+### Operating System
+
+- [计算机操作系统 - 内存管理](./TechNote/OS/计算机操作系统 - 内存管理.md)
+- [计算机操作系统 - 概述](./TechNote/OS/计算机操作系统 - 概述.md)
+- [计算机操作系统 - 死锁](./TechNote/OS/计算机操作系统 - 死锁.md)
+- [计算机操作系统 - 目录](./TechNote/OS/计算机操作系统 - 目录.md)
+- [计算机操作系统 - 设备管理](./TechNote/OS/计算机操作系统 - 设备管理.md)
+- [计算机操作系统 - 进程管理](./TechNote/OS/计算机操作系统 - 进程管理.md)
+- [计算机操作系统 - 链接](./TechNote/OS/计算机操作系统 - 链接.md)
+- [计算机操作系统](./TechNote/OS/计算机操作系统.md)
+
+### Computer Network
+
+- [计算机网络 - 传输层](./TechNote/Network/计算机网络 - 传输层.md)
+- [计算机网络 - 应用层](./TechNote/Network/计算机网络 - 应用层.md)
+- [计算机网络 - 概述](./TechNote/Network/计算机网络 - 概述.md)
+- [计算机网络 - 物理层](./TechNote/Network/计算机网络 - 物理层.md)
+- [计算机网络 - 目录](./TechNote/Network/计算机网络 - 目录.md)
+- [计算机网络 - 网络层](./TechNote/Network/计算机网络 - 网络层.md)
+- [计算机网络 - 链路层](./TechNote/Network/计算机网络 - 链路层.md)
+- [计算机网络](./TechNote/Network/计算机网络.md)
+
+### Linux & Protocols
+
+- [DaKaYouHuaShuo_liqinqin](./TechNote/Linux/DaKaYouHuaShuo_liqinqin.md)
+- [ESS API ALL-1](./TechNote/Linux/ESS API ALL-1.md)
+- [ESS API ALL-2](./TechNote/Linux/ESS API ALL-2.md)
+- [Equipment model proto](./TechNote/Linux/Equipment model proto.md)
+- [Front-end Engineer Basics HTML5](./TechNote/Linux/Front-end Engineer Basics HTML5.md)
+- [HAIQ_ESS_API](./TechNote/Linux/HAIQ_ESS_API.md)
+- [Kubot protocol](./TechNote/Linux/Kubot protocol.md)
+- [NerdTree](./TechNote/Linux/NerdTree.md)
+- [Self use blog server](./TechNote/Linux/Self use blog server.md)
+
+### Design Patterns
+
+- [设计模式 - 目录](./TechNote/Design Pattern/设计模式 - 目录.md)
+- [设计模式 - 目录1](./TechNote/Design Pattern/设计模式 - 目录1.md)
+- [设计模式](./TechNote/Design Pattern/设计模式.md)
+- [面向对象思想](./TechNote/Design Pattern/面向对象思想.md)
+- [设计模式  - 单例](./TechNote/Design Pattern/设计模式  - 单例.md)
+- [设计模式 - 中介者](./TechNote/Design Pattern/设计模式 - 中介者.md)
+- [设计模式 - 享元](./TechNote/Design Pattern/设计模式 - 享元.md)
+- [设计模式 - 代理](./TechNote/Design Pattern/设计模式 - 代理.md)
+- [设计模式 - 原型模式](./TechNote/Design Pattern/设计模式 - 原型模式.md)
+- [设计模式 - 命令](./TechNote/Design Pattern/设计模式 - 命令.md)
+- [设计模式 - 备忘录](./TechNote/Design Pattern/设计模式 - 备忘录.md)
+- [设计模式 - 外观](./TechNote/Design Pattern/设计模式 - 外观.md)
+- [设计模式 - 工厂方法](./TechNote/Design Pattern/设计模式 - 工厂方法.md)
+- [设计模式 - 抽象工厂](./TechNote/Design Pattern/设计模式 - 抽象工厂.md)
+- [设计模式 - 桥接](./TechNote/Design Pattern/设计模式 - 桥接.md)
+- [设计模式 - 模板方法](./TechNote/Design Pattern/设计模式 - 模板方法.md)
+- [设计模式 - 状态](./TechNote/Design Pattern/设计模式 - 状态.md)
+- [设计模式 - 生成器](./TechNote/Design Pattern/设计模式 - 生成器.md)
+- [设计模式 - 空对象](./TechNote/Design Pattern/设计模式 - 空对象.md)
+- [设计模式 - 策略](./TechNote/Design Pattern/设计模式 - 策略.md)
+- [设计模式 - 简单工厂](./TechNote/Design Pattern/设计模式 - 简单工厂.md)
+- [设计模式 - 组合](./TechNote/Design Pattern/设计模式 - 组合.md)
+- [设计模式 - 装饰](./TechNote/Design Pattern/设计模式 - 装饰.md)
+- [设计模式 - 观察者](./TechNote/Design Pattern/设计模式 - 观察者.md)
+- [设计模式 - 解释器](./TechNote/Design Pattern/设计模式 - 解释器.md)
+- [设计模式 - 访问者](./TechNote/Design Pattern/设计模式 - 访问者.md)
+- [设计模式 - 责任链](./TechNote/Design Pattern/设计模式 - 责任链.md)
+- [设计模式 - 迭代器](./TechNote/Design Pattern/设计模式 - 迭代器.md)
+- [设计模式 - 适配器](./TechNote/Design Pattern/设计模式 - 适配器.md)
+
+### Algorithms
+
+- [算法 - 其它](./TechNote/AlgorithmQuestions/算法 - 其它.md)
+- [算法 - 并查集](./TechNote/AlgorithmQuestions/算法 - 并查集.md)
+- [算法 - 排序](./TechNote/AlgorithmQuestions/算法 - 排序.md)
+- [算法 - 栈和队列](./TechNote/AlgorithmQuestions/算法 - 栈和队列.md)
+- [算法 - 目录](./TechNote/AlgorithmQuestions/算法 - 目录.md)
+- [算法 - 符号表](./TechNote/AlgorithmQuestions/算法 - 符号表.md)
+- [算法 - 算法分析](./TechNote/AlgorithmQuestions/算法 - 算法分析.md)
+- [算法](./TechNote/AlgorithmQuestions/算法.md)
+
+### Misc
+
+- [README](./TechNote/README.md)
+- [markdownExample](./TechNote/markdownExample.md)
+
+## notes-2024
+
+### LeetCode Topics
+
+- [Leetcode 题解 - 二分查找](./notes-2024/Leetcode 题解 - 二分查找.md)
+- [Leetcode 题解 - 位运算](./notes-2024/Leetcode 题解 - 位运算.md)
+- [Leetcode 题解 - 分治](./notes-2024/Leetcode 题解 - 分治.md)
+- [Leetcode 题解 - 动态规划](./notes-2024/Leetcode 题解 - 动态规划.md)
+- [Leetcode 题解 - 双指针](./notes-2024/Leetcode 题解 - 双指针.md)
+- [Leetcode 题解 - 哈希表](./notes-2024/Leetcode 题解 - 哈希表.md)
+- [Leetcode 题解 - 图](./notes-2024/Leetcode 题解 - 图.md)
+- [Leetcode 题解 - 字符串](./notes-2024/Leetcode 题解 - 字符串.md)
+- [Leetcode 题解 - 排序](./notes-2024/Leetcode 题解 - 排序.md)
+- [Leetcode 题解 - 搜索](./notes-2024/Leetcode 题解 - 搜索.md)
+- [Leetcode 题解 - 数学](./notes-2024/Leetcode 题解 - 数学.md)
+- [Leetcode 题解 - 数组与矩阵](./notes-2024/Leetcode 题解 - 数组与矩阵.md)
+- [Leetcode 题解 - 栈和队列](./notes-2024/Leetcode 题解 - 栈和队列.md)
+- [Leetcode 题解 - 树](./notes-2024/Leetcode 题解 - 树.md)
+- [Leetcode 题解 - 目录](./notes-2024/Leetcode 题解 - 目录.md)
+- [Leetcode 题解 - 贪心思想](./notes-2024/Leetcode 题解 - 贪心思想.md)
+- [Leetcode 题解 - 链表](./notes-2024/Leetcode 题解 - 链表.md)
+- [Leetcode 题解](./notes-2024/Leetcode 题解.md)
+
+### 剑指 Offer (by problem)
+
+- [3. 数组中重复的数字](./notes-2024/3. 数组中重复的数字.md)
+- [4. 二维数组中的查找](./notes-2024/4. 二维数组中的查找.md)
+- [5. 替换空格](./notes-2024/5. 替换空格.md)
+- [6. 从尾到头打印链表](./notes-2024/6. 从尾到头打印链表.md)
+- [7. 重建二叉树](./notes-2024/7. 重建二叉树.md)
+- [8. 二叉树的下一个结点](./notes-2024/8. 二叉树的下一个结点.md)
+- [9. 用两个栈实现队列](./notes-2024/9. 用两个栈实现队列.md)
+- [10.1 斐波那契数列](./notes-2024/10.1 斐波那契数列.md)
+- [10.2 矩形覆盖](./notes-2024/10.2 矩形覆盖.md)
+- [10.3 跳台阶](./notes-2024/10.3 跳台阶.md)
+- [10.4 变态跳台阶](./notes-2024/10.4 变态跳台阶.md)
+- [11. 旋转数组的最小数字](./notes-2024/11. 旋转数组的最小数字.md)
+- [12. 矩阵中的路径](./notes-2024/12. 矩阵中的路径.md)
+- [13. 机器人的运动范围](./notes-2024/13. 机器人的运动范围.md)
+- [14. 剪绳子](./notes-2024/14. 剪绳子.md)
+- [15. 二进制中 1 的个数](./notes-2024/15. 二进制中 1 的个数.md)
+- [16. 数值的整数次方](./notes-2024/16. 数值的整数次方.md)
+- [17. 打印从 1 到最大的 n 位数](./notes-2024/17. 打印从 1 到最大的 n 位数.md)
+- [18.1 在 O(1) 时间内删除链表节点](./notes-2024/18.1 在 O(1) 时间内删除链表节点.md)
+- [18.2 删除链表中重复的结点](./notes-2024/18.2 删除链表中重复的结点.md)
+- [19. 正则表达式匹配](./notes-2024/19. 正则表达式匹配.md)
+- [20. 表示数值的字符串](./notes-2024/20. 表示数值的字符串.md)
+- [21. 调整数组顺序使奇数位于偶数前面](./notes-2024/21. 调整数组顺序使奇数位于偶数前面.md)
+- [22. 链表中倒数第 K 个结点](./notes-2024/22. 链表中倒数第 K 个结点.md)
+- [23. 链表中环的入口结点](./notes-2024/23. 链表中环的入口结点.md)
+- [24. 反转链表](./notes-2024/24. 反转链表.md)
+- [25. 合并两个排序的链表](./notes-2024/25. 合并两个排序的链表.md)
+- [26. 树的子结构](./notes-2024/26. 树的子结构.md)
+- [27. 二叉树的镜像](./notes-2024/27. 二叉树的镜像.md)
+- [28. 对称的二叉树](./notes-2024/28. 对称的二叉树.md)
+- [29. 顺时针打印矩阵](./notes-2024/29. 顺时针打印矩阵.md)
+- [30. 包含 min 函数的栈](./notes-2024/30. 包含 min 函数的栈.md)
+- [31. 栈的压入、弹出序列](./notes-2024/31. 栈的压入、弹出序列.md)
+- [32.1 从上往下打印二叉树](./notes-2024/32.1 从上往下打印二叉树.md)
+- [32.2 把二叉树打印成多行](./notes-2024/32.2 把二叉树打印成多行.md)
+- [32.3 按之字形顺序打印二叉树](./notes-2024/32.3 按之字形顺序打印二叉树.md)
+- [33. 二叉搜索树的后序遍历序列](./notes-2024/33. 二叉搜索树的后序遍历序列.md)
+- [34. 二叉树中和为某一值的路径](./notes-2024/34. 二叉树中和为某一值的路径.md)
+- [35. 复杂链表的复制](./notes-2024/35. 复杂链表的复制.md)
+- [36. 二叉搜索树与双向链表](./notes-2024/36. 二叉搜索树与双向链表.md)
+- [37. 序列化二叉树](./notes-2024/37. 序列化二叉树.md)
+- [38. 字符串的排列](./notes-2024/38. 字符串的排列.md)
+- [39. 数组中出现次数超过一半的数字](./notes-2024/39. 数组中出现次数超过一半的数字.md)
+- [40. 最小的 K 个数](./notes-2024/40. 最小的 K 个数.md)
+- [41.1 数据流中的中位数](./notes-2024/41.1 数据流中的中位数.md)
+- [41.2 字符流中第一个不重复的字符](./notes-2024/41.2 字符流中第一个不重复的字符.md)
+- [42. 连续子数组的最大和](./notes-2024/42. 连续子数组的最大和.md)
+- [43. 从 1 到 n 整数中 1 出现的次数](./notes-2024/43. 从 1 到 n 整数中 1 出现的次数.md)
+- [44. 数字序列中的某一位数字](./notes-2024/44. 数字序列中的某一位数字.md)
+- [45. 把数组排成最小的数](./notes-2024/45. 把数组排成最小的数.md)
+- [46. 把数字翻译成字符串](./notes-2024/46. 把数字翻译成字符串.md)
+- [47. 礼物的最大价值](./notes-2024/47. 礼物的最大价值.md)
+- [48. 最长不含重复字符的子字符串](./notes-2024/48. 最长不含重复字符的子字符串.md)
+- [49. 丑数](./notes-2024/49. 丑数.md)
+- [50. 第一个只出现一次的字符位置](./notes-2024/50. 第一个只出现一次的字符位置.md)
+- [51. 数组中的逆序对](./notes-2024/51. 数组中的逆序对.md)
+- [52. 两个链表的第一个公共结点](./notes-2024/52. 两个链表的第一个公共结点.md)
+- [53. 数字在排序数组中出现的次数](./notes-2024/53. 数字在排序数组中出现的次数.md)
+- [54. 二叉查找树的第 K 个结点](./notes-2024/54. 二叉查找树的第 K 个结点.md)
+- [55.1 二叉树的深度](./notes-2024/55.1 二叉树的深度.md)
+- [55.2 平衡二叉树](./notes-2024/55.2 平衡二叉树.md)
+- [56. 数组中只出现一次的数字](./notes-2024/56. 数组中只出现一次的数字.md)
+- [57.1 和为 S 的两个数字](./notes-2024/57.1 和为 S 的两个数字.md)
+- [57.2 和为 S 的连续正数序列](./notes-2024/57.2 和为 S 的连续正数序列.md)
+- [58.1 翻转单词顺序列](./notes-2024/58.1 翻转单词顺序列.md)
+- [58.2 左旋转字符串](./notes-2024/58.2 左旋转字符串.md)
+- [59. 滑动窗口的最大值](./notes-2024/59. 滑动窗口的最大值.md)
+- [60. n 个骰子的点数](./notes-2024/60. n 个骰子的点数.md)
+- [61. 扑克牌顺子](./notes-2024/61. 扑克牌顺子.md)
+- [62. 圆圈中最后剩下的数](./notes-2024/62. 圆圈中最后剩下的数.md)
+- [63. 股票的最大利润](./notes-2024/63. 股票的最大利润.md)
+- [64. 求 1+2+3+...+n](./notes-2024/64. 求 1+2+3+...+n.md)
+- [65. 不用加减乘除做加法](./notes-2024/65. 不用加减乘除做加法.md)
+- [66. 构建乘积数组](./notes-2024/66. 构建乘积数组.md)
+- [67. 把字符串转换成整数](./notes-2024/67. 把字符串转换成整数.md)
+- [68. 树中两个节点的最低公共祖先](./notes-2024/68. 树中两个节点的最低公共祖先.md)
+
+## XuetangX
+
+Java course notes from 学堂在线.
+
+- [1_Basics](./XuetangX/1_Basics.md)
+- [2_Class](./XuetangX/2_Class.md)
+- [3_Extends](./XuetangX/3_Extends.md)
+
+## SinevaWorkLog
+
+- [weekly](./SinevaWorkLog/weekly.md)
+
+> *Notes index: 250 files · Last updated: 2026-07-12*
+
+<br><br><br>
+
+Inspired by the personal knowledge project of CodeSheep.
+<!-- And you can check the original template websites r2coding content [here](./r2coding.md) -->

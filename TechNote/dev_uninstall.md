@@ -21,3 +21,5 @@ sudo bash matrix_auto_uninstall.sh --yes    # 跳过确认
 | apt 包   | `mysql-server`、`dotnet-sdk-6.0`、`nginx`、`net-tools`、`vim`、`curl`、`chrony` 等        |
 
 **说明：** 不会卸载 `openssh-server`，避免远程 SSH 断开。重装前执行卸载脚本，再跑 `sudo bash matrix_auto_install.sh` 即可。
+
+
