@@ -2,31 +2,42 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-  <!-- Favicon 配置 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+  <!-- Favicon -->
   <link rel="icon" href="/docs/_media/favicon.ico" type="image/x-icon">
   <link rel="shortcut icon" href="/docs/_media/favicon.ico" type="image/x-icon">
-  
-  <!-- 苹果设备图标 -->
   <link rel="apple-touch-icon" sizes="180x180" href="/docs/_media/apple-touch-icon.png">
-  
-  <!-- 现代浏览器图标 -->
   <link rel="icon" type="image/png" sizes="192x192" href="/docs/_media/web-app-manifest-192x192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/docs/_media/web-app-manifest-512x512.png">
 
-
-  <title>Domi’s Cloud Nook🛖</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-  <meta name="description" content="Description">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <title>Domi's Cloud Nook🛖</title>
+  <meta name="description" content="Personal knowledge base — Operations Research, C++, Java, and more.">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/pure.css">
-  <!-- <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/dark.css"> -->
+  <style>
+    .markdown-section { max-width: 960px; }
+    .markdown-section table { display: table; width: 100%; }
+    .markdown-section .mermaid {
+      text-align: center;
+      margin: 1.2em 0;
+      overflow-x: auto;
+    }
+    .markdown-section pre[data-lang="mermaid"] { background: transparent; }
+  </style>
 </head>
 <body>
   <div id="app"></div>
+
+  <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script>
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'default',
+      securityLevel: 'loose',
+      flowchart: { htmlLabels: true, useMaxWidth: true }
+    });
+
     window.$docsify = {
       name: '',
       title: '',
@@ -36,10 +47,37 @@
       nativeEmoji: true,
       notFoundPage: true,
       coverpage: true,
-      loadNavbar: true
-    }
+      loadNavbar: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      markdown: {
+        renderer: {
+          code: function (code, lang) {
+            if (lang === 'mermaid') {
+              return '<div class="mermaid">' + code + '</div>';
+            }
+            return this.origin.code.apply(this, arguments);
+          }
+        }
+      },
+      plugins: [
+        function (hook) {
+          hook.doneEach(function () {
+            var section = document.querySelector('.markdown-section');
+            if (!section) return;
+            section.querySelectorAll('.mermaid svg').forEach(function (el) { el.remove(); });
+            section.querySelectorAll('.mermaid[data-processed]').forEach(function (el) {
+              el.removeAttribute('data-processed');
+            });
+            var nodes = section.querySelectorAll('.mermaid');
+            if (nodes.length) {
+              mermaid.run({ nodes: nodes, suppressErrors: true });
+            }
+          });
+        }
+      ]
+    };
   </script>
-  <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
 </body>
 </html>
