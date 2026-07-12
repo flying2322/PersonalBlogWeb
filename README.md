@@ -116,7 +116,7 @@ Personal pages and bookmarks. **Full catalog → [§3 ALL NOTES INDEX](#3-all-no
 
 Curated entry points by topic. See **§3** for every file.
 
-## 1_Algorithm_Leecode
+## 1 算法
 
 LeetCode 专题、剑指 Offer 逐题解、算法数据结构笔记
 
@@ -124,7 +124,7 @@ LeetCode 专题、剑指 Offer 逐题解、算法数据结构笔记
 - [Leetcode 题解 - 动态规划](./1_Algorithm_Leecode/Leetcode%20%E9%A2%98%E8%A7%A3%20-%20%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92.md) — Leetcode 题解 - 动态规划
 - [Leetcode 题解 - 树](./1_Algorithm_Leecode/Leetcode%20%E9%A2%98%E8%A7%A3%20-%20%E6%A0%91.md) — Leetcode 题解 - 树
 
-## 2_JavaPythonCCpp
+## 2 语言
 
 Java / C++ / Python 语言、并发、数据库与工程实践
 
@@ -135,7 +135,7 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [protobuf_basics](./2_JavaPythonCCpp/protobuf_basics.md) — 在 Protocol Buffers (Protobuf) 中，bytes 是一种基础的标量数据类型，用于表示任意的字节序列（即原始二进制数据）。它在网络通信…
 - [剑指 Offer 题解 - 目录](./2_JavaPythonCCpp/%E5%89%91%E6%8C%87%20Offer%20%E9%A2%98%E8%A7%A3%20-%20%E7%9B%AE%E5%BD%95.md) — 剑指 Offer 题解
 
-## 3_DesignPattern
+## 3 设计模式
 
 23 种设计模式与面向对象思想
 
@@ -143,7 +143,7 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [设计模式](./3_DesignPattern/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md) — 一、概述
 - [面向对象思想](./3_DesignPattern/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E6%80%9D%E6%83%B3.md) — 面向对象思想
 
-## 4_OS_Linux_WIN_MAC
+## 4 操作系统
 
 操作系统、Linux 工具、ESS 协议与前端基础
 
@@ -151,21 +151,21 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [Self_use_blog_server](./4_OS_Linux_WIN_MAC/Self_use_blog_server.md) — 1. CodeSheep knowledeg server
 - [cla](./4_OS_Linux_WIN_MAC/cla.md) — 🧱** Clash for Linux（Headless）完整配置与使用笔记**
 
-## 5_Network
+## 5 计算机网络
 
 计算机网络各层原理与笔记
 
 - [计算机网络 - 目录](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%20-%20%E7%9B%AE%E5%BD%95.md) — 计算机网络
 - [计算机网络](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md) — 计算机网络.md
 
-## 7_DairyAndLife
+## 7 日常
 
 日记、周报、人生清单与生活随笔
 
 - [weekly](./7_DairyAndLife/weekly.md) — Week 2: 1 ~ 5 June
 - [20260530_interview_overWork](./7_DairyAndLife/20260530_interview_overWork.md) — markdown
 
-## 8_WorkHRCMSIN
+## 8 Work
 
 Matrix AGV 调度 Core、路径规划与工作调试笔记
 
@@ -174,11 +174,11 @@ Matrix AGV 调度 Core、路径规划与工作调试笔记
 - [matrix-core](./8_WorkHRCMSIN/matrix-core.md) — Here is my understanding of Matrix — core based on exploring the repo.
 - [core_turnaround2charge](./8_WorkHRCMSIN/core_turnaround2charge.md) — corechargeturnAround
 
-## 9_Others_Notes_Unsorted
+## 9 其他
 
 书签集合、论文备忘、个人索引与杂项笔记
 
-- [liwenpeng](./9_Others_Notes_Unsorted/liwenpeng.md) — This is a page I wanna to summary my link and posts platforms.
+- [Aboute ME](./9_Others_Notes_Unsorted/liwenpeng.md) — This is a page I wanna to summary my link and posts platforms.
 - [Bookmarks](./9_Others_Notes_Unsorted/Bookmarks.md) — Over time, I noticed that my bookmarks folder had become almost full. Regardles…
 - [neovimTutorial](./9_Others_Notes_Unsorted/neovimTutorial.md) — Neovim Toturial for truely beginners on win11 and colemak users
 - [bapyap](./9_Others_Notes_Unsorted/bapyap.md) — 在集装箱码头的运营优化中，泊位分配问题（Berth Allocation Problem, BAP）和场位分配问题（Yard Allocation Probl…
@@ -200,7 +200,9 @@ Complete navigation to all **249** markdown notes.
 - [8_WorkHRCMSIN](#8-workhrcmsin)
 - [9_Others_Notes_Unsorted](#9-others-notes-unsorted)
 
-## 1_Algorithm_Leecode
+
+
+## 1 算法
 
 LeetCode 专题、剑指 Offer 逐题解、算法数据结构笔记
 
@@ -312,7 +314,7 @@ LeetCode 专题、剑指 Offer 逐题解、算法数据结构笔记
 - [8. 二叉树的下一个结点](./1_Algorithm_Leecode/8.%20%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%8B%E4%B8%80%E4%B8%AA%E7%BB%93%E7%82%B9.md) — 8. 二叉树的下一个结点
 - [9. 用两个栈实现队列](./1_Algorithm_Leecode/9.%20%E7%94%A8%E4%B8%A4%E4%B8%AA%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97.md) — 9. 用两个栈实现队列
 
-## 2_JavaPythonCCpp
+## 2 语言
 
 Java / C++ / Python 语言、并发、数据库与工程实践
 
@@ -375,7 +377,7 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [缓存](./2_JavaPythonCCpp/%E7%BC%93%E5%AD%98.md) — 缓存
 - [集群](./2_JavaPythonCCpp/%E9%9B%86%E7%BE%A4.md) — 集群
 
-## 3_DesignPattern
+## 3 设计模式
 
 23 种设计模式与面向对象思想
 
@@ -409,11 +411,20 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [设计模式 - 迭代器](./3_DesignPattern/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%20-%20%E8%BF%AD%E4%BB%A3%E5%99%A8.md) — 迭代器（Iterator）
 - [设计模式 - 适配器](./3_DesignPattern/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%20-%20%E9%80%82%E9%85%8D%E5%99%A8.md) — 1. 适配器（Adapter）
 
-## 4_OS_Linux_WIN_MAC
+## 4 操作系统
 
 操作系统、Linux 工具、ESS 协议与前端基础
 
-- [DaKaYouHuaShuo_liqinqin](./4_OS_Linux_WIN_MAC/DaKaYouHuaShuo_liqinqin.md) — - 面向用户（开发+客户）
+- [计算机操作系统 - 内存管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 内存管理
+- [计算机操作系统 - 概述](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E6%A6%82%E8%BF%B0.md) — 计算机操作系统 - 概述
+- [计算机操作系统 - 死锁](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E6%AD%BB%E9%94%81.md) — 计算机操作系统 - 死锁
+- [计算机操作系统 - 目录](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E7%9B%AE%E5%BD%95.md) — 计算机操作系统
+- [计算机操作系统 - 设备管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 设备管理
+- [计算机操作系统 - 进程管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 进程管理
+- [计算机操作系统 - 链接](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E9%93%BE%E6%8E%A5.md) — 计算机操作系统 - 链接
+- [计算机操作系统](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.md) — 计算机操作系统
+
+- [DaKaYouHuaShuo](./4_OS_Linux_WIN_MAC/DaKaYouHuaShuo_liqinqin.md) — - 面向用户（开发+客户）
 - [Docker](./4_OS_Linux_WIN_MAC/Docker.md) — Docker
 - [ESS_API_ALL_1](./4_OS_Linux_WIN_MAC/ESS_API_ALL_1.md) — Table of Contents
 - [ESS_API_ALL_2](./4_OS_Linux_WIN_MAC/ESS_API_ALL_2.md) — 4. 任务事件回调接口
@@ -424,17 +435,9 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [Kubot_protocol](./4_OS_Linux_WIN_MAC/Kubot_protocol.md) — 1. 接口
 - [NerdTree](./4_OS_Linux_WIN_MAC/NerdTree.md) — File node mappings
 - [Self_use_blog_server](./4_OS_Linux_WIN_MAC/Self_use_blog_server.md) — 1. CodeSheep knowledeg server
-- [cla](./4_OS_Linux_WIN_MAC/cla.md) — 🧱** Clash for Linux（Headless）完整配置与使用笔记**
-- [计算机操作系统 - 内存管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 内存管理
-- [计算机操作系统 - 概述](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E6%A6%82%E8%BF%B0.md) — 计算机操作系统 - 概述
-- [计算机操作系统 - 死锁](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E6%AD%BB%E9%94%81.md) — 计算机操作系统 - 死锁
-- [计算机操作系统 - 目录](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E7%9B%AE%E5%BD%95.md) — 计算机操作系统
-- [计算机操作系统 - 设备管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E8%AE%BE%E5%A4%87%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 设备管理
-- [计算机操作系统 - 进程管理](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86.md) — 计算机操作系统 - 进程管理
-- [计算机操作系统 - 链接](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%20-%20%E9%93%BE%E6%8E%A5.md) — 计算机操作系统 - 链接
-- [计算机操作系统](./4_OS_Linux_WIN_MAC/%E8%AE%A1%E7%AE%97%E6%9C%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F.md) — 计算机操作系统
+- [clash on linux](./4_OS_Linux_WIN_MAC/cla.md) — 🧱**Clash for Linux（Headless）完整配置与使用笔记**
 
-## 5_Network
+## 5 计算机网络
 
 计算机网络各层原理与笔记
 
@@ -447,7 +450,7 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [计算机网络 - 链路层](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%20-%20%E9%93%BE%E8%B7%AF%E5%B1%82.md) — 计算机网络 - 链路层
 - [计算机网络](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md) — 计算机网络.md
 
-## 7_DairyAndLife
+## 7 日常
 
 日记、周报、人生清单与生活随笔
 
@@ -455,7 +458,7 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [bucket_list](./7_DairyAndLife/bucket_list.md) — Bucket List
 - [weekly](./7_DairyAndLife/weekly.md) — Week 2: 1 ~ 5 June
 
-## 8_WorkHRCMSIN
+## 8 Work
 
 Matrix AGV 调度 Core、路径规划与工作调试笔记
 
@@ -475,7 +478,7 @@ Matrix AGV 调度 Core、路径规划与工作调试笔记
 - [doStartMovement](./8_WorkHRCMSIN/doStartMovement.md) — 在这行代码上，没有功能区别，两者都是给 std::sharedptr<Route> 起别名 RoutePtr。
 - [matrix-core](./8_WorkHRCMSIN/matrix-core.md) — Here is my understanding of Matrix — core based on exploring the repo.
 
-## 9_Others_Notes_Unsorted
+## 9 其他
 
 书签集合、论文备忘、个人索引与杂项笔记
 
@@ -497,5 +500,4 @@ Matrix AGV 调度 Core、路径规划与工作调试笔记
 > *Notes index: 249 files · Last updated: 2026-07-12*
 <br><br><br>
 
-Inspired by the personal knowledge project of CodeSheep.
-<!-- And you can check the original template websites r2coding content [here](./r2coding.md) -->
+Inspired by CodeSheep's personal knowledge project. Some notes cite external sources and preserve their original layout and image attributions. For copyright concerns, please email me — thanks.

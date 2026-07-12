@@ -1,4 +1,3 @@
-> 🎯 **[My Bucket List — life goals & travel checklist](../7_DairyAndLife/bucket_list.md)**
 
 
 <img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="90%" height="90%">
