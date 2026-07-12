@@ -1,6 +1,6 @@
 # 1. 接口
 ## 1.1 概述
-![clipboard.png](../notes-2024/pics/screenshot-20240123-113930.png)
+![clipboard.png](../1_Algorithm_Leecode/pics/screenshot-20240123-113930.png)
 如框架图所示,虚线框内包含接入服务(Linklayer)、消息中间件(Redis/Kafka)、调度系统(RCS),运行于服
 务器环境中。机器人通过WIFI/4G/5G等无线网络设施与Linklayer进行通信,Linklayer可以同时接入多个机器人。
 RCS通过 Linklayer获取机器人状态和控制机器人,RCS与Linklayer通过redis和kafka进行通信,RCS可以是海

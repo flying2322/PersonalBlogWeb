@@ -1,3 +1,5 @@
+> 🎯 **[My Bucket List — life goals & travel checklist](../7_DairyAndLife/bucket_list.md)**
+
 
 <img src="https://s2.loli.net/2023/06/18/F4YaMLNsvmZpbS8.png" alt="selfie.png" width="90%" height="90%">
 
@@ -31,7 +33,7 @@ BOOKMARKS IN FAVORITES FOLDER
 
 这里根据知乎问题 [有哪些适合入门且较全面的运筹学书籍可以推荐一下吗？](https://www.zhihu.com/question/24620225/answer/1837628198) 整理而成。主要作者覃含章、王源、留德华教授等，这些内容非常详尽，对于想一窥“运筹优化-管理科学”的研究内容和方法的学者窃以为很有价值。再次整理希望使内容更有层次和条理。
 
-![Operations Research Books(Highly recommended)](_media/4books.png)
+![Operations Research Books(Highly recommended)](../img/4books.png)
 
 ---
 

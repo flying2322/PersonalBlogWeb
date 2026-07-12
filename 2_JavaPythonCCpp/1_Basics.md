@@ -93,7 +93,7 @@ New -> New project -> project name/JavaSE 1.8
 public static void arraycopy(Object source, int srcIndex, Object dest, int destIndex, int length)
 ```
 
-![arraycopy](../XuetangX/img/strcopy.jpg)
+![arraycopy](../img/strcopy.jpg)
 **Example**
 ```java
 public class ArrayCopyDemo
