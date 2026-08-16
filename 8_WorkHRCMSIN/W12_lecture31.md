@@ -278,3 +278,197 @@ sequenceDiagram
 | 2′  | 时序收束 + Q&A | 强调：`slowPenaltyFactor`、对向因子当前弱效                             |
 
 如需，我可以把以上内容整理成 `core/docs` 下一份独立培训 Markdown（可直接投影），或导出为分页幻灯结构。
+
+
+
+
+
+
+
+下面按**调用顺序**梳理：只挑「订单分配 + 路径规划」链路上、**实现超过约 50 行**、且讲座里最该讲的函数。
+
+---
+
+## 1. 核心函数清单（>50 行）
+
+### 订单分配侧
+
+| 函数                                         | 约行数  | 一句话                               |
+| ------------------------------------------ | ---- | --------------------------------- |
+| `OptimizeTaskAssigner::canWorkVehicles`    | ~106 | 过滤可接单车，拆成空闲/忙碌池（含 `maxCacheTask`） |
+| `OptimizeTaskAssigner::assignGroupOrders`  | ~63  | 空闲优先 / 拼单开关 / 比代价绑车               |
+| `OptimizeTaskAssigner::assignIdleVehicles` | ~117 | 对空闲车调规划，选最短估时                     |
+| `OptimizeTaskAssigner::mergePath`          | ~91  | 忙碌车在途插单：两路点序列交错取近                 |
+| `OptimizeTaskAssigner::findBestRoute`      | ~51  | 派单侧规划入口（同层 / 跨层电梯）                |
+| `TaskAssignService::dispatchBlockTasks`    | ~222 | 已绑车订单取队首 Block，推车后交给交管            |
+| `TaskAssignService::processPushVehicles`   | ~53  | `canPushVehicles`：多车规划推开闲置车       |
+| `TaskAssignService::dispatchPushYieldTask` | ~69  | 给被推车建闲置让行任务并规划                    |
+
+### 路径规划侧
+
+| 函数                                               | 约行数  | 一句话                              |
+| ------------------------------------------------ | ---- | -------------------------------- |
+| `planning::plan`（`utils.hpp`）                    | ~85  | 组装 A*、旋转/旅行代价策略，校验起终点            |
+| `planning::multiPlan`（`utils.hpp`）               | ~106 | 推车用的多车联合规划入口                     |
+| `MultiRoutePlanner::plan`                        | ~76  | 主车路径 → 找冲突闲置车 → 再规划避让            |
+| `GenericSearchPlanner::doPlan`                   | ~100 | **真正的 A\* 搜索核**（open/closed、边代价） |
+| `RegulationTrafficControlService::runBlockTask`  | ~59  | 交管接 Block：规划全路径写入 Control        |
+| `RegulationTrafficControlService::getPlanResult` | ~80  | 交管规划：挂绕障/交通流/禁行区策略               |
+| `RegulationTrafficControlService::detour`        | ~142 | 绕障触发后重规划                         |
+| `RegulationTrafficControlService::updateRoutes`  | ~192 | 滚动下发路段、让行、旋转阈值                   |
+
+> 说明：`updatePositions` 也很大，偏「位置推进/完成判定」，不是「选路算法核」，讲座可一笔带过。
+
+---
+
+## 2. 调用顺序 UML（序列图）——讲座主图
+
+从「每秒派单拍」到「第一次真正 A\*」再到「交管落地规划」：
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant TAS as TaskAssignService
+    participant OTA as OptimizeTaskAssigner
+    participant Plan as planning::plan / multiPlan
+    participant MRP as MultiRoutePlanner
+    participant AStar as GenericSearchPlanner::doPlan
+    participant TC as RegulationTrafficControlService
+
+    Note over TAS: doWork() ~1s（入口较短）
+
+    TAS->>OTA: dispatchOrders → assign → assignGroupOrders
+    OTA->>OTA: canWorkVehicles（>50）
+    OTA->>OTA: assignIdleVehicles（>50）
+    OTA->>OTA: findBestRoute（>50）
+    OTA->>Plan: plan(路网, 车, 起, 目标)
+    Plan->>AStar: AStarPlanner → doPlan（>50）
+    AStar-->>Plan: PlanResult
+    Plan-->>OTA: 估时/距离
+
+    opt merge 打开且要比忙碌车
+        OTA->>OTA: assignWorkVehicles → mergePath（>50）
+        OTA->>OTA: findBestRoute
+        OTA->>Plan: plan(...)
+        Plan->>AStar: doPlan
+    end
+
+    OTA->>OTA: assignOrderToVehicle（绑车）
+
+    TAS->>TAS: dispatchBlockTasks（>50）
+    opt canPushVehicles
+        TAS->>TAS: processPushVehicles（>50）
+        TAS->>Plan: multiPlan（>50）
+        Plan->>MRP: MultiRoutePlanner::plan（>50）
+        MRP->>AStar: doPlan（主车）
+        MRP->>AStar: doPlan（挡路闲置车）
+        TAS->>TAS: dispatchPushYieldTask（>50）
+    end
+
+    TAS->>TC: dispatchTask → addVehicleTask → runBlockTask（>50）
+    TC->>TC: getPlanResult（>50）
+    TC->>Plan: plan(..., 交通流/禁行区策略)
+    Plan->>AStar: doPlan
+    AStar-->>TC: 全路径写入 Control
+
+    Note over TC: 后续周期 updateRoutes / detour<br/>滚动执行与绕障重规划
+```
+
+---
+
+## 3. 结构关系 UML（类图）——讲「谁调谁」
+
+```mermaid
+classDiagram
+    class TaskAssignService {
+        +doWork()
+        +dispatchOrders()
+        +dispatchBlockTasks()  ≈222
+        +processPushVehicles() ≈53
+        +dispatchPushYieldTask() ≈69
+        +dispatchTask()
+    }
+
+    class OptimizeTaskAssigner {
+        +assignGroupOrders() ≈63
+        +canWorkVehicles() ≈106
+        +assignIdleVehicles() ≈117
+        +assignWorkVehicles()
+        +mergePath() ≈91
+        +findBestRoute() ≈51
+        +assignOrderToVehicle()
+    }
+
+    class planning_utils {
+        +plan() ≈85
+        +multiPlan() ≈106
+    }
+
+    class MultiRoutePlanner {
+        +plan() ≈76
+    }
+
+    class AStarPlanner {
+        +plan()
+    }
+
+    class GenericSearchPlanner {
+        +doPlan() ≈100
+    }
+
+    class RegulationTrafficControlService {
+        +runBlockTask() ≈59
+        +getPlanResult() ≈80
+        +detour() ≈142
+        +updateRoutes() ≈192
+    }
+
+    TaskAssignService --> OptimizeTaskAssigner : 选车
+    OptimizeTaskAssigner --> planning_utils : findBestRoute
+    TaskAssignService --> planning_utils : 推车 multiPlan
+    planning_utils --> MultiRoutePlanner : 多车
+    planning_utils --> AStarPlanner : 单车
+    MultiRoutePlanner --> AStarPlanner
+    AStarPlanner --> GenericSearchPlanner : doPlan
+    TaskAssignService --> RegulationTrafficControlService : 下发 Block
+    RegulationTrafficControlService --> planning_utils : getPlanResult
+```
+
+---
+
+## 4. 按调用顺序「怎么讲」（口播提纲）
+
+1. **`assignGroupOrders`**：决策中枢——空闲优先 / merge / 比代价。  
+2. **`canWorkVehicles`**：谁有资格进池（电量、车组、地图、`maxCacheTask`）。  
+3. **`assignIdleVehicles` / `mergePath`**：分别算空闲直达与忙碌插单；都靠 **`findBestRoute`**。  
+4. **`planning::plan` → `doPlan`**：派单阶段的「估时尺子」（A\* + 旅行/旋转代价）。  
+5. **`dispatchBlockTasks` → `processPushVehicles` → `multiPlan`**：执行前能不能把挡路闲置车推开。  
+6. **`runBlockTask` → `getPlanResult` → `plan` → `doPlan`**：交管第一次生成**可执行全路径**（比派单多挂交通流/禁行区等策略）。  
+7. **`updateRoutes` / `detour`**：跑起来以后的滚动下发与绕障重规划（仍会再进 `getPlanResult`/`doPlan`）。
+
+---
+
+## 5. 两张「算法核」对比（适合收尾）
+
+|     | 派单规划              | 交管规划              |
+| --- | ----------------- | ----------------- |
+| 入口  | `findBestRoute`   | `getPlanResult`   |
+| 目的  | 选车、比 ETA          | 生成/重规划真路径         |
+| 策略  | 旅行 + 旋转为主         | + 交通流、禁行区、可选绕障    |
+| 搜索核 | 同一个 `doPlan`（A\*） | 同一个 `doPlan`（A\*） |
+
+**金句**：订单分配和路径规划共用一个 A\* 核（`doPlan`）；差别在**谁调用、挂什么代价策略、结果用来选车还是开车**。
+
+若需要，我可以再拆一张「仅 `mergePath` ↔ `doPlan`」的放大序列图，专门讲拼单时怎么反复调规划。
+
+
+
+
+
+
+
+
+
+
+
+
