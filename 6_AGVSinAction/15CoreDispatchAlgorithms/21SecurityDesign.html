@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 调度系统安全设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="active">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 调度系统安全设计：访问控制、数据加密、通信安全、物理安全</h2>
+
+<p>说实话，安全这个话题在AGV调度系统里，经常被当成「锦上添花」的东西。我见过不少项目，前期只顾着把车跑起来，等上线了才发现——嗯，谁都能连上调度服务器，报文明文传输，甚至有人能直接改数据库里的路径数据。那场面，想想都头疼。</p>
+
+<p>今天咱们就把这块掰开揉碎了讲。安全不是单独的一个模块，它应该渗透到系统的每个角落。我个人习惯把它分成四个维度：<strong>访问控制、数据加密、通信安全、物理安全</strong>。下面一个个说。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>安全设计不是「加锁」，而是「建墙」。每一层都设防，才能挡住大多数攻击。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="780" height="380" fill="#f0f8ff" stroke="#b0c4de" stroke-width="2" rx="10"/>
+  <text x="400" y="50" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV调度系统安全设计四维模型</text>
+  
+  <!-- 中心节点 -->
+  <circle cx="400" cy="200" r="60" fill="#4682b4" opacity="0.9"/>
+  <text x="400" y="195" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调度系统</text>
+  <text x="400" y="215" text-anchor="middle" font-size="12" fill="white">安全核心</text>
+  
+  <!-- 四个维度 -->
+  <!-- 访问控制 -->
+  <rect x="80" y="120" width="160" height="80" fill="#e6f3ff" stroke="#5b9bd5" stroke-width="2" rx="8"/>
+  <text x="160" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">访问控制</text>
+  <text x="160" y="175" text-anchor="middle" font-size="12" fill="#555">RBAC / 权限分级</text>
+  <text x="160" y="190" text-anchor="middle" font-size="12" fill="#555">会话管理 / 审计</text>
+  <line x1="240" y1="160" x2="345" y2="180" stroke="#5b9bd5" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- 数据加密 -->
+  <rect x="560" y="120" width="160" height="80" fill="#e6f3ff" stroke="#5b9bd5" stroke-width="2" rx="8"/>
+  <text x="640" y="155" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">数据加密</text>
+  <text x="640" y="175" text-anchor="middle" font-size="12" fill="#555">AES-256 / TLS 1.3</text>
+  <text x="640" y="190" text-anchor="middle" font-size="12" fill="#555">密钥轮换 / 脱敏</text>
+  <line x1="455" y1="180" x2="560" y2="160" stroke="#5b9bd5" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- 通信安全 -->
+  <rect x="80" y="280" width="160" height="80" fill="#e6f3ff" stroke="#5b9bd5" stroke-width="2" rx="8"/>
+  <text x="160" y="315" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">通信安全</text>
+  <text x="160" y="335" text-anchor="middle" font-size="12" fill="#555">mTLS / 双向认证</text>
+  <text x="160" y="350" text-anchor="middle" font-size="12" fill="#555">心跳 / 防重放</text>
+  <line x1="240" y1="320" x2="345" y2="240" stroke="#5b9bd5" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- 物理安全 -->
+  <rect x="560" y="280" width="160" height="80" fill="#e6f3ff" stroke="#5b9bd5" stroke-width="2" rx="8"/>
+  <text x="640" y="315" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">物理安全</text>
+  <text x="640" y="335" text-anchor="middle" font-size="12" fill="#555">工控机加固</text>
+  <text x="640" y="350" text-anchor="middle" font-size="12" fill="#555">网络隔离 / 防拆</text>
+  <line x1="455" y1="240" x2="560" y2="320" stroke="#5b9bd5" stroke-width="2" stroke-dasharray="5,3"/>
+</svg>
+
+<h3>1. 访问控制：谁可以进来？</h3>
+
+<p>访问控制是安全的第一道门。说白了，就是搞清楚「谁」能「做什么」。我在项目里见过最离谱的事——一个操作员账号居然有管理员权限，能改路径、删任务。后来排查发现，是开发阶段为了方便，直接给了所有人 root 权限，上线后忘了改回来。</p>
+
+<p>我个人习惯用 <strong>RBAC（基于角色的访问控制）</strong>。把用户分成几类：</p>
+
+<ul>
+  <li><strong>操作员</strong>：只能查看任务状态、手动启停车辆</li>
+  <li><strong>调度员</strong>：可以创建/修改任务，但不能改系统配置</li>
+  <li><strong>管理员</strong>：能改配置、管理用户、查看日志</li>
+  <li><strong>审计员</strong>：只读，专门看日志和操作记录</li>
+</ul>
+
+<p>你想想看，如果每个角色都只能做自己分内的事，就算某个账号被盗了，损失也有限。这就是「最小权限原则」——给每个人刚刚好的权限，不多给一分。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里，把权限写死在代码里。后来要加一个新角色，得改代码重新部署。那叫一个痛苦。建议把权限配置放到数据库或配置中心，动态加载。</p>
+</div>
+
+<h3>2. 数据加密：存着和传着都要安全</h3>
+
+<p>数据加密分两块：<strong>存储加密</strong>和<strong>传输加密</strong>。很多团队只关注传输加密，忽略了存储。我记得有一次做安全审计，发现数据库里用户的密码居然是明文存的。嗯，那感觉就像把家门钥匙挂在门外。</p>
+
+<p>先说存储加密。敏感数据比如密码、路径配置、任务日志，建议用 <strong>AES-256</strong> 加密。密码本身一定要加盐哈希，别用 MD5，那玩意儿早就不安全了。我个人推荐 <strong>bcrypt</strong> 或 <strong>Argon2</strong>。</p>
+
+<p>再说传输加密。AGV 和调度服务器之间的通信，必须走 <strong>TLS 1.3</strong>。别用 1.2 以下版本，有已知漏洞。而且证书要定期轮换，我见过一个项目用了三年没换证书，结果证书过期了，所有车都连不上服务器——那叫一个惨。</p>
+
+<pre><code>// 伪代码示例：AES-256 加密存储路径数据
+public class PathEncryptor {
+    private static final String ALGORITHM = "AES/GCM/NoPadding";
+    private static final int KEY_SIZE = 256;
+    
+    public byte[] encryptPathData(PathData data, SecretKey key) {
+        // 初始化向量随机生成，每次不同
+        byte[] iv = generateRandomIV(12);
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(128, iv));
+        byte[] encrypted = cipher.doFinal(serialize(data));
+        // 返回 iv + 密文
+        return ByteBuffer.allocate(iv.length + encrypted.length)
+            .put(iv).put(encrypted).array();
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>密钥管理是加密的命门。别把密钥硬编码在代码里，也别和数据库放在同一台机器上。建议用专门的密钥管理服务（KMS）或硬件安全模块（HSM）。</p>
+</div>
+
+<h3>3. 通信安全：车和服务器怎么说话？</h3>
+
+<p>AGV 和调度服务器之间的通信，是安全的重灾区。为什么？因为无线环境太容易被监听了。你想想看，如果有人在车间里放一个嗅探器，所有报文都能被截获。</p>
+
+<p>我建议用 <strong>mTLS（双向 TLS）</strong>。普通的 TLS 只验证服务器身份，mTLS 要求客户端也出示证书。这样就算有人伪造了一个客户端，没有合法证书也连不上服务器。</p>
+
+<p>另外，通信协议里要加 <strong>防重放攻击</strong> 的机制。每个报文带一个时间戳和序列号，服务器检查是否在有效窗口内。我曾经遇到过一个问题：有人截获了一个「停止车辆」的指令，反复重放，导致车辆频繁急停。后来加了序列号校验，同一个序列号的报文只处理一次，问题就解决了。</p>
+
+<table>
+  <tr>
+    <th>安全机制</th>
+    <th>作用</th>
+    <th>实现方式</th>
+  </tr>
+  <tr>
+    <td>mTLS</td>
+    <td>双向身份认证</td>
+    <td>客户端和服务器各持证书</td>
+  </tr>
+  <tr>
+    <td>时间戳+序列号</td>
+    <td>防重放攻击</td>
+    <td>报文头携带，服务端校验</td>
+  </tr>
+  <tr>
+    <td>心跳保活</td>
+    <td>检测连接断开</td>
+    <td>每 5 秒发送心跳包</td>
+  </tr>
+  <tr>
+    <td>报文签名</td>
+    <td>防篡改</td>
+    <td>HMAC-SHA256 签名</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>通信超时时间别设太长。我一般设 3 秒超时，重试 3 次。如果还连不上，就认为车辆离线，触发安全停车。别让车在没收到指令的情况下一直跑，那太危险了。</p>
+</div>
+
+<h3>4. 物理安全：别小看「摸得着」的风险</h3>
+
+<p>物理安全往往被忽略，但恰恰是最容易出问题的。AGV 调度系统的核心——工控机、交换机、路由器——都部署在车间里。车间是什么环境？灰尘、震动、温度变化，还有可能被人误碰。</p>
+
+<p>我建议做这几件事：</p>
+
+<ul>
+  <li><strong>工控机加固</strong>：用工业级设备，防尘防震。系统盘用 SSD，别用机械硬盘，AGV 跑起来震动大，机械盘容易坏。</li>
+  <li><strong>网络隔离</strong>：调度网络和办公网络物理隔离。别图省事用同一个交换机，万一有人从办公网渗透进来，整个调度系统就暴露了。</li>
+  <li><strong>防拆设计</strong>：AGV 上的控制器和通信模块，加防拆螺丝或封条。我曾经遇到一个项目，有人把 AGV 上的无线模块拆下来换了个山寨的，结果通信不稳定，车到处乱跑。</li>
+  <li><strong>环境监控</strong>：机柜里装温湿度传感器，温度过高自动告警。别等设备烧了才发现。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>物理安全不只是防人，还要防环境。车间里的电磁干扰、电源波动，都可能让设备出问题。建议所有关键设备都接 UPS，并做电磁屏蔽。</p>
+</div>
+
+<h3>小结</h3>
+
+<p>安全设计没有「一劳永逸」的方案。它是个持续的过程，需要不断评估、改进。我个人习惯每半年做一次安全审计，看看有没有新的漏洞，权限有没有被滥用，证书有没有快过期。</p>
+
+<p>记住一句话：<strong>安全不是功能，是习惯</strong>。把安全融入到开发的每个环节，比事后打补丁强一百倍。</p>
+
+<div class="footer-nav">
+            <a href="20LogAndMonitor.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22DispatchPracticePart1.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

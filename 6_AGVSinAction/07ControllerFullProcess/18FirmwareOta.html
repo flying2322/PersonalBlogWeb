@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 固件升级与OTA</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="active">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 固件升级与OTA：Bootloader设计、固件签名与校验、差分升级、远程升级流程</h2>
+
+<p>说到AGV的固件升级，我估计不少工程师都经历过那种痛苦——抱着笔记本电脑，蹲在AGV旁边，一根线接着一根线地刷程序。一台两台还行，要是仓库里跑着几十台车，那真是要命。所以，OTA（Over-The-Air）升级，说白了就是AGV控制器的“远程换血”能力。这一章，我把这些年踩过的坑和积累的经验，掰开了揉碎了讲给你听。</p>
+
+<h3>18.1 Bootloader设计：升级的“守门员”</h3>
+
+<p>Bootloader是什么？你可以把它理解成AGV控制器的“BIOS”。它是一段独立的、固化在芯片起始地址的小程序。每次上电，CPU先跑Bootloader，再由它决定：是跳转到用户程序，还是进入升级模式。</p>
+
+<p><strong>我个人习惯把Flash分区设计成三块：</strong></p>
+
+<ul>
+  <li><strong>Bootloader区：</strong> 64KB，只读，几乎不改动。</li>
+  <li><strong>App区（主程序）：</strong> 存放当前运行的固件。</li>
+  <li><strong>Download区（下载缓存区）：</strong> 存放新固件包，校验通过后再拷贝到App区。</li>
+</ul>
+
+<p>为什么要多一个Download区？我在项目中遇到过直接往App区写数据，写到一半断电了，结果AGV变砖了。有了Download区，就算升级失败，Bootloader还能从App区启动，保证系统不瘫。</p>
+
+<div class="highlight">
+  <p><strong>核心设计原则：</strong></p>
+  <ul>
+    <li>Bootloader必须支持“看门狗”喂狗，防止升级过程中死机。</li>
+    <li>Bootloader要能识别固件版本号，避免“降级刷写”。</li>
+    <li>Bootloader代码要精简，最好用汇编或纯C写，别依赖操作系统。</li>
+  </ul>
+</div>
+
+<p>下面是一个简化的Bootloader跳转逻辑，我习惯用这种结构：</p>
+
+<pre><code>// 伪代码：Bootloader主流程
+void bootloader_main(void) {
+    // 1. 检查是否有升级请求（比如GPIO电平、Flash标志位）
+    if (check_update_request() == TRUE) {
+        // 2. 进入升级模式，接收新固件
+        enter_update_mode();
+        // 3. 校验固件签名（后面会讲）
+        if (verify_firmware_signature() == PASS) {
+            // 4. 擦除App区，写入新固件
+            flash_erase(APP_START_ADDR);
+            flash_write(APP_START_ADDR, download_buffer);
+            // 5. 设置启动标志
+            set_boot_flag(APP_VALID);
+        } else {
+            // 签名失败，保持旧固件
+            set_boot_flag(APP_VALID);
+        }
+    }
+    // 6. 跳转到App区
+    jump_to_app(APP_START_ADDR);
+}
+</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong> 我习惯在Bootloader里加一个“强制升级”引脚。如果这个引脚在启动时被拉低，不管App区有没有程序，都强制进入升级模式。这招救过我很多次，尤其是调试初期。</p>
+</div>
+
+<h3>18.2 固件签名与校验：别让恶意固件混进来</h3>
+
+<p>你想想看，AGV在工厂里跑来跑去，要是被人刷了个恶意固件，那后果不堪设想。所以，固件签名不是可选项，是必选项。</p>
+
+<p><strong>我常用的方案是：</strong> 用RSA-2048签名，用SHA-256做哈希校验。具体流程是这样的：</p>
+
+<ol>
+  <li><strong>PC端（开发机）：</strong> 编译出固件.bin文件，计算SHA-256哈希值，然后用私钥对这个哈希值加密，生成签名文件。</li>
+  <li><strong>AGV端（Bootloader）：</strong> 收到固件包后，先计算固件的SHA-256哈希值，然后用公钥解密签名文件，得到原始的哈希值。两个哈希值对比，一致则通过。</li>
+</ol>
+
+<p>这里有个坑——公钥存哪里？我曾经直接把公钥写在Bootloader代码里，结果被同事吐槽说“这不等于把钥匙挂在门上吗？”后来我学乖了，把公钥的哈希值也存进去，启动时先校验公钥本身有没有被篡改。</p>
+
+<div class="warning">
+  <p><strong>警告：</strong> 千万不要用MD5做签名校验！MD5已经被证明可以碰撞。我见过有同行图省事用MD5，结果被黑客轻松绕过。至少用SHA-256，有条件上SHA-3更好。</p>
+</div>
+
+<h3>18.3 差分升级：省流量、省时间、省带宽</h3>
+
+<p>AGV的固件动不动就几百KB甚至几MB，如果每次升级都全量传输，那OTA的效率太低了。尤其是用4G或者LoRa这种窄带通信时，差分升级几乎是必须的。</p>
+
+<p><strong>差分升级的原理很简单：</strong> 只传输新旧固件之间的差异部分。AGV端收到差异数据后，用旧固件加上差异数据，合成新固件。</p>
+
+<p>我推荐用 <strong>bsdiff</strong> 算法，它专门针对二进制文件做了优化。在项目中实测，一个1MB的固件，如果只改了10%的代码，差分包可能只有50KB左右，压缩比非常可观。</p>
+
+<p><strong>差分升级的流程：</strong></p>
+
+<ol>
+  <li><strong>云端/服务器：</strong> 用bsdiff生成差分补丁包（patch文件）。</li>
+  <li><strong>AGV端：</strong> 下载patch文件，用bspatch工具将旧固件 + patch = 新固件。</li>
+  <li><strong>校验：</strong> 合成后的新固件做一次全量校验（签名+哈希），确保合成过程没出错。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>注意：</strong> 差分升级对Flash空间有要求。你需要同时保留旧固件、下载的patch文件、以及合成中的新固件。我一般会预留至少2倍App区大小的Flash空间，否则容易爆内存。</p>
+</div>
+
+<h3>18.4 远程升级流程：从云端到AGV的完整链路</h3>
+
+<p>好了，前面都是基础组件，现在把它们串起来，看看完整的远程升级流程是什么样的。</p>
+
+<p>我习惯把流程分成四个阶段：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>阶段</th>
+      <th>动作</th>
+      <th>关键点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1. 触发阶段</td>
+      <td>云端下发升级通知，AGV上报当前版本号</td>
+      <td>AGV必须处于“空闲”或“充电”状态，不能正在执行任务</td>
+    </tr>
+    <tr>
+      <td>2. 下载阶段</td>
+      <td>AGV下载差分补丁包，存到Download区</td>
+      <td>支持断点续传，网络中断后能接着下</td>
+    </tr>
+    <tr>
+      <td>3. 合成与校验</td>
+      <td>bspatch合成新固件，RSA+SHA256校验</td>
+      <td>校验失败则回滚，不破坏旧固件</td>
+    </tr>
+    <tr>
+      <td>4. 生效阶段</td>
+      <td>设置启动标志，软重启，Bootloader加载新固件</td>
+      <td>如果新固件启动失败（比如卡死），Bootloader要能自动回滚</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这里我画了一张流程图，帮你理清整个逻辑：</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50" />
+    </marker>
+  </defs>
+  <style>
+    .box { fill: #e8f4f8; stroke: #2c3e50; stroke-width: 2; rx: 8; ry: 8; }
+    .box-text { font-family: Arial; font-size: 14px; fill: #2c3e50; text-anchor: middle; }
+    .arrow { stroke: #2c3e50; stroke-width: 2; marker-end: url(#arrowhead); }
+    .highlight-box { fill: #fef9e7; stroke: #f39c12; stroke-width: 2; rx: 8; ry: 8; }
+  </style>
+  
+  <!-- 云端 -->
+  <rect x="260" y="20" width="200" height="50" class="box" />
+  <text x="360" y="50" class="box-text">云端服务器</text>
+  
+  <!-- 箭头1 -->
+  <line x1="360" y1="70" x2="360" y2="110" class="arrow" />
+  
+  <!-- 触发升级 -->
+  <rect x="260" y="110" width="200" height="50" class="box" />
+  <text x="360" y="140" class="box-text">触发升级（版本对比）</text>
+  
+  <!-- 箭头2 -->
+  <line x1="360" y1="160" x2="360" y2="200" class="arrow" />
+  
+  <!-- 下载差分包 -->
+  <rect x="260" y="200" width="200" height="50" class="box" />
+  <text x="360" y="230" class="box-text">下载差分补丁包</text>
+  
+  <!-- 箭头3 -->
+  <line x1="360" y1="250" x2="360" y2="290" class="arrow" />
+  
+  <!-- 合成与校验 -->
+  <rect x="260" y="290" width="200" height="50" class="highlight-box" />
+  <text x="360" y="320" class="box-text">合成新固件 + 签名校验</text>
+  
+  <!-- 分支 -->
+  <line x1="360" y1="340" x2="360" y2="380" class="arrow" />
+  
+  <!-- 校验结果 -->
+  <rect x="260" y="380" width="200" height="50" class="box" />
+  <text x="360" y="410" class="box-text">校验通过？</text>
+  
+  <!-- 通过分支 -->
+  <line x1="460" y1="405" x2="560" y2="405" class="arrow" />
+  <rect x="560" y="380" width="140" height="50" class="box" />
+  <text x="630" y="410" class="box-text">重启加载新固件</text>
+  
+  <!-- 失败分支 -->
+  <line x1="260" y1="405" x2="160" y2="405" class="arrow" />
+  <rect x="20" y="380" width="140" height="50" class="box" />
+  <text x="90" y="410" class="box-text">回滚到旧固件</text>
+  
+  <!-- 底部说明 -->
+  <text x="360" y="490" font-family="Arial" font-size="12" fill="#7f8c8d" text-anchor="middle">图：AGV远程升级核心流程</text>
+</svg>
+
+<div class="tip">
+  <p><strong>实战经验：</strong> 我建议在AGV端维护一个“升级状态机”。状态包括：IDLE、DOWNLOADING、VERIFYING、UPDATING、ROLLBACK。这样一旦升级过程中断电，重新上电后Bootloader能根据状态机决定是继续升级还是回滚。这个状态机要保存在非易失性存储器里，比如EEPROM或者Flash的最后几个扇区。</p>
+</div>
+
+<h3>18.5 避坑指南：我踩过的那些雷</h3>
+
+<p>最后，分享几个我亲身经历过的教训，希望能帮你少走弯路：</p>
+
+<ul>
+  <li><strong>千万别在升级过程中关看门狗。</strong> 我曾经为了省事，在升级时把看门狗关了，结果有一次网络卡顿，升级卡住了，AGV彻底死机。后来我改成在升级循环里喂狗，问题解决。</li>
+  <li><strong>差分升级前，一定要校验旧固件的完整性。</strong> 如果旧固件本身已经损坏了，差分合成出来的新固件也是坏的。我吃过这个亏，后来在合成前先对旧固件做一次CRC校验。</li>
+  <li><strong>OTA升级的通信协议要设计“心跳”和“超时重传”。</strong> 尤其是用Wi-Fi或者4G时，信号不稳定是常态。我习惯把每个数据包控制在1KB以内，并加上序号，接收方收到后回复ACK，超时则重传。</li>
+  <li><strong>升级完成后，让AGV自动重启一次。</strong> 不要依赖人工确认。我见过有同事升级完了忘了重启，结果AGV还在跑旧程序，白忙活一场。</li>
+</ul>
+
+<p>嗯，关于固件升级和OTA，核心就是这些。Bootloader是地基，签名校验是门锁，差分升级是省钱的妙招，而完整的流程则是把这些串起来的绳子。你想想看，把这些都做好了，AGV的远程维护能力就真正落地了。</p>
+
+<div class="footer-nav">
+            <a href="17PowerManagement.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19LogAndDebug.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,363 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 局部路径规划算法（二）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="active">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 局部路径规划算法（二）：时间弹性带（TEB）算法原理、轨迹优化与约束处理</h2>
+
+<p>大家好，欢迎来到局部路径规划的第二讲。</p>
+<p>上一讲我们聊了DWA，那个算法说白了就是“速度空间采样+评价”。今天要讲的TEB，思路完全不一样。它把路径规划问题，转化成了一个<strong>带约束的轨迹优化问题</strong>。</p>
+<p>我第一次接触TEB时，觉得这名字挺玄乎——“时间弹性带”。后来做项目用上了，才发现它真的很巧妙。尤其适合那种<strong>需要精确控制到达时间</strong>的场景，比如AGV在工位前精准停靠。</p>
+
+<h3>11.1 TEB的核心思想：从“路径”到“轨迹”</h3>
+
+<p>先问大家一个问题：DWA规划出来的是什么？是一段<strong>速度指令</strong>，对吧？它没有显式地规划“未来几秒我在哪”。</p>
+<p>TEB不一样。它直接优化一条<strong>带时间戳的路径</strong>，也就是轨迹。</p>
+<p>什么叫“弹性带”？你想象一根橡皮筋，两端固定（起点和终点）。中间有一些点（机器人位姿），橡皮筋可以伸缩变形。TEB就是通过“拉”这根橡皮筋，让它既满足运动学约束，又能快速到达目标。</p>
+
+<div class="highlight">
+  <p><strong>核心公式（简化版）：</strong></p>
+  <p>TEB将轨迹表示为一系列离散的机器人位姿 <code>Q = [x0, y0, theta0, x1, y1, theta1, ...]</code>，以及对应的时间间隔 <code>dt = [dt0, dt1, ...]</code>。</p>
+  <p>优化目标：<code>min f(Q, dt) = 路径平滑性 + 时间最优性 + 约束惩罚</code></p>
+</div>
+
+<p>说白了，TEB就是在求解一个<strong>非线性优化问题</strong>。我习惯用g2o或者Ceres来解它。嗯，这里要注意，优化变量里包含了时间间隔dt，所以它能直接控制机器人“什么时候到哪”。</p>
+
+<h3>11.2 轨迹优化的三大要素</h3>
+
+<p>TEB的优化问题，通常包含三个部分。我一个个说。</p>
+
+<h4>11.2.1 目标函数：追求“快”与“稳”</h4>
+
+<ul>
+  <li><strong>时间最优性</strong>：我们希望总时间 <code>sum(dt)</code> 尽量小。说白了就是“快点到”。</li>
+  <li><strong>路径平滑性</strong>：相邻位姿的转角变化要小。避免急转弯，否则AGV容易甩货。</li>
+  <li><strong>轨迹连续性</strong>：速度和加速度不能突变。这个在代码里通常用二阶差分约束来实现。</li>
+</ul>
+
+<p>我记得有一次调试，发现AGV在拐弯时总是抖一下。查了半天，原来是平滑性权重设得太低。调高之后，轨迹就顺滑多了。</p>
+
+<h4>11.2.2 约束处理：把“不能做”的事写进优化</h4>
+
+<p>TEB最强大的地方，就是能处理各种约束。我把它分为三类：</p>
+
+<table>
+  <tr>
+    <th>约束类型</th>
+    <th>具体内容</th>
+    <th>我的处理经验</th>
+  </tr>
+  <tr>
+    <td>运动学约束</td>
+    <td>最大速度、最大加速度、最小转弯半径</td>
+    <td>用不等式约束，超出就惩罚</td>
+  </tr>
+  <tr>
+    <td>避障约束</td>
+    <td>与障碍物的最小距离</td>
+    <td>用符号距离场，计算梯度很快</td>
+  </tr>
+  <tr>
+    <td>任务约束</td>
+    <td>终点位姿、到达时间、朝向要求</td>
+    <td>用硬约束，或者加高权重</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在约束权重上吃过亏。避障权重设得太高，导致机器人为了绕一个小障碍，走了个大弯路。后来我改用“软约束+自适应权重”，效果好很多。</p>
+</div>
+
+<h3>11.3 TEB的优化求解流程</h3>
+
+<p>下面这张图，是我自己总结的TEB求解流程。你把它看懂了，写代码就有方向了。</p>
+
+<svg width="720" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 流程框 -->
+  <rect x="50" y="30" width="180" height="50" rx="8" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="140" y="60" text-anchor="middle" fill="white" font-size="14" font-weight="bold">1. 初始化轨迹</text>
+  
+  <rect x="50" y="120" width="180" height="50" rx="8" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="140" y="150" text-anchor="middle" fill="white" font-size="14" font-weight="bold">2. 构建优化问题</text>
+  
+  <rect x="50" y="210" width="180" height="50" rx="8" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="140" y="240" text-anchor="middle" fill="white" font-size="14" font-weight="bold">3. 求解非线性优化</text>
+  
+  <rect x="50" y="300" width="180" height="50" rx="8" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="140" y="330" text-anchor="middle" fill="white" font-size="14" font-weight="bold">4. 提取控制指令</text>
+
+  <!-- 箭头 -->
+  <line x1="140" y1="80" x2="140" y2="120" stroke="#2c5f8a" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="140" y1="170" x2="140" y2="210" stroke="#2c5f8a" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="140" y1="260" x2="140" y2="300" stroke="#2c5f8a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 右侧说明 -->
+  <rect x="300" y="30" width="380" height="50" rx="8" fill="#e6f7ff" stroke="#91d5ff" stroke-width="1"/>
+  <text x="310" y="50" fill="#333" font-size="12">用全局路径或直线插值生成初始位姿序列</text>
+  <text x="310" y="68" fill="#333" font-size="12">时间间隔dt初始化为均匀值</text>
+
+  <rect x="300" y="120" width="380" height="50" rx="8" fill="#e6f7ff" stroke="#91d5ff" stroke-width="1"/>
+  <text x="310" y="140" fill="#333" font-size="12">添加目标函数：时间最优 + 平滑性</text>
+  <text x="310" y="158" fill="#333" font-size="12">添加约束：运动学、避障、任务</text>
+
+  <rect x="300" y="210" width="380" height="50" rx="8" fill="#e6f7ff" stroke="#91d5ff" stroke-width="1"/>
+  <text x="310" y="230" fill="#333" font-size="12">使用g2o/Ceres等求解器迭代优化</text>
+  <text x="310" y="248" fill="#333" font-size="12">通常迭代10-20次收敛</text>
+
+  <rect x="300" y="300" width="380" height="50" rx="8" fill="#e6f7ff" stroke="#91d5ff" stroke-width="1"/>
+  <text x="310" y="320" fill="#333" font-size="12">取轨迹前几个位姿，计算速度/角速度</text>
+  <text x="310" y="338" fill="#333" font-size="12">发送给底层控制器</text>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c5f8a"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>你想想看，这个流程每执行一次，就得到一段优化后的轨迹。然后机器人走一小段，再重新规划。这就是<strong>滚动优化</strong>的思想。</p>
+
+<h3>11.4 代码实战：TEB的核心片段</h3>
+
+<p>下面这段代码，是我从实际项目中摘出来的。它展示了如何构建TEB的优化问题。</p>
+
+<pre><code>// 伪代码：TEB优化问题构建
+// 使用Ceres Solver
+
+// 1. 定义优化变量
+std::vector&lt;double&gt; x, y, theta;  // 位姿
+std::vector&lt;double&gt; dt;           // 时间间隔
+
+// 2. 构建问题
+ceres::Problem problem;
+
+// 2.1 添加时间最优目标
+for (int i = 0; i &lt; dt.size(); ++i) {
+    problem.AddResidualBlock(
+        new ceres::AutoDiffCostFunction&lt;TimeCost, 1, 1&gt;(new TimeCost()),
+        nullptr, &amp;dt[i]
+    );
+}
+
+// 2.2 添加平滑性约束
+for (int i = 1; i &lt; x.size() - 1; ++i) {
+    problem.AddResidualBlock(
+        new ceres::AutoDiffCostFunction&lt;SmoothCost, 2, 1, 1, 1&gt;(new SmoothCost()),
+        nullptr, &amp;x[i-1], &amp;x[i], &amp;x[i+1]
+    );
+}
+
+// 2.3 添加避障约束（使用符号距离场）
+for (int i = 0; i &lt; x.size(); ++i) {
+    problem.AddResidualBlock(
+        new ceres::AutoDiffCostFunction&lt;ObstacleCost, 1, 1, 1&gt;(new ObstacleCost(sdf)),
+        nullptr, &amp;x[i], &amp;y[i]
+    );
+}
+
+// 3. 求解
+ceres::Solver::Options options;
+options.max_num_iterations = 20;
+ceres::Solver::Summary summary;
+ceres::Solve(options, &amp;problem, &amp;summary);</code></pre>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>实际部署时，不要把整个轨迹都优化完再走。我习惯只优化前10-15个位姿，然后取前2-3个位姿计算速度。这样实时性更好。</p>
+</div>
+
+<h3>11.5 TEB vs DWA：什么时候用哪个？</h3>
+
+<p>很多同学问我，TEB和DWA到底选哪个？我个人的经验是这样的：</p>
+
+<ul>
+  <li><strong>DWA</strong>：适合<strong>反应式避障</strong>，计算快，但轨迹质量一般。适合在开阔环境、速度要求不高的场景。</li>
+  <li><strong>TEB</strong>：适合<strong>精确轨迹跟踪</strong>，能处理复杂约束。适合在狭窄通道、需要精准停靠的场景。</li>
+</ul>
+
+<p>我做过一个项目，AGV要在仓库里走“S”形弯道，还要在货架前精确停靠。用DWA总是撞到货架腿，换成TEB之后，一次就过了。为什么？因为TEB显式地优化了<strong>与障碍物的距离</strong>，而DWA只是采样时检查一下。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>TEB的优化问题是非凸的。如果初始轨迹给得不好，容易陷入局部最优。我建议用全局路径作为初始值，或者用A*先粗规划一条路径。</p>
+</div>
+
+<h3>11.6 总结与思考</h3>
+
+<p>好了，今天的内容就到这里。我们来捋一捋：</p>
+
+<ul>
+  <li>TEB把路径规划变成了<strong>轨迹优化</strong>问题</li>
+  <li>它同时优化<strong>位姿</strong>和<strong>时间间隔</strong></li>
+  <li>可以处理<strong>运动学、避障、任务</strong>三类约束</li>
+  <li>求解器用<strong>g2o或Ceres</strong>，迭代10-20次即可</li>
+</ul>
+
+<p>说实话，TEB是我个人最喜欢的局部规划算法。它优雅、灵活，而且效果真的好。但代价就是计算量比DWA大一些。不过现在嵌入式平台性能越来越强，这个已经不是问题了。</p>
+
+<p>你想想看，如果你的AGV需要在复杂环境中精确导航，TEB绝对值得一试。下次遇到避障难题，不妨试试把问题“优化”一下。</p>
+
+<div class="footer-nav">
+            <a href="10LocalPathPlanningPart1.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12LocalPathPlanningPart3.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

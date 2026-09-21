@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 任务调度模块设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="active">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 任务调度模块设计：任务队列管理、任务优先级、任务分配策略</h2>
+
+<p>各位同学，今天我们来聊聊AGV控制器里最核心的一个模块——任务调度。说实话，我在这个领域摸爬滚打了十几年，见过太多因为调度设计不合理导致AGV“死锁”、“空跑”甚至“撞车”的案例。任务调度模块，说白了就是AGV的“大脑决策中心”。它决定了哪个任务先做、哪个车去执行、走哪条路。</p>
+
+<p>我个人习惯把任务调度模块拆成三个子模块来看：<strong>任务队列管理</strong>、<strong>任务优先级</strong>、<strong>任务分配策略</strong>。这三个东西缺一不可，而且相互影响。你想想看，如果队列管理不好，优先级再高也没用；如果分配策略不对，优先级再合理也是白搭。</p>
+
+<h3>4.1 任务队列管理</h3>
+
+<p>任务队列，说白了就是任务的“候车室”。所有待执行的任务都在这里排队。我建议用<strong>双向链表</strong>来实现，因为AGV任务经常需要插入、删除、调整顺序。数组？嗯，不太推荐，因为频繁的插入删除会导致大量数据搬移，实时性会受影响。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>任务队列必须支持动态增删改查，且时间复杂度要控制在O(1)或O(log n)。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：任务队列里同时有100多个任务，结果因为队列设计成单向链表，每次查找某个任务都要从头遍历，导致调度延迟飙升到200ms。后来改成哈希表+双向链表，延迟直接降到5ms以下。</p>
+
+<p>任务队列的数据结构，我一般这样设计：</p>
+
+<pre><code>typedef struct {
+    uint32_t task_id;           // 任务唯一ID
+    uint8_t  priority;          // 优先级 0-255
+    uint32_t create_time;       // 创建时间戳
+    uint32_t deadline;          // 截止时间
+    uint8_t  status;            // 0:等待 1:执行中 2:完成 3:取消
+    float    path_length;       // 预估路径长度(米)
+    uint8_t  assigned_robot;    // 分配的AGV编号
+    struct list_head list;      // 链表节点
+} agv_task_t;</code></pre>
+
+<p>这里要注意，<code>path_length</code> 不是固定的。我建议在任务入队时，先做一次<strong>粗粒度路径规划</strong>，估算出大概的行驶距离。这样后面做最短路径优先策略时，才有数据支撑。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在任务队列里忘记加“取消”状态，结果某个任务执行到一半，用户想取消，但系统还在傻傻地调度。后来加了个状态机，才彻底解决这个问题。</p>
+</div>
+
+<h3>4.2 任务优先级</h3>
+
+<p>任务优先级，是调度模块的“指挥棒”。AGV场景里，优先级通常分这么几类：</p>
+
+<table>
+  <tr>
+    <th>优先级等级</th>
+    <th>典型任务</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>0-15（紧急）</td>
+    <td>急停、故障处理、安全任务</td>
+    <td>必须立即执行，抢占所有资源</td>
+  </tr>
+  <tr>
+    <td>16-63（高）</td>
+    <td>生产线急料、充电任务</td>
+    <td>优先于普通任务</td>
+  </tr>
+  <tr>
+    <td>64-127（普通）</td>
+    <td>常规搬运、入库出库</td>
+    <td>大部分任务属于此类</td>
+  </tr>
+  <tr>
+    <td>128-255（低）</td>
+    <td>巡检、数据采集、空闲回库</td>
+    <td>可被高优先级任务抢占</td>
+  </tr>
+</table>
+
+<p>我个人习惯用<strong>位图法</strong>来实现优先级调度。为什么？因为AGV控制器资源有限，位图法查找最高优先级任务的时间复杂度是O(1)，而且内存占用极小。我曾经试过用红黑树，虽然也能用，但在嵌入式环境里，位图法更轻量。</p>
+
+<p>代码实现大概是这样：</p>
+
+<pre><code>// 优先级位图，256位，每个bit代表一个优先级是否有任务
+uint32_t priority_bitmap[8];  // 256位 = 8个32位
+
+// 设置某优先级有任务
+void set_priority(uint8_t prio) {
+    priority_bitmap[prio / 32] |= (1 << (prio % 32));
+}
+
+// 获取当前最高优先级
+uint8_t get_highest_priority() {
+    for (int i = 0; i &lt; 8; i++) {
+        if (priority_bitmap[i] != 0) {
+            // 找到第一个非0的32位块
+            uint32_t bits = priority_bitmap[i];
+            // 用内置函数找最低位
+            uint8_t offset = __builtin_ctz(bits);
+            return i * 32 + offset;
+        }
+    }
+    return 255; // 无任务
+}</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>如果编译器不支持 <code>__builtin_ctz</code>，可以用查表法代替。256字节的表，查一次就能找到最低位，速度也很快。</p>
+</div>
+
+<p>这里有个容易踩的坑：<strong>优先级反转</strong>。比如低优先级任务占着某个资源，高优先级任务等着用，结果中优先级任务插进来，把低优先级任务挤到一边，高优先级任务反而被阻塞了。我曾经在项目里吃过这个亏，后来加了<strong>优先级继承协议</strong>才解决。具体做法是：当高优先级任务等待低优先级任务释放资源时，临时把低优先级任务的优先级提升到相同等级。</p>
+
+<h3>4.3 任务分配策略</h3>
+
+<p>任务分配策略，就是决定“哪个AGV去执行哪个任务”。常用的策略有两种：<strong>最短路径优先</strong>和<strong>先来先服务</strong>。我分别说说。</p>
+
+<h4>4.3.1 最短路径优先（SPF）</h4>
+
+<p>最短路径优先，说白了就是“谁离得近谁去”。这个策略在AGV数量多、任务密集的场景下特别有效。我建议的实现方式是：</p>
+
+<ol>
+  <li>任务入队时，先计算每个空闲AGV到任务起点的距离</li>
+  <li>选出距离最短的AGV</li>
+  <li>如果多个AGV距离相同，再比较它们的剩余电量、当前负载等因素</li>
+</ol>
+
+<p>代码逻辑大致如下：</p>
+
+<pre><code>uint8_t select_robot_by_spf(agv_task_t *task) {
+    float min_distance = 999999.0;
+    uint8_t selected_robot = 0xFF;
+    
+    for (int i = 0; i &lt; robot_count; i++) {
+        if (robots[i].status != ROBOT_IDLE) continue;
+        
+        float dist = calculate_distance(robots[i].position, task-&gt;start_point);
+        if (dist &lt; min_distance) {
+            min_distance = dist;
+            selected_robot = i;
+        } else if (fabs(dist - min_distance) &lt; 0.1) {
+            // 距离相同，比较电量
+            if (robots[i].battery &gt; robots[selected_robot].battery) {
+                selected_robot = i;
+            }
+        }
+    }
+    return selected_robot;
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>注意：</strong>最短路径优先不是万能的。如果所有AGV都挤在同一个区域，而任务分布在远处，这个策略会导致AGV分布不均。我建议配合<strong>负载均衡</strong>策略一起使用。</p>
+</div>
+
+<h4>4.3.2 先来先服务（FCFS）</h4>
+
+<p>先来先服务，就是“谁先来谁先得”。这个策略实现简单，公平性好，但效率不一定高。你想想看，如果先来的任务要去最远的角落，后来的任务就在旁边，但后来的任务只能等着，这显然不合理。</p>
+
+<p>我一般在<strong>任务量少、AGV数量少</strong>的场景下用FCFS。比如小型仓库，只有3-5台AGV，任务也不密集，FCFS完全够用。但在大型工厂，几十台AGV同时跑，FCFS就会导致严重的效率问题。</p>
+
+<p>FCFS的实现很简单，就是维护一个先进先出的队列：</p>
+
+<pre><code>// 任务入队
+void enqueue_task(agv_task_t *task) {
+    list_add_tail(&amp;task-&gt;list, &amp;task_queue);
+}
+
+// 取出最早的任务
+agv_task_t* dequeue_task() {
+    if (list_empty(&amp;task_queue)) return NULL;
+    return list_first_entry(&amp;task_queue, agv_task_t, list);
+}</code></pre>
+
+<h4>4.3.3 混合策略</h4>
+
+<p>在实际项目中，我很少只用一种策略。我建议用<strong>混合策略</strong>：</p>
+
+<ul>
+  <li>紧急任务（优先级0-15）：直接抢占，不管什么策略</li>
+  <li>高优先级任务（16-63）：用最短路径优先，但要考虑AGV负载</li>
+  <li>普通任务（64-127）：用最短路径优先，如果距离差超过阈值，才重新分配</li>
+  <li>低优先级任务（128-255）：用先来先服务，避免频繁切换</li>
+</ul>
+
+<p>这样做的好处是：紧急任务能快速响应，普通任务效率高，低优先级任务稳定。我曾经在一个汽车零部件工厂的项目里用这个混合策略，AGV的整体效率提升了30%以上，而且死锁率降到了0.1%以下。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>混合策略虽然好，但参数调优很关键。比如“距离差阈值”设多少？设大了，策略退化成FCFS；设小了，AGV频繁切换任务，反而增加空跑。我一般建议先设为10米，然后根据实际运行数据调整。</p>
+</div>
+
+<h3>4.4 任务调度流程图</h3>
+
+<p>下面我用一张SVG图来展示整个任务调度的核心流程。这张图是我在项目里反复迭代后总结出来的，希望能帮大家理清思路。</p>
+
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV任务调度核心流程</text>
+  
+  <!-- 任务入队 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务入队</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 优先级判断 -->
+  <polygon points="400,150 480,190 400,230 320,190" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">优先级判断</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="230" x2="400" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 紧急任务处理 -->
+  <rect x="250" y="260" width="300" height="50" rx="10" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="290" text-anchor="middle" font-size="14" fill="white">紧急任务(0-15): 立即抢占执行</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="310" x2="400" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 策略选择 -->
+  <polygon points="400,340 480,380 400,420 320,380" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="385" text-anchor="middle" font-size="14" fill="white" font-weight="bold">策略选择</text>
+  
+  <!-- 分支箭头 -->
+  <line x1="320" y1="380" x2="200" y2="380" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="480" y1="380" x2="600" y2="380" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- SPF -->
+  <rect x="50" y="355" width="150" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="125" y="385" text-anchor="middle" font-size="14" fill="white">最短路径优先(SPF)</text>
+  
+  <!-- FCFS -->
+  <rect x="600" y="355" width="150" height="50" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="675" y="385" text-anchor="middle" font-size="14" fill="white">先来先服务(FCFS)</text>
+  
+  <!-- 箭头 -->
+  <line x1="125" y1="405" x2="125" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="675" y1="405" x2="675" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 合并 -->
+  <line x1="125" y1="450" x2="400" y2="450" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="675" y1="450" x2="400" y2="450" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="450" x2="400" y2="480" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 任务分配 -->
+  <rect x="250" y="480" width="300" height="50" rx="10" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="510" text-anchor="middle" font-size="14" fill="white">任务分配: 选择最优AGV</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="530" x2="400" y2="560" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 执行 -->
+  <rect x="300" y="560" width="200" height="30" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="580" text-anchor="middle" font-size="14" fill="white">AGV执行任务</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="10" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图展示了任务从入队到执行的完整流程。核心就是：<strong>先判断优先级，再选择策略，最后分配AGV</strong>。每一步都有对应的数据结构和算法支撑。</p>
+
+<h3>4.5 总结与建议</h3>
+
+<p>任务调度模块设计，说白了就是三个字：<strong>快、准、稳</strong>。快，就是调度延迟要低；准，就是任务分配要合理；稳，就是系统不能死锁、不能崩溃。</p>
+
+<p>我个人建议，在设计任务调度模块时，先想清楚这几个问题：</p>
+
+<ul>
+  <li>你的AGV数量是多少？10台以内和100台以上，设计思路完全不同</li>
+  <li>任务的到达频率是多少？是均匀到达还是突发性到达？</li>
+  <li>对实时性的要求有多高？毫秒级还是秒级？</li>
+</ul>
+
+<p>想清楚这些，再去选数据结构和策略，就不会走弯路。嗯，今天就讲到这里，大家有什么问题可以随时交流。</p>
+
+        <div class="footer-nav">
+            <a href="03SoftwareArchitecture.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05PathPlanningModule.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 故障处理与安全机制</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="active">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 故障处理与安全机制</h2>
+<p>各位做AGV的朋友，你们有没有遇到过这种情况——车跑着跑着突然卡住了，规划器报错，然后整个系统就傻在那了？</p>
+<p>我遇到过。而且不止一次。</p>
+<p>说实话，路径规划做得再漂亮，如果故障处理和安全机制没跟上，那这车就是个定时炸弹。今天咱们就聊聊这个「保命」的话题。</p>
+
+<h3>26.1 规划失败恢复：别让车死在那</h3>
+<p>规划失败，说白了就是算法算不出路来了。原因很多：地图变了、障碍物堵死了、或者单纯就是计算超时。</p>
+<p>我个人习惯把恢复策略分成三级：</p>
+
+<table>
+  <tr>
+    <th>级别</th>
+    <th>触发条件</th>
+    <th>恢复动作</th>
+  </tr>
+  <tr>
+    <td>L1 - 轻量恢复</td>
+    <td>单次规划超时</td>
+    <td>重新规划，最多重试3次</td>
+  </tr>
+  <tr>
+    <td>L2 - 中等恢复</td>
+    <td>连续3次规划失败</td>
+    <td>切换规划算法（如A*→RRT）</td>
+  </tr>
+  <tr>
+    <td>L3 - 重度恢复</td>
+    <td>所有算法都失败</td>
+    <td>请求远程干预或原地待命</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>不要无限重试。我见过一个项目，规划失败后一直重试，结果电机堵转烧了。设定最大重试次数，这是底线。</p>
+</div>
+
+<p>代码实现上，我习惯这样写：</p>
+
+<pre><code>class RecoveryManager:
+    def __init__(self, max_retries=3):
+        self.retry_count = 0
+        self.max_retries = max_retries
+        self.planners = [AStarPlanner(), RRTPlanner(), HybridAStarPlanner()]
+    
+    def attempt_recovery(self, current_pose, goal):
+        while self.retry_count &lt; self.max_retries:
+            planner = self.planners[self.retry_count % len(self.planners)]
+            path = planner.plan(current_pose, goal)
+            if path is not None:
+                self.retry_count = 0
+                return path
+            self.retry_count += 1
+            # 每次失败后，稍微放松一下约束
+            planner.relax_constraints()
+        return None  # 所有尝试都失败</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>每次重试时，可以稍微放松一下约束条件。比如把碰撞检测的膨胀半径缩小5%，或者允许路径更曲折一些。有时候就是差那么一点点空间。</p>
+</div>
+
+<h3>26.2 紧急制动：该停就得停</h3>
+<p>紧急制动不是简单的「刹车」两个字。你想想看，AGV上可能载着几百公斤的货物，急刹车会导致货物移位甚至翻倒。</p>
+<p>我建议把制动分成三个等级：</p>
+
+<ul>
+  <li><strong>一级制动（预警）：</strong>减速到0.5m/s，同时发出声光报警。适用于检测到前方有动态障碍物但距离还够。</li>
+  <li><strong>二级制动（紧急）：</strong>立即停车，但保持电机力矩。适用于突然闯入的行人或跌落物。</li>
+  <li><strong>三级制动（急停）：</strong>切断动力源，机械刹车抱死。适用于传感器完全失效或通信中断。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>三级制动是最后的手段。我曾经遇到一个案例，三级制动触发太频繁，结果刹车片一个月就磨光了。能不用就别用。</p>
+</div>
+
+<p>紧急制动的触发条件，我一般这样设计：</p>
+
+<pre><code>def check_emergency_brake(self, state):
+    # 1. 安全距离检查
+    if self.front_distance &lt; self.MIN_SAFE_DISTANCE:
+        return BrakeLevel.EMERGENCY
+    
+    # 2. 速度异常检查
+    if abs(state.velocity - state.target_velocity) &gt; 0.5:
+        return BrakeLevel.WARNING
+    
+    # 3. 传感器健康检查
+    if self.sensor_health &lt; 0.3:  # 传感器故障率超过70%
+        return BrakeLevel.HARD_STOP
+    
+    return BrakeLevel.NONE</code></pre>
+
+<h3>26.3 安全走廊：给车画个「安全区」</h3>
+<p>安全走廊这个概念，说白了就是给AGV规划一条「虚拟隧道」。车只能在隧道里走，出了隧道就触发保护。</p>
+<p>我习惯用两种方式构建安全走廊：</p>
+
+<ol>
+  <li><strong>静态安全走廊：</strong>基于地图预先生成。比如在货架通道里，左右各留30cm的余量。</li>
+  <li><strong>动态安全走廊：</strong>实时计算。根据当前速度和转向角，动态调整走廊宽度。</li>
+</ol>
+
+<p>动态安全走廊的计算公式其实不复杂：</p>
+
+<pre><code>def compute_dynamic_corridor(velocity, steering_angle):
+    # 速度越快，走廊越宽（因为制动距离更长）
+    base_width = 0.5  # 基础宽度0.5米
+    speed_factor = velocity * 0.2  # 每1m/s加宽0.2米
+    # 转向越大，走廊越宽（因为转弯半径更小）
+    turn_factor = abs(steering_angle) * 0.3
+    
+    corridor_width = base_width + speed_factor + turn_factor
+    return corridor_width</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>安全走廊不是越宽越好。太宽了，车就没法在狭窄通道里走了。我一般控制在0.5-1.2米之间，根据场景动态调整。</p>
+</div>
+
+<h3>26.4 冗余规划器：多一个心眼</h3>
+<p>冗余规划器，说白了就是「备胎」。主规划器挂了，备用的顶上。</p>
+<p>我一般配置三个规划器：</p>
+
+<table>
+  <tr>
+    <th>规划器</th>
+    <th>适用场景</th>
+    <th>计算速度</th>
+    <th>路径质量</th>
+  </tr>
+  <tr>
+    <td>A*（主）</td>
+    <td>常规场景，地图已知</td>
+    <td>快</td>
+    <td>高</td>
+  </tr>
+  <tr>
+    <td>RRT（备1）</td>
+    <td>动态障碍物多</td>
+    <td>中</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>DWA（备2）</td>
+    <td>局部避障，紧急情况</td>
+    <td>极快</td>
+    <td>低（但能用）</td>
+  </tr>
+</table>
+
+<p>切换逻辑我这样设计：</p>
+
+<pre><code>class RedundantPlanner:
+    def __init__(self):
+        self.primary = AStarPlanner()
+        self.backup1 = RRTPlanner()
+        self.backup2 = DWAPlanner()
+        self.active_planner = self.primary
+    
+    def plan(self, start, goal):
+        # 主规划器先上
+        path = self.active_planner.plan(start, goal)
+        if path is not None:
+            return path
+        
+        # 主规划器失败，切到备1
+        print("主规划器失败，切换到RRT")
+        self.active_planner = self.backup1
+        path = self.active_planner.plan(start, goal)
+        if path is not None:
+            return path
+        
+        # 备1也失败，切到备2（DWA只做局部规划）
+        print("RRT也失败，切换到DWA局部规划")
+        self.active_planner = self.backup2
+        path = self.active_planner.plan(start, goal)
+        return path  # 即使路径质量差，也比没有强</code></pre>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>冗余规划器之间要定期做「健康检查」。我习惯每10秒让备胎规划器也跑一次，看看它能不能正常工作。别等到主规划器挂了才发现备胎也坏了。</p>
+</div>
+
+<h3>26.5 整体架构：把这些串起来</h3>
+<p>好了，上面说的这些机制，怎么整合到一起？我画了一张图，你们看看：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV故障处理与安全机制架构图</text>
+  
+  <!-- 主规划器 -->
+  <rect x="50" y="80" width="200" height="60" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">主规划器 (A*)</text>
+  
+  <!-- 备1 -->
+  <rect x="300" y="80" width="200" height="60" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">备1规划器 (RRT)</text>
+  
+  <!-- 备2 -->
+  <rect x="550" y="80" width="200" height="60" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">备2规划器 (DWA)</text>
+  
+  <!-- 箭头：主→备1 -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+  <line x1="250" y1="110" x2="300" y2="110" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="500" y1="110" x2="550" y2="110" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 恢复管理器 -->
+  <rect x="50" y="200" width="700" height="60" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="235" text-anchor="middle" font-size="16" fill="white" font-weight="bold">恢复管理器 (RecoveryManager)</text>
+  
+  <!-- 箭头：规划器→恢复管理器 -->
+  <line x1="150" y1="140" x2="150" y2="200" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="140" x2="400" y2="200" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="650" y1="140" x2="650" y2="200" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 安全走廊 -->
+  <rect x="50" y="320" width="320" height="60" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="210" y="355" text-anchor="middle" font-size="16" fill="white" font-weight="bold">安全走廊 (Corridor)</text>
+  
+  <!-- 紧急制动 -->
+  <rect x="430" y="320" width="320" height="60" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="590" y="355" text-anchor="middle" font-size="16" fill="white" font-weight="bold">紧急制动 (BrakeManager)</text>
+  
+  <!-- 箭头：恢复管理器→安全走廊 -->
+  <line x1="200" y1="260" x2="200" y2="320" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- 箭头：恢复管理器→紧急制动 -->
+  <line x1="600" y1="260" x2="600" y2="320" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 执行层 -->
+  <rect x="50" y="430" width="700" height="50" rx="8" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="460" text-anchor="middle" font-size="16" fill="white" font-weight="bold">执行层 (电机控制 / 刹车 / 声光报警)</text>
+  
+  <!-- 箭头：安全走廊→执行层 -->
+  <line x1="210" y1="380" x2="210" y2="430" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <!-- 箭头：紧急制动→执行层 -->
+  <line x1="590" y1="380" x2="590" y2="430" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 标注 -->
+  <text x="750" y="490" text-anchor="end" font-size="12" fill="#95a5a6">图：故障处理与安全机制架构</text>
+</svg>
+
+<p>这张图展示了整个流程：</p>
+<ul>
+  <li>主规划器先上，不行就切备1，再不行切备2</li>
+  <li>恢复管理器负责协调切换逻辑和重试策略</li>
+  <li>安全走廊和紧急制动是两条并行的安全线</li>
+  <li>最终所有指令都落到执行层</li>
+</ul>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>安全机制不能依赖单一传感器。我见过一个项目，只靠激光雷达做安全检测，结果激光雷达被灰尘遮住了，车直接撞墙。一定要多传感器融合，比如激光+超声波+碰撞条。</p>
+</div>
+
+<p>好了，这一章的内容就这些。故障处理和安全机制，说白了就是「防患于未然」和「亡羊补牢」的结合。你想想看，AGV在工厂里跑，万一出事故，轻则损坏货物，重则伤人。所以这些机制，一个都不能少。</p>
+
+<p>我个人习惯在项目初期就把这些安全机制写进代码框架里，而不是等出问题了再补。因为——嗯，等你出问题再补，可能就没机会补了。</p>
+
+<div class="footer-nav">
+            <a href="25EngineeringOptimize.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27WarehouseAStarDwaCase.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

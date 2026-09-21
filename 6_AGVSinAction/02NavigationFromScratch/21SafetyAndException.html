@@ -1,0 +1,493 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 AGV安全机制与异常处理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="active">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 AGV安全机制与异常处理：急停逻辑、激光雷达安全区域配置、碰撞检测与避障、异常状态恢复（脱轨/定位丢失）、日志记录与报警</h2>
+
+<p>做AGV这么多年，我最大的感触就是：<strong>导航算法决定车跑不跑得动，安全机制决定车能不能活着回来</strong>。说白了，一个没有完善安全机制的AGV，就是个定时炸弹。今天咱们就把这块硬骨头啃下来。</p>
+
+<h3>21.1 急停逻辑：最后一道防线</h3>
+
+<p>急停按钮，是AGV上最不起眼但最重要的零件。我见过太多项目，急停逻辑写得稀烂，结果真出事了按下去车还在跑。</p>
+
+<p><strong>急停的硬件设计要点：</strong></p>
+<ul>
+  <li><strong>双通道冗余</strong>：急停按钮必须有两路独立的信号通道，一路进安全PLC，一路进主控制器。两路同时失效的概率极低。</li>
+  <li><strong>常闭触点</strong>：急停按钮用常闭（NC）触点，而不是常开（NO）。为什么？因为线路断了、接触器坏了，常闭触点会直接断开，触发急停。这叫「故障安全」。</li>
+  <li><strong>硬线切断</strong>：急停信号必须直接切断驱动器的使能信号，而不是靠软件去发停止指令。软件可能死机，硬线不会。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>急停逻辑的软件处理流程：</strong></p>
+  <ol>
+    <li>检测到急停信号（电平变化或IO中断）</li>
+    <li>立即停止所有运动指令，清除速度目标值</li>
+    <li>设置电机抱闸，防止溜车</li>
+    <li>记录急停事件到日志（时间、位置、原因）</li>
+    <li>等待人工复位，禁止自动恢复</li>
+  </ol>
+</div>
+
+<pre><code>// 急停处理伪代码
+void EmergencyStopHandler() {
+    if (digitalRead(ESTOP_PIN) == LOW) {  // 常闭触点断开
+        motorDriver.disableAll();         // 硬线切断
+        motionPlanner.clearAllTargets();  // 清除目标
+        brake.engage();                   // 抱闸
+        logEvent("ESTOP_TRIGGERED", currentPose);
+        while(digitalRead(ESTOP_PIN) == LOW) {
+            delay(100);  // 等待人工复位
+        }
+        // 复位后进入待机状态，不自动恢复运动
+        setState(ROBOT_STATE_IDLE);
+    }
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：急停复位后，AGV绝对不能自动恢复运动。必须由操作人员确认安全后，手动下发恢复指令。我曾经见过一个项目，急停复位后车自己跑了，差点撞到人。</p>
+</div>
+
+<h3>21.2 激光雷达安全区域配置</h3>
+
+<p>激光雷达是AGV的「眼睛」，但更重要的是它的「安全区」功能。说白了，就是给雷达画几个圈，不同圈触发不同反应。</p>
+
+<p><strong>安全区域的分级设计：</strong></p>
+<table>
+  <tr>
+    <th>区域类型</th>
+    <th>距离范围</th>
+    <th>触发动作</th>
+    <th>响应时间</th>
+  </tr>
+  <tr>
+    <td>警告区</td>
+    <td>3-5米</td>
+    <td>减速至0.3m/s</td>
+    <td>100ms</td>
+  </tr>
+  <tr>
+    <td>减速区</td>
+    <td>1.5-3米</td>
+    <td>减速至0.1m/s</td>
+    <td>50ms</td>
+  </tr>
+  <tr>
+    <td>停止区</td>
+    <td>0-1.5米</td>
+    <td>紧急停止</td>
+    <td>20ms</td>
+  </tr>
+</table>
+
+<p>我个人习惯把安全区域配置成动态的。比如AGV直行时，前方安全区拉长；转弯时，侧方安全区加宽。你想想看，如果转弯时还用直行的安全区，车屁股很容易扫到货架。</p>
+
+<pre><code>// 动态安全区域配置示例
+void configureSafetyZones(NavigationState state) {
+    SafetyZoneConfig config;
+    switch(state) {
+        case FORWARD:
+            config.frontZone = 3.0;   // 前方3米
+            config.sideZone = 0.5;    // 侧方0.5米
+            break;
+        case TURNING:
+            config.frontZone = 1.5;   // 前方1.5米
+            config.sideZone = 1.2;    // 侧方1.2米（转弯侧）
+            break;
+        case DOCKING:
+            config.frontZone = 0.8;   // 对接时缩小安全区
+            config.sideZone = 0.3;
+            break;
+    }
+    lidar.setSafetyZones(config);
+}
+</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在仓库里调试，发现AGV老是莫名其妙急停。查了半天，原来是地面上的反光条被激光雷达当成了障碍物。后来在安全区域配置里加了「地面过滤」参数，把低于10cm的反射点滤掉，问题解决。</p>
+</div>
+
+<h3>21.3 碰撞检测与避障</h3>
+
+<p>激光雷达安全区是「主动防御」，碰撞检测是「被动防御」。两者缺一不可。</p>
+
+<p><strong>碰撞检测的三种方式：</strong></p>
+<ul>
+  <li><strong>机械碰撞开关</strong>：AGV前后安装的保险杠，碰到东西就触发。这是最原始但最可靠的方式。</li>
+  <li><strong>电流/力矩检测</strong>：电机驱动器反馈的电流异常增大，说明可能撞到东西了。我习惯设置一个阈值，超过正常值的150%就触发碰撞保护。</li>
+  <li><strong>IMU加速度检测</strong>：突然的加速度变化，比如从匀速到急停，可能是撞上了。这个可以用来做辅助判断。</li>
+</ul>
+
+<p><strong>避障策略的优先级：</strong></p>
+<ol>
+  <li>急停（最高优先级）—— 碰撞开关触发或安全区被侵入</li>
+  <li>绕行 —— 检测到障碍物，重新规划路径</li>
+  <li>等待 —— 障碍物是动态的（比如人），等它离开</li>
+  <li>减速通过 —— 障碍物在安全距离外，缓慢通过</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>避障算法的核心逻辑：</strong></p>
+  <p>说白了就是三步：<strong>检测 → 分类 → 决策</strong>。先检测到障碍物，然后判断它是静态的还是动态的，最后决定是绕行还是等待。动态障碍物我一般用「速度障碍法」（Velocity Obstacle）来处理，效果不错。</p>
+</div>
+
+<h3>21.4 异常状态恢复：脱轨与定位丢失</h3>
+
+<p>这是AGV系统里最头疼的问题。车跑着跑着，突然告诉你「我迷路了」或者「我脱轨了」。怎么办？</p>
+
+<p><strong>脱轨检测与恢复：</strong></p>
+<ul>
+  <li><strong>检测方式</strong>：通过里程计推算的位置与磁条/二维码/激光反射板的位置偏差超过阈值（比如10cm），判定为脱轨。</li>
+  <li><strong>恢复策略</strong>：
+    <ul>
+      <li>先停车，记录当前位置</li>
+      <li>尝试「回轨」：根据偏差方向，缓慢调整方向，直到重新检测到轨道信号</li>
+      <li>如果3次回轨失败，上报人工干预</li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>定位丢失的恢复策略：</strong></p>
+<p>定位丢失比脱轨更严重。因为脱轨至少知道大概位置，定位丢失是彻底不知道自己在哪。</p>
+
+<pre><code>// 定位丢失恢复流程
+void handleLocalizationLoss() {
+    // 1. 立即停车
+    stopMotion();
+    
+    // 2. 尝试重定位
+    bool relocalized = false;
+    for (int i = 0; i < 3; i++) {
+        relocalized = attemptRelocalization();
+        if (relocalized) break;
+        delay(500);  // 等待半秒再试
+    }
+    
+    // 3. 如果重定位失败，进入「迷失模式」
+    if (!relocalized) {
+        // 缓慢向前移动，同时扫描环境特征
+        // 直到找到匹配的地图特征点
+        enterLostMode();
+    }
+    
+    // 4. 如果还是不行，上报人工
+    if (!relocalized) {
+        reportError("LOCALIZATION_LOST");
+        waitForHumanIntervention();
+    }
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：定位丢失后，AGV绝对不能高速移动。我见过一个案例，定位丢失后AGV以全速往前冲，结果撞上了货架。后来我们规定：定位丢失后最大速度限制在0.2m/s。</p>
+</div>
+
+<h3>21.5 日志记录与报警</h3>
+
+<p>日志是AGV的「黑匣子」。出了问题，第一件事就是翻日志。没有日志，你连问题在哪都不知道。</p>
+
+<p><strong>日志分级：</strong></p>
+<table>
+  <tr>
+    <th>级别</th>
+    <th>含义</th>
+    <th>记录内容</th>
+    <th>存储方式</th>
+  </tr>
+  <tr>
+    <td>DEBUG</td>
+    <td>调试信息</td>
+    <td>传感器原始数据、算法中间结果</td>
+    <td>循环覆盖，保留最近7天</td>
+  </tr>
+  <tr>
+    <td>INFO</td>
+    <td>正常运行</td>
+    <td>任务开始/结束、路径规划、状态切换</td>
+    <td>按天归档，保留30天</td>
+  </tr>
+  <tr>
+    <td>WARN</td>
+    <td>警告</td>
+    <td>安全区触发、轻微偏差、通信超时</td>
+    <td>单独存储，保留90天</td>
+  </tr>
+  <tr>
+    <td>ERROR</td>
+    <td>错误</td>
+    <td>急停、碰撞、定位丢失、硬件故障</td>
+    <td>永久保留，上传服务器</td>
+  </tr>
+</table>
+
+<p><strong>报警机制的设计：</strong></p>
+<ul>
+  <li><strong>声光报警</strong>：AGV上的蜂鸣器和三色灯。绿色正常，黄色警告，红色错误。</li>
+  <li><strong>远程报警</strong>：通过MQTT或HTTP上报到调度系统。我习惯用MQTT，实时性好。</li>
+  <li><strong>报警分级</strong>：
+    <ul>
+      <li>一级报警（紧急）：急停、碰撞、定位丢失 → 立即通知运维人员</li>
+      <li>二级报警（重要）：安全区触发、脱轨、通信中断 → 记录并通知</li>
+      <li>三级报警（一般）：电池低电量、传感器脏污 → 记录即可</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：日志格式一定要统一。我见过最坑的日志，有的用逗号分隔，有的用空格，有的用中文冒号。后来我强制要求所有日志用JSON格式，时间戳精确到毫秒。这样不管是人工查还是机器分析，都方便。</p>
+</div>
+
+<h3>21.6 安全机制的整体架构</h3>
+
+<p>下面这张图，是我做AGV安全系统时画的架构图。说白了，安全机制分三层：<strong>硬件层 → 控制层 → 决策层</strong>。每一层都有独立的故障检测和响应机制。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV安全机制整体架构</text>
+  
+  <!-- 第一层：硬件层 -->
+  <rect x="50" y="70" width="700" height="120" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="8"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">硬件层（硬线安全）</text>
+  
+  <rect x="80" y="110" width="150" height="60" fill="#c8e6c9" rx="5"/>
+  <text x="155" y="135" text-anchor="middle" font-size="13" fill="#1b5e20">急停按钮</text>
+  <text x="155" y="155" text-anchor="middle" font-size="11" fill="#1b5e20">双通道常闭触点</text>
+  
+  <rect x="260" y="110" width="150" height="60" fill="#c8e6c9" rx="5"/>
+  <text x="335" y="135" text-anchor="middle" font-size="13" fill="#1b5e20">碰撞开关</text>
+  <text x="335" y="155" text-anchor="middle" font-size="11" fill="#1b5e20">前后保险杠</text>
+  
+  <rect x="440" y="110" width="150" height="60" fill="#c8e6c9" rx="5"/>
+  <text x="515" y="135" text-anchor="middle" font-size="13" fill="#1b5e20">激光雷达</text>
+  <text x="515" y="155" text-anchor="middle" font-size="11" fill="#1b5e20">安全区域输出</text>
+  
+  <rect x="620" y="110" width="100" height="60" fill="#c8e6c9" rx="5"/>
+  <text x="670" y="135" text-anchor="middle" font-size="13" fill="#1b5e20">驱动器</text>
+  <text x="670" y="155" text-anchor="middle" font-size="11" fill="#1b5e20">STO功能</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：控制层 -->
+  <rect x="50" y="220" width="700" height="120" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="8"/>
+  <text x="400" y="245" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">控制层（逻辑安全）</text>
+  
+  <rect x="80" y="260" width="200" height="60" fill="#ffe0b2" rx="5"/>
+  <text x="180" y="285" text-anchor="middle" font-size="13" fill="#bf360c">安全PLC</text>
+  <text x="180" y="305" text-anchor="middle" font-size="11" fill="#bf360c">急停逻辑、安全区域监控</text>
+  
+  <rect x="310" y="260" width="200" height="60" fill="#ffe0b2" rx="5"/>
+  <text x="410" y="285" text-anchor="middle" font-size="13" fill="#bf360c">主控制器</text>
+  <text x="410" y="305" text-anchor="middle" font-size="11" fill="#bf360c">碰撞检测、避障算法</text>
+  
+  <rect x="540" y="260" width="180" height="60" fill="#ffe0b2" rx="5"/>
+  <text x="630" y="285" text-anchor="middle" font-size="13" fill="#bf360c">状态机</text>
+  <text x="630" y="305" text-anchor="middle" font-size="11" fill="#bf360c">异常状态恢复</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：决策层 -->
+  <rect x="50" y="370" width="700" height="100" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="8"/>
+  <text x="400" y="395" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">决策层（系统安全）</text>
+  
+  <rect x="80" y="410" width="200" height="45" fill="#bbdefb" rx="5"/>
+  <text x="180" y="435" text-anchor="middle" font-size="13" fill="#0d47a1">调度系统</text>
+  <text x="180" y="450" text-anchor="middle" font-size="10" fill="#0d47a1">任务暂停/取消</text>
+  
+  <rect x="310" y="410" width="200" height="45" fill="#bbdefb" rx="5"/>
+  <text x="410" y="435" text-anchor="middle" font-size="13" fill="#0d47a1">日志系统</text>
+  <text x="410" y="450" text-anchor="middle" font-size="10" fill="#0d47a1">记录、归档、分析</text>
+  
+  <rect x="540" y="410" width="180" height="45" fill="#bbdefb" rx="5"/>
+  <text x="630" y="435" text-anchor="middle" font-size="13" fill="#0d47a1">报警系统</text>
+  <text x="630" y="450" text-anchor="middle" font-size="10" fill="#0d47a1">声光、远程通知</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图我画了很多遍。核心思想就是：<strong>每一层独立工作，上层依赖下层，但下层不依赖上层</strong>。什么意思？就算主控制器死机了，安全PLC照样能触发急停；就算安全PLC坏了，硬线急停照样能切断驱动器。这才叫真正的安全。</p>
+
+<div class="highlight">
+  <p><strong>总结一下安全机制的核心原则：</strong></p>
+  <ul>
+    <li><strong>故障安全</strong>：任何故障都要让系统进入安全状态，而不是维持原状</li>
+    <li><strong>冗余设计</strong>：关键信号要有备份，单点故障不能导致系统失控</li>
+    <li><strong>可追溯</strong>：所有异常都要记录，方便事后分析</li>
+    <li><strong>人工确认</strong>：紧急情况恢复后，必须由人确认安全</li>
+  </ul>
+</div>
+
+<p>嗯，安全机制这块就聊到这儿。说白了，安全不是功能，是底线。你算法写得再好，安全没做好，一切都是白搭。希望这些经验能帮你少走弯路。</p>
+
+        <div class="footer-nav">
+            <a href="20AutoChargingDock.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

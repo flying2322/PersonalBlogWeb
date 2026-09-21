@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>27 参数调优</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="active">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>27 参数调优：任务优先级优化、栈空间大小调整、系统时钟节拍频率选择</h2>
+
+<p>各位同学，欢迎来到参数调优这一节。</p>
+<p>说实话，RTOS移植完了能跑起来，只是第一步。真正让系统稳定、高效地运行，靠的是参数调优。这就像你组装了一台赛车，发动机能点火了，但能不能在赛道上跑出好成绩，还得看悬挂怎么调、轮胎气压多少、换挡时机怎么把握。</p>
+<p>今天我们就来聊聊三个最关键的调优参数：<strong>任务优先级</strong>、<strong>栈空间大小</strong>、<strong>系统时钟节拍频率</strong>。这三个参数调好了，你的AGV控制器才能算得上是一个合格的实时系统。</p>
+
+<h3>27.1 任务优先级优化：别让高优先级饿死低优先级</h3>
+
+<p>任务优先级，说白了就是给每个任务排个队。谁重要谁先跑。</p>
+<p>但这里有个坑——<strong>优先级反转</strong>。我在项目中遇到过，一个低优先级的任务拿着互斥锁不放，中优先级的任务一直抢CPU，结果高优先级的任务反而被卡住了。AGV在转弯时突然停下来，就是因为这个原因。</p>
+
+<div class="highlight">
+    <p><strong>核心原则：</strong></p>
+    <ul>
+        <li>实时性要求高的任务（如电机控制、急停处理）给最高优先级</li>
+        <li>周期性任务（如传感器采集）给中等优先级</li>
+        <li>后台任务（如日志记录、状态显示）给最低优先级</li>
+    </ul>
+</div>
+
+<p>我个人习惯的做法是：先按功能分类，再按时间要求排序。比如AGV控制器里，我一般这样分配：</p>
+
+<table>
+    <tr>
+        <th>任务名称</th>
+        <th>优先级</th>
+        <th>说明</th>
+    </tr>
+    <tr>
+        <td>急停处理</td>
+        <td>最高（5）</td>
+        <td>必须立即响应，毫秒级延迟都不行</td>
+    </tr>
+    <tr>
+        <td>电机控制</td>
+        <td>高（4）</td>
+        <td>控制周期1ms，不能抖动</td>
+    </tr>
+    <tr>
+        <td>传感器采集</td>
+        <td>中（3）</td>
+        <td>10ms周期，允许少量抖动</td>
+    </tr>
+    <tr>
+        <td>路径规划</td>
+        <td>中低（2）</td>
+        <td>计算量大，但可以分步执行</td>
+    </tr>
+    <tr>
+        <td>日志记录</td>
+        <td>低（1）</td>
+        <td>有空就写，没空就丢</td>
+    </tr>
+</table>
+
+<div class="tip">
+    <p><strong>小技巧：</strong>不要把所有任务都挤在相邻的优先级上。留出一些空档，方便以后扩展。我曾经因为没留空档，加一个新功能时不得不重构整个优先级表，那叫一个痛苦。</p>
+</div>
+
+<h3>27.2 栈空间大小调整：给多了浪费，给少了崩溃</h3>
+
+<p>栈空间，是每个任务私有的内存区域。函数调用、局部变量、中断嵌套，全都要用栈。</p>
+<p>你想想看，如果栈空间给小了，任务一运行就栈溢出，系统直接崩溃。给大了呢？内存浪费。AGV控制器上内存本来就金贵，不能这么挥霍。</p>
+
+<p><strong>怎么确定栈大小？</strong>我一般用三步法：</p>
+
+<ol>
+    <li><strong>估算</strong>：根据任务中最大的函数调用链深度，加上局部变量大小，再留30%余量</li>
+    <li><strong>实测</strong>：在调试模式下运行，观察栈使用峰值</li>
+    <li><strong>调整</strong>：根据实测数据，精确设置栈大小</li>
+</ol>
+
+<p>举个例子，我之前调一个传感器采集任务，估算需要512字节。结果实测发现，峰值只用了不到300字节。嗯，这里要注意，不同运行场景下栈使用量可能不同。比如正常运行时和异常处理时，栈深度可能差很多。</p>
+
+<div class="warning">
+    <p><strong>避坑指南：</strong>我曾经因为栈空间给得太紧，AGV在连续急转弯时频繁死机。查了两天才发现，是路径规划任务在计算复杂路径时，递归调用深度超过了预期。从那以后，我每个任务都至少留50%的余量。</p>
+</div>
+
+<p>在FreeRTOS里，可以用<code>uxTaskGetStackHighWaterMark()</code>来查看栈剩余空间。我建议在调试阶段，每个任务都打印一下这个值：</p>
+
+<pre><code>// 在任务循环中定期检查栈使用情况
+UBaseType_t uxHighWaterMark;
+uxHighWaterMark = uxTaskGetStackHighWaterMark(NULL);
+if(uxHighWaterMark &lt; 100) {
+    // 栈空间不足，需要调整
+    printf("Warning: Task stack low, only %d bytes left\n", uxHighWaterMark);
+}</code></pre>
+
+<h3>27.3 系统时钟节拍频率选择：快有快的好，慢有慢的妙</h3>
+
+<p>系统时钟节拍，就是RTOS的心跳。每个心跳，调度器都会检查一次，看看要不要切换任务。</p>
+<p>频率高了，任务切换更及时，实时性更好。但代价呢？CPU花在调度上的时间就多了。频率低了，CPU利用率高，但任务响应会变慢。</p>
+
+<p><strong>怎么选？</strong>我建议从两个角度考虑：</p>
+
+<ul>
+    <li><strong>任务的最小时间需求</strong>：如果你的电机控制需要1ms周期，那节拍频率至少得1000Hz</li>
+    <li><strong>CPU的负载能力</strong>：节拍频率越高，调度开销越大。一般建议不超过CPU主频的1%</li>
+</ul>
+
+<p>举个例子，AGV控制器用STM32F4，主频168MHz。我一般选1000Hz的节拍频率。为什么？因为电机控制周期是1ms，传感器采集是10ms，1000Hz刚好能满足需求，调度开销也只有0.6%左右，完全可以接受。</p>
+
+<div class="highlight">
+    <p><strong>经验之谈：</strong>如果你用的是低端MCU，比如Cortex-M0，主频只有48MHz，那建议把节拍频率降到500Hz甚至100Hz。别为了追求实时性把CPU都耗在调度上了。</p>
+</div>
+
+<p>在FreeRTOS里，节拍频率通过<code>configTICK_RATE_HZ</code>配置：</p>
+
+<pre><code>// FreeRTOSConfig.h
+#define configTICK_RATE_HZ    ((TickType_t)1000)  // 1000Hz，1ms一个节拍</code></pre>
+
+<p>这里有个细节要注意：节拍频率越高，<code>vTaskDelay()</code>的精度也越高。但如果你只是做简单的延时，没必要追求太高的精度。我见过有人把节拍频率设到10000Hz，结果CPU一半时间都在跑调度器，得不偿失。</p>
+
+<h3>27.4 三者之间的平衡</h3>
+
+<p>这三个参数不是孤立的。优先级影响任务的响应时间，栈空间影响任务的稳定性，节拍频率影响系统的整体实时性。</p>
+<p>我一般这样调优：</p>
+
+<ol>
+    <li>先确定节拍频率，满足最紧急任务的时间需求</li>
+    <li>再分配优先级，确保关键任务能及时得到CPU</li>
+    <li>最后调整栈空间，保证每个任务都能稳定运行</li>
+</ol>
+
+<p>调优是个迭代的过程。别指望一次就能调好。我每次做新项目，都要反复调个三五轮，才能找到最合适的参数组合。</p>
+
+<div class="tip">
+    <p><strong>最后说一句：</strong>参数调优没有标准答案。同样的参数，在不同的硬件平台、不同的应用场景下，效果可能天差地别。多测试、多观察、多总结，才是王道。</p>
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">参数调优核心逻辑</text>
+    
+    <!-- 三个主模块 -->
+    <!-- 任务优先级 -->
+    <rect x="50" y="80" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务优先级</text>
+    
+    <!-- 栈空间大小 -->
+    <rect x="300" y="80" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">栈空间大小</text>
+    
+    <!-- 系统时钟节拍 -->
+    <rect x="550" y="80" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">系统时钟节拍</text>
+    
+    <!-- 箭头连接 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+        </marker>
+    </defs>
+    
+    <line x1="250" y1="110" x2="300" y2="110" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="110" x2="550" y2="110" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 影响因素 -->
+    <rect x="50" y="180" width="200" height="100" rx="6" fill="#ecf0f1" stroke="#3498db" stroke-width="1"/>
+    <text x="150" y="205" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">影响因素</text>
+    <text x="150" y="225" text-anchor="middle" font-size="11" fill="#7f8c8d">• 实时性要求</text>
+    <text x="150" y="245" text-anchor="middle" font-size="11" fill="#7f8c8d">• 任务重要性</text>
+    <text x="150" y="265" text-anchor="middle" font-size="11" fill="#7f8c8d">• 优先级反转</text>
+    
+    <rect x="300" y="180" width="200" height="100" rx="6" fill="#ecf0f1" stroke="#2ecc71" stroke-width="1"/>
+    <text x="400" y="205" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">影响因素</text>
+    <text x="400" y="225" text-anchor="middle" font-size="11" fill="#7f8c8d">• 函数调用深度</text>
+    <text x="400" y="245" text-anchor="middle" font-size="11" fill="#7f8c8d">• 局部变量大小</text>
+    <text x="400" y="265" text-anchor="middle" font-size="11" fill="#7f8c8d">• 中断嵌套</text>
+    
+    <rect x="550" y="180" width="200" height="100" rx="6" fill="#ecf0f1" stroke="#e74c3c" stroke-width="1"/>
+    <text x="650" y="205" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">影响因素</text>
+    <text x="650" y="225" text-anchor="middle" font-size="11" fill="#7f8c8d">• 最小时间需求</text>
+    <text x="650" y="245" text-anchor="middle" font-size="11" fill="#7f8c8d">• CPU负载能力</text>
+    <text x="650" y="265" text-anchor="middle" font-size="11" fill="#7f8c8d">• 调度开销</text>
+    
+    <!-- 调优流程 -->
+    <rect x="150" y="320" width="500" height="50" rx="25" fill="#9b59b6" opacity="0.8"/>
+    <text x="400" y="350" text-anchor="middle" font-size="14" fill="white" font-weight="bold">调优流程：先定节拍 → 再分配优先级 → 最后调栈空间</text>
+    
+    <!-- 连接线 -->
+    <line x1="150" y1="280" x2="150" y2="320" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <line x1="400" y1="280" x2="400" y2="320" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <line x1="650" y1="280" x2="650" y2="320" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+</svg>
+
+<p>好了，参数调优就讲到这里。记住，调优不是一蹴而就的事，多动手、多测试，你的AGV控制器会越来越稳。</p>
+
+        <div class="footer-nav">
+            <a href="26BootloaderDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="28CommonIssues.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

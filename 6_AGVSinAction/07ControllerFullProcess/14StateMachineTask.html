@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 状态机与任务管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="active">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 状态机与任务管理：AGV状态机设计（空闲、导航、充电、异常）、任务队列与优先级、多AGV协同逻辑</h2>
+
+<p>各位同学，今天我们来聊聊AGV的“大脑”怎么运转。说白了，就是状态机与任务管理。这东西听起来玄乎，其实就像我们人一样——什么时候该干活，什么时候该休息，出问题了怎么办。AGV也得有这套逻辑。</p>
+
+<p>我个人习惯把状态机比作AGV的“意识”。没有它，车就是一堆电机和传感器的集合。有了它，车才知道自己是谁，该干嘛去。</p>
+
+<h3>14.1 AGV核心状态机设计</h3>
+
+<p>先看最基础的状态机。我做过那么多项目，发现不管多复杂的AGV，核心状态就那么几个：<strong>空闲、导航、充电、异常</strong>。你想想看，是不是这个理？</p>
+
+<div class="highlight">
+<p><strong>核心状态定义：</strong></p>
+<ul>
+  <li><strong>空闲（Idle）</strong>：等待任务，低功耗待机</li>
+  <li><strong>导航（Navigation）</strong>：执行路径规划与运动控制</li>
+  <li><strong>充电（Charging）</strong>：自动对接充电桩，管理电池</li>
+  <li><strong>异常（Error）</strong>：处理故障，进入安全模式</li>
+</ul>
+</div>
+
+<p>这里我画了一张状态转移图，大家感受一下逻辑关系：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="420" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 空闲状态 -->
+  <ellipse cx="120" cy="200" rx="70" ry="40" fill="#e6ffe6" stroke="#2d8a2d" stroke-width="3"/>
+  <text x="120" y="205" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d8a2d">空闲</text>
+  <text x="120" y="220" text-anchor="middle" font-size="11" fill="#555">Idle</text>
+  
+  <!-- 导航状态 -->
+  <ellipse cx="320" cy="120" rx="70" ry="40" fill="#e6f3ff" stroke="#1a73e8" stroke-width="3"/>
+  <text x="320" y="125" text-anchor="middle" font-size="16" font-weight="bold" fill="#1a73e8">导航</text>
+  <text x="320" y="140" text-anchor="middle" font-size="11" fill="#555">Navigation</text>
+  
+  <!-- 充电状态 -->
+  <ellipse cx="320" cy="320" rx="70" ry="40" fill="#fff3e6" stroke="#e68a1a" stroke-width="3"/>
+  <text x="320" y="325" text-anchor="middle" font-size="16" font-weight="bold" fill="#e68a1a">充电</text>
+  <text x="320" y="340" text-anchor="middle" font-size="11" fill="#555">Charging</text>
+  
+  <!-- 异常状态 -->
+  <ellipse cx="560" cy="200" rx="70" ry="40" fill="#ffe6e6" stroke="#d32f2f" stroke-width="3"/>
+  <text x="560" y="205" text-anchor="middle" font-size="16" font-weight="bold" fill="#d32f2f">异常</text>
+  <text x="560" y="220" text-anchor="middle" font-size="11" fill="#555">Error</text>
+  
+  <!-- 转移箭头 -->
+  <!-- 空闲 -> 导航 -->
+  <defs>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2d8a2d"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1a73e8"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e68a1a"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d32f2f"/>
+    </marker>
+  </defs>
+  
+  <!-- 空闲 -> 导航 -->
+  <line x1="185" y1="180" x2="255" y2="140" stroke="#2d8a2d" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="210" y="155" text-anchor="middle" font-size="11" fill="#2d8a2d">分配任务</text>
+  
+  <!-- 导航 -> 空闲 -->
+  <line x1="255" y1="160" x2="185" y2="195" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="210" y="185" text-anchor="middle" font-size="11" fill="#1a73e8">任务完成</text>
+  
+  <!-- 空闲 -> 充电 -->
+  <line x1="155" y1="235" x2="255" y2="300" stroke="#2d8a2d" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="195" y="275" text-anchor="middle" font-size="11" fill="#2d8a2d">低电量</text>
+  
+  <!-- 充电 -> 空闲 -->
+  <line x1="255" y1="290" x2="185" y2="240" stroke="#e68a1a" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  <text x="210" y="260" text-anchor="middle" font-size="11" fill="#e68a1a">充满/唤醒</text>
+  
+  <!-- 导航 -> 异常 -->
+  <line x1="385" y1="140" x2="495" y2="180" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="440" y="155" text-anchor="middle" font-size="11" fill="#d32f2f">故障发生</text>
+  
+  <!-- 充电 -> 异常 -->
+  <line x1="385" y1="300" x2="495" y2="220" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="450" y="265" text-anchor="middle" font-size="11" fill="#d32f2f">充电异常</text>
+  
+  <!-- 异常 -> 空闲 -->
+  <line x1="495" y1="220" x2="385" y2="240" stroke="#1a73e8" stroke-width="2" marker-end="url(#arrowBlue)" stroke-dasharray="5,3"/>
+  <text x="440" y="235" text-anchor="middle" font-size="11" fill="#1a73e8">故障恢复</text>
+  
+  <!-- 导航 -> 充电 -->
+  <path d="M 350 155 Q 380 220 350 280" fill="none" stroke="#e68a1a" stroke-width="2" marker-end="url(#arrowOrange)" stroke-dasharray="5,3"/>
+  <text x="390" y="220" text-anchor="middle" font-size="11" fill="#e68a1a">电量过低</text>
+  
+  <!-- 标题 -->
+  <text x="360" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">AGV核心状态机转移图</text>
+</svg>
+
+<p>嗯，这里要注意：状态转移不是随便跳的。比如从“导航”直接跳到“充电”，必须满足电量低于阈值且附近有充电桩。我在项目中遇到过，有人把状态转移条件写得太宽松，结果AGV在运输途中突然跑去充电，把产线搞乱了。</p>
+
+<div class="tip">
+<p><strong>实战小技巧：</strong>状态机实现时，我建议用枚举类型 + switch-case 结构。别用 if-else 嵌套，后期维护会想哭的。</p>
+</div>
+
+<pre><code>// 状态机核心代码片段
+typedef enum {
+    STATE_IDLE,
+    STATE_NAVIGATION,
+    STATE_CHARGING,
+    STATE_ERROR
+} agv_state_t;
+
+agv_state_t current_state = STATE_IDLE;
+
+void agv_state_machine_run(void) {
+    switch (current_state) {
+        case STATE_IDLE:
+            // 等待任务分配
+            if (task_queue_has_task()) {
+                current_state = STATE_NAVIGATION;
+            }
+            if (battery_level &lt; BATTERY_LOW_THRESHOLD) {
+                current_state = STATE_CHARGING;
+            }
+            break;
+            
+        case STATE_NAVIGATION:
+            // 执行导航
+            if (navigation_complete()) {
+                current_state = STATE_IDLE;
+            }
+            if (fault_detected()) {
+                current_state = STATE_ERROR;
+            }
+            if (battery_level &lt; BATTERY_CRITICAL) {
+                current_state = STATE_CHARGING;
+            }
+            break;
+            
+        case STATE_CHARGING:
+            // 充电管理
+            if (battery_level &gt;= BATTERY_FULL) {
+                current_state = STATE_IDLE;
+            }
+            if (charging_fault()) {
+                current_state = STATE_ERROR;
+            }
+            break;
+            
+        case STATE_ERROR:
+            // 异常处理
+            if (error_cleared()) {
+                current_state = STATE_IDLE;
+            }
+            break;
+    }
+}
+</code></pre>
+
+<h3>14.2 任务队列与优先级管理</h3>
+
+<p>状态机搞定了，接下来就是任务管理。AGV不可能只干一件事，它得排队干活。我见过很多新手，直接把任务塞进一个链表里，结果高优先级的任务被堵在后面，急死人。</p>
+
+<p>任务队列的设计，说白了就是三个问题：<strong>谁来插队？谁先执行？插队后原来的任务怎么办？</strong></p>
+
+<div class="highlight">
+<p><strong>任务优先级划分（我常用的方案）：</strong></p>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e6f3ff;">
+    <th>优先级</th>
+    <th>任务类型</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>0（最高）</td>
+    <td>紧急停止 / 安全任务</td>
+    <td>不可抢占，立即执行</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>异常处理 / 故障恢复</td>
+    <td>高优先级，可中断当前任务</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>充电任务</td>
+    <td>电量低于阈值时触发</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>普通运输任务</td>
+    <td>按FIFO顺序执行</td>
+  </tr>
+  <tr>
+    <td>4（最低）</td>
+    <td>维护 / 自检任务</td>
+    <td>空闲时执行</td>
+  </tr>
+</table>
+</div>
+
+<p>为什么会这样设计？你想想看，如果AGV正在运输途中，突然传感器报错，这时候必须暂停运输，先处理异常。我曾经在项目里吃过亏——没做优先级抢占，结果AGV带着故障继续跑，最后撞了货架。</p>
+
+<div class="warning">
+<p><strong>避坑指南：</strong>我曾经遇到过任务队列死锁的问题。高优先级任务一直插队，低优先级任务永远得不到执行。解决方案是加一个“老化机制”——任务等待超过一定时间，自动提升优先级。</p>
+</div>
+
+<pre><code>// 任务队列管理示例
+typedef struct {
+    uint8_t priority;       // 0-4, 0最高
+    uint32_t task_id;
+    uint32_t timestamp;     // 入队时间戳
+    void (*task_func)(void);
+} task_t;
+
+// 优先级队列插入（带老化提升）
+void task_queue_insert(task_t *new_task) {
+    // 老化处理：等待超过30秒的任务，优先级+1
+    for (int i = 0; i &lt; queue_size; i++) {
+        if ((get_tick() - task_queue[i].timestamp) &gt; 30000) {
+            if (task_queue[i].priority &gt; 0) {
+                task_queue[i].priority--;
+            }
+        }
+    }
+    // 按优先级插入
+    int insert_pos = 0;
+    while (insert_pos &lt; queue_size &amp;&amp; 
+           task_queue[insert_pos].priority &lt;= new_task-&gt;priority) {
+        insert_pos++;
+    }
+    // 插入逻辑...
+}
+</code></pre>
+
+<h3>14.3 多AGV协同逻辑</h3>
+
+<p>单台AGV好搞，多台一起跑就麻烦了。我记得第一次做多AGV项目，三台车在十字路口堵成一锅粥。后来我总结了一套协同逻辑，核心就四个字：<strong>资源互斥</strong>。</p>
+
+<p>多AGV协同，说白了就是解决“谁先过”的问题。我常用的方案是<strong>分布式令牌+区域锁</strong>：</p>
+
+<ul>
+  <li><strong>区域锁</strong>：把地图划分成网格，每个网格同一时间只能有一台AGV占用</li>
+  <li><strong>分布式令牌</strong>：AGV进入关键区域前，先申请令牌，拿到才能进</li>
+  <li><strong>死锁检测</strong>：定期检查是否有AGV互相等待，超时则强制解锁</li>
+</ul>
+
+<div class="highlight">
+<p><strong>多AGV协同的核心规则：</strong></p>
+<ol>
+  <li>每台AGV维护自己的状态机，独立运行</li>
+  <li>共享资源（路径段、充电桩）通过中央调度器分配</li>
+  <li>低优先级AGV主动让行高优先级AGV</li>
+  <li>死锁发生时，由调度器发起“回退-重规划”流程</li>
+</ol>
+</div>
+
+<p>嗯，这里有个细节：多AGV协同不能全靠中央调度。万一调度器挂了，所有车都得停。我建议采用<strong>去中心化+心跳检测</strong>的方案。每台AGV广播自己的位置和状态，其他车收到后自行避让。中央调度只做宏观分配，不参与微观控制。</p>
+
+<pre><code>// 多AGV协同 - 区域锁申请
+bool request_area_lock(uint8_t agv_id, uint16_t area_id) {
+    // 检查区域是否被占用
+    if (area_lock[area_id] == 0xFF) {
+        // 空闲，锁定
+        area_lock[area_id] = agv_id;
+        return true;
+    }
+    // 被占用，检查优先级
+    uint8_t current_owner = area_lock[area_id];
+    if (agv_priority[agv_id] &lt; agv_priority[current_owner]) {
+        // 高优先级AGV可以抢占
+        // 通知原车主退出
+        send_preempt_message(current_owner, area_id);
+        area_lock[area_id] = agv_id;
+        return true;
+    }
+    return false;  // 等待
+}
+</code></pre>
+
+<div class="tip">
+<p><strong>实战经验：</strong>多AGV协同最怕的是“活锁”——两辆车互相让，结果谁都不走。我解决的办法是引入随机退避时间。就像WiFi的CSMA/CA一样，退避时间不同，自然就分出了先后。</p>
+</div>
+
+<p>最后总结一下：状态机是AGV的“骨架”，任务管理是“血液”，多AGV协同是“神经系统”。这三者配合好了，你的AGV才能跑得稳、跑得快、不出乱子。我在实际项目中，光状态机就迭代了三个版本，才达到满意的效果。所以别急，慢慢调，总会调顺的。</p>
+
+<div class="footer-nav">
+            <a href="13SafetyMechanism.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15HostHmiDev.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV控制器实时操作系统移植实战 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: inline;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+            margin-left: 0.3rem;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV控制器实时操作系统移植实战</h1>
+    <div class="subhead">
+        <span>🔐 嵌入式实时系统 · 工业级实战</span>
+        <span>v2.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>嵌入式软件开发工程师</strong> — 深入RTOS内核与移植技术</li>
+                <li><strong>AGV/机器人开发者</strong> — 构建高性能运动控制与感知系统</li>
+                <li><strong>物联网/IoT 工程师</strong> — 掌握实时通信与低功耗设计</li>
+                <li><strong>汽车电子/工控开发者</strong> — 理解CAN、安全与可靠性机制</li>
+                <li><strong>高校学生/研究者</strong> — 系统学习RTOS原理与项目实战</li>
+                <li><strong>底层架构师</strong> — 从Bootloader到多任务调度全链路设计</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握RTOS内核完整移植</strong> — 从启动文件到调度器，从时钟到内存管理</li>
+                <li><strong>独立搭建AGV控制器固件</strong> — 电机驱动、传感器融合、路径规划全实现</li>
+                <li><strong>开发工业级通信协议栈</strong> — CANopen、LWIP、MQTT、FatFS</li>
+                <li><strong>调试与优化技能</strong> — 栈溢出检测、CPU利用率、低功耗调优</li>
+                <li><strong>安全机制深度理解</strong> — 看门狗、CRC校验、Bootloader双备份</li>
+                <li><strong>实战项目经验</strong> — 从零搭建AGV控制器，现场部署与维护</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>AGV控制器概述：</strong><span class="syllabus-desc">AGV系统架构、控制器硬件选型、实时操作系统选型分析。</span></li>
+        <li data-index="2"><strong>RTOS内核基础：</strong><span class="syllabus-desc">任务调度原理、任务状态机、上下文切换机制。</span></li>
+        <li data-index="3"><strong>移植环境搭建：</strong><span class="syllabus-desc">交叉编译工具链配置、调试器（J-Link/ST-Link）环境搭建、工程模板创建。</span></li>
+        <li data-index="4"><strong>启动文件与链接脚本：</strong><span class="syllabus-desc">芯片启动流程分析、链接脚本（.ld）编写、堆栈与中断向量表配置。</span></li>
+        <li data-index="5"><strong>RTOS时钟与定时器：</strong><span class="syllabus-desc">系统滴答定时器（SysTick）配置、时钟节拍中断服务函数编写、多时钟源管理。</span></li>
+        <li data-index="6"><strong>任务创建与管理：</strong><span class="syllabus-desc">任务控制块（TCB）设计、任务栈空间分配、任务创建API实现。</span></li>
+        <li data-index="7"><strong>调度器实现：</strong><span class="syllabus-desc">优先级抢占调度算法、时间片轮转调度、空闲任务与阻塞机制。</span></li>
+        <li data-index="8"><strong>中断管理：</strong><span class="syllabus-desc">中断优先级配置、中断嵌套处理、临界区保护（关中断/锁调度器）。</span></li>
+        <li data-index="9"><strong>同步与通信机制：</strong><span class="syllabus-desc">信号量（二值/计数）、互斥锁（优先级继承）、消息队列、事件标志组。</span></li>
+        <li data-index="10"><strong>内存管理：</strong><span class="syllabus-desc">静态内存池分配、动态内存分配（malloc替代方案）、内存碎片处理。</span></li>
+        <li data-index="11"><strong>移植层接口（CPU Port）：</strong><span class="syllabus-desc">寄存器上下文保存与恢复、PendSV异常处理、任务切换触发机制。</span></li>
+        <li data-index="12"><strong>板级支持包（BSP）开发：</strong><span class="syllabus-desc">GPIO驱动封装、UART驱动（中断+轮询）、定时器驱动。</span></li>
+        <li data-index="13"><strong>AGV专用外设驱动：</strong><span class="syllabus-desc">电机编码器接口、IMU（惯性测量单元）数据读取、激光雷达（LiDAR）数据解析。</span></li>
+        <li data-index="14"><strong>CAN总线通信：</strong><span class="syllabus-desc">CAN控制器初始化、CAN报文收发、CANopen协议栈移植。</span></li>
+        <li data-index="15"><strong>Wi-Fi/以太网通信：</strong><span class="syllabus-desc">LWIP协议栈移植、TCP/IP Socket编程、MQTT客户端实现。</span></li>
+        <li data-index="16"><strong>文件系统移植：</strong><span class="syllabus-desc">FatFS文件系统集成、SD卡驱动、日志记录与配置存储。</span></li>
+        <li data-index="17"><strong>系统启动流程：</strong><span class="syllabus-desc">从复位到main函数、硬件初始化顺序、RTOS启动与多任务创建。</span></li>
+        <li data-index="18"><strong>调试与性能分析：</strong><span class="syllabus-desc">断言（assert）机制、任务栈溢出检测、CPU利用率统计。</span></li>
+        <li data-index="19"><strong>低功耗管理：</strong><span class="syllabus-desc">休眠模式与唤醒源、动态频率调整、外设电源管理。</span></li>
+        <li data-index="20"><strong>安全与可靠性：</strong><span class="syllabus-desc">看门狗（IWDG/WWDG）配置、数据校验（CRC）、异常处理与系统恢复。</span></li>
+        <li data-index="21"><strong>AGV运动控制任务：</strong><span class="syllabus-desc">差速驱动模型、PID控制算法实现、速度与位置闭环。</span></li>
+        <li data-index="22"><strong>传感器融合任务：</strong><span class="syllabus-desc">卡尔曼滤波实现、里程计与IMU数据融合、定位估计。</span></li>
+        <li data-index="23"><strong>路径规划任务：</strong><span class="syllabus-desc">A*算法实现、全局路径规划、局部避障策略。</span></li>
+        <li data-index="24"><strong>任务间数据流设计：</strong><span class="syllabus-desc">全局数据结构体、发布-订阅模式、数据一致性保护。</span></li>
+        <li data-index="25"><strong>系统集成测试：</strong><span class="syllabus-desc">单元测试框架（Unity/CMock）、硬件在环（HIL）测试、压力测试。</span></li>
+        <li data-index="26"><strong>Bootloader设计：</strong><span class="syllabus-desc">固件升级流程、双备份区切换、CRC校验与回滚机制。</span></li>
+        <li data-index="27"><strong>参数调优：</strong><span class="syllabus-desc">任务优先级优化、栈空间大小调整、系统时钟节拍频率选择。</span></li>
+        <li data-index="28"><strong>常见问题与解决方案：</strong><span class="syllabus-desc">任务死锁、优先级反转、中断延迟过高、内存泄漏。</span></li>
+        <li data-index="29"><strong>项目实战：</strong><span class="syllabus-desc">从零搭建AGV控制器固件、功能模块联调、现场部署与维护。</span></li>
+        <li data-index="30"><strong>课程总结与进阶：</strong><span class="syllabus-desc">RTOS移植经验总结、开源项目推荐（FreeRTOS/RT-Thread）、下一步学习路径。</span></li>
+    </ul>
+    
+</div>
+</body>
+</html>

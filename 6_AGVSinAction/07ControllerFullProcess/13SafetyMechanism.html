@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 安全机制设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="active">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 安全机制设计：急停逻辑、避障策略（VFH+）、电子围栏、故障诊断与恢复</h2>
+
+<p>做AGV控制器这么多年，我越来越觉得——安全不是功能，是底线。</p>
+<p>你想想看，一辆无人车在工厂里跑，周围全是人、设备、货架。一旦出问题，轻则撞坏东西，重则伤人。所以这一章，咱们重点聊聊AGV的安全机制怎么设计。说白了，就是怎么让车“知道危险”、“避开危险”、“在危险中活下来”。</p>
+
+<div class="highlight">
+  <strong>核心要点：</strong> 安全机制不是堆功能，而是分层防御。急停是最后一道墙，避障是日常防御，电子围栏是区域管控，故障诊断是自我修复能力。
+</div>
+
+<h3>13.1 急停逻辑：最后一道防线</h3>
+
+<p>急停，听起来简单——按个按钮车就停了。但实际工程里，这里坑很多。</p>
+<p>我个人习惯把急停分成两级：</p>
+<ul>
+  <li><strong>硬件急停</strong>：物理按钮，直接切断电机驱动电源。这个优先级最高，不经过任何软件逻辑。</li>
+  <li><strong>软件急停</strong>：通过CAN总线或IO信号触发，控制器收到信号后执行紧急制动流程。</li>
+</ul>
+
+<p>我在项目中遇到过一个问题：客户反馈急停按钮按下去，车还要滑行半米才停。查了半天，发现是软件急停里做了“减速曲线”，想着让车平稳停下。但急停场景下，平稳就是犯罪！</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在急停逻辑里加了PID缓停，结果被客户骂惨了。急停就是急停，直接抱闸+切断动力，别搞什么平滑过渡。
+</div>
+
+<p>急停的恢复逻辑也很重要。很多新手会忽略这一点：急停恢复后，车应该处于什么状态？我的建议是：</p>
+<ul>
+  <li>急停恢复后，车必须处于“手动模式”</li>
+  <li>必须人工确认安全后，才能重新切换到自动运行</li>
+  <li>急停触发时的路径信息要保留，方便后续恢复</li>
+</ul>
+
+<h3>13.2 避障策略：VFH+算法实战</h3>
+
+<p>避障算法有很多，什么DWA、TEB、VFH。我个人最常用的是VFH+，为什么？因为它计算量小、实时性好，适合嵌入式平台。</p>
+
+<p>VFH+的核心思想很简单：把周围环境用极坐标网格表示，然后找出一条“最安全”的方向走。</p>
+
+<p>具体步骤我总结为四步：</p>
+<ol>
+  <li><strong>构建局部栅格地图</strong>：用激光雷达数据，把障碍物映射到车体周围的栅格中</li>
+  <li><strong>生成极坐标直方图</strong>：每个角度方向计算一个“障碍物密度值”</li>
+  <li><strong>识别可行区域</strong>：找密度值低于阈值的连续角度区间</li>
+  <li><strong>选择最优方向</strong>：结合目标方向、当前方向、历史方向，选一个最合适的</li>
+</ol>
+
+<p>这里我贴一段核心代码，展示VFH+中最关键的一步——极坐标直方图生成：</p>
+
+<pre><code>// VFH+ 极坐标直方图生成（简化版）
+#define SECTOR_COUNT 72  // 5度一个扇区
+#define MAX_DISTANCE 4.0f // 米
+
+float histogram[SECTOR_COUNT] = {0};
+
+void vfh_build_histogram(LaserScan *scan) {
+    memset(histogram, 0, sizeof(histogram));
+    
+    for (int i = 0; i &lt; scan-&gt;point_count; i++) {
+        float angle = scan-&gt;points[i].angle;
+        float dist = scan-&gt;points[i].distance;
+        
+        if (dist &gt; MAX_DISTANCE) continue;  // 太远的忽略
+        
+        // 计算障碍物密度值
+        int sector = (int)(angle / (2*M_PI) * SECTOR_COUNT) % SECTOR_COUNT;
+        float density = 1.0f / (dist * dist);  // 距离越近，密度越大
+        
+        // 考虑障碍物宽度，影响相邻扇区
+        int influence = (int)(0.5f / dist * SECTOR_COUNT / (2*M_PI));
+        for (int j = -influence; j &lt;= influence; j++) {
+            int idx = (sector + j + SECTOR_COUNT) % SECTOR_COUNT;
+            histogram[idx] += density * (1.0f - fabs(j) / (float)influence);
+        }
+    }
+}</code></pre>
+
+<p>嗯，这里要注意一个细节：障碍物宽度的影响。很多初学者只考虑障碍物所在的扇区，结果车贴着障碍物边缘走，很容易刮蹭。我习惯把障碍物的影响范围扩散到相邻扇区，距离越近扩散越宽。</p>
+
+<div class="tip">
+  <strong>实战技巧：</strong> VFH+的阈值设置很关键。阈值太高，车会钻到窄缝里出不来；阈值太低，车会绕大圈。我一般设两个阈值：高阈值用于紧急避障，低阈值用于正常导航。动态切换效果更好。
+</div>
+
+<h3>13.3 电子围栏：虚拟的墙</h3>
+
+<p>电子围栏，说白了就是在地图上画一些“不能进”的区域。但实际工程里，电子围栏不只是“不能进”，还有“不能出”。</p>
+
+<p>我一般把电子围栏分为三类：</p>
+<table>
+  <tr>
+    <th>类型</th>
+    <th>说明</th>
+    <th>典型场景</th>
+  </tr>
+  <tr>
+    <td>禁止进入区</td>
+    <td>车不能开进去的区域</td>
+    <td>货架区、人员通道</td>
+  </tr>
+  <tr>
+    <td>禁止驶出区</td>
+    <td>车不能离开的区域</td>
+    <td>工作区域边界、悬崖边缘</td>
+  </tr>
+  <tr>
+    <td>减速区</td>
+    <td>进入该区域必须减速</td>
+    <td>转弯处、狭窄通道</td>
+  </tr>
+</table>
+
+<p>电子围栏的实现方式，我推荐用多边形表示。每个围栏是一个多边形顶点列表，判断车的位置是否在多边形内部。这个算法很成熟，用射线法或者角度和法都行。</p>
+
+<p>我在项目中遇到过一个问题：电子围栏的边界判断频率太低，车高速冲过去时，已经越过围栏才检测到。后来我做了“预测性检测”——不光看当前位置，还预测未来0.5秒的位置是否进入围栏。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在电子围栏里只做了位置判断，没做方向判断。结果车倒车时，屁股先进入围栏区域，但车头还在外面，系统没报警。后来我改成判断车体轮廓的任意顶点是否进入围栏。
+</div>
+
+<h3>13.4 故障诊断与恢复：让车学会自救</h3>
+
+<p>故障诊断，不是等车坏了再修，而是在故障发生前就发现苗头。</p>
+
+<p>我习惯把故障分为三个等级：</p>
+<ul>
+  <li><strong>一级故障（警告）</strong>：不影响运行，但需要记录。比如某个传感器数据偶尔跳变。</li>
+  <li><strong>二级故障（降级）</strong>：部分功能受限，但还能动。比如激光雷达被遮挡，切换到超声波避障。</li>
+  <li><strong>三级故障（停机）</strong>：必须立即停止。比如电机驱动器报错、急停被触发。</li>
+</ul>
+
+<p>故障恢复策略，我总结了一个“三步走”原则：</p>
+<ol>
+  <li><strong>诊断</strong>：确定故障类型和位置。是传感器坏了？还是通信断了？还是机械卡住了？</li>
+  <li><strong>隔离</strong>：把故障部分隔离出去，不让它影响其他模块。比如某个电机编码器坏了，就切换到开环控制。</li>
+  <li><strong>恢复</strong>：尝试自动恢复，或者引导人工介入。比如通信超时，自动重连3次，不行就报人工。</li>
+</ol>
+
+<p>这里我画了一张故障诊断与恢复的流程图，方便大家理解整个逻辑：</p>
+
+<svg width="720" height="480" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="480" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">故障诊断与恢复流程图</text>
+  
+  <!-- 开始 -->
+  <rect x="280" y="55" width="160" height="45" rx="22" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+  <text x="360" y="83" text-anchor="middle" font-size="14" fill="white" font-weight="bold">系统运行中</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="100" x2="360" y2="130" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 故障检测 -->
+  <rect x="260" y="130" width="200" height="45" rx="8" fill="#2196F3" stroke="#1976D2" stroke-width="2"/>
+  <text x="360" y="158" text-anchor="middle" font-size="14" fill="white">故障检测模块</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="175" x2="360" y2="205" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断 -->
+  <polygon points="360,210 440,245 360,280 280,245" fill="#FF9800" stroke="#F57C00" stroke-width="2"/>
+  <text x="360" y="250" text-anchor="middle" font-size="13" fill="white" font-weight="bold">有故障？</text>
+  
+  <!-- 无故障 -->
+  <line x1="440" y1="245" x2="520" y2="245" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="520" y="225" width="120" height="40" rx="8" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+  <text x="580" y="250" text-anchor="middle" font-size="13" fill="white">继续运行</text>
+  
+  <!-- 有故障 -->
+  <line x1="360" y1="280" x2="360" y2="310" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 故障分级 -->
+  <rect x="250" y="310" width="220" height="45" rx="8" fill="#9C27B0" stroke="#7B1FA2" stroke-width="2"/>
+  <text x="360" y="338" text-anchor="middle" font-size="14" fill="white">故障分级判断</text>
+  
+  <!-- 三个分支 -->
+  <line x1="250" y1="332" x2="120" y2="380" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="355" x2="360" y2="380" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="470" y1="332" x2="600" y2="380" stroke="#555" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 一级故障 -->
+  <rect x="40" y="380" width="160" height="45" rx="8" fill="#FFEB3B" stroke="#FBC02D" stroke-width="2"/>
+  <text x="120" y="400" text-anchor="middle" font-size="12" fill="#333">一级故障（警告）</text>
+  <text x="120" y="416" text-anchor="middle" font-size="11" fill="#555">记录日志，继续运行</text>
+  
+  <!-- 二级故障 -->
+  <rect x="280" y="380" width="160" height="45" rx="8" fill="#FF9800" stroke="#F57C00" stroke-width="2"/>
+  <text x="360" y="400" text-anchor="middle" font-size="12" fill="white">二级故障（降级）</text>
+  <text x="360" y="416" text-anchor="middle" font-size="11" fill="#eee">切换备用方案</text>
+  
+  <!-- 三级故障 -->
+  <rect x="520" y="380" width="160" height="45" rx="8" fill="#F44336" stroke="#D32F2F" stroke-width="2"/>
+  <text x="600" y="400" text-anchor="middle" font-size="12" fill="white">三级故障（停机）</text>
+  <text x="600" y="416" text-anchor="middle" font-size="11" fill="#eee">紧急制动，报修</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>故障恢复这块，我特别想强调一点：<strong>不要盲目恢复</strong>。有些故障是间歇性的，比如通信偶尔丢包，重试几次就好了。但有些故障是永久性的，比如电机烧了，你重试一万次也没用。</p>
+
+<div class="tip">
+  <strong>实战技巧：</strong> 我习惯给每个故障类型配一个“恢复计数器”。连续恢复失败3次，就不再尝试，直接报人工。这样可以避免车在原地反复重启，浪费电池。
+</div>
+
+<p>最后，分享一个我踩过的坑：故障日志的记录。刚开始做的时候，我只记录故障代码和时间。后来排查问题时发现根本不够用。现在我要求故障日志必须包含：</p>
+<ul>
+  <li>故障发生时的车速、方向、位置</li>
+  <li>前后5秒的传感器数据快照</li>
+  <li>当前任务ID和路径点</li>
+  <li>系统状态（电池电量、温度、运行模式）</li>
+</ul>
+
+<p>有了这些信息，排查故障的效率能提升好几倍。嗯，这就是经验的价值吧。</p>
+
+<div class="footer-nav">
+            <a href="12ControlAlgorithmAdvanced.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14StateMachineTask.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 电源管理与低功耗</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="active">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 电源管理与低功耗：电池电量监测、电源路径管理、低功耗模式切换、充电逻辑</h2>
+
+<p>做AGV控制器，电源管理这块儿，说实话，是真正决定产品能不能用的关键。你算法写得再好，电机控制得再顺，电池没电了或者充不进电，一切白搭。我这些年踩过的坑，有一半都跟电源有关。今天咱们就把这块硬骨头啃下来。</p>
+
+<h3>17.1 电池电量监测——别让AGV半路“趴窝”</h3>
+
+<p>AGV最怕什么？最怕跑到一半没电了，堵在通道上，整个产线都得停。所以电量监测不是简单的“看电压”，而是一门学问。</p>
+
+<p>我个人习惯用TI的BQ系列芯片，比如BQ40Z50、BQ34Z100。这些芯片内置了阻抗跟踪算法，能实时估算电池的剩余电量，精度能做到1%以内。你想想看，如果只靠测电压，锂电池放电平台很平，电压降一点，电量可能已经掉了20%。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>电量监测不是测电压，而是测“库仑”——也就是流进流出电池的电荷量。BQ芯片内部有高精度ADC，配合电流传感器，实时积分。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：AGV在低温环境下（比如冷库），电池容量会骤降。BQ芯片的算法会自动补偿温度对容量的影响，但前提是你得把NTC热敏电阻接对位置。嗯，这里要注意，NTC要贴在电池电芯表面，而不是PCB板上，否则测的是环境温度，不是电池温度。</p>
+
+<p>代码层面，我们通过I2C读取BQ芯片的寄存器：</p>
+
+<pre><code>// 读取BQ40Z50的电量百分比
+uint8_t read_battery_soc(void) {
+    uint8_t soc = 0;
+    uint8_t reg_addr = 0x04; // SOC寄存器地址
+    i2c_start(BQ_I2C_ADDR);
+    i2c_write(reg_addr);
+    i2c_restart(BQ_I2C_ADDR | I2C_READ);
+    soc = i2c_read_byte(ACK);
+    i2c_stop();
+    return soc; // 返回0-100
+}</code></pre>
+
+<p>注意，BQ芯片的寄存器读取有时需要“解锁”操作，否则读出来的是默认值。我曾经因为这个bug，调试了整整两天，最后发现是忘了发解锁命令。</p>
+
+<h3>17.2 电源路径管理——充放电两不误</h3>
+
+<p>AGV控制器里，电池和外部电源（比如充电桩）是同时存在的。如果直接并联，会出现电流倒灌、电压冲突等问题。电源路径管理就是解决这个问题的。</p>
+
+<p>说白了，就是让系统优先使用外部电源供电，同时给电池充电；当外部电源断开时，无缝切换到电池供电。这个切换过程不能有掉电，否则控制器会复位。</p>
+
+<p>我常用的方案是BQ25713这颗芯片，它内部集成了双向升降压转换器和路径管理MOSFET。结构图如下：</p>
+
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="700" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="350" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">电源路径管理结构图</text>
+  
+  <!-- 外部电源 -->
+  <rect x="50" y="80" width="120" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="110" y="108" text-anchor="middle" fill="white" font-size="14">外部电源</text>
+  <text x="110" y="125" text-anchor="middle" fill="white" font-size="11">(充电桩/适配器)</text>
+  
+  <!-- 电池 -->
+  <rect x="50" y="280" width="120" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="110" y="308" text-anchor="middle" fill="white" font-size="14">锂电池组</text>
+  <text x="110" y="325" text-anchor="middle" fill="white" font-size="11">(24V/48V)</text>
+  
+  <!-- BQ25713 -->
+  <rect x="250" y="160" width="180" height="100" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="340" y="195" text-anchor="middle" fill="white" font-size="16" font-weight="bold">BQ25713</text>
+  <text x="340" y="215" text-anchor="middle" fill="white" font-size="12">双向升降压</text>
+  <text x="340" y="235" text-anchor="middle" fill="white" font-size="12">路径管理</text>
+  
+  <!-- 负载 -->
+  <rect x="520" y="160" width="130" height="100" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="585" y="195" text-anchor="middle" fill="white" font-size="14">系统负载</text>
+  <text x="585" y="215" text-anchor="middle" fill="white" font-size="11">(控制器+电机)</text>
+  
+  <!-- 箭头：外部电源 -> BQ -->
+  <line x1="170" y1="105" x2="250" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头：电池 -> BQ -->
+  <line x1="170" y1="305" x2="250" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头：BQ -> 负载 -->
+  <line x1="430" y1="210" x2="520" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 说明文字 -->
+  <text x="340" y="370" text-anchor="middle" fill="#7f8c8d" font-size="12">外部电源优先供电，同时给电池充电；外部断开时电池无缝接管</text>
+</svg>
+
+<p>路径管理的核心逻辑是：</p>
+<ul>
+  <li><strong>有外部电源时</strong>：BQ芯片关闭电池放电通路，打开外部电源通路，同时启动充电回路给电池充电。</li>
+  <li><strong>无外部电源时</strong>：BQ芯片打开电池放电通路，关闭外部电源通路，系统由电池供电。</li>
+  <li><strong>切换瞬间</strong>：BQ芯片内部的理想二极管或MOSFET会保持输出电压稳定，不会出现掉电。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>在BQ芯片的VSYS引脚上并联一个大电容（比如220uF），可以进一步吸收切换瞬间的电压跌落。我一般还会加一个TVS管，防止充电桩插拔时的浪涌。</p>
+</div>
+
+<h3>17.3 低功耗模式切换——让AGV“睡个好觉”</h3>
+
+<p>AGV不是一直在跑的。它可能停在充电站，或者等待任务。这时候如果控制器全速运行，电池很快就耗光了。低功耗模式就是让控制器在空闲时“打盹”，需要时再“醒来”。</p>
+
+<p>我一般把低功耗分为三级：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e8f4f8;">
+    <th>模式</th>
+    <th>功耗</th>
+    <th>唤醒时间</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>运行模式</td>
+    <td>5-10W</td>
+    <td>—</td>
+    <td>正常导航、搬运</td>
+  </tr>
+  <tr>
+    <td>待机模式</td>
+    <td>1-2W</td>
+    <td>&lt;10ms</td>
+    <td>等待任务、短时停靠</td>
+  </tr>
+  <tr>
+    <td>休眠模式</td>
+    <td>&lt;0.1W</td>
+    <td>&lt;500ms</td>
+    <td>长时间停靠、充电中</td>
+  </tr>
+</table>
+
+<p>切换逻辑是这样的：</p>
+<ol>
+  <li>当AGV到达目标点且无新任务时，进入待机模式。此时关闭电机驱动、激光雷达等大功率外设，但保持通信模块和主控MCU运行。</li>
+  <li>如果待机超过设定时间（比如5分钟），自动进入休眠模式。此时MCU进入深度睡眠，只保留RTC和唤醒中断。</li>
+  <li>当收到任务指令或充电桩连接信号时，立即唤醒。</li>
+</ol>
+
+<p>代码实现上，我习惯用状态机来管理：</p>
+
+<pre><code>typedef enum {
+    POWER_MODE_RUN,
+    POWER_MODE_STANDBY,
+    POWER_MODE_SLEEP
+} power_mode_t;
+
+void power_mode_switch(power_mode_t new_mode) {
+    switch(new_mode) {
+        case POWER_MODE_STANDBY:
+            // 关闭电机、激光雷达
+            motor_disable();
+            lidar_power_off();
+            // 降低MCU主频
+            HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1);
+            // 进入待机模式
+            HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI);
+            break;
+        case POWER_MODE_SLEEP:
+            // 关闭所有非必要外设
+            uart_deinit();
+            spi_deinit();
+            // 设置RTC唤醒
+            HAL_RTC_SetAlarm_IT(&hrtc, &sAlarm, RTC_FORMAT_BIN);
+            // 进入深度睡眠
+            HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_OFF, PWR_SLEEPENTRY_WFI);
+            break;
+        default:
+            break;
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>进入低功耗模式前，一定要确保所有外设都正确关闭，尤其是电机驱动。我曾经有一次忘了关电机使能，结果AGV在休眠状态下自己溜车了，撞到了货架。嗯，从那以后我每次都会检查外设状态寄存器。</p>
+</div>
+
+<h3>17.4 充电逻辑——安全第一，效率第二</h3>
+
+<p>AGV的充电逻辑，说白了就是“怎么充、什么时候停”。锂电池充电有三阶段：预充电、恒流充电、恒压充电。BQ芯片会自动管理这些，但我们需要告诉它充电参数。</p>
+
+<p>我一般通过I2C配置BQ芯片的寄存器：</p>
+
+<pre><code>// 配置充电参数
+void charge_config(void) {
+    // 设置充电电流：2A
+    uint8_t charge_current = 0x14; // 对应2A
+    i2c_write_reg(BQ_I2C_ADDR, 0x14, charge_current);
+    
+    // 设置充电电压：4.2V每节，4节串联=16.8V
+    uint8_t charge_voltage = 0x42; // 对应16.8V
+    i2c_write_reg(BQ_I2C_ADDR, 0x15, charge_voltage);
+    
+    // 设置终止电流：0.1C
+    uint8_t term_current = 0x05; // 对应0.5A
+    i2c_write_reg(BQ_I2C_ADDR, 0x16, term_current);
+}</code></pre>
+
+<p>充电逻辑中，有几个关键点：</p>
+<ul>
+  <li><strong>预充电</strong>：当电池电压低于3V时，先用小电流（0.1C）充电，防止损坏电池。</li>
+  <li><strong>恒流充电</strong>：电压达到3V后，用设定电流（比如2A）快速充电。</li>
+  <li><strong>恒压充电</strong>：电压达到4.2V每节后，转为恒压模式，电流逐渐下降。</li>
+  <li><strong>终止充电</strong>：当电流降到终止电流（比如0.1C）时，停止充电。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>安全机制：</strong>我还会在充电回路中加一个硬件看门狗。如果MCU死机了，看门狗会强制断开充电MOSFET，防止过充。这个设计救过我的AGV一次——有一次充电桩通信异常，MCU一直没发停止命令，硬件看门狗在超时后自动切断了充电，电池才没鼓包。</p>
+</div>
+
+<p>另外，充电过程中要实时监测电池温度。如果温度超过45°C，应该降低充电电流；超过55°C，立即停止充电。BQ芯片内部有温度保护，但为了保险，我还会在MCU端做一层软件保护。</p>
+
+<p>好了，电源管理这块儿，核心就是这些。你想想看，AGV能不能稳定运行，很大程度上取决于电源系统靠不靠谱。从电量监测到路径管理，再到低功耗和充电逻辑，每一步都得精心设计。我这些年做过的项目，凡是电源出问题的，基本都是细节没做到位——比如NTC位置不对、切换电容太小、充电终止电流设错了。希望你能避开这些坑。</p>
+        <div class="footer-nav">
+            <a href="16IntegrationAndTest.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18FirmwareOta.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

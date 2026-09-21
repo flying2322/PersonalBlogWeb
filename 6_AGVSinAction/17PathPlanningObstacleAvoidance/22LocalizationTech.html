@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 AGV定位技术</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="active">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 AGV定位技术：AMCL自适应蒙特卡洛定位、EKF融合定位、基于图优化的定位</h2>
+
+<p>定位，说白了就是让AGV回答三个问题：<strong>“我在哪？我要去哪？我怎么去？”</strong> 第一个问题如果答错了，后面全是白搭。</p>
+
+<p>我刚开始做AGV那会儿，最头疼的就是定位。明明地图画得清清楚楚，车就是不知道自己站在哪。后来踩的坑多了，才慢慢摸清楚门道。今天咱们就把AGV定位的三种主流方案掰开揉碎讲清楚。</p>
+
+<h3>一、AMCL自适应蒙特卡洛定位</h3>
+
+<p>AMCL，全称是Adaptive Monte Carlo Localization。名字挺唬人，其实核心思想很简单：<strong>用一堆随机粒子来猜位置</strong>。</p>
+
+<p>想象一下，你蒙上眼睛走进一个房间，手里拿着一张地图。你一开始完全不知道自己在哪，那就先在地图上随机撒1000个点——每个点就是一个“粒子”，代表一个可能的位置。</p>
+
+<p>然后你往前走两步，摸到一面墙。这时候，那些落在墙里的粒子就“死掉”了，只有落在合理位置的粒子活下来。再走几步，摸到一个门，继续筛选。几轮下来，粒子就会聚集到真正的位置附近。</p>
+
+<div class="highlight">
+  <p><strong>AMCL的核心流程：</strong></p>
+  <ol>
+    <li><strong>初始化</strong>：在地图范围内随机撒粒子</li>
+    <li><strong>预测</strong>：根据里程计数据移动所有粒子</li>
+    <li><strong>更新</strong>：用激光雷达等传感器数据计算每个粒子的权重</li>
+    <li><strong>重采样</strong>：淘汰权重低的粒子，复制权重高的粒子</li>
+    <li><strong>自适应</strong>：根据收敛情况动态调整粒子数量</li>
+  </ol>
+</div>
+
+<p>这里有个关键点——<strong>自适应</strong>。为什么叫自适应？因为粒子数量不是固定的。我见过很多新手把粒子数设成固定值，比如5000个。结果在空旷走廊里，5000个粒子全散开了，定位精度反而差。</p>
+
+<p>AMCL的做法是：<strong>定位越不确定，粒子越多；定位越确定，粒子越少</strong>。收敛好了可能只用200个粒子，跑起来飞快。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong> 在实际项目中，AMCL最怕两件事：一是 kidnapped robot problem（机器人被突然抱起放到别处），二是对称环境。我曾经在一个长走廊里调试，左右两边一模一样，粒子死活分不清方向。后来我加了个磁条辅助，才把这个问题解决。</p>
+</div>
+
+<h3>二、EKF融合定位</h3>
+
+<p>AMCL虽然好用，但它有个硬伤——<strong>只依赖激光雷达</strong>。如果激光雷达被遮挡，或者环境特征太少，AMCL就抓瞎了。</p>
+
+<p>这时候就需要EKF（扩展卡尔曼滤波）出场了。EKF的本质是<strong>多传感器数据融合</strong>，把里程计、IMU、激光、甚至视觉的数据揉在一起，取长补短。</p>
+
+<p>我打个比方：AMCL像是一个靠眼睛认路的人，EKF则是一个既看路又数步子还感受加速度的人。眼睛被挡住了，还能靠脚步推算大概位置。</p>
+
+<p>EKF的工作流程分两步：</p>
+
+<ul>
+  <li><strong>预测步</strong>：根据里程计和IMU，推算下一时刻的位置和姿态</li>
+  <li><strong>更新步</strong>：用激光或视觉观测数据，修正预测的误差</li>
+</ul>
+
+<p>这里有个数学细节——<strong>协方差矩阵</strong>。它代表了每个状态量的不确定度。比如里程计漂移严重，那协方差就设大一点；激光数据很准，协方差就设小一点。EKF会自动根据这些权重做最优融合。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong> EKF有个前提假设——系统是高斯分布的。但实际中，AGV的噪声往往不是严格的高斯分布。我遇到过IMU的零偏突然跳变，EKF直接发散的情况。后来加了异常检测逻辑，才稳住。</p>
+</div>
+
+<p>EKF的代码实现其实不复杂，核心就几个矩阵运算。我贴一段伪代码，大家感受一下：</p>
+
+<pre><code>// EKF预测步
+x_pred = A * x + B * u;          // 状态预测
+P_pred = A * P * A^T + Q;        // 协方差预测
+
+// EKF更新步
+K = P_pred * H^T * (H * P_pred * H^T + R)^-1;  // 卡尔曼增益
+x = x_pred + K * (z - H * x_pred);              // 状态更新
+P = (I - K * H) * P_pred;                       // 协方差更新</code></pre>
+
+<p>说白了，EKF就是在“相信预测”和“相信观测”之间找一个平衡点。卡尔曼增益K就是那个平衡系数。</p>
+
+<h3>三、基于图优化的定位</h3>
+
+<p>如果说AMCL是“实时猜位置”，EKF是“实时融合”，那图优化就是<strong>“事后算总账”</strong>。</p>
+
+<p>图优化的思路很优雅：把AGV的每个时刻的位姿看作一个节点，把节点之间的约束（比如里程计、激光匹配、闭环检测）看作边，然后构建一个图。最后通过最小化所有边的误差，得到最优的位姿序列。</p>
+
+<p>我举个例子：你让AGV在车间里跑一圈，回到起点。AMCL可能告诉你终点和起点差了20厘米。但图优化会说：“等等，你明明回到了原点，这个闭环约束应该让起点和终点重合。”然后它会调整整条路径上的所有位姿，让误差均匀分布。</p>
+
+<div class="highlight">
+  <p><strong>图优化的核心优势：</strong></p>
+  <ul>
+    <li><strong>全局一致性</strong>：能利用闭环检测消除累积误差</li>
+    <li><strong>稀疏性</strong>：实际中图是稀疏的，计算效率高</li>
+    <li><strong>可回滚</strong>：可以离线优化，不要求实时性</li>
+  </ul>
+</div>
+
+<p>不过图优化也有缺点——<strong>计算量大</strong>。如果图里有几万个节点，求解一次可能要几秒钟。所以它通常用于建图阶段，或者作为定位的后端优化。实时定位还是靠AMCL或EKF。</p>
+
+<p>我记得有一次做仓储AGV项目，客户要求定位精度±2厘米。AMCL死活达不到，后来我改成AMCL+图优化的方案：AMCL做实时定位，每10秒触发一次图优化修正漂移。最终精度做到了±1.5厘米。</p>
+
+<h3>三种方案怎么选？</h3>
+
+<p>我整理了一个对比表，方便大家选型：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方案</th>
+      <th>适用场景</th>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AMCL</td>
+      <td>环境特征丰富、激光雷达稳定</td>
+      <td>实现简单、鲁棒性好</td>
+      <td>依赖激光、对称环境易失效</td>
+    </tr>
+    <tr>
+      <td>EKF</td>
+      <td>多传感器融合、实时性要求高</td>
+      <td>计算量小、融合灵活</td>
+      <td>高斯假设、无法消除累积误差</td>
+    </tr>
+    <tr>
+      <td>图优化</td>
+      <td>建图、高精度定位、闭环场景</td>
+      <td>全局一致性、精度高</td>
+      <td>计算量大、不适合纯实时</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯是：<strong>能用AMCL就用AMCL</strong>，因为它最简单、最稳定。如果环境太差或者精度要求高，就上EKF融合。如果还要更高精度，那就图优化兜底。</p>
+
+<p>下面这张图展示了三种定位方案在AGV系统中的协作关系：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV定位技术架构图</text>
+  
+  <!-- 传感器层 -->
+  <rect x="50" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.8"/>
+  <text x="150" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">激光雷达</text>
+  
+  <rect x="300" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.8"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">里程计/IMU</text>
+  
+  <rect x="550" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.8"/>
+  <text x="650" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">视觉/磁条</text>
+  
+  <!-- 箭头 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <line x1="150" y1="130" x2="150" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="130" x2="400" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="130" x2="650" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 定位算法层 -->
+  <rect x="50" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="150" y="215" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AMCL定位</text>
+  
+  <rect x="300" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="400" y="215" text-anchor="middle" font-size="16" fill="white" font-weight="bold">EKF融合定位</text>
+  
+  <rect x="550" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="650" y="215" text-anchor="middle" font-size="16" fill="white" font-weight="bold">图优化定位</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="240" x2="150" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="240" x2="400" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="240" x2="650" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出层 -->
+  <rect x="150" y="290" width="500" height="60" rx="8" fill="#27ae60" opacity="0.8"/>
+  <text x="400" y="325" text-anchor="middle" font-size="16" fill="white" font-weight="bold">位姿输出 (x, y, θ) + 置信度</text>
+  
+  <!-- 虚线连接表示可选组合 -->
+  <line x1="250" y1="210" x2="300" y2="210" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="500" y1="210" x2="550" y2="210" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,5"/>
+  
+  <!-- 图例 -->
+  <rect x="50" y="370" width="15" height="15" fill="#3498db"/>
+  <text x="70" y="383" font-size="12" fill="#2c3e50">传感器输入</text>
+  <rect x="200" y="370" width="15" height="15" fill="#e74c3c"/>
+  <text x="220" y="383" font-size="12" fill="#2c3e50">定位算法</text>
+  <rect x="350" y="370" width="15" height="15" fill="#27ae60"/>
+  <text x="370" y="383" font-size="12" fill="#2c3e50">定位输出</text>
+</svg>
+
+<p>从图上可以看出，三种定位方案可以独立工作，也可以组合使用。实际项目中，我经常把AMCL和EKF串起来——AMCL提供初始位姿，EKF做高频融合，图优化做低频修正。这样既保证了实时性，又保证了精度。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong> 我曾经在一个项目里只用EKF，结果跑了半小时后漂移了半米。后来发现是IMU的零偏没有在线校准。加了个零偏估计器后，问题就解决了。所以做EKF时，<strong>一定要关注传感器的误差模型</strong>，别想当然地认为数据是准的。</p>
+</div>
+
+<p>好了，关于AGV定位的三种主流方案就聊到这儿。AMCL、EKF、图优化，各有各的脾气。选型时别贪多，也别图省事，根据实际场景和传感器配置来定。记住一句话：<strong>没有最好的定位方案，只有最合适的</strong>。</p>
+
+        <div class="footer-nav">
+            <a href="21MultiAgvCoopDispatch.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23DynamicReplanStrategy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

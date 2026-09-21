@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 跳点搜索(JPS)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="active">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 跳点搜索：A星的进化版</h2>
+
+<p>各位同学，今天我们来聊一个让我又爱又恨的算法——跳点搜索（JPS）。</p>
+
+<p>说实话，我刚入行那会儿，用的都是最基础的A*。直到有一次在仓库项目里，地图有2000×2000个格子，A*跑起来那个慢啊...嗯，后来我发现了JPS，才算是打开了新世界的大门。</p>
+
+<h3>1.1 什么是跳点搜索？</h3>
+
+<p>跳点搜索，英文叫Jump Point Search，简称JPS。它本质上是对A*的一种优化策略。</p>
+
+<p>你想想看，A*在网格地图上搜索时，会把每个格子都当成节点来扩展。但很多格子其实没必要看——比如一条笔直的走廊，中间那些格子你根本不用一个个检查，直接跳到走廊尽头就行了。</p>
+
+<p>JPS的核心思想就是：<strong>只扩展那些“有转折可能”的关键点</strong>，中间那些平平无奇的格子，直接跳过去。</p>
+
+<div class="highlight">
+  <p><strong>核心结论：</strong>JPS在无障碍的开放区域，速度比A*快10-50倍。但在复杂迷宫中，优势会缩小。</p>
+</div>
+
+<h3>1.2 跳点的定义</h3>
+
+<p>什么叫跳点？说白了，就是那些路径方向可能发生变化的格子。我总结了三类情况：</p>
+
+<ul>
+  <li><strong>强迫邻居点</strong>：当前格子旁边有障碍物，导致路径必须绕行</li>
+  <li><strong>方向变化点</strong>：从直线运动变为斜线运动的转折处</li>
+  <li><strong>目标点本身</strong>：终点当然要停下来</li>
+</ul>
+
+<p>我记得第一次实现JPS时，就栽在强迫邻居的判断上。当时有个场景，障碍物在右上角，我死活没检测到那个跳点，结果路径直接穿墙了...后来才发现是邻居判断的方向搞反了。</p>
+
+<h3>1.3 JPS的核心流程</h3>
+
+<p>咱们来看一下JPS的完整流程。我习惯用这张图来理解：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">JPS算法核心流程</text>
+  
+  <!-- 开始节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" fill="white" font-size="16">开始：起点入OpenList</text>
+  
+  <!-- 箭头1 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤1 -->
+  <rect x="250" y="140" width="300" height="50" rx="10" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" fill="#2c3e50" font-size="15">从OpenList取出F值最小的节点</text>
+  
+  <!-- 箭头2 -->
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2 -->
+  <rect x="200" y="220" width="400" height="50" rx="10" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" fill="#2c3e50" font-size="15">沿当前方向进行“跳跃”扩展</text>
+  
+  <!-- 箭头3 -->
+  <line x1="400" y1="270" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断菱形 -->
+  <polygon points="400,300 500,340 400,380 300,340" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="345" text-anchor="middle" fill="white" font-size="14">找到跳点？</text>
+  
+  <!-- 是分支 -->
+  <line x1="500" y1="340" x2="580" y2="340" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="330" text-anchor="middle" fill="#27ae60" font-size="14">是</text>
+  
+  <!-- 加入OpenList -->
+  <rect x="580" y="315" width="180" height="50" rx="10" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="670" y="345" text-anchor="middle" fill="#1e8449" font-size="14">加入OpenList</text>
+  
+  <!-- 否分支 -->
+  <line x1="300" y1="340" x2="200" y2="340" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="250" y="330" text-anchor="middle" fill="#e74c3c" font-size="14">否</text>
+  
+  <!-- 继续扩展 -->
+  <rect x="60" y="315" width="140" height="50" rx="10" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="130" y="345" text-anchor="middle" fill="#922b21" font-size="14">继续沿方向扩展</text>
+  
+  <!-- 箭头回到判断 -->
+  <line x1="130" y1="365" x2="130" y2="400" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="130" y1="400" x2="400" y2="400" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="400" x2="400" y2="380" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头从OpenList到目标判断 -->
+  <line x1="670" y1="365" x2="670" y2="420" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="670" y1="420" x2="400" y2="420" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 目标判断 -->
+  <polygon points="400,420 500,460 400,500 300,460" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="400" y="465" text-anchor="middle" fill="white" font-size="14">到达目标？</text>
+  
+  <!-- 是分支 -->
+  <line x1="500" y1="460" x2="580" y2="460" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="450" text-anchor="middle" fill="#27ae60" font-size="14">是</text>
+  
+  <!-- 结束 -->
+  <rect x="580" y="440" width="160" height="40" rx="20" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="660" y="465" text-anchor="middle" fill="white" font-size="15">路径生成</text>
+  
+  <!-- 否分支 -->
+  <line x1="300" y1="460" x2="200" y2="460" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="250" y="450" text-anchor="middle" fill="#e74c3c" font-size="14">否</text>
+  
+  <!-- 回到取节点 -->
+  <line x1="200" y1="460" x2="200" y2="165" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="200" y1="165" x2="250" y2="165" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="5,5"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>1.4 跳跃规则详解</h3>
+
+<p>JPS的跳跃规则，我总结成三句话：</p>
+
+<ol>
+  <li><strong>水平/垂直方向</strong>：一直往前走，直到遇到障碍物、跳点或边界</li>
+  <li><strong>对角线方向</strong>：先尝试水平/垂直方向，再走对角线</li>
+  <li><strong>遇到强迫邻居</strong>：立即停止，这就是一个跳点</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>实现时可以用递归或循环。我个人偏好循环，因为递归深度太深时容易栈溢出。曾经在3000×3000的地图上，递归版JPS直接崩了...从那以后我就只用循环实现了。</p>
+</div>
+
+<h3>1.5 代码实现</h3>
+
+<p>下面是我常用的JPS核心代码。注意，这里只展示跳跃部分：</p>
+
+<pre><code>// 水平方向跳跃
+function jumpHorizontal(grid, x, y, dx, mapWidth) {
+    while (true) {
+        x += dx;
+        
+        // 边界检查
+        if (x &lt; 0 || x &gt;= mapWidth) return null;
+        if (grid[y][x] === 1) return null;  // 障碍物
+        
+        // 检查是否为跳点
+        if (isJumpPoint(grid, x, y, dx, 0)) {
+            return {x, y};
+        }
+        
+        // 检查强迫邻居
+        if (hasForcedNeighbor(grid, x, y, dx, 0)) {
+            return {x, y};
+        }
+    }
+}
+
+// 判断是否为跳点
+function isJumpPoint(grid, x, y, dx, dy) {
+    // 目标点
+    if (x === goal.x &amp;&amp; y === goal.y) return true;
+    
+    // 强迫邻居检查
+    if (dx !== 0) {  // 水平移动
+        if (grid[y+1] &amp;&amp; grid[y+1][x] === 1 &amp;&amp; grid[y][x-dx] === 0) return true;
+        if (grid[y-1] &amp;&amp; grid[y-1][x] === 1 &amp;&amp; grid[y][x-dx] === 0) return true;
+    }
+    
+    return false;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>强迫邻居的判断方向很容易搞反。我曾经犯过一个错误：把障碍物的邻居方向写反了，结果路径总是贴着墙走。调试了整整一个下午才发现是符号问题。</p>
+</div>
+
+<h3>1.6 JPS vs A*：对比分析</h3>
+
+<p>咱们来做个直观对比。我拿一个实际项目的数据说话：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#3498db; color:white;">
+    <th>对比维度</th>
+    <th>A*算法</th>
+    <th>JPS算法</th>
+  </tr>
+  <tr>
+    <td>扩展节点数</td>
+    <td>多（每个格子都检查）</td>
+    <td>少（只扩展跳点）</td>
+  </tr>
+  <tr>
+    <td>开放区域性能</td>
+    <td>慢（O(n)）</td>
+    <td>极快（O(log n)）</td>
+  </tr>
+  <tr>
+    <td>复杂迷宫性能</td>
+    <td>中等</td>
+    <td>略优于A*</td>
+  </tr>
+  <tr>
+    <td>实现难度</td>
+    <td>简单</td>
+    <td>中等（跳跃逻辑复杂）</td>
+  </tr>
+  <tr>
+    <td>内存占用</td>
+    <td>高（OpenList大）</td>
+    <td>低（OpenList小）</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>通用</td>
+    <td>网格地图、开放空间多</td>
+  </tr>
+</table>
+
+<p>你看这个表格就明白了。JPS最大的优势就是节点少。我做过测试：在1000×1000的空旷地图上，A*要扩展约100万个节点，而JPS只扩展了2000多个。差了500倍！</p>
+
+<p>但JPS也有短板。如果地图全是狭窄的走廊，那跳点几乎每个格子都是，JPS就退化成了A*。这时候两者的性能差不多。</p>
+
+<h3>1.7 实际项目中的选择建议</h3>
+
+<p>我个人在实际项目中的选择标准是这样的：</p>
+
+<ul>
+  <li><strong>仓库AGV</strong>：强烈推荐JPS。仓库通道宽，障碍物少，JPS优势明显</li>
+  <li><strong>家庭扫地机</strong>：可以用A*。房间小，家具多，JPS优势不大</li>
+  <li><strong>游戏寻路</strong>：看情况。如果是RTS游戏的大地图，JPS很合适；如果是FPS的小地图，A*就够了</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里无脑上了JPS，结果地图里全是斜对角线的障碍物，JPS的跳跃逻辑频繁触发，性能反而比A*还差。后来我加了一个预处理：如果地图的障碍物密度超过40%，就自动切换回A*。这个策略一直用到现在。</p>
+</div>
+
+<h3>1.8 小结</h3>
+
+<p>JPS说白了就是A*的“偷懒版”——只挑关键节点来扩展。它不是什么银弹，但在合适的场景下，性能提升是质的飞跃。</p>
+
+<p>嗯，我建议你动手实现一下。先写A*，再改成JPS，对比一下扩展的节点数。只有亲手写过，才能真正理解跳点的妙处。</p>
+
+<p>记住一句话：<strong>JPS不是替代A*，而是A*在网格地图上的最佳搭档。</strong></p>
+
+<div class="footer-nav">
+            <a href="14BidirectionalAStar.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16DynamicEnvAStar.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

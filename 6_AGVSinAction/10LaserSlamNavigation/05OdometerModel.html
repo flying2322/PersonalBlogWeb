@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 里程计模型</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="active">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 里程计模型：两轮差速模型、阿克曼模型、轮式编码器数据处理、里程计标定方法</h2>
+
+<p>各位同学，今天我们来聊聊里程计。说实话，里程计是SLAM系统里最基础、也最容易被忽视的一环。很多新手一上来就盯着激光雷达和IMU，结果发现建图总是不准，回头一查——原来是轮子编码器数据就没处理好。</p>
+
+<p>我个人习惯把里程计比作「机器人的腿脚感觉」。你闭着眼睛走路，靠的是脚底的感觉和肌肉记忆。机器人也一样，没有GPS，没有视觉，它只能靠轮子转了多少圈来猜自己走了多远。这就是里程计的核心思想。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>里程计不是万能的，但没有里程计是万万不能的。它提供的是短时间内的局部相对位姿，精度高但会随时间漂移。</p>
+</div>
+
+<h3>5.1 两轮差速模型</h3>
+
+<p>两轮差速模型，说白了就是最常见的扫地机器人那种结构。两个驱动轮左右各一个，一个或多个万向轮做支撑。转弯靠的是左右轮速度差。</p>
+
+<p>我在项目中遇到过一个问题：明明左右轮编码器读数都正常，但机器人就是走不直。后来发现是左右轮直径有微小差异，导致直线运动时实际走了个弧线。嗯，这里要注意，理论模型和实际总有差距。</p>
+
+<p>两轮差速模型的核心公式其实很简单：</p>
+
+<pre><code>// 假设左右轮间距为L，左右轮线速度分别为vL和vR
+// 机器人线速度 v = (vL + vR) / 2
+// 机器人角速度 w = (vR - vL) / L
+// 位姿更新（离散时间，dt为采样周期）
+x' = x + v * cos(theta) * dt
+y' = y + v * sin(theta) * dt
+theta' = theta + w * dt</code></pre>
+
+<p>你想想看，这个模型假设轮子与地面是纯滚动、无滑动的。但在实际场景中，瓷砖地面、地毯、斜坡，滑动情况完全不同。我建议你在做标定时，至少采集三种不同地面的数据。</p>
+
+<table>
+  <tr>
+    <th>参数</th>
+    <th>含义</th>
+    <th>典型值</th>
+  </tr>
+  <tr>
+    <td>L</td>
+    <td>左右轮间距（轮距）</td>
+    <td>0.3~0.6 m</td>
+  </tr>
+  <tr>
+    <td>R</td>
+    <td>车轮半径</td>
+    <td>0.05~0.15 m</td>
+  </tr>
+  <tr>
+    <td>N</td>
+    <td>编码器线数（每圈脉冲数）</td>
+    <td>500~4096</td>
+  </tr>
+</table>
+
+<h3>5.2 阿克曼模型</h3>
+
+<p>阿克曼模型，就是汽车那种转向方式。前轮转向，后轮驱动。你想想看，汽车转弯时，四个轮子的轨迹是四个不同半径的圆弧，这就是阿克曼几何要解决的问题。</p>
+
+<p>我记得第一次做AGV项目时，客户非要让一个汽车底盘的AGV原地掉头。我解释了半天：阿克曼模型做不到原地旋转，最小转弯半径是由轴距和最大转向角决定的。最后只能加了个麦克纳姆轮方案。</p>
+
+<p>阿克曼模型的核心参数：</p>
+
+<ul>
+  <li><strong>轴距 L</strong>：前后轮中心距离</li>
+  <li><strong>轮距 B</strong>：左右轮中心距离</li>
+  <li><strong>转向角 δ</strong>：前轮转向角度（注意内外轮转角不同）</li>
+</ul>
+
+<pre><code>// 阿克曼模型简化计算（假设车辆低速，忽略侧偏）
+// 转弯半径 R = L / tan(δ)
+// 角速度 w = v / R = v * tan(δ) / L
+// 位姿更新与两轮差速类似，但v是后轴中心速度</code></pre>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>阿克曼模型在低速（< 1 m/s）时精度还不错，但速度一高，轮胎侧偏效应就出来了。我一般会在模型中加一个侧偏刚度补偿项，效果会好很多。</p>
+</div>
+
+<h3>5.3 轮式编码器数据处理</h3>
+
+<p>编码器数据处理，说白了就是把脉冲数换算成距离和速度。但这里坑很多，我一个个说。</p>
+
+<p><strong>第一步：脉冲转距离</strong></p>
+
+<pre><code>// 编码器线数 N，车轮半径 R
+// 每个脉冲对应的距离 = 2 * π * R / N
+// 实际距离 = 脉冲数 * 每个脉冲对应的距离</code></pre>
+
+<p><strong>第二步：速度计算</strong></p>
+
+<p>速度计算有两种方式：M法和T法。M法适合高速，T法适合低速。我建议你直接用M/T混合法，高低速都适用。</p>
+
+<pre><code>// M法：固定时间Δt内计数脉冲数M
+// 速度 v = M * (2πR / N) / Δt
+
+// T法：测量两个脉冲之间的时间间隔T
+// 速度 v = (2πR / N) / T
+
+// M/T法：同时测量M和T，取两者优势</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>编码器数据有量化误差。比如每圈500线的编码器，每个脉冲对应约1.26mm（轮径0.2m）。这个分辨率对于高精度SLAM来说是不够的。我曾经在一个项目中用了4096线的编码器，配合细分电路，才勉强达到0.1mm的分辨率。</p>
+</div>
+
+<p><strong>第三步：滤波处理</strong></p>
+
+<p>原始编码器数据噪声很大，尤其是低速时。我一般会做三步处理：</p>
+
+<ol>
+  <li><strong>中值滤波</strong>：去除野点（突然跳变的脉冲）</li>
+  <li><strong>滑动平均</strong>：平滑速度曲线</li>
+  <li><strong>限幅滤波</strong>：限制最大加速度，防止突变</li>
+</ol>
+
+<h3>5.4 里程计标定方法</h3>
+
+<p>标定，说白了就是让理论模型匹配实际机器人。我见过太多人直接拿厂家给的轮径和轮距参数用，结果建图一塌糊涂。</p>
+
+<p><strong>标定什么？</strong></p>
+
+<ul>
+  <li><strong>轮径标定</strong>：左右轮实际直径与理论值的偏差</li>
+  <li><strong>轮距标定</strong>：左右轮实际间距与设计值的偏差</li>
+  <li><strong>非正交误差</strong>：轮子安装角度偏差</li>
+</ul>
+
+<p><strong>经典标定方法：</strong></p>
+
+<p>我记得最实用的方法是「直线-旋转-直线」法。具体步骤：</p>
+
+<ol>
+  <li>让机器人走一段直线（比如5米），记录实际位移与编码器推算位移的比值，得到轮径修正系数</li>
+  <li>让机器人原地旋转360度，记录实际旋转角度与编码器推算角度的比值，得到轮距修正系数</li>
+  <li>重复多次，取平均值</li>
+</ol>
+
+<pre><code>// 轮径修正系数计算
+// 实际行走距离 D_actual（用激光或卷尺测量）
+// 编码器推算距离 D_odom
+// 修正系数 k = D_actual / D_odom
+// 修正后轮径 R_corrected = k * R_nominal</code></pre>
+
+<div class="highlight">
+  <p><strong>标定注意事项：</strong></p>
+  <ul>
+    <li>标定场地要平整、足够大（至少10m×10m）</li>
+    <li>机器人负载要与实际工作时一致</li>
+    <li>地面材质要与实际工作环境一致</li>
+    <li>标定速度要覆盖常用速度范围</li>
+  </ul>
+</div>
+
+<p>我曾经在一个项目中，标定做了整整两天。第一天发现标定结果总是不收敛，后来发现是地面有坡度，机器人走直线时其实在爬坡。换了块平地后，半小时就搞定了。所以，标定环境的选择比标定算法本身更重要。</p>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图是我自己整理的里程计知识体系，你可以对照着看：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">里程计模型知识体系</text>
+  
+  <!-- 顶层：里程计 -->
+  <rect x="300" y="60" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">轮式里程计</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：两大模型 -->
+  <rect x="100" y="140" width="250" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="225" y="170" text-anchor="middle" font-size="14" fill="white">两轮差速模型</text>
+  
+  <rect x="450" y="140" width="250" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="575" y="170" text-anchor="middle" font-size="14" fill="white">阿克曼模型</text>
+  
+  <!-- 箭头 -->
+  <line x1="225" y1="190" x2="225" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="575" y1="190" x2="575" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第三层：核心参数 -->
+  <rect x="50" y="220" width="150" height="40" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="125" y="245" text-anchor="middle" font-size="12" fill="white">轮距L / 轴距L</text>
+  
+  <rect x="220" y="220" width="150" height="40" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="295" y="245" text-anchor="middle" font-size="12" fill="white">轮径R</text>
+  
+  <rect x="430" y="220" width="150" height="40" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="505" y="245" text-anchor="middle" font-size="12" fill="white">转向角δ</text>
+  
+  <rect x="600" y="220" width="150" height="40" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="675" y="245" text-anchor="middle" font-size="12" fill="white">编码器线数N</text>
+  
+  <!-- 箭头 -->
+  <line x1="125" y1="260" x2="125" y2="290" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="295" y1="260" x2="295" y2="290" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="505" y1="260" x2="505" y2="290" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="675" y1="260" x2="675" y2="290" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第四层：数据处理 -->
+  <rect x="50" y="290" width="700" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" font-size="14" fill="white">编码器数据处理</text>
+  <text x="400" y="330" text-anchor="middle" font-size="11" fill="#e8d5f5">脉冲计数 → 距离换算 → M/T法速度计算 → 滤波处理</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第五层：标定 -->
+  <rect x="100" y="370" width="600" height="50" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="390" text-anchor="middle" font-size="14" fill="white">里程计标定</text>
+  <text x="400" y="410" text-anchor="middle" font-size="11" fill="#fef5e7">轮径标定 → 轮距标定 → 非正交误差补偿 → 直线-旋转-直线法</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="420" x2="400" y2="450" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 底层：输出 -->
+  <rect x="250" y="450" width="300" height="40" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="475" text-anchor="middle" font-size="14" fill="white">输出：位姿 (x, y, θ)</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把里程计的知识体系串起来了。从底层模型到数据处理，再到标定方法，每一步都环环相扣。你想想看，如果轮径标定不准，后面的所有计算都是错的。所以我的建议是：先做标定，再做SLAM。</p>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>标定不是一次性的工作。轮子磨损、负载变化、地面更换，都会影响标定参数。我一般会在AGV的启动脚本里加一个标定参数检查模块，每次启动时自动校验一次。如果偏差超过阈值，就提醒操作员重新标定。</p>
+</div>
+
+<p>好了，里程计模型这部分就讲到这里。内容不少，但都是实战中必须掌握的东西。下一节我们会聊激光雷达的数据处理，到时候你会看到里程计和激光数据是怎么融合的。</p>
+
+<div class="footer-nav">
+            <a href="04CoordinateTransform.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06SensorFusionBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

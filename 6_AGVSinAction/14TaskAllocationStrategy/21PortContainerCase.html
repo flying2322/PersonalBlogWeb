@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 实际案例</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="active">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 实际案例：港口AGV调度——集装箱搬运、岸桥-场桥协同、水平运输优化</h2>
+
+<p>各位同行，今天咱们聊点实在的。港口AGV调度，听起来高大上，说白了就是让一堆无人驾驶的小车在码头里高效地搬箱子。我参与过几个港口的自动化改造项目，踩过坑，也攒了些经验。这一章，我就把港口场景下AGV调度的核心逻辑掰开揉碎讲给你听。</p>
+
+<h3>港口作业的三块硬骨头</h3>
+
+<p>港口AGV调度，本质上要解决三个问题：<strong>集装箱搬运</strong>、<strong>岸桥-场桥协同</strong>、<strong>水平运输优化</strong>。这三件事环环相扣，任何一个环节掉链子，整个码头就得堵成一锅粥。</p>
+
+<p>先看一张整体架构图，帮你快速建立认知：</p>
+
+<svg width="800" height="480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c7a7b"/>
+    </marker>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e6fffb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b2f5ea;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fff4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c6f6d5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fffaf0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fefcbf;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="480" fill="#f7fafc" rx="12" ry="12"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#234e52">港口AGV调度系统核心逻辑</text>
+
+  <!-- 第一层：岸桥 -->
+  <rect x="50" y="70" width="200" height="100" rx="10" fill="url(#grad1)" stroke="#319795" stroke-width="2"/>
+  <text x="150" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#234e52">岸桥（QC）</text>
+  <text x="150" y="135" text-anchor="middle" font-size="12" fill="#2c7a7b">卸船/装船指令</text>
+  <text x="150" y="155" text-anchor="middle" font-size="12" fill="#2c7a7b">集装箱抓取/放置</text>
+
+  <!-- 第二层：水平运输 -->
+  <rect x="300" y="70" width="200" height="100" rx="10" fill="url(#grad2)" stroke="#38a169" stroke-width="2"/>
+  <text x="400" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#22543d">AGV车队</text>
+  <text x="400" y="135" text-anchor="middle" font-size="12" fill="#276749">水平运输</text>
+  <text x="400" y="155" text-anchor="middle" font-size="12" fill="#276749">路径规划/避障</text>
+
+  <!-- 第三层：场桥 -->
+  <rect x="550" y="70" width="200" height="100" rx="10" fill="url(#grad3)" stroke="#d69e2e" stroke-width="2"/>
+  <text x="650" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#744210">场桥（YC）</text>
+  <text x="650" y="135" text-anchor="middle" font-size="12" fill="#975a16">堆场存取指令</text>
+  <text x="650" y="155" text-anchor="middle" font-size="12" fill="#975a16">集装箱堆码</text>
+
+  <!-- 箭头：岸桥 -> AGV -->
+  <line x1="250" y1="120" x2="300" y2="120" stroke="#319795" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="275" y="110" text-anchor="middle" font-size="11" fill="#2c7a7b">任务下发</text>
+
+  <!-- 箭头：AGV -> 场桥 -->
+  <line x1="500" y1="120" x2="550" y2="120" stroke="#38a169" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="525" y="110" text-anchor="middle" font-size="11" fill="#276749">任务下发</text>
+
+  <!-- 调度中心 -->
+  <rect x="200" y="230" width="400" height="80" rx="12" fill="#edf2f7" stroke="#4a5568" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="400" y="265" text-anchor="middle" font-size="16" font-weight="bold" fill="#2d3748">AGV调度系统（任务分配引擎）</text>
+  <text x="400" y="290" text-anchor="middle" font-size="12" fill="#4a5568">任务池管理 | 车辆分配 | 路径规划 | 冲突解决</text>
+
+  <!-- 虚线连接：调度中心到各设备 -->
+  <line x1="250" y1="230" x2="150" y2="170" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="400" y1="230" x2="400" y2="170" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <line x1="550" y1="230" x2="650" y2="170" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- 底部：关键指标 -->
+  <rect x="100" y="360" width="600" height="90" rx="10" fill="#e2e8f0" stroke="#718096" stroke-width="1"/>
+  <text x="400" y="385" text-anchor="middle" font-size="14" font-weight="bold" fill="#2d3748">核心优化目标</text>
+  <text x="200" y="415" text-anchor="middle" font-size="12" fill="#4a5568">⏱ 岸桥等待时间最小化</text>
+  <text x="400" y="415" text-anchor="middle" font-size="12" fill="#4a5568">🚚 AGV空载率降低</text>
+  <text x="600" y="415" text-anchor="middle" font-size="12" fill="#4a5568">📦 堆场翻箱率控制</text>
+  <text x="200" y="435" text-anchor="middle" font-size="12" fill="#4a5568">⚡ 任务响应延迟 &lt; 2s</text>
+  <text x="400" y="435" text-anchor="middle" font-size="12" fill="#4a5568">🛣️ 路径冲突率 &lt; 5%</text>
+  <text x="600" y="435" text-anchor="middle" font-size="12" fill="#4a5568">🔋 充电时机优化</text>
+</svg>
+
+<h3>集装箱搬运：不只是“搬过去”那么简单</h3>
+
+<p>很多人以为AGV搬运就是A点到B点。其实港口里，每个集装箱都有严格的<strong>作业指令</strong>。比如卸船时，岸桥从船上抓一个40尺的箱子，AGV得在指定时间到达岸桥下方，精准对位，然后驮着箱子去堆场。</p>
+
+<p>我遇到过一个问题：AGV提前到了，岸桥还没准备好，AGV只能干等，浪费运力。后来我们引入了<strong>任务预分配</strong>机制——根据岸桥的作业进度，提前5-10秒给AGV下发指令，让车刚好在岸桥放箱时到达。这个时间窗口的精度，我们做到了±1秒。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>集装箱搬运不是简单的运输，而是与岸桥、场桥的“握手”过程。AGV到达时间必须与设备动作周期严格对齐。</p>
+</div>
+
+<h3>岸桥-场桥协同：谁等谁都不行</h3>
+
+<p>岸桥（QC）和场桥（YC）是港口最贵的设备，停机一分钟损失巨大。AGV调度必须保证：<strong>岸桥不等待AGV，AGV不等待场桥</strong>。</p>
+
+<p>听起来简单，做起来难。我记得有一次在宁波的项目，岸桥卸船效率是35箱/小时，场桥堆码效率只有28箱/小时。AGV在中间跑得再快也没用，堆场那边堵死了。后来我们做了两件事：</p>
+
+<ol>
+  <li><strong>动态任务池</strong>：把岸桥卸下的箱子先缓存到任务池，不强制AGV立刻运走。AGV根据堆场拥堵情况，智能选择搬运时机。</li>
+  <li><strong>场桥优先级调度</strong>：给场桥分配任务时，优先处理即将到达的AGV的卸箱任务，减少AGV排队时间。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>协同调度的核心是“信息透明”。AGV调度系统必须实时知道岸桥的作业进度、场桥的忙闲状态、堆场的剩余容量。缺一个信息，调度就是盲人摸象。</p>
+</div>
+
+<h3>水平运输优化：路径规划与冲突解决</h3>
+
+<p>港口AGV的路径规划，比工厂里复杂得多。码头道路是双向单车道，AGV不能逆行，不能超车，还得避让其他AGV和有人驾驶车辆。</p>
+
+<p>我们用的是<strong>分层路径规划</strong>：</p>
+
+<ul>
+  <li><strong>全局路径</strong>：基于码头地图，用A*算法算出一条最优路径。考虑距离、拥堵程度、道路权重。</li>
+  <li><strong>局部避障</strong>：每100ms检测一次前方障碍物，用DWA算法做局部路径调整。</li>
+  <li><strong>交通管制</strong>：在交叉口、狭窄路段，引入“虚拟红绿灯”机制，AGV按时间片通过。</li>
+</ul>
+
+<p>这里有个坑——我曾经以为全局路径算好了就万事大吉。结果AGV多了以后，路径冲突率飙升到15%。后来我们加了<strong>路径预留</strong>机制：AGV申请路径时，系统把路径上的路段锁定，其他AGV不能进入。冲突率直接降到2%以下。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>路径预留不能锁太久，否则会造成道路空置浪费。我们一般预留3-5秒的通行时间，超时自动释放。</p>
+</div>
+
+<h3>任务分配策略：谁去干最合适？</h3>
+
+<p>港口里可能有几十甚至上百台AGV同时作业。任务来了，派哪辆车去？</p>
+
+<p>我常用的策略是<strong>多目标优化分配</strong>：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>评估维度</th>
+      <th>权重</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>距离最近</td>
+      <td>0.4</td>
+      <td>AGV当前位置到任务点的曼哈顿距离</td>
+    </tr>
+    <tr>
+      <td>电量充足</td>
+      <td>0.3</td>
+      <td>剩余电量能否完成往返任务</td>
+    </tr>
+    <tr>
+      <td>任务优先级</td>
+      <td>0.2</td>
+      <td>岸桥卸船任务 > 堆场转堆任务</td>
+    </tr>
+    <tr>
+      <td>负载均衡</td>
+      <td>0.1</td>
+      <td>避免某台AGV过度劳累</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>每个维度打分后加权求和，得分最高的AGV获得任务。这个策略的好处是灵活——权重可以动态调整。比如高峰期，把“距离最近”的权重调高，减少岸桥等待时间。</p>
+
+<div class="highlight">
+  <p><strong>核心公式：</strong>Score = w1 * DistScore + w2 * BatteryScore + w3 * PriorityScore + w4 * BalanceScore</p>
+  <p>权重w1~w4根据码头工况动态调整，我一般用强化学习在线优化这些权重。</p>
+</div>
+
+<h3>代码示例：任务分配核心逻辑</h3>
+
+<p>下面是一个简化版的任务分配函数，展示了多目标打分的过程：</p>
+
+<pre><code>def assign_task(task, agv_list):
+    best_agv = None
+    best_score = -float('inf')
+    
+    for agv in agv_list:
+        # 1. 距离得分（归一化到0-1）
+        dist = manhattan_distance(agv.position, task.start_point)
+        dist_score = 1 - (dist / max_distance)
+        
+        # 2. 电量得分
+        battery_score = agv.battery / 100.0
+        
+        # 3. 任务优先级得分
+        priority_score = task.priority / 5.0  # 假设优先级1-5
+        
+        # 4. 负载均衡得分（已分配任务数越少越好）
+        balance_score = 1 - (agv.task_count / max_task_count)
+        
+        # 加权总分
+        score = (0.4 * dist_score + 
+                 0.3 * battery_score + 
+                 0.2 * priority_score + 
+                 0.1 * balance_score)
+        
+        if score > best_score:
+            best_score = score
+            best_agv = agv
+    
+    return best_agv</code></pre>
+
+<p>这段代码看着简单，实际生产环境里要考虑的东西多得多。比如AGV当前是否在充电、是否正在执行高优先级任务、路径上是否有拥堵等。我一般会在打分前加一个<strong>过滤器</strong>，先把不满足条件的AGV排除掉。</p>
+
+<h3>避坑指南：我曾经踩过的雷</h3>
+
+<p>最后分享几个实战中遇到的坑，希望你别再走一遍：</p>
+
+<ul>
+  <li><strong>坑一：忽略AGV的转弯半径</strong>。港口道路窄，AGV转弯需要3-5米的空间。路径规划时没考虑这个，结果AGV在路口卡住了。后来我们在路径节点之间加了转弯约束。</li>
+  <li><strong>坑二：任务分配太频繁</strong>。每100ms分配一次任务，系统负载太高，AGV也频繁切换任务。后来改成每500ms批量分配，吞吐量反而提升了20%。</li>
+  <li><strong>坑三：没考虑充电策略</strong>。AGV电量低于20%才去充电，结果高峰期一堆车同时充电，运力骤降。我们改成<strong>动态充电阈值</strong>——低峰期20%充电，高峰期10%才充，保证运力。</li>
+</ul>
+
+<p>嗯，港口AGV调度是个系统工程，没有银弹。每个码头的地形、设备、作业量都不一样，需要你根据实际情况调整策略。但核心逻辑——<strong>任务预分配、多目标打分、路径预留、动态权重</strong>——这些是通用的。</p>
+
+<p>希望这一章能帮你少走弯路。下次咱们聊聊更具体的——如何用强化学习优化任务分配权重，让系统自己学会“聪明”地派车。</p>
+
+<div class="footer-nav">
+            <a href="20FactoryLineDispatchCase.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22RealtimeAllocOptimize.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

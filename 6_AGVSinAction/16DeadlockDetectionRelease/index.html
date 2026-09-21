@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV调度系统 · 死锁检测与解除</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 0.8rem;
+            font-size: 0.95rem;
+            color: #2d6a4f;
+            background: #d8f3dcb3;
+            display: inline-block;
+            padding: 0.3rem 2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV调度系统 · 死锁检测与解除</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01DeadlockPhenomenon.html"></a>
+            <span class="chapter-badge">第1章</span>
+            <div class="chapter-title">死锁现象初探</div>
+            <div class="chapter-desc">什么是AGV死锁？一个简单的十字路口死锁案例。</div>
+            <div class="card-tags"><span class="tag">入门</span><span class="tag">案例</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02FourNecessaryConditions.html"></a>
+            <span class="chapter-badge">第2章</span>
+            <div class="chapter-title">死锁四大必要条件</div>
+            <div class="chapter-desc">互斥、占有并等待、非剥夺、循环等待。</div>
+            <div class="card-tags"><span class="tag">理论</span><span class="tag">核心</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03ResourceAllocationGraph.html"></a>
+            <span class="chapter-badge">第3章</span>
+            <div class="chapter-title">死锁检测基础</div>
+            <div class="chapter-desc">资源分配图（RAG）的绘制与解读。</div>
+            <div class="card-tags"><span class="tag">图示</span><span class="tag">RAG</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04CycleDetectDfs.html"></a>
+            <span class="chapter-badge">第4章</span>
+            <div class="chapter-title">环路检测算法</div>
+            <div class="chapter-desc">基于图论的环路检测算法（DFS实现）。</div>
+            <div class="card-tags"><span class="tag">算法</span><span class="tag">DFS</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05BankersAlgorithmDetect.html"></a>
+            <span class="chapter-badge">第5章</span>
+            <div class="chapter-title">银行家算法应用</div>
+            <div class="chapter-desc">银行家算法在AGV调度中的应用。</div>
+            <div class="card-tags"><span class="tag">算法</span><span class="tag">避免</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06ResourcePreemptionRelease.html"></a>
+            <span class="chapter-badge">第6章</span>
+            <div class="chapter-title">资源剥夺法</div>
+            <div class="chapter-desc">死锁解除策略：资源剥夺法（抢占式）。</div>
+            <div class="card-tags"><span class="tag">解除</span><span class="tag">抢占</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07TaskRollbackRelease.html"></a>
+            <span class="chapter-badge">第7章</span>
+            <div class="chapter-title">回滚法</div>
+            <div class="chapter-desc">死锁解除策略：回滚法（撤销AGV任务）。</div>
+            <div class="card-tags"><span class="tag">解除</span><span class="tag">回滚</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08TerminateAgvRelease.html"></a>
+            <span class="chapter-badge">第8章</span>
+            <div class="chapter-title">杀死进程法</div>
+            <div class="chapter-desc">死锁解除策略：杀死进程法（终止AGV）。</div>
+            <div class="card-tags"><span class="tag">解除</span><span class="tag">终止</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09BreakMutualExclusion.html"></a>
+            <span class="chapter-badge">第9章</span>
+            <div class="chapter-title">破坏互斥条件</div>
+            <div class="chapter-desc">死锁预防：破坏互斥条件（路径共享优化）。</div>
+            <div class="card-tags"><span class="tag">预防</span><span class="tag">共享</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10BreakHoldAndWait.html"></a>
+            <span class="chapter-badge">第10章</span>
+            <div class="chapter-title">破坏占有并等待</div>
+            <div class="chapter-desc">一次性申请所有资源。</div>
+            <div class="card-tags"><span class="tag">预防</span><span class="tag">一次性</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11BreakNoPreemption.html"></a>
+            <span class="chapter-badge">第11章</span>
+            <div class="chapter-title">破坏非剥夺条件</div>
+            <div class="chapter-desc">资源超时机制。</div>
+            <div class="card-tags"><span class="tag">预防</span><span class="tag">超时</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12BreakCircularWait.html"></a>
+            <span class="chapter-badge">第12章</span>
+            <div class="chapter-title">破坏循环等待</div>
+            <div class="chapter-desc">资源有序分配法。</div>
+            <div class="card-tags"><span class="tag">预防</span><span class="tag">排序</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13SafeUnsafeState.html"></a>
+            <span class="chapter-badge">第13章</span>
+            <div class="chapter-title">安全状态判断</div>
+            <div class="chapter-desc">安全状态与不安全状态判断。</div>
+            <div class="card-tags"><span class="tag">避免</span><span class="tag">安全</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14BankersPreallocation.html"></a>
+            <span class="chapter-badge">第14章</span>
+            <div class="chapter-title">银行家预分配</div>
+            <div class="chapter-desc">银行家算法实现资源预分配。</div>
+            <div class="card-tags"><span class="tag">避免</span><span class="tag">预分配</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15TimeWindowPathReserve.html"></a>
+            <span class="chapter-badge">第15章</span>
+            <div class="chapter-title">时间窗路径预留</div>
+            <div class="chapter-desc">基于时间窗的路径预留机制。</div>
+            <div class="card-tags"><span class="tag">避免</span><span class="tag">时间窗</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16ZoneAndDirectionLock.html"></a>
+            <span class="chapter-badge">第16章</span>
+            <div class="chapter-title">交通管制法</div>
+            <div class="chapter-desc">区域锁与方向锁。</div>
+            <div class="card-tags"><span class="tag">避免</span><span class="tag">管制</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17PetriNetAvoidance.html"></a>
+            <span class="chapter-badge">第17章</span>
+            <div class="chapter-title">Petri网建模</div>
+            <div class="chapter-desc">基于Petri网的建模与死锁避免。</div>
+            <div class="card-tags"><span class="tag">建模</span><span class="tag">Petri</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18SingleLaneDeadlock.html"></a>
+            <span class="chapter-badge">第18章</span>
+            <div class="chapter-title">单行线死锁实战</div>
+            <div class="chapter-desc">单行线场景下的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">单行线</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19MultiIntersectionDeadlock.html"></a>
+            <span class="chapter-badge">第19章</span>
+            <div class="chapter-title">多交叉路口实战</div>
+            <div class="chapter-desc">多交叉路口场景下的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">路口</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20WarehouseIoDeadlock.html"></a>
+            <span class="chapter-badge">第20章</span>
+            <div class="chapter-title">仓库出入库死锁</div>
+            <div class="chapter-desc">仓库出入库区的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">仓储</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21MultiFloorDeadlock.html"></a>
+            <span class="chapter-badge">第21章</span>
+            <div class="chapter-title">多楼层AGV死锁</div>
+            <div class="chapter-desc">多楼层AGV系统的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">楼层</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22AutoDoorDeadlock.html"></a>
+            <span class="chapter-badge">第22章</span>
+            <div class="chapter-title">自动门交互死锁</div>
+            <div class="chapter-desc">AGV与自动门交互的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">自动门</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23ElevatorDeadlock.html"></a>
+            <span class="chapter-badge">第23章</span>
+            <div class="chapter-title">电梯交互死锁</div>
+            <div class="chapter-desc">AGV与电梯交互的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">电梯</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24RobotArmDockDeadlock.html"></a>
+            <span class="chapter-badge">第24章</span>
+            <div class="chapter-title">机械臂对接死锁</div>
+            <div class="chapter-desc">AGV与机械臂对接的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">机械臂</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25MixedFleetDeadlock.html"></a>
+            <span class="chapter-badge">第25章</span>
+            <div class="chapter-title">多车型混合调度</div>
+            <div class="chapter-desc">多车型混合调度中的死锁处理。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">混合</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26DynamicReplanDeadlock.html"></a>
+            <span class="chapter-badge">第26章</span>
+            <div class="chapter-title">动态路径预防</div>
+            <div class="chapter-desc">动态路径规划中的死锁预防。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">动态</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27PriorityReleaseStrategy.html"></a>
+            <span class="chapter-badge">第27章</span>
+            <div class="chapter-title">任务优先级解除</div>
+            <div class="chapter-desc">任务优先级与死锁解除策略。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">优先级</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28DistributedClusterDetect.html"></a>
+            <span class="chapter-badge">第28章</span>
+            <div class="chapter-title">分布式死锁检测</div>
+            <div class="chapter-desc">大规模AGV集群的分布式死锁检测。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">分布式</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29MlDeadlockPredict.html"></a>
+            <span class="chapter-badge">第29章</span>
+            <div class="chapter-title">机器学习预测</div>
+            <div class="chapter-desc">基于机器学习的死锁预测。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">ML</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30MonitorAlarmPlatform.html"></a>
+            <span class="chapter-badge">第30章</span>
+            <div class="chapter-title">监控与告警平台</div>
+            <div class="chapter-desc">系统监控与死锁告警平台搭建。</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">监控</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

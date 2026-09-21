@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 充电管理策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="active">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 充电管理策略：电量阈值设定、自动充电路径规划、充电站调度</h2>
+
+<p>AGV 这东西，说白了就是个会跑的机器人。它得吃饭，也就是充电。但仓储场景里几十台车同时跑，充电管理要是搞不好，那场面可就热闹了——有的车趴窝在半路，有的车排队排到天荒地老。</p>
+
+<p>我个人习惯把充电管理拆成三个核心问题：<strong>什么时候去充？怎么去充？去哪充？</strong> 分别对应电量阈值、充电路径、充电站调度。咱们一个一个聊。</p>
+
+<h3>电量阈值设定：别等没电了再想辙</h3>
+
+<p>阈值设多少，直接决定系统稳定性。设高了，车频繁跑去充电，影响效率；设低了，车可能半路没电，堵住通道。</p>
+
+<p>我一般分两级阈值：</p>
+
+<ul>
+  <li><strong>预警阈值</strong>：比如 30%。这时候系统开始规划，但车继续干活。</li>
+  <li><strong>强制阈值</strong>：比如 15%。必须立刻去充，优先级最高。</li>
+</ul>
+
+<p>你想想看，如果所有车都设同一个阈值，那高峰期充电站门口能排长龙。所以我建议用<strong>动态阈值</strong>——根据任务紧急程度、当前电量、距离充电站远近，动态调整。</p>
+
+<div class="highlight">
+  <p><strong>核心原则</strong>：阈值不是死的，要跟任务调度联动。高优先级任务的车，可以允许它电量更低一点再充。</p>
+</div>
+
+<p>举个例子，我做过一个项目，客户要求 24 小时不间断运行。我们设了三档：</p>
+
+<table>
+  <tr>
+    <th>电量区间</th>
+    <th>行为</th>
+  </tr>
+  <tr>
+    <td>60% 以上</td>
+    <td>正常执行任务</td>
+  </tr>
+  <tr>
+    <td>30% - 60%</td>
+    <td>标记为“可充电”，但不强制</td>
+  </tr>
+  <tr>
+    <td>15% - 30%</td>
+    <td>完成当前任务后，立即去充</td>
+  </tr>
+  <tr>
+    <td>低于 15%</td>
+    <td>中断当前任务，紧急充电</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>注意</strong>：我曾经遇到过电池老化导致电量跳变的情况。明明显示 20%，下一秒直接掉到 5%。所以阈值设定要留余量，别卡得太死。</p>
+</div>
+
+<h3>自动充电路径规划：怎么去最划算？</h3>
+
+<p>车决定去充电了，接下来就是路径问题。这里有个关键点：<strong>充电路径和普通任务路径不一样</strong>。</p>
+
+<p>普通任务追求最短时间，但充电路径要考虑：</p>
+<ul>
+  <li>电量够不够撑到充电站？</li>
+  <li>路上会不会堵车？</li>
+  <li>能不能顺便干点活？</li>
+</ul>
+
+<p>我常用的策略叫<strong>“电量感知路径规划”</strong>。说白了，就是 A* 算法的代价函数里，加上电量消耗因子。</p>
+
+<pre><code>// 伪代码示例：电量感知路径规划
+function planChargePath(agv, targetStation):
+    // 基础路径代价
+    baseCost = astar(agv.position, targetStation)
+    
+    // 电量消耗预估
+    energyCost = estimateEnergy(baseCost, agv.load)
+    
+    // 如果电量不够，找中途充电点
+    if agv.battery - energyCost < SAFETY_MARGIN:
+        midStation = findNearestStation(agv.position)
+        return planChargePath(agv, midStation)
+    
+    // 考虑拥堵因子
+    congestionCost = getCongestionFactor(targetStation)
+    
+    return baseCost + energyCost * 0.3 + congestionCost * 0.2</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：别让车空跑。如果去充电站路上会经过某个工作站，可以安排它顺路放下货。这叫“顺路充电”，能省不少时间。</p>
+</div>
+
+<p>嗯，这里要注意：充电路径规划要<strong>实时更新</strong>。因为充电站的状态是动态的——可能你规划的时候有空位，走到一半被人占了。所以路径要能动态重规划。</p>
+
+<h3>充电站调度：别让车扎堆</h3>
+
+<p>充电站调度，说白了就是解决“谁去哪个站”的问题。我见过最糟糕的情况：8 台车同时涌向同一个充电站，剩下 3 个站空着。</p>
+
+<p>调度策略我分三种：</p>
+
+<ol>
+  <li><strong>就近分配</strong>：谁离得近谁去。简单，但容易导致热门站拥堵。</li>
+  <li><strong>负载均衡</strong>：看每个站的排队长度，选最短的。效果好，但计算量大。</li>
+  <li><strong>预测调度</strong>：根据历史数据，提前预测哪个站会空闲。这个最智能，但需要数据积累。</li>
+</ol>
+
+<p>我个人习惯用<strong>混合策略</strong>：平时用负载均衡，高峰期用预测调度。</p>
+
+<div class="highlight">
+  <p><strong>关键点</strong>：充电站调度要和任务调度联动。如果某个充电站附近有高优先级任务，那这个站应该优先留给执行该任务的车。</p>
+</div>
+
+<p>我曾经踩过一个坑：充电站调度没考虑充电桩的功率。有的快充桩 30 分钟充满，有的慢充要 2 小时。如果不区分，慢充桩会被占着不放。后来我们加了<strong>充电桩类型标签</strong>，调度时优先把快充桩留给紧急任务。</p>
+
+<h3>整体逻辑：一张图说清楚</h3>
+
+<p>下面这张图，是我自己总结的充电管理整体流程。你看一眼就明白了：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV 充电管理核心流程</text>
+  
+  <!-- 模块1：电量监控 -->
+  <rect x="50" y="80" width="200" height="80" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">电量监控模块</text>
+  <text x="150" y="140" text-anchor="middle" font-size="12" fill="white">实时采集电量数据</text>
+  
+  <!-- 箭头1 -->
+  <line x1="250" y1="120" x2="320" y2="120" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 模块2：阈值判断 -->
+  <rect x="320" y="80" width="200" height="80" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="420" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">阈值判断</text>
+  <text x="420" y="140" text-anchor="middle" font-size="12" fill="white">预警/强制/动态调整</text>
+  
+  <!-- 箭头2 -->
+  <line x1="520" y1="120" x2="590" y2="120" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 模块3：路径规划 -->
+  <rect x="590" y="80" width="200" height="80" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="690" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">充电路径规划</text>
+  <text x="690" y="140" text-anchor="middle" font-size="12" fill="white">电量感知 + 动态重规划</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="420" y1="160" x2="420" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 模块4：充电站调度 -->
+  <rect x="250" y="230" width="340" height="80" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="420" y="265" text-anchor="middle" font-size="16" fill="white" font-weight="bold">充电站调度</text>
+  <text x="420" y="290" text-anchor="middle" font-size="12" fill="white">就近分配 / 负载均衡 / 预测调度</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="420" y1="310" x2="420" y2="380" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 模块5：执行 -->
+  <rect x="250" y="380" width="340" height="80" rx="10" fill="#1abc9c" opacity="0.9"/>
+  <text x="420" y="415" text-anchor="middle" font-size="16" fill="white" font-weight="bold">执行充电任务</text>
+  <text x="420" y="440" text-anchor="middle" font-size="12" fill="white">到达充电站 → 对接 → 充电 → 完成</text>
+  
+  <!-- 反馈箭头 -->
+  <path d="M 590 420 Q 750 420 750 200 Q 750 120 690 120" fill="none" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="760" y="280" font-size="12" fill="#e67e22" transform="rotate(90,760,280)">状态反馈</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>你看，整个流程是闭环的。电量监控触发阈值判断，然后路径规划和充电站调度并行决策，最后执行。执行完的状态再反馈回去，形成闭环。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经遇到过充电站调度算法跑太久，导致车在路口等指令。后来我把调度计算放到后台线程，用异步方式下发指令，问题就解决了。</p>
+</div>
+
+<p>最后说一句：充电管理不是孤立的。它跟任务调度、交通管制、地图管理都紧密相关。你设计的时候，一定要考虑<strong>全局最优</strong>，别只盯着充电本身。</p>
+
+<div class="highlight">
+  <p><strong>总结一下</strong>：阈值要动态、路径要感知电量、调度要负载均衡。这三板斧用好了，AGV 充电管理基本不会出大问题。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="21TaskPathCoupling.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

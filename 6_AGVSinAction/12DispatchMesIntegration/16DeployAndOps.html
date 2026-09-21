@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 系统部署与运维</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="active">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 系统部署与运维：Docker容器化部署、Kubernetes编排、CI/CD流水线、灰度发布策略</h2>
+
+<p>各位同行，今天我们来聊聊AGV调度系统真正上线后的那些事。说实话，很多项目在开发阶段跑得挺好，一到部署运维就翻车。我见过太多因为环境不一致导致的“在我机器上能跑”的尴尬局面。</p>
+
+<p>所以这一章，我重点讲四个核心话题：<strong>Docker容器化</strong>、<strong>Kubernetes编排</strong>、<strong>CI/CD流水线</strong>、<strong>灰度发布策略</strong>。这些都是我踩过坑之后，觉得必须分享给你的实战经验。</p>
+
+<h3>为什么必须容器化？</h3>
+
+<p>AGV调度系统依赖的东西太多了。数据库、消息队列、地图服务、算法模块……每个组件都有各自的版本要求。你想想看，如果每个现场都手动部署一遍，不出错才怪。</p>
+
+<p>我个人习惯，从项目第一天就用Docker。把调度系统、地图服务、甚至数据库都打包成镜像。这样不管部署到哪个现场，环境都是一模一样的。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>一次构建，到处运行。别让环境差异成为你的噩梦。</p>
+</div>
+
+<h3>Dockerfile 怎么写才专业？</h3>
+
+<p>我见过很多人的Dockerfile写得像流水账。其实有讲究。给你看一个我常用的模板：</p>
+
+<pre><code># 多阶段构建，减小镜像体积
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+WORKDIR /app
+COPY . .
+RUN dotnet publish -c Release -o out
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/out .
+EXPOSE 5000
+ENTRYPOINT ["dotnet", "AGVScheduler.dll"]</code></pre>
+
+<p>这里有个坑：<strong>基础镜像别用太大的</strong>。我曾经用了一个带完整SDK的镜像，结果镜像体积2个多G，传到现场慢得要死。后来改用runtime镜像，体积直接降到200M。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>多阶段构建是标配。第一阶段编译，第二阶段只放运行环境。这样镜像又小又安全。</p>
+</div>
+
+<h3>Kubernetes 编排：让调度系统自动恢复</h3>
+
+<p>AGV调度系统不能停。一旦调度服务挂了，整个车队的任务就乱了。Kubernetes的自动恢复机制，说白了就是给你的系统上了双保险。</p>
+
+<p>我建议你至少配置这些资源：</p>
+
+<ul>
+  <li><strong>Deployment</strong>：管理调度服务的副本数，保证最少2个实例</li>
+  <li><strong>Service</strong>：提供稳定的访问入口，AGV小车通过这个地址连接</li>
+  <li><strong>ConfigMap</strong>：存放配置参数，比如数据库连接串、MQTT地址</li>
+  <li><strong>PersistentVolume</strong>：持久化日志和地图数据</li>
+</ul>
+
+<p>给你看一个简单的Deployment配置：</p>
+
+<pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agv-scheduler
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: agv-scheduler
+  template:
+    metadata:
+      labels:
+        app: agv-scheduler
+    spec:
+      containers:
+      - name: scheduler
+        image: registry.agv.com/scheduler:v2.1
+        ports:
+        - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 30
+          periodSeconds: 10</code></pre>
+
+<p>嗯，这里要注意：<strong>一定要加健康检查</strong>。我遇到过调度服务进程还在，但内部线程池已经卡死的情况。没有健康检查，K8s不会自动重启，AGV小车就会一直等响应。</p>
+
+<h3>CI/CD 流水线：从代码到上线自动化</h3>
+
+<p>以前我部署一次要半小时：编译、打包、上传、登录服务器、停服务、替换文件、重启……现在用GitLab CI + Jenkins，提交代码后自动完成所有步骤。</p>
+
+<p>我的流水线一般分三个阶段：</p>
+
+<ol>
+  <li><strong>构建阶段</strong>：代码检查、单元测试、编译打包</li>
+  <li><strong>镜像阶段</strong>：构建Docker镜像，推送到私有仓库</li>
+  <li><strong>部署阶段</strong>：更新K8s的Deployment，触发滚动更新</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经把测试环境的数据库连接串写死在代码里，结果CI构建时自动跑了测试，把测试库的表给清了。后来我强制要求：所有敏感信息必须通过环境变量注入，代码里只留占位符。</p>
+</div>
+
+<h3>灰度发布：如何安全升级调度系统？</h3>
+
+<p>AGV调度系统升级最怕什么？怕新版本有bug，导致整个车队瘫痪。灰度发布就是让你先让一小部分AGV用新版本，观察没问题再全量切换。</p>
+
+<p>在K8s里实现灰度发布，我常用两种方式：</p>
+
+<table>
+  <tr>
+    <th>方式</th>
+    <th>原理</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>蓝绿部署</td>
+    <td>同时运行两套环境，切换流量</td>
+    <td>版本差异大，需要快速回滚</td>
+  </tr>
+  <tr>
+    <td>金丝雀发布</td>
+    <td>新版本只接收少量流量</td>
+    <td>逐步验证，风险可控</td>
+  </tr>
+</table>
+
+<p>我个人更推荐金丝雀发布。举个例子：</p>
+
+<pre><code># 先部署1个新版本实例
+kubectl set image deployment/agv-scheduler scheduler=registry.agv.com/scheduler:v2.2
+kubectl scale deployment agv-scheduler --replicas=3
+
+# 观察10分钟，确认没问题
+# 再逐步增加新版本实例，减少旧版本
+kubectl set image deployment/agv-scheduler scheduler=registry.agv.com/scheduler:v2.2
+kubectl scale deployment agv-scheduler --replicas=5</code></pre>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>灰度发布期间，一定要监控AGV的任务完成率。如果发现异常，立即执行回滚命令：<code>kubectl rollout undo deployment/agv-scheduler</code>。别犹豫，我曾经犹豫了3分钟，结果20台AGV全部卡在路口。</p>
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我对本章内容的总结。你可以把它当作部署运维的检查清单：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV调度系统部署运维知识体系</text>
+  
+  <!-- 四个核心模块 -->
+  <!-- Docker容器化 -->
+  <rect x="50" y="70" width="160" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Docker容器化</text>
+  
+  <!-- Kubernetes编排 -->
+  <rect x="240" y="70" width="160" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="320" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Kubernetes编排</text>
+  
+  <!-- CI/CD流水线 -->
+  <rect x="430" y="70" width="160" height="50" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="510" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">CI/CD流水线</text>
+  
+  <!-- 灰度发布 -->
+  <rect x="620" y="70" width="140" height="50" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="690" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">灰度发布</text>
+  
+  <!-- 连接线 -->
+  <line x1="130" y1="120" x2="130" y2="180" stroke="#3498db" stroke-width="2"/>
+  <line x1="320" y1="120" x2="320" y2="180" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="510" y1="120" x2="510" y2="180" stroke="#e67e22" stroke-width="2"/>
+  <line x1="690" y1="120" x2="690" y2="180" stroke="#9b59b6" stroke-width="2"/>
+  
+  <!-- Docker子项 -->
+  <rect x="30" y="180" width="200" height="120" rx="6" fill="#ebf5fb" stroke="#3498db" stroke-width="1.5"/>
+  <text x="130" y="205" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">关键实践</text>
+  <text x="50" y="230" font-size="12" fill="#34495e">• 多阶段构建</text>
+  <text x="50" y="250" font-size="12" fill="#34495e">• 基础镜像瘦身</text>
+  <text x="50" y="270" font-size="12" fill="#34495e">• 环境变量注入</text>
+  <text x="50" y="290" font-size="12" fill="#34495e">• 健康检查配置</text>
+  
+  <!-- K8s子项 -->
+  <rect x="240" y="180" width="200" height="120" rx="6" fill="#e8f8f5" stroke="#2ecc71" stroke-width="1.5"/>
+  <text x="340" y="205" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">核心资源</text>
+  <text x="260" y="230" font-size="12" fill="#34495e">• Deployment</text>
+  <text x="260" y="250" font-size="12" fill="#34495e">• Service</text>
+  <text x="260" y="270" font-size="12" fill="#34495e">• ConfigMap</text>
+  <text x="260" y="290" font-size="12" fill="#34495e">• PersistentVolume</text>
+  
+  <!-- CI/CD子项 -->
+  <rect x="450" y="180" width="200" height="120" rx="6" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+  <text x="550" y="205" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">流水线阶段</text>
+  <text x="470" y="230" font-size="12" fill="#34495e">• 代码检查+测试</text>
+  <text x="470" y="250" font-size="12" fill="#34495e">• 镜像构建+推送</text>
+  <text x="470" y="270" font-size="12" fill="#34495e">• 自动部署更新</text>
+  <text x="470" y="290" font-size="12" fill="#34495e">• 自动回滚机制</text>
+  
+  <!-- 灰度子项 -->
+  <rect x="650" y="180" width="140" height="120" rx="6" fill="#f4ecf7" stroke="#9b59b6" stroke-width="1.5"/>
+  <text x="720" y="205" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">策略选择</text>
+  <text x="665" y="230" font-size="12" fill="#34495e">• 蓝绿部署</text>
+  <text x="665" y="250" font-size="12" fill="#34495e">• 金丝雀发布</text>
+  <text x="665" y="270" font-size="12" fill="#34495e">• 流量切换</text>
+  <text x="665" y="290" font-size="12" fill="#34495e">• 快速回滚</text>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="340" width="600" height="100" rx="10" fill="#2c3e50" opacity="0.9"/>
+  <text x="400" y="370" text-anchor="middle" font-size="16" fill="white" font-weight="bold">最终目标：自动化、高可用、可回滚</text>
+  <text x="400" y="395" text-anchor="middle" font-size="13" fill="#ecf0f1">从代码提交到生产部署，全流程自动化</text>
+  <text x="400" y="415" text-anchor="middle" font-size="13" fill="#ecf0f1">任何时刻都能快速回滚到上一个稳定版本</text>
+  
+  <!-- 箭头连接 -->
+  <line x1="130" y1="300" x2="130" y2="340" stroke="#3498db" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="320" y1="300" x2="320" y2="340" stroke="#2ecc71" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="510" y1="300" x2="510" y2="340" stroke="#e67e22" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="690" y1="300" x2="690" y2="340" stroke="#9b59b6" stroke-width="2" stroke-dasharray="5,5"/>
+</svg>
+
+<p>这张图把四个模块串起来了。你想想看，从Docker打包镜像，到K8s编排部署，再到CI/CD自动触发，最后灰度发布安全上线——这就是一套完整的部署运维体系。</p>
+
+<div class="tip">
+  <p><strong>最后说一句：</strong>别追求一步到位。我建议你先从Docker容器化开始，把调度系统打包好。然后引入K8s做自动恢复。等这些都稳定了，再上CI/CD和灰度发布。一步一步来，稳扎稳打。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="15MesWmsLinkage.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17PerformanceOptimization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

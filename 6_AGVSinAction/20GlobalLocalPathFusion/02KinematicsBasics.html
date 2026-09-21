@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 AGV运动学基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="active">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 AGV运动学基础：两轮差速模型、阿克曼模型、运动约束、位姿表示与坐标变换</h2>
+
+<p>各位同学，欢迎来到第二章。上一章我们聊了AGV的整体架构，今天咱们把目光聚焦到AGV的“腿脚”上——运动学模型。</p>
+
+<p>说白了，运动学就是研究“怎么走”的问题。你给轮子发指令，车怎么动？转弯半径多大？能不能原地掉头？这些搞不清楚，路径规划就是纸上谈兵。我个人习惯，在开始任何路径规划算法之前，先把运动学模型焊死在脑子里。</p>
+
+<div class="highlight">
+    <p><strong>核心观点：</strong>运动学模型是连接“控制指令”与“实际运动”的桥梁。没有它，规划出来的路径就是“空中楼阁”。</p>
+</div>
+
+<h3>2.1 位姿表示与坐标变换</h3>
+
+<p>先解决一个基础问题：AGV在哪儿？怎么描述它的位置和朝向？</p>
+
+<p>我们通常用一个三维向量来表示AGV的位姿：<code>[x, y, θ]</code>。其中 <code>x</code> 和 <code>y</code> 是它在全局坐标系下的坐标，<code>θ</code> 是它的朝向角（通常以逆时针为正）。</p>
+
+<p>嗯，这里要注意：坐标系的选择很关键。我见过不少新手把全局坐标系和机器人坐标系搞混，结果控制量算出来全是反的。</p>
+
+<ul>
+    <li><strong>全局坐标系（世界坐标系）：</strong>固定在地面上的参考系，通常用 <code>X<sub>W</sub>O<sub>W</sub>Y<sub>W</sub></code> 表示。</li>
+    <li><strong>机器人坐标系（局部坐标系）：</strong>固定在AGV车体上的参考系，通常用 <code>X<sub>R</sub>O<sub>R</sub>Y<sub>R</sub></code> 表示，原点在AGV的几何中心，X轴指向车头方向。</li>
+</ul>
+
+<p>坐标变换说白了就是“换位思考”。你站在AGV上看世界，和站在上帝视角看AGV，看到的东西是不一样的。变换公式其实很简单，就是一个旋转加平移：</p>
+
+<pre><code>// 从机器人坐标系到全局坐标系的变换
+x_w = x_r * cos(θ) - y_r * sin(θ) + x_agv
+y_w = x_r * sin(θ) + y_r * cos(θ) + y_agv</code></pre>
+
+<p>我在项目中遇到过一个问题：激光雷达装在AGV前方偏左的位置，如果不做坐标变换，直接把雷达检测到的障碍物坐标当成全局坐标，那AGV肯定会撞墙。所以，每次做感知融合之前，我都会先检查一遍坐标变换链路。</p>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong>我曾经因为忘记更新θ值，导致坐标变换一直用上一帧的角度，结果AGV在转弯时定位漂移了半米多。后来我养成了一个习惯：每次做坐标变换前，先打印一下当前的位姿，确认数据是最新的。</p>
+</div>
+
+<h3>2.2 两轮差速模型</h3>
+
+<p>这是最常用的模型，没有之一。你想想看，扫地机器人、仓储AGV，大部分都是这种结构。两个驱动轮独立控制，再加一个或两个万向轮做支撑。</p>
+
+<p>两轮差速的核心思想：通过控制左右轮的速度差来实现转向。</p>
+
+<ul>
+    <li><strong>直线运动：</strong>左右轮速度相等。</li>
+    <li><strong>原地旋转：</strong>左右轮速度大小相等、方向相反。</li>
+    <li><strong>弧线运动：</strong>左右轮速度不等。</li>
+</ul>
+
+<p>它的运动学方程是这样的：</p>
+
+<pre><code>// 两轮差速模型运动学
+v = (v_right + v_left) / 2          // 线速度
+ω = (v_right - v_left) / L          // 角速度，L为轮距
+
+// 位姿更新（离散时间）
+x' = x + v * cos(θ) * dt
+y' = y + v * sin(θ) * dt
+θ' = θ + ω * dt</code></pre>
+
+<p>这里 <code>L</code> 是左右轮的轮距，这个参数很关键。我记得有一次调试，AGV转弯总是转不到位，查了半天发现是轮距参数写错了，差了2厘米。你想想看，轮距误差2厘米，在高速转弯时累积的位姿误差会有多大？</p>
+
+<div class="highlight">
+    <p><strong>优点：</strong>结构简单、控制方便、能原地旋转。</p>
+    <p><strong>缺点：</strong>对地面平整度敏感，轮子容易打滑。</p>
+</div>
+
+<h3>2.3 阿克曼模型</h3>
+
+<p>阿克曼模型就是汽车模型。前轮转向，后轮驱动。你平时开的车，就是阿克曼模型。</p>
+
+<p>它的核心约束是：所有车轮的转向中心必须交于一点。这样才能保证车轮在转弯时纯滚动，没有滑动。</p>
+
+<p>阿克曼模型的运动学方程稍微复杂一点：</p>
+
+<pre><code>// 阿克曼模型运动学
+// 输入：车速 v，前轮转向角 δ
+// 输出：转弯半径 R，角速度 ω
+
+R = L / tan(δ)          // L为轴距
+ω = v / R
+
+// 位姿更新
+x' = x + v * cos(θ) * dt
+y' = y + v * sin(θ) * dt
+θ' = θ + ω * dt</code></pre>
+
+<p>这里有个关键点：阿克曼模型不能原地旋转。它的最小转弯半径由轴距和最大转向角决定。我在做室外AGV项目时，就吃过这个亏。室内用惯了差速模型，觉得原地掉头很正常。结果室外AGV用的是阿克曼模型，规划路径时没考虑转弯半径，结果车在窄巷子里调不了头，尴尬得很。</p>
+
+<div class="warning">
+    <p><strong>警告：</strong>阿克曼模型有非完整性约束。简单说就是：它不能横向移动，也不能原地旋转。路径规划时必须考虑这一点，否则规划出来的路径可能无法执行。</p>
+</div>
+
+<h3>2.4 运动约束</h3>
+
+<p>运动约束，说白了就是AGV的“物理极限”。你规划得再好，车跑不动也是白搭。</p>
+
+<p>常见的运动约束包括：</p>
+
+<ul>
+    <li><strong>最大速度约束：</strong>v ≤ v<sub>max</sub></li>
+    <li><strong>最大加速度约束：</strong>a ≤ a<sub>max</sub>（加减速能力）</li>
+    <li><strong>最大角速度约束：</strong>ω ≤ ω<sub>max</sub></li>
+    <li><strong>最大转向角约束（阿克曼）：</strong>δ ≤ δ<sub>max</sub></li>
+</ul>
+
+<p>我个人习惯，在做路径规划之前，先把这些约束整理成一个参数表。这样在规划时可以直接查表，不用每次都重新计算。</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>参数</th>
+            <th>符号</th>
+            <th>典型值（差速）</th>
+            <th>典型值（阿克曼）</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>最大线速度</td>
+            <td>v<sub>max</sub></td>
+            <td>1.5 m/s</td>
+            <td>3.0 m/s</td>
+        </tr>
+        <tr>
+            <td>最大加速度</td>
+            <td>a<sub>max</sub></td>
+            <td>0.5 m/s²</td>
+            <td>0.3 m/s²</td>
+        </tr>
+        <tr>
+            <td>最大角速度</td>
+            <td>ω<sub>max</sub></td>
+            <td>1.0 rad/s</td>
+            <td>0.5 rad/s</td>
+        </tr>
+        <tr>
+            <td>最小转弯半径</td>
+            <td>R<sub>min</sub></td>
+            <td>0（可原地转）</td>
+            <td>2.0 m</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>嗯，这里要特别说一下加速度约束。很多新手只考虑最大速度，不考虑加速度。结果规划出来的路径，AGV根本跑不出那个速度，因为加速距离不够。我曾经在一个项目中，把加速度约束设得太保守，结果AGV跑起来像老太太散步。后来调大了加速度，效率提升了不少，但也要注意别调太大，否则货物会倒。</p>
+
+<h3>2.5 知识体系总览</h3>
+
+<p>为了让大家更直观地理解本章的知识结构，我画了一张图：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV运动学基础 - 知识体系</text>
+    
+    <!-- 中心节点 -->
+    <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+    <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV运动学基础</text>
+    
+    <!-- 四个分支 -->
+    <!-- 分支1: 位姿表示与坐标变换 -->
+    <rect x="50" y="180" width="180" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <text x="140" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">位姿表示与坐标变换</text>
+    
+    <!-- 分支2: 两轮差速模型 -->
+    <rect x="310" y="180" width="180" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+    <text x="400" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">两轮差速模型</text>
+    
+    <!-- 分支3: 阿克曼模型 -->
+    <rect x="570" y="180" width="180" height="50" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+    <text x="660" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">阿克曼模型</text>
+    
+    <!-- 分支4: 运动约束 -->
+    <rect x="310" y="380" width="180" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+    <text x="400" y="410" text-anchor="middle" font-size="14" fill="white" font-weight="bold">运动约束</text>
+    
+    <!-- 连接线 -->
+    <line x1="400" y1="120" x2="140" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="120" x2="400" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="120" x2="660" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="120" x2="400" y2="380" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 子节点 - 位姿表示 -->
+    <rect x="20" y="270" width="130" height="40" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+    <text x="85" y="295" text-anchor="middle" font-size="12" fill="#c0392b">[x, y, θ] 表示</text>
+    
+    <rect x="20" y="330" width="130" height="40" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+    <text x="85" y="355" text-anchor="middle" font-size="12" fill="#c0392b">全局 vs 局部坐标系</text>
+    
+    <rect x="170" y="270" width="130" height="40" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+    <text x="235" y="295" text-anchor="middle" font-size="12" fill="#c0392b">旋转 + 平移变换</text>
+    
+    <!-- 子节点 - 差速模型 -->
+    <rect x="310" y="270" width="180" height="40" rx="8" fill="#d5f5e3" stroke="#2ecc71" stroke-width="1"/>
+    <text x="400" y="295" text-anchor="middle" font-size="12" fill="#27ae60">v = (v_r + v_l)/2</text>
+    
+    <rect x="310" y="330" width="180" height="40" rx="8" fill="#d5f5e3" stroke="#2ecc71" stroke-width="1"/>
+    <text x="400" y="355" text-anchor="middle" font-size="12" fill="#27ae60">ω = (v_r - v_l)/L</text>
+    
+    <!-- 子节点 - 阿克曼模型 -->
+    <rect x="570" y="270" width="180" height="40" rx="8" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+    <text x="660" y="295" text-anchor="middle" font-size="12" fill="#e67e22">R = L / tan(δ)</text>
+    
+    <rect x="570" y="330" width="180" height="40" rx="8" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+    <text x="660" y="355" text-anchor="middle" font-size="12" fill="#e67e22">非完整性约束</text>
+    
+    <!-- 子节点 - 运动约束 -->
+    <rect x="310" y="450" width="180" height="40" rx="8" fill="#ebdef0" stroke="#9b59b6" stroke-width="1"/>
+    <text x="400" y="475" text-anchor="middle" font-size="12" fill="#8e44ad">速度/加速度/转向角限制</text>
+</svg>
+
+<p>这张图把本章的核心内容串起来了。你从中心节点出发，沿着四个分支走一遍，就能建立起完整的知识框架。</p>
+
+<h3>2.6 小结</h3>
+
+<p>好了，这一章的内容就这些。总结一下：</p>
+
+<ul>
+    <li>位姿表示是基础，<code>[x, y, θ]</code> 三个量要记牢。</li>
+    <li>坐标变换是桥梁，全局和局部坐标系要分清楚。</li>
+    <li>两轮差速模型适合室内、需要灵活转向的场景。</li>
+    <li>阿克曼模型适合室外、高速行驶的场景，但要注意转弯半径。</li>
+    <li>运动约束是硬限制，规划时必须考虑。</li>
+</ul>
+
+<p>下一章我们会把这些运动学模型用到路径规划中，看看怎么让AGV按照我们期望的轨迹运动。嗯，到时候会用到今天讲的所有内容，所以这一章一定要消化透。</p>
+
+<div class="tip">
+    <p><strong>个人建议：</strong>学完这一章，你可以找个开源的两轮差速小车（比如TurtleBot），跑一下它的运动学代码。亲手改改参数，看看位姿怎么变化，比光看书效果好得多。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="01CourseIntroduction.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03EnvMapRepresentation.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

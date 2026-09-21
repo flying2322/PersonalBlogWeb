@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 仿真环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="active">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 仿真环境搭建——仿真平台选择、场景配置与性能指标定义</h2>
+
+<p>说实话，做AGV调度系统这么多年，我踩过最大的坑就是——<strong>没做仿真就直接上线</strong>。</p>
+
+<p>那是在一个3C电子厂的仓库项目里，客户催得急，我们团队直接拿真实车辆跑测试。结果呢？三台AGV在交叉口死锁，整个产线停了40分钟。厂长脸都绿了。</p>
+
+<p>从那以后，我给自己定了个规矩：<strong>仿真不过关，绝不碰真车</strong>。</p>
+
+<p>这一章，我就把仿真环境搭建的完整思路讲给你听。说白了，就是三件事：选对平台、搭好场景、定准指标。</p>
+
+<h3>17.1 仿真平台怎么选？</h3>
+
+<p>市面上能用的仿真平台不少，但我个人最常用的就两个：<strong>MATLAB/Simulink</strong> 和 <strong>Gazebo</strong>。它们各有各的脾气，选哪个得看你的具体需求。</p>
+
+<h4>17.1.1 MATLAB/Simulink——算法验证的利器</h4>
+
+<p>如果你主要做<strong>调度算法</strong>的验证，比如任务分配策略、路径规划逻辑，那我强烈推荐MATLAB/Simulink。</p>
+
+<p>为什么？因为它<strong>数学工具太强了</strong>。你想想看，写一个遗传算法或者匈牙利算法，在MATLAB里可能几十行代码就搞定了。换到C++里，光数据结构就得写半天。</p>
+
+<p>我在做<strong>多AGV任务均衡分配</strong>项目时，就是用Simulink搭的仿真环境。当时需要对比三种不同的任务分配策略，Simulink的<strong>数据记录和可视化功能</strong>帮我省了至少两周时间。</p>
+
+<div class="highlight">
+  <strong>适用场景：</strong>
+  <ul>
+    <li>调度算法原型验证</li>
+    <li>任务分配策略对比</li>
+    <li>路径规划算法测试</li>
+    <li>交通管制逻辑仿真</li>
+  </ul>
+</div>
+
+<p>不过，MATLAB也有短板。它<strong>不擅长做物理引擎仿真</strong>。如果你要模拟AGV的碰撞检测、传感器数据，那还是得看Gazebo。</p>
+
+<h4>17.1.2 Gazebo——物理仿真的王者</h4>
+
+<p>Gazebo是ROS生态里的仿真神器。它最大的优势是<strong>物理引擎真实</strong>，能模拟摩擦力、惯性、碰撞等真实物理特性。</p>
+
+<p>我记得有一次，客户要求AGV在<strong>湿滑地面</strong>上运行。在MATLAB里，我根本模拟不出打滑的效果。后来换成Gazebo，调整一下摩擦系数，问题就解决了。</p>
+
+<p>Gazebo的另一个好处是<strong>传感器仿真</strong>。激光雷达、摄像头、IMU，这些都能模拟。如果你要做<strong>感知与定位</strong>相关的测试，Gazebo是首选。</p>
+
+<div class="tip">
+  <strong>我的建议：</strong>如果你团队里既有算法工程师又有机械工程师，那就两个平台都用。算法在MATLAB里跑，物理仿真在Gazebo里做。两个平台的数据可以互相导入导出，形成闭环。
+</div>
+
+<h4>17.1.3 两个平台的对比</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>对比维度</th>
+      <th>MATLAB/Simulink</th>
+      <th>Gazebo</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>算法验证效率</td>
+      <td>★★★★★</td>
+      <td>★★★☆☆</td>
+    </tr>
+    <tr>
+      <td>物理仿真真实度</td>
+      <td>★★☆☆☆</td>
+      <td>★★★★★</td>
+    </tr>
+    <tr>
+      <td>传感器仿真</td>
+      <td>★★☆☆☆</td>
+      <td>★★★★★</td>
+    </tr>
+    <tr>
+      <td>学习曲线</td>
+      <td>★★★☆☆</td>
+      <td>★★★★☆</td>
+    </tr>
+    <tr>
+      <td>社区资源</td>
+      <td>★★★★☆</td>
+      <td>★★★★★</td>
+    </tr>
+    <tr>
+      <td>商业授权费用</td>
+      <td>高</td>
+      <td>免费开源</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>17.2 仿真场景怎么配置？</h3>
+
+<p>平台选好了，接下来就是搭场景。这一步很多人不重视，觉得随便画个地图就行。其实不然——<strong>场景配置直接决定了仿真结果的可信度</strong>。</p>
+
+<h4>17.2.1 地图建模</h4>
+
+<p>我一般把地图分成三类：</p>
+
+<ul>
+  <li><strong>抽象地图</strong>：用节点和边表示，适合算法验证。比如一个仓库，我就画几个货架点和几个工作站点，中间用路径连起来。</li>
+  <li><strong>栅格地图</strong>：把真实环境栅格化，每个格子标记为可通行或不可通行。适合路径规划测试。</li>
+  <li><strong>三维地图</strong>：完全还原真实场景，包括货架高度、通道宽度、地面材质。适合物理仿真。</li>
+</ul>
+
+<p>我个人习惯是<strong>从抽象到具体</strong>。先在MATLAB里用抽象地图验证算法逻辑，没问题了再到Gazebo里搭三维地图做物理仿真。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong>我曾经在Gazebo里直接导入一个高精度的三维仓库模型，结果仿真跑起来卡得要死。后来才发现，模型面数太多，物理引擎计算量太大。所以，三维地图的<strong>面数要控制在合理范围内</strong>，别追求完美还原。
+</div>
+
+<h4>17.2.2 AGV模型配置</h4>
+
+<p>AGV模型需要配置的参数不少，我列几个关键的：</p>
+
+<ul>
+  <li><strong>运动学模型</strong>：差速驱动？麦克纳姆轮？还是舵轮？不同驱动方式，运动特性完全不同。</li>
+  <li><strong>速度与加速度</strong>：最大速度、最大加速度、转弯速度。这些参数直接影响任务执行时间。</li>
+  <li><strong>传感器配置</strong>：激光雷达的扫描范围、探测距离；摄像头的视野角度。这些决定了AGV的感知能力。</li>
+  <li><strong>负载能力</strong>：空载和满载时的运动参数可能不同，这个别忘了配。</li>
+</ul>
+
+<p>嗯，这里要注意：<strong>AGV模型参数最好从真实车辆上获取</strong>。我做过一个项目，仿真里AGV跑得飞快，结果真车一跑，速度根本达不到。后来一查，是电机扭矩参数设错了。</p>
+
+<h4>17.2.3 任务场景配置</h4>
+
+<p>任务场景就是你要模拟的业务流程。比如：</p>
+
+<ul>
+  <li><strong>仓库拣货场景</strong>：AGV从货架取货，送到工作站。</li>
+  <li><strong>产线配送场景</strong>：AGV从原料区取料，送到指定工位。</li>
+  <li><strong>跨楼层运输场景</strong>：AGV需要坐电梯或通过升降机。</li>
+</ul>
+
+<p>每个场景都要配置<strong>任务生成规则</strong>：任务到达频率、任务优先级、任务之间的依赖关系。这些规则越贴近真实业务，仿真结果越有参考价值。</p>
+
+<h3>17.3 性能指标怎么定义？</h3>
+
+<p>仿真跑完了，怎么评价好坏？这就需要定义<strong>性能指标</strong>。我一般把指标分成三类：</p>
+
+<h4>17.3.1 任务执行类指标</h4>
+
+<ul>
+  <li><strong>任务完成率</strong>：在规定时间内完成的任务占比。低于95%就算不合格。</li>
+  <li><strong>平均任务完成时间</strong>：从任务下发到AGV完成，平均花了多久。</li>
+  <li><strong>任务等待时间</strong>：任务生成后，到被分配给AGV的等待时长。这个指标能反映调度算法的响应速度。</li>
+  <li><strong>任务超时率</strong>：超过截止时间的任务占比。对时效性要求高的场景，这个指标很关键。</li>
+</ul>
+
+<h4>17.3.2 车辆利用类指标</h4>
+
+<ul>
+  <li><strong>车辆利用率</strong>：AGV实际工作时间占总时间的比例。利用率太低说明车辆闲置太多，太高说明车辆可能过载。</li>
+  <li><strong>空驶率</strong>：AGV空载行驶里程占总里程的比例。空驶率越低，说明调度策略越优。</li>
+  <li><strong>充电/换电频率</strong>：AGV需要停下来充电的次数。这个指标影响系统连续运行能力。</li>
+</ul>
+
+<h4>17.3.3 系统稳定性指标</h4>
+
+<ul>
+  <li><strong>死锁次数</strong>：多台AGV互相阻塞，无法继续运行的次数。理想情况是0次。</li>
+  <li><strong>路径冲突次数</strong>：AGV在交叉口或狭窄通道相遇的次数。冲突次数多，说明交通管制策略需要优化。</li>
+  <li><strong>系统吞吐量</strong>：单位时间内完成的任务数量。这是衡量系统整体性能的核心指标。</li>
+</ul>
+
+<div class="highlight">
+  <strong>我的经验：</strong>指标不是越多越好。我一般会选<strong>3-5个核心指标</strong>作为评判标准。比如，做任务分配策略对比时，我就看「平均任务完成时间」和「车辆利用率」这两个。指标太多，反而容易迷失方向。
+</div>
+
+<h3>17.4 仿真环境搭建的整体流程</h3>
+
+<p>说了这么多，我画个流程图帮你理清思路：</p>
+
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f8f9fa" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">仿真环境搭建整体流程</text>
+  
+  <!-- 步骤1：平台选择 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">步骤1：平台选择</text>
+  
+  <!-- 分支 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="150" x2="250" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="150" x2="550" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- MATLAB分支 -->
+  <rect x="150" y="150" width="200" height="40" rx="6" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="250" y="175" text-anchor="middle" font-size="14" fill="white">MATLAB/Simulink</text>
+  
+  <!-- Gazebo分支 -->
+  <rect x="450" y="150" width="200" height="40" rx="6" fill="#2ecc71" stroke="#27ae60" stroke-width="1.5"/>
+  <text x="550" y="175" text-anchor="middle" font-size="14" fill="white">Gazebo</text>
+  
+  <!-- 汇聚 -->
+  <line x1="250" y1="190" x2="250" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="550" y1="190" x2="550" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="250" y1="220" x2="550" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="220" x2="400" y2="240" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 步骤2：场景配置 -->
+  <rect x="300" y="240" width="200" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="270" text-anchor="middle" font-size="16" fill="white" font-weight="bold">步骤2：场景配置</text>
+  
+  <!-- 子步骤 -->
+  <line x1="400" y1="290" x2="400" y2="310" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <rect x="100" y="310" width="180" height="35" rx="5" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="190" y="333" text-anchor="middle" font-size="13" fill="#2c3e50">地图建模</text>
+  
+  <rect x="310" y="310" width="180" height="35" rx="5" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="333" text-anchor="middle" font-size="13" fill="#2c3e50">AGV模型配置</text>
+  
+  <rect x="520" y="310" width="180" height="35" rx="5" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="610" y="333" text-anchor="middle" font-size="13" fill="#2c3e50">任务场景配置</text>
+  
+  <!-- 汇聚 -->
+  <line x1="190" y1="345" x2="190" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="345" x2="400" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="610" y1="345" x2="610" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="190" y1="370" x2="610" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="370" x2="400" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 步骤3：指标定义 -->
+  <rect x="300" y="390" width="200" height="50" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="420" text-anchor="middle" font-size="16" fill="white" font-weight="bold">步骤3：指标定义</text>
+  
+  <!-- 子步骤 -->
+  <line x1="400" y1="440" x2="400" y2="460" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <rect x="100" y="460" width="180" height="30" rx="4" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1"/>
+  <text x="190" y="480" text-anchor="middle" font-size="12" fill="#2c3e50">任务执行类</text>
+  
+  <rect x="310" y="460" width="180" height="30" rx="4" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1"/>
+  <text x="400" y="480" text-anchor="middle" font-size="12" fill="#2c3e50">车辆利用类</text>
+  
+  <rect x="520" y="460" width="180" height="30" rx="4" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="1"/>
+  <text x="610" y="480" text-anchor="middle" font-size="12" fill="#2c3e50">系统稳定性类</text>
+</svg>
+
+<p>你看，整个流程其实很清晰：<strong>先选平台，再搭场景，最后定指标</strong>。每一步都有讲究，但核心就一句话——<strong>仿真要为真实系统服务</strong>。</p>
+
+<h3>17.5 一个实战案例</h3>
+
+<p>最后，我分享一个真实的案例。去年我做了一个<strong>汽车零部件工厂的AGV调度项目</strong>，仿真环境是这样搭的：</p>
+
+<ul>
+  <li><strong>平台</strong>：MATLAB/Simulink做算法验证，Gazebo做物理仿真。</li>
+  <li><strong>场景</strong>：抽象地图用节点图表示，三维地图用Gazebo的Building Editor搭建。AGV模型参数直接从供应商提供的技术文档里提取。</li>
+  <li><strong>指标</strong>：核心看「任务完成率」和「死锁次数」。要求任务完成率≥98%，死锁次数为0。</li>
+</ul>
+
+<p>仿真跑了整整两周，发现了三个问题：</p>
+<ol>
+  <li>某个交叉口的交通管制逻辑有bug，导致死锁。</li>
+  <li>任务分配策略在高峰期负载不均衡，有的AGV忙死，有的闲死。</li>
+  <li>AGV在转弯时速度过快，有侧翻风险。</li>
+</ol>
+
+<p>这些问题如果在真实系统里发现，代价就大了。好在仿真阶段都解决了，上线后系统运行非常稳定。</p>
+
+<div class="tip">
+  <strong>最后说一句：</strong>仿真不是万能的，但没有仿真万万不能。花在仿真上的时间，最终都会在真实系统里加倍还给你。
+</div>
+
+<div class="footer-nav">
+            <a href="16ExceptionFaultTolerance.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18PerformanceMetrics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

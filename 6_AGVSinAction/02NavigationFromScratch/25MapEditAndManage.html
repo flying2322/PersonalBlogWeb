@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 AGV地图编辑与管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="active">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 AGV地图编辑与管理：地图格式（PGM/YAML）、地图编辑工具（MapEditor/Photoshop）、地图分区（高精地图/语义地图）、地图动态更新</h2>
+
+<p>做AGV导航，地图是绕不开的核心。说白了，地图就是机器人的「眼睛」和「记忆」。没有地图，AGV就是个瞎子。今天咱们聊聊地图的编辑与管理，这里面门道不少。</p>
+
+<p>我个人习惯把地图管理分成三块：格式、工具、更新。这三块搞明白了，你的AGV系统才算真正有了「脑子」。</p>
+
+<h3>地图格式：PGM与YAML</h3>
+
+<p>先说说最常见的格式组合——PGM+YAML。这是ROS生态里最经典的地图存储方式。</p>
+
+<p><strong>PGM（Portable Gray Map）</strong> 是灰度图。每个像素代表一个栅格，值从0到255。0是黑色（障碍物），255是白色（自由空间），中间值代表未知区域。嗯，这里要注意：不同厂家对灰度值的解释可能不一样，我踩过这个坑。</p>
+
+<p><strong>YAML</strong> 是配置文件。它告诉机器人地图的元信息：分辨率、原点坐标、占用阈值等等。看个例子：</p>
+
+<pre><code>image: map.pgm
+resolution: 0.05
+origin: [-10.0, -10.0, 0.0]
+occupied_thresh: 0.65
+free_thresh: 0.196
+negate: 0
+</code></pre>
+
+<p>这里 <code>resolution: 0.05</code> 表示每个栅格代表5厘米。我建议新手别把分辨率设太高，0.05米是个不错的起点。太高了地图文件巨大，太低了你又怕撞墙。</p>
+
+<div class="highlight">
+<p><strong>核心要点：</strong>PGM存的是「图」，YAML存的是「参数」。两者缺一不可。我曾经见过有人只改了PGM没改YAML，结果地图原点对不上，AGV直接往墙上撞。</p>
+</div>
+
+<h3>地图编辑工具：MapEditor与Photoshop</h3>
+
+<p>地图建好了，总得修修补补吧？这就用到编辑工具了。</p>
+
+<p><strong>MapEditor</strong> 是专门给机器人地图用的工具。它懂栅格语义，知道哪些像素是障碍物，哪些是通道。我常用的操作：</p>
+
+<ul>
+<li>擦除噪点：激光雷达扫出来的地图经常有「鬼影」，手动擦掉</li>
+<li>封闭边界：有些开放区域需要手动加墙，防止AGV跑出去</li>
+<li>添加虚拟墙：不想让AGV去的地方，画条线就行</li>
+</ul>
+
+<p><strong>Photoshop</strong> 也能用，但要注意技巧。用PS编辑PGM时，必须保持灰度模式，不能转RGB。我有个同事用PS编辑后保存成JPG，结果地图全花了——因为JPG有损压缩会改变像素值。</p>
+
+<div class="tip">
+<p><strong>小技巧：</strong>用PS编辑时，把地图放大到800%以上，用1像素的画笔慢慢修。别嫌麻烦，修图半小时，调试省三天。</p>
+</div>
+
+<h3>地图分区：高精地图与语义地图</h3>
+
+<p>一张地图包打天下？不现实。我习惯把地图分成两层：高精地图和语义地图。</p>
+
+<p><strong>高精地图</strong> 存的是几何信息。每个障碍物的精确位置、形状、尺寸。这层地图用于路径规划和避障。精度要求高，通常到厘米级。</p>
+
+<p><strong>语义地图</strong> 存的是「意义」。比如：这里是货架区、那里是充电站、这条通道是单向的。语义地图不关心精确坐标，它关心的是「这个区域能干什么」。</p>
+
+<p>为什么要分开？你想想看，高精地图天天变（货架移动、货物堆放），但语义地图基本不变（充电站位置、安全区域）。分开管理，更新成本低很多。</p>
+
+<div class="warning">
+<p><strong>注意：</strong>语义地图和高精地图必须保持同步。我见过一个项目，语义地图说「这里是通道」，但高精地图显示「这里有障碍物」，结果AGV卡在半路进退两难。</p>
+</div>
+
+<h3>地图动态更新</h3>
+
+<p>这是最头疼的部分。工厂环境不是一成不变的，AGV跑着跑着，前面多了个托盘，怎么办？</p>
+
+<p>动态更新有两种策略：</p>
+
+<ol>
+<li><strong>局部更新</strong>：只更新变化区域。比如某个货架被移动了，只更新那个区域的栅格。效率高，但需要检测变化的能力。</li>
+<li><strong>全局重扫</strong>：重新建图。简单粗暴，但耗时。我建议只在环境大改时用，比如产线重新布局。</li>
+</ol>
+
+<p>我个人习惯用局部更新+定期全局校验的组合。平时跑局部更新，每周做一次全局校验，确保地图没跑偏。</p>
+
+<p>动态更新的核心是「变化检测」。怎么知道环境变了？</p>
+
+<ul>
+<li>激光雷达扫描对比：当前扫描和地图做匹配，差异大的地方就是变化区域</li>
+<li>视觉辅助：摄像头拍到的画面和地图对比，发现新物体就标记</li>
+<li>人工标记：操作员在界面上点一下「这里变了」，系统自动更新</li>
+</ul>
+
+<p>嗯，这里要注意：动态更新不能太频繁。我见过有人设成每秒更新一次，结果地图一直在抖，AGV反而更不稳定。建议更新频率控制在分钟级。</p>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图帮你理清思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV地图编辑与管理知识体系</text>
+  
+  <!-- 第一层：地图格式 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图格式</text>
+  
+  <rect x="50" y="140" width="90" height="40" rx="5" fill="#2980b9"/>
+  <text x="95" y="165" text-anchor="middle" font-size="13" fill="white">PGM灰度图</text>
+  
+  <rect x="160" y="140" width="90" height="40" rx="5" fill="#2980b9"/>
+  <text x="205" y="165" text-anchor="middle" font-size="13" fill="white">YAML配置</text>
+  
+  <!-- 箭头 -->
+  <line x1="250" y1="95" x2="300" y2="95" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：编辑工具 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">编辑工具</text>
+  
+  <rect x="300" y="140" width="90" height="40" rx="5" fill="#d35400"/>
+  <text x="345" y="165" text-anchor="middle" font-size="13" fill="white">MapEditor</text>
+  
+  <rect x="410" y="140" width="90" height="40" rx="5" fill="#d35400"/>
+  <text x="455" y="165" text-anchor="middle" font-size="13" fill="white">Photoshop</text>
+  
+  <!-- 箭头 -->
+  <line x1="500" y1="95" x2="550" y2="95" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：地图分区 -->
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图分区</text>
+  
+  <rect x="550" y="140" width="90" height="40" rx="5" fill="#1e8449"/>
+  <text x="595" y="165" text-anchor="middle" font-size="13" fill="white">高精地图</text>
+  
+  <rect x="660" y="140" width="90" height="40" rx="5" fill="#1e8449"/>
+  <text x="705" y="165" text-anchor="middle" font-size="13" fill="white">语义地图</text>
+  
+  <!-- 底部：动态更新 -->
+  <rect x="200" y="240" width="400" height="50" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="400" y="270" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图动态更新</text>
+  
+  <!-- 连接线 -->
+  <line x1="150" y1="180" x2="250" y2="240" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="400" y1="180" x2="380" y2="240" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="650" y1="180" x2="550" y2="240" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,3"/>
+  
+  <!-- 动态更新子项 -->
+  <rect x="100" y="320" width="130" height="40" rx="5" fill="#9b59b6"/>
+  <text x="165" y="345" text-anchor="middle" font-size="12" fill="white">局部更新</text>
+  
+  <rect x="260" y="320" width="130" height="40" rx="5" fill="#9b59b6"/>
+  <text x="325" y="345" text-anchor="middle" font-size="12" fill="white">全局重扫</text>
+  
+  <rect x="420" y="320" width="130" height="40" rx="5" fill="#9b59b6"/>
+  <text x="485" y="345" text-anchor="middle" font-size="12" fill="white">变化检测</text>
+  
+  <rect x="580" y="320" width="130" height="40" rx="5" fill="#9b59b6"/>
+  <text x="645" y="345" text-anchor="middle" font-size="12" fill="white">人工标记</text>
+  
+  <!-- 连接线 -->
+  <line x1="250" y1="290" x2="165" y2="320" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="350" y1="290" x2="325" y2="320" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="450" y1="290" x2="485" y2="320" stroke="#7f8c8d" stroke-width="1.5"/>
+  <line x1="550" y1="290" x2="645" y2="320" stroke="#7f8c8d" stroke-width="1.5"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="13" fill="#7f8c8d">四层架构：格式 → 工具 → 分区 → 更新</text>
+  <text x="400" y="445" text-anchor="middle" font-size="12" fill="#95a5a6">每层解决不同问题，层层递进</text>
+</svg>
+
+<p>地图管理这事，说白了就是「三分建、七分养」。建图只是开始，日常的维护和更新才是大头。我建议团队里专门安排一个人负责地图管理，别让所有人都能改地图——改坏了都不知道谁干的。</p>
+
+<div class="highlight">
+<p><strong>避坑指南：</strong>我曾经在一个项目里，地图版本没管好，新旧地图混着用，结果AGV在同一个位置有时候能过有时候不能过。排查了两天才发现是地图版本不一致。从那以后，我强制要求所有地图文件必须带版本号和修改日期。</p>
+</div>
+
+<p>好了，地图编辑与管理就聊到这儿。记住：好地图是改出来的，不是一次建出来的。</p>
+
+        <div class="footer-nav">
+            <a href="24HostMonitorSystem.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26PerformanceTestOptimize.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

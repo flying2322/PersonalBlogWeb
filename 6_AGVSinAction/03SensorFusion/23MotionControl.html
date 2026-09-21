@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 运动控制</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="active">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 运动控制——PID控制器、纯追踪模型、Stanley控制器</h2>
+
+<p>各位，欢迎来到运动控制这一讲。</p>
+<p>说实话，在AGV导航系统里，传感器融合负责“感知”，路径规划负责“决策”，而运动控制，就是那个最终“执行”的环节。你前面算得再准，规划得再好，如果控制跟不上，车就会像喝醉了一样，左右摇摆，甚至冲出路径。我见过太多项目，传感器精度很高，但最后死在控制参数没调好上。</p>
+<p>今天我们就来聊聊三种最经典的运动控制方法：<strong>PID控制器</strong>、<strong>纯追踪模型</strong>和<strong>Stanley控制器</strong>。它们各有各的脾气，也各有各的适用场景。</p>
+
+<hr />
+
+<h3>一、PID控制器：最朴素的“纠偏”大师</h3>
+
+<p>PID，比例-积分-微分。说白了，就是看你现在偏了多少（P），过去累计偏了多少（I），以及未来可能偏多少（D），然后综合起来给一个控制量。</p>
+<p>我刚开始做AGV时，第一个接触的就是PID。当时觉得这东西太简单了，不就是三个系数嘛。结果调了一周，车还是在原地画圈。后来才明白，PID虽然简单，但调参是一门玄学。</p>
+
+<h4>1.1 位置式PID vs 增量式PID</h4>
+<p>在AGV运动控制中，我们通常用<strong>增量式PID</strong>。为什么？因为位置式PID输出的是绝对控制量，一旦积分项饱和，车就会失控。增量式只输出变化量，相对安全。</p>
+
+<pre><code>// 增量式PID实现
+float pid_incremental(float target, float current, PID_t *pid) {
+    float error = target - current;
+    float output = pid-&gt;Kp * (error - pid-&gt;last_error) 
+                 + pid-&gt;Ki * error 
+                 + pid-&gt;Kd * (error - 2*pid-&gt;last_error + pid-&gt;last_last_error);
+    
+    pid-&gt;last_last_error = pid-&gt;last_error;
+    pid-&gt;last_error = error;
+    
+    return output;
+}
+</code></pre>
+
+<div class="tip">
+<strong>我的经验：</strong>调PID时，先把I和D设为0，只调P。让车能走直线但有点震荡时，加一点D来抑制超调。最后再加I消除静差。千万别一上来三个参数一起调，你会疯的。
+</div>
+
+<h4>1.2 PID在AGV中的局限性</h4>
+<p>PID适合<strong>直线跟踪</strong>和<strong>定点停车</strong>。但如果你让AGV走一个弯道，PID就有点力不从心了。为什么？因为PID本质上是在“纠偏”，它不知道前方有弯道，只能等偏了再拉回来。这就导致了弯道处的“切弯”现象。</p>
+
+<div class="warning">
+<strong>注意：</strong>PID的积分项在AGV启动和停止时容易引起超调。我曾经遇到过AGV在目标点前反复震荡，就是因为积分项累计了太多误差。解决方案是加积分限幅，或者在误差小于某个阈值时冻结积分。
+</div>
+
+<hr />
+
+<h3>二、纯追踪模型：让AGV学会“看前方”</h3>
+
+<p>纯追踪模型，英文叫Pure Pursuit。这个名字很形象——就是让AGV像猎豹一样，始终盯着前方一个“目标点”去追。</p>
+<p>它的核心思想很简单：在路径上选一个<strong>前视距离</strong>处的点，然后计算一个圆弧，让AGV沿着这个圆弧运动到目标点。说白了，就是“看多远，走多弯”。</p>
+
+<h4>2.1 前视距离的选取</h4>
+<p>这是纯追踪模型最关键的地方。前视距离太短，车会左右震荡；前视距离太长，车会“切弯”，走大半径弧线。</p>
+
+<table>
+    <tr>
+        <th>前视距离</th>
+        <th>效果</th>
+        <th>适用场景</th>
+    </tr>
+    <tr>
+        <td>太短（&lt;0.5m）</td>
+        <td>震荡剧烈，路径跟踪不稳定</td>
+        <td>低速、高精度纠偏</td>
+    </tr>
+    <tr>
+        <td>适中（1-2m）</td>
+        <td>跟踪平滑，弯道不切弯</td>
+        <td>一般AGV导航</td>
+    </tr>
+    <tr>
+        <td>太长（&gt;3m）</td>
+        <td>弯道严重切弯，路径偏移大</td>
+        <td>高速、大曲率路径</td>
+    </tr>
+</table>
+
+<p>我个人习惯的做法是：让前视距离与车速成正比。车速快时看远一点，车速慢时看近一点。这样能兼顾稳定性和跟踪精度。</p>
+
+<pre><code>// 纯追踪模型计算转向角
+float pure_pursuit(float lookahead_distance, float lateral_error) {
+    float alpha = atan2(lateral_error, lookahead_distance);
+    float curvature = 2.0 * sin(alpha) / lookahead_distance;
+    float steering_angle = atan(curvature * wheelbase);
+    return steering_angle;
+}
+</code></pre>
+
+<div class="highlight">
+<strong>核心要点：</strong>纯追踪模型不直接控制速度，它只输出转向角。速度控制通常由另一个PID或速度规划器负责。两者解耦，调试起来更清晰。
+</div>
+
+<hr />
+
+<h3>三、Stanley控制器：基于横向误差的“精准打击”</h3>
+
+<p>Stanley控制器是斯坦福大学在DARPA挑战赛中提出的方法。它比纯追踪模型更“激进”，因为它同时考虑了<strong>横向误差</strong>和<strong>航向误差</strong>。</p>
+<p>说白了，纯追踪模型只看“点”，而Stanley控制器既看“点”也看“方向”。</p>
+
+<h4>3.1 控制律公式</h4>
+<p>Stanley控制器的核心公式很简洁：</p>
+<pre><code>steering_angle = heading_error + atan2(k * lateral_error, velocity)
+</code></pre>
+<p>其中：</p>
+<ul>
+    <li><strong>heading_error</strong>：当前航向与路径切线方向的夹角</li>
+    <li><strong>lateral_error</strong>：车辆中心到路径的垂直距离</li>
+    <li><strong>k</strong>：增益系数，控制横向误差的收敛速度</li>
+    <li><strong>velocity</strong>：当前车速</li>
+</ul>
+
+<p>你想想看，这个公式妙在哪里？当车速很低时，atan2项会很大，横向误差被快速纠正。当车速很高时，atan2项变小，避免过度转向导致侧滑。这就是所谓的“速度自适应”。</p>
+
+<h4>3.2 与纯追踪模型的对比</h4>
+<table>
+    <tr>
+        <th>特性</th>
+        <th>纯追踪模型</th>
+        <th>Stanley控制器</th>
+    </tr>
+    <tr>
+        <td>输入</td>
+        <td>前视距离、横向误差</td>
+        <td>横向误差、航向误差、车速</td>
+    </tr>
+    <tr>
+        <td>弯道表现</td>
+        <td>平滑，但会切弯</td>
+        <td>精准，但可能震荡</td>
+    </tr>
+    <tr>
+        <td>速度适应性</td>
+        <td>需手动调整前视距离</td>
+        <td>自动适应车速</td>
+    </tr>
+    <tr>
+        <td>调试难度</td>
+        <td>低（一个参数）</td>
+        <td>中（两个参数）</td>
+    </tr>
+</table>
+
+<div class="warning">
+<strong>避坑指南：</strong>我曾经在一个项目中用Stanley控制器，发现AGV在直线路径上左右摆动。排查了半天，发现是航向误差的计算方式有问题——我用了全局航向角，但路径切线方向计算有延迟。后来改用局部坐标系下的相对航向角，问题就解决了。记住，<strong>误差一定要在车辆坐标系下计算</strong>。
+</div>
+
+<hr />
+
+<h3>四、三种控制器的选择策略</h3>
+
+<p>说了这么多，到底该用哪个？我的建议是：</p>
+<ul>
+    <li><strong>直线路径为主 + 定点停车</strong>：用PID就够了，简单可靠。</li>
+    <li><strong>有弯道 + 速度不高</strong>：用纯追踪模型，调试方便，效果稳定。</li>
+    <li><strong>高速 + 弯道多 + 精度要求高</strong>：用Stanley控制器，但要做好参数整定。</li>
+</ul>
+
+<p>当然，实际项目中我经常把它们组合使用。比如直线段用PID，弯道切换到纯追踪模型。切换时要注意平滑过渡，否则车会“抖”一下。</p>
+
+<hr />
+
+<h3>五、知识体系总览</h3>
+
+<p>下面这张图，是我对运动控制这一章核心逻辑的总结。你可以看到，三种控制器各有侧重，但最终都服务于同一个目标——让AGV精确、稳定地跟踪规划好的路径。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV运动控制核心逻辑</text>
+    
+    <!-- 输入 -->
+    <rect x="50" y="80" width="150" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="125" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">路径规划输出</text>
+    
+    <!-- 三个控制器 -->
+    <rect x="300" y="60" width="180" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="390" y="90" text-anchor="middle" font-size="14" fill="white" font-weight="bold">PID控制器</text>
+    
+    <rect x="300" y="140" width="180" height="50" rx="8" fill="#e67e22" opacity="0.9"/>
+    <text x="390" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">纯追踪模型</text>
+    
+    <rect x="300" y="220" width="180" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+    <text x="390" y="250" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Stanley控制器</text>
+    
+    <!-- 输出 -->
+    <rect x="580" y="140" width="150" height="60" rx="8" fill="#8e44ad" opacity="0.9"/>
+    <text x="655" y="175" text-anchor="middle" font-size="14" fill="white" font-weight="bold">转向角 + 速度</text>
+    
+    <!-- 箭头：输入到控制器 -->
+    <line x1="200" y1="110" x2="300" y2="85" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="200" y1="110" x2="300" y2="165" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="200" y1="110" x2="300" y2="245" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 箭头：控制器到输出 -->
+    <line x1="480" y1="85" x2="580" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="480" y1="165" x2="580" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="480" y1="245" x2="580" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#333"/>
+        </marker>
+    </defs>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="320" text-anchor="middle" font-size="13" fill="#555">传感器融合 → 路径规划 → 运动控制（本章核心）</text>
+    <text x="400" y="350" text-anchor="middle" font-size="12" fill="#888">三种控制器可单独使用，也可组合切换</text>
+    
+    <!-- 适用场景标签 -->
+    <rect x="50" y="280" width="130" height="30" rx="5" fill="#ecf0f1" stroke="#bdc3c7"/>
+    <text x="115" y="300" text-anchor="middle" font-size="11" fill="#2c3e50">直线/定点 → PID</text>
+    
+    <rect x="200" y="280" width="130" height="30" rx="5" fill="#ecf0f1" stroke="#bdc3c7"/>
+    <text x="265" y="300" text-anchor="middle" font-size="11" fill="#2c3e50">弯道/低速 → 纯追踪</text>
+    
+    <rect x="350" y="280" width="150" height="30" rx="5" fill="#ecf0f1" stroke="#bdc3c7"/>
+    <text x="425" y="300" text-anchor="middle" font-size="11" fill="#2c3e50">高速/高精度 → Stanley</text>
+</svg>
+
+<hr />
+
+<p>好了，运动控制这一章就讲到这里。三种方法各有千秋，没有绝对的好坏。关键是你得理解它们的原理，然后根据实际场景去选、去调、去优化。我在项目里踩过的坑，上面都提到了，希望能帮你少走弯路。</p>
+
+<p>记住，控制算法是“死”的，但AGV是“活”的。多观察车的实际表现，多思考背后的物理意义，你也能成为运动控制的高手。</p>
+
+<div class="footer-nav">
+            <a href="22PathPlanningBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24RosIntegration.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

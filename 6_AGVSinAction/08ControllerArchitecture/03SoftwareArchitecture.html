@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 AGV软件架构总览</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="active">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 AGV软件架构总览：分层架构、模块化设计与实时性可靠性</h2>
+
+<p>各位工程师朋友，今天我们来聊聊AGV的软件架构。说实话，很多刚入行的朋友一上来就盯着某个算法猛啃，结果整个系统跑起来各种问题——不是这里卡顿，就是那里死锁。我当年也踩过这个坑。</p>
+
+<p>AGV的软件架构，说白了就是一套分工协作的规则。你想想看，一辆AGV既要看路（感知），又要想怎么走（决策），还得控制电机转起来（执行）。这三件事如果搅在一起，代码维护起来就是噩梦。</p>
+
+<h3>3.1 分层架构：感知层、决策层、执行层</h3>
+
+<p>我个人习惯把AGV软件分成三个层次，就像公司的组织架构——各司其职，互不越权。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>上层依赖下层，下层不依赖上层。决策层可以调用感知层的数据，但感知层绝不去管决策层要干什么。</p>
+</div>
+
+<h4>感知层（Perception Layer）</h4>
+<p>这一层负责「看」和「听」。激光雷达、摄像头、IMU、编码器……所有传感器的数据都在这里处理。我见过不少项目，感知层代码写得乱七八糟，传感器数据直接裸奔到决策层，结果决策层被各种噪声干扰得晕头转向。</p>
+
+<p>感知层要做的事情很明确：</p>
+<ul>
+  <li><strong>数据采集</strong>：以固定频率读取传感器原始数据</li>
+  <li><strong>预处理</strong>：滤波、去噪、时间戳对齐</li>
+  <li><strong>特征提取</strong>：从点云中提取障碍物轮廓，从图像中识别二维码</li>
+  <li><strong>状态估计</strong>：融合多传感器数据，输出位姿估计</li>
+</ul>
+
+<p>嗯，这里要注意一点——感知层输出的数据一定要带时间戳。我曾经在一个项目中，因为激光雷达和IMU的时间戳没对齐，导致定位结果跳来跳去，AGV在走廊里画起了龙。</p>
+
+<h4>决策层（Decision Layer）</h4>
+<p>决策层是AGV的「大脑」。它拿到感知层的数据后，要回答三个问题：</p>
+<ol>
+  <li>我现在在哪？（定位）</li>
+  <li>我要去哪？（任务规划）</li>
+  <li>我该怎么走？（路径规划与运动控制）</li>
+</ol>
+
+<p>决策层通常包含这些模块：</p>
+<ul>
+  <li><strong>全局路径规划</strong>：从A点到B点的宏观路径，比如用A*算法</li>
+  <li><strong>局部路径规划</strong>：实时避障，比如DWA算法</li>
+  <li><strong>任务调度</strong>：多任务排队、优先级管理</li>
+  <li><strong>状态机</strong>：空闲、运行、充电、异常等状态切换</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>决策层一定要做「超时保护」。比如路径规划超过100ms没出结果，就立即切换到安全模式。否则AGV会愣在原地，或者更糟——直接撞墙。</p>
+</div>
+
+<h4>执行层（Execution Layer）</h4>
+<p>执行层是「手脚」。它接收决策层下发的速度指令（线速度、角速度），然后驱动电机、转向机构动起来。</p>
+
+<p>执行层的关键点：</p>
+<ul>
+  <li><strong>电机控制</strong>：PID闭环控制，电流环、速度环、位置环</li>
+  <li><strong>制动管理</strong>：急停、缓停、驻车制动</li>
+  <li><strong>状态反馈</strong>：实际速度、电流、温度上报</li>
+  <li><strong>安全监控</strong>：看门狗、急停信号、碰撞传感器</li>
+</ul>
+
+<p>执行层对实时性要求最高。我建议执行层的控制周期做到5ms以内，否则AGV跑起来会一抖一抖的。</p>
+
+<h3>3.2 模块化设计思想</h3>
+
+<p>模块化设计，说白了就是「高内聚、低耦合」。每个模块只做一件事，并且把这件事做好。</p>
+
+<p>我常用的模块划分方式：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>模块名称</th>
+      <th>职责</th>
+      <th>对外接口</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sensor_manager</td>
+      <td>统一管理所有传感器，提供时间同步数据</td>
+      <td>get_laser_scan(), get_odom()</td>
+    </tr>
+    <tr>
+      <td>localization</td>
+      <td>基于AMCL或EKF输出位姿</td>
+      <td>get_pose()</td>
+    </tr>
+    <tr>
+      <td>planner</td>
+      <td>全局+局部路径规划</td>
+      <td>plan_path(start, goal)</td>
+    </tr>
+    <tr>
+      <td>controller</td>
+      <td>跟踪路径，输出速度指令</td>
+      <td>set_cmd_vel(v, w)</td>
+    </tr>
+    <tr>
+      <td>safety</td>
+      <td>急停、碰撞检测、边界保护</td>
+      <td>is_safe()</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>模块化设计的好处，我在项目中体会很深。有一次客户要求换激光雷达，从Sick换成Hokuyo。因为传感器管理是独立模块，我只改了sensor_manager的驱动代码，其他模块完全没动。要是当初写成一坨，估计得加班到天亮。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>模块间通信不要用全局变量！我曾经图省事，用全局变量传位姿数据，结果多线程竞争搞得定位数据时而对时而错。后来老老实实用ROS的Topic或者消息队列，问题迎刃而解。</p>
+</div>
+
+<h3>3.3 实时性与可靠性要求</h3>
+
+<p>AGV是跑在工厂里的，不是实验室里的玩具。实时性和可靠性是硬指标。</p>
+
+<h4>实时性要求</h4>
+<p>实时性分硬实时和软实时。AGV的哪些环节需要硬实时？</p>
+<ul>
+  <li><strong>电机控制</strong>：控制周期必须稳定，抖动超过1ms就可能出问题</li>
+  <li><strong>安全监控</strong>：急停信号响应必须在10ms内</li>
+  <li><strong>传感器数据</strong>：激光雷达数据必须在100ms内处理完</li>
+</ul>
+
+<p>我建议在架构设计时就考虑实时性：</p>
+<ul>
+  <li>关键任务跑在RTOS上（如FreeRTOS、RT-Linux）</li>
+  <li>非关键任务（如日志记录、远程监控）跑在普通Linux上</li>
+  <li>使用优先级抢占调度，电机控制线程优先级最高</li>
+</ul>
+
+<h4>可靠性要求</h4>
+<p>可靠性说白了就是「别死机、别跑偏」。我总结了几条经验：</p>
+
+<ol>
+  <li><strong>看门狗机制</strong>：每个关键模块都要有看门狗，超过规定时间没喂狗就自动重启</li>
+  <li><strong>降级策略</strong>：激光雷达坏了，能不能只用IMU和编码器继续慢速运行？</li>
+  <li><strong>数据校验</strong>：所有通信数据都要做CRC校验，防止电磁干扰导致数据错误</li>
+  <li><strong>状态恢复</strong>：意外断电后，AGV能记住当前位置和任务状态</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>一个真实案例：</strong>某客户现场，AGV在充电站附近频繁死机。排查了三天，发现是充电时产生的电磁干扰导致CAN总线数据出错。后来在CAN通信层加了重传机制和CRC校验，问题解决。你看，可靠性设计往往藏在细节里。</p>
+</div>
+
+<h3>3.4 架构总览图</h3>
+
+<p>下面这张图是我画的一个AGV软件架构总览，你可以看到三个层次和模块之间的数据流。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV软件架构总览图</text>
+  
+  <!-- 执行层 -->
+  <rect x="50" y="380" width="700" height="100" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="405" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">执行层 (Execution Layer)</text>
+  <text x="150" y="435" text-anchor="middle" font-size="13" fill="#555">电机控制</text>
+  <text x="300" y="435" text-anchor="middle" font-size="13" fill="#555">制动管理</text>
+  <text x="450" y="435" text-anchor="middle" font-size="13" fill="#555">状态反馈</text>
+  <text x="600" y="435" text-anchor="middle" font-size="13" fill="#555">安全监控</text>
+  <text x="400" y="460" text-anchor="middle" font-size="12" fill="#777">控制周期 ≤ 5ms | 硬实时</text>
+  
+  <!-- 决策层 -->
+  <rect x="50" y="200" width="700" height="140" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="225" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">决策层 (Decision Layer)</text>
+  <text x="130" y="260" text-anchor="middle" font-size="13" fill="#555">全局路径规划</text>
+  <text x="280" y="260" text-anchor="middle" font-size="13" fill="#555">局部路径规划</text>
+  <text x="430" y="260" text-anchor="middle" font-size="13" fill="#555">任务调度</text>
+  <text x="570" y="260" text-anchor="middle" font-size="13" fill="#555">状态机</text>
+  <text x="400" y="290" text-anchor="middle" font-size="12" fill="#777">控制周期 ≤ 100ms | 软实时</text>
+  <text x="400" y="310" text-anchor="middle" font-size="12" fill="#777">超时保护 | 降级策略</text>
+  
+  <!-- 感知层 -->
+  <rect x="50" y="60" width="700" height="100" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">感知层 (Perception Layer)</text>
+  <text x="130" y="115" text-anchor="middle" font-size="13" fill="#555">激光雷达</text>
+  <text x="260" y="115" text-anchor="middle" font-size="13" fill="#555">摄像头</text>
+  <text x="390" y="115" text-anchor="middle" font-size="13" fill="#555">IMU/编码器</text>
+  <text x="530" y="115" text-anchor="middle" font-size="13" fill="#555">数据融合</text>
+  <text x="660" y="115" text-anchor="middle" font-size="13" fill="#555">位姿估计</text>
+  <text x="400" y="140" text-anchor="middle" font-size="12" fill="#777">数据频率 10-50Hz | 时间戳对齐</text>
+  
+  <!-- 数据流箭头 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2196f3"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff9800"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+    </marker>
+  </defs>
+  
+  <!-- 感知层 -> 决策层 -->
+  <line x1="400" y1="160" x2="400" y2="198" stroke="#2196f3" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="420" y="182" font-size="11" fill="#2196f3">位姿/障碍物数据</text>
+  
+  <!-- 决策层 -> 执行层 -->
+  <line x1="400" y1="340" x2="400" y2="378" stroke="#ff9800" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  <text x="420" y="362" font-size="11" fill="#ff9800">速度指令 (v, w)</text>
+  
+  <!-- 执行层 -> 决策层（反馈） -->
+  <line x1="550" y1="380" x2="550" y2="340" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)" stroke-dasharray="5,3"/>
+  <text x="570" y="362" font-size="11" fill="#4caf50">实际速度/状态</text>
+  
+  <!-- 侧边标注 -->
+  <rect x="10" y="60" width="30" height="420" rx="5" fill="#e0e0e0"/>
+  <text x="25" y="280" text-anchor="middle" font-size="12" fill="#555" transform="rotate(-90, 25, 280)">数据流方向</text>
+</svg>
+
+<p>这张图里，数据从下往上流动——传感器数据经过感知层处理，变成决策层能用的位姿和障碍物信息；决策层规划出路径，下发速度指令给执行层；执行层驱动电机，同时把实际状态反馈回去。嗯，这就是一个完整的闭环。</p>
+
+<h3>3.5 小结</h3>
+
+<p>这一章我们聊了AGV软件架构的三个核心问题：</p>
+<ul>
+  <li><strong>分层架构</strong>：感知层、决策层、执行层，各层职责清晰，数据单向流动</li>
+  <li><strong>模块化设计</strong>：高内聚低耦合，每个模块独立开发、独立测试</li>
+  <li><strong>实时性与可靠性</strong>：硬实时任务跑RTOS，软实时任务跑Linux，看门狗和降级策略不能少</li>
+</ul>
+
+<p>我个人觉得，架构设计就像盖房子——地基打好了，后面加功能、换硬件都轻松。如果一开始就图省事，后面改起来成本翻倍。你想想看，是不是这个道理？</p>
+
+<div class="tip">
+  <p><strong>一个小建议：</strong>刚开始做AGV项目时，别急着写代码。先花一周时间把架构图画清楚，模块接口定义好。磨刀不误砍柴工，这句话在嵌入式开发里尤其适用。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="02CoreHardwareSelection.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04TaskSchedulingModule.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

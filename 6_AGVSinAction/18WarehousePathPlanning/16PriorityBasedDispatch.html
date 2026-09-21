@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 基于优先级的调度</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="active">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 基于优先级的调度：静态优先级、动态优先级、死锁避免</h2>
+
+<p>各位好，我是老张。今天聊的话题，说白了就是「谁先走，谁后走」的问题。</p>
+
+<p>AGV调度里，优先级是个绕不开的坎。你想想看，仓库里几十台车同时跑，有的车拉着急单，有的车只是去补货。如果一视同仁，急单可能被堵死。我见过一个项目，就因为优先级没设好，结果VIP订单的AGV被普通补货车堵了整整8分钟——客户差点掀桌子。</p>
+
+<p>所以，优先级调度不是「要不要」的问题，而是「怎么设」的问题。今天我把三种主流方案掰开揉碎了讲：静态优先级、动态优先级，还有死锁避免。</p>
+
+<h3>16.1 静态优先级：简单粗暴，但够用</h3>
+
+<p>静态优先级，就是给每台AGV、每个任务提前定好一个「等级」。比如：</p>
+
+<ul>
+  <li>紧急订单：优先级 10</li>
+  <li>普通补货：优先级 5</li>
+  <li>空车回库：优先级 1</li>
+</ul>
+
+<p>调度器每次选任务时，直接挑优先级最高的那个。代码实现也很直白：</p>
+
+<pre><code>// 静态优先级调度示例
+typedef struct {
+    int task_id;
+    int priority;  // 数值越大优先级越高
+    char* destination;
+} Task;
+
+Task* select_highest_priority(Task tasks[], int count) {
+    Task* best = &tasks[0];
+    for (int i = 1; i &lt; count; i++) {
+        if (tasks[i].priority &gt; best-&gt;priority) {
+            best = &tasks[i];
+        }
+    }
+    return best;
+}</code></pre>
+
+<p>嗯，这里要注意：静态优先级虽然简单，但有个致命问题——<strong>优先级反转</strong>。什么意思？就是低优先级的车占了路口，高优先级的车过不去。我在一个电商仓库就踩过这个坑，后来加了个「优先级继承」机制才解决。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>静态优先级适合任务类型固定的场景。比如分拣区和存储区之间，任务类型就那么几种，设好优先级基本不用动。但如果业务经常变，静态方案就有点僵了。
+</div>
+
+<h3>16.2 动态优先级：灵活，但别玩脱了</h3>
+
+<p>动态优先级，就是优先级会随着时间、状态、拥堵情况变化。说白了，让系统自己「看情况」调整。</p>
+
+<p>常见的动态策略有：</p>
+
+<ul>
+  <li><strong>时间衰减</strong>：任务等得越久，优先级越高。防止饿死。</li>
+  <li><strong>拥堵反馈</strong>：某区域车太多，降低该区域任务的优先级，引导分流。</li>
+  <li><strong>电量感知</strong>：电量低于20%的AGV，优先级自动提升，让它赶紧去充电。</li>
+</ul>
+
+<p>我做过一个项目，用了「时间+拥堵」双因子动态优先级。核心逻辑是这样的：</p>
+
+<pre><code>// 动态优先级计算
+float calc_dynamic_priority(Task* task, float congestion_factor) {
+    float base = task-&gt;base_priority;
+    float wait_bonus = task-&gt;wait_time * 0.1;  // 每等1秒加0.1
+    float congestion_penalty = congestion_factor * 0.5;  // 拥堵越严重，扣分越多
+    return base + wait_bonus - congestion_penalty;
+}</code></pre>
+
+<p>为什么会这样设计？因为单纯按等待时间提权，会导致所有车都往一个方向挤。加上拥堵惩罚后，系统会自动「绕路」——说白了，就是让车学会避高峰。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong>我曾经把动态优先级调得太灵敏，结果AGV频繁变道，反而增加了死锁概率。后来加了「最小变更间隔」——每台车5秒内只能改一次优先级，这才稳定下来。
+</div>
+
+<h3>16.3 死锁避免：优先级调度的「安全网」</h3>
+
+<p>优先级调度搞不好，就会死锁。什么叫死锁？就是两台车互相堵着，谁也别想走。我见过最夸张的一次，8台AGV在十字路口「打结」，整个仓库瘫痪了40分钟。</p>
+
+<p>死锁避免的核心思路就四个字：<strong>提前预防</strong>。别等死锁发生了再解，而是在分配资源（比如路口、充电桩）之前，先检查一下「如果给了，会不会死锁」。</p>
+
+<p>常用的方法是<strong>银行家算法</strong>的变体。简单说就是：</p>
+
+<ol>
+  <li>每台AGV申请资源时，先模拟分配</li>
+  <li>检查分配后系统是否处于「安全状态」</li>
+  <li>安全才给，不安全就排队等</li>
+</ol>
+
+<p>代码实现大概长这样：</p>
+
+<pre><code>// 死锁避免检查（简化版）
+bool is_safe_state(AGV* agvs, int count, Resource* res) {
+    // 模拟分配资源
+    Resource temp = *res;
+    for (int i = 0; i &lt; count; i++) {
+        if (agvs[i].request &lt;= temp.available) {
+            temp.available -= agvs[i].request;
+            temp.allocated[i] += agvs[i].request;
+        } else {
+            return false;  // 资源不够，不安全
+        }
+    }
+    return true;  // 所有AGV都能满足，安全
+}</code></pre>
+
+<p>嗯，这里要注意：银行家算法虽然理论完美，但实际项目中很少全量使用。为什么？因为计算量太大。仓库里几十台车，每台车申请资源都跑一遍模拟，调度周期会变长。</p>
+
+<div class="highlight">
+  <strong>我的做法：</strong>只在关键资源（比如单行道入口、充电桩）上做死锁避免检查。普通路口用「超时回退」——如果一台车在路口等超过10秒，自动倒车让路。简单，但有效。
+</div>
+
+<h3>16.4 三种方案的对比与选择</h3>
+
+<p>说了这么多，到底怎么选？我整理了一张表，方便你对照：</p>
+
+<table>
+  <tr>
+    <th>方案</th>
+    <th>优点</th>
+    <th>缺点</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>静态优先级</td>
+    <td>实现简单，性能高</td>
+    <td>不灵活，可能饿死</td>
+    <td>任务类型固定，业务稳定</td>
+  </tr>
+  <tr>
+    <td>动态优先级</td>
+    <td>适应性强，利用率高</td>
+    <td>参数调优复杂，可能震荡</td>
+    <td>业务波动大，多品种订单</td>
+  </tr>
+  <tr>
+    <td>死锁避免</td>
+    <td>安全性高，系统稳定</td>
+    <td>计算开销大，降低吞吐</td>
+    <td>高密度、高价值场景</td>
+  </tr>
+</table>
+
+<p>我个人习惯是：<strong>动态优先级 + 关键点死锁避免</strong>。说白了，用动态优先级保证效率，用死锁避免兜底。这样既不会太死板，也不会太冒险。</p>
+
+<p>最后说一句：优先级调度没有银弹。你想想看，每个仓库的布局、订单结构、AGV数量都不一样。最好的方案，永远是「试出来的」。我每次做新项目，都会先在仿真环境里跑三天，调参数调到吐——但值得。</p>
+
+<div class="tip">
+  <strong>一个小技巧：</strong>在调度日志里加上「优先级变更记录」。这样出了问题，你能回溯到「哪台车在什么时间因为什么原因改了优先级」。排查死锁时，这个日志比什么工具都好使。
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">基于优先级的调度核心逻辑</text>
+  
+  <!-- 三个主模块 -->
+  <!-- 静态优先级 -->
+  <rect x="50" y="80" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">静态优先级</text>
+  
+  <!-- 动态优先级 -->
+  <rect x="300" y="80" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态优先级</text>
+  
+  <!-- 死锁避免 -->
+  <rect x="550" y="80" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">死锁避免</text>
+  
+  <!-- 箭头：静态 -> 动态 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+  
+  <line x1="250" y1="110" x2="295" y2="110" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="500" y1="110" x2="545" y2="110" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 子特性 -->
+  <!-- 静态子项 -->
+  <rect x="50" y="170" width="200" height="40" rx="5" fill="#85c1e9"/>
+  <text x="150" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">固定等级，简单高效</text>
+  
+  <rect x="50" y="220" width="200" height="40" rx="5" fill="#85c1e9"/>
+  <text x="150" y="245" text-anchor="middle" font-size="13" fill="#2c3e50">可能优先级反转</text>
+  
+  <!-- 动态子项 -->
+  <rect x="300" y="170" width="200" height="40" rx="5" fill="#82e0aa"/>
+  <text x="400" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">时间衰减 + 拥堵反馈</text>
+  
+  <rect x="300" y="220" width="200" height="40" rx="5" fill="#82e0aa"/>
+  <text x="400" y="245" text-anchor="middle" font-size="13" fill="#2c3e50">参数调优复杂</text>
+  
+  <!-- 死锁子项 -->
+  <rect x="550" y="170" width="200" height="40" rx="5" fill="#f1948a"/>
+  <text x="650" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">银行家算法变体</text>
+  
+  <rect x="550" y="220" width="200" height="40" rx="5" fill="#f1948a"/>
+  <text x="650" y="245" text-anchor="middle" font-size="13" fill="#2c3e50">计算开销大</text>
+  
+  <!-- 底部推荐方案 -->
+  <rect x="150" y="300" width="500" height="60" rx="10" fill="#f39c12" opacity="0.85"/>
+  <text x="400" y="325" text-anchor="middle" font-size="16" fill="white" font-weight="bold">推荐方案：动态优先级 + 关键点死锁避免</text>
+  <text x="400" y="345" text-anchor="middle" font-size="12" fill="white">效率与安全兼顾，适合大多数仓储场景</text>
+  
+  <!-- 连接线到推荐 -->
+  <line x1="150" y1="260" x2="250" y2="300" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="400" y1="260" x2="400" y2="295" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="650" y1="260" x2="550" y2="300" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+</svg>
+
+        <div class="footer-nav">
+            <a href="15TrafficControlStrategy.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17CentralizedPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

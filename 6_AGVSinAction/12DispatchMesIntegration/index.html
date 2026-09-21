@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV调度系统与MES对接实战 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 0.8rem;
+            font-size: 0.95rem;
+            color: #2c5f2d;
+            background: #e9f5e9;
+            display: inline-block;
+            padding: 0.3rem 2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV调度系统与MES对接实战</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01AgvMesOverview.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">AGV与MES概述</div>
+            <div class="chapter-desc">AGV系统架构、MES系统功能、两者集成价值与典型应用场景。</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">集成</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02CommProtocolBasics.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">通信协议基础</div>
+            <div class="chapter-desc">HTTP/HTTPS、WebSocket、MQTT、Socket在AGV与MES中的应用对比。</div>
+            <div class="card-tags"><span class="tag">协议</span><span class="tag">对比</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03InterfaceSpecDesign.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">接口规范设计</div>
+            <div class="chapter-desc">RESTful API设计原则、接口文档编写（Swagger/OpenAPI）、版本管理策略。</div>
+            <div class="card-tags"><span class="tag">API</span><span class="tag">Swagger</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04DataModelDefine.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">数据模型定义</div>
+            <div class="chapter-desc">任务订单模型、AGV状态模型、位置坐标模型、异常事件模型。</div>
+            <div class="card-tags"><span class="tag">建模</span><span class="tag">状态</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05MesTaskDispatch.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">MES下发任务</div>
+            <div class="chapter-desc">任务创建接口、任务优先级管理、任务拆分与合并逻辑、任务取消与重发机制。</div>
+            <div class="card-tags"><span class="tag">任务</span><span class="tag">优先级</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06AgvStatusReport.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">AGV状态上报</div>
+            <div class="chapter-desc">心跳机制、位置上报、电量上报、任务状态变更上报、异常报警上报。</div>
+            <div class="card-tags"><span class="tag">心跳</span><span class="tag">报警</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07TaskDispatchStrategy.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">任务调度策略</div>
+            <div class="chapter-desc">最短路径优先、最早截止时间优先、动态优先级调度、多AGV协同调度。</div>
+            <div class="card-tags"><span class="tag">调度</span><span class="tag">协同</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08PathPlanningNav.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">路径规划与导航</div>
+            <div class="chapter-desc">拓扑地图构建、A*算法应用、交通管制、死锁检测与解除。</div>
+            <div class="card-tags"><span class="tag">A*</span><span class="tag">死锁</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09ExceptionHandling.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">异常处理机制</div>
+            <div class="chapter-desc">AGV离线处理、任务超时处理、路径阻塞处理、电量不足自动充电。</div>
+            <div class="card-tags"><span class="tag">容错</span><span class="tag">充电</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10MessageQueue.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">消息队列集成</div>
+            <div class="chapter-desc">RabbitMQ/Kafka在AGV-MES中的应用、消息持久化、消息去重、消息顺序保证。</div>
+            <div class="card-tags"><span class="tag">MQ</span><span class="tag">Kafka</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11DatabaseDesign.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">数据库设计</div>
+            <div class="chapter-desc">MySQL/PostgreSQL表结构设计、Redis缓存应用、时序数据库（InfluxDB）存储AGV轨迹。</div>
+            <div class="card-tags"><span class="tag">SQL</span><span class="tag">Redis</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12LogAndMonitor.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">日志与监控</div>
+            <div class="chapter-desc">ELK日志收集、Prometheus+Grafana监控、告警规则配置、日志级别管理。</div>
+            <div class="card-tags"><span class="tag">监控</span><span class="tag">ELK</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13SecurityMechanism.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">安全机制</div>
+            <div class="chapter-desc">接口鉴权（JWT/OAuth2）、数据加密传输（HTTPS/TLS）、访问控制列表（ACL）、防重放攻击。</div>
+            <div class="card-tags"><span class="tag">JWT</span><span class="tag">TLS</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14MultiAgvCooperation.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">多AGV协同</div>
+            <div class="chapter-desc">任务分配算法、避碰策略、交通管制规则、充电站管理。</div>
+            <div class="card-tags"><span class="tag">协同</span><span class="tag">避碰</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15MesWmsLinkage.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">MES与WMS联动</div>
+            <div class="chapter-desc">入库任务流程、出库任务流程、盘点任务流程、库位管理对接。</div>
+            <div class="card-tags"><span class="tag">WMS</span><span class="tag">库位</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16DeployAndOps.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">系统部署与运维</div>
+            <div class="chapter-desc">Docker容器化部署、Kubernetes编排、CI/CD流水线、灰度发布策略。</div>
+            <div class="card-tags"><span class="tag">Docker</span><span class="tag">K8s</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17PerformanceOptimization.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">性能优化</div>
+            <div class="chapter-desc">接口响应优化、数据库查询优化、消息队列吞吐优化、AGV调度算法优化。</div>
+            <div class="card-tags"><span class="tag">优化</span><span class="tag">吞吐</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18TestStrategy.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">测试策略</div>
+            <div class="chapter-desc">单元测试、集成测试、压力测试、混沌工程、模拟器测试。</div>
+            <div class="card-tags"><span class="tag">测试</span><span class="tag">混沌</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19DataSync.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">数据同步机制</div>
+            <div class="chapter-desc">实时同步与批量同步、增量同步策略、数据一致性保证、冲突解决。</div>
+            <div class="card-tags"><span class="tag">同步</span><span class="tag">一致性</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20VersionCompatibility.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">版本升级与兼容</div>
+            <div class="chapter-desc">接口版本兼容策略、数据迁移方案、灰度升级、回滚机制。</div>
+            <div class="card-tags"><span class="tag">版本</span><span class="tag">回滚</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21AutoPlantMesCase.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">行业案例1：汽车制造</div>
+            <div class="chapter-desc">冲压、焊装、涂装、总装车间AGV与MES集成实战。</div>
+            <div class="card-tags"><span class="tag">汽车</span><span class="tag">总装</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22EcommerceWmsCase.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">行业案例2：电商仓储</div>
+            <div class="chapter-desc">拣选、补货、退货、盘点AGV与MES/WMS集成实战。</div>
+            <div class="card-tags"><span class="tag">电商</span><span class="tag">仓储</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23SemiconductorMesCase.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">行业案例3：半导体工厂</div>
+            <div class="chapter-desc">晶圆搬运、光刻、检测、封装AGV与MES集成实战。</div>
+            <div class="card-tags"><span class="tag">半导体</span><span class="tag">晶圆</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24PharmaGmpMesCase.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">行业案例4：医药行业</div>
+            <div class="chapter-desc">GMP合规、批次追溯、温控运输AGV与MES集成实战。</div>
+            <div class="card-tags"><span class="tag">医药</span><span class="tag">GMP</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25PortTosMesCase.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">行业案例5：港口码头</div>
+            <div class="chapter-desc">集装箱搬运、堆场管理、船舶配载AGV与TOS/MES集成实战。</div>
+            <div class="card-tags"><span class="tag">港口</span><span class="tag">TOS</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26SecondaryDevExtend.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">二次开发与扩展</div>
+            <div class="chapter-desc">插件化架构设计、自定义任务类型、自定义报表、自定义告警规则。</div>
+            <div class="card-tags"><span class="tag">插件</span><span class="tag">扩展</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27SimulatorDev.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">模拟器开发</div>
+            <div class="chapter-desc">AGV模拟器、MES模拟器、场景模拟器、压力测试模拟器。</div>
+            <div class="card-tags"><span class="tag">模拟</span><span class="tag">测试</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28ProjectManagement.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">项目管理与实施</div>
+            <div class="chapter-desc">需求分析、方案设计、开发测试、上线部署、验收交付全流程。</div>
+            <div class="card-tags"><span class="tag">项目</span><span class="tag">交付</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29TroubleshootingOps.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">故障排查与运维</div>
+            <div class="chapter-desc">常见问题排查手册、日志分析技巧、性能瓶颈定位、应急响应流程。</div>
+            <div class="card-tags"><span class="tag">运维</span><span class="tag">排查</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30FutureTrendsOutlook.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">未来趋势与展望</div>
+            <div class="chapter-desc">5G+AGV、AI调度算法、数字孪生、边缘计算、云原生架构演进。</div>
+            <div class="card-tags"><span class="tag">5G</span><span class="tag">数字孪生</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 控制与跟踪</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="active">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 控制与跟踪——纯追踪算法、Stanley算法、MPC控制</h2>
+
+<p>各位好，今天我们聊点硬核的。地图建好了，定位也准了，接下来干什么？当然是让车动起来，并且沿着我们规划的路径走。</p>
+
+<p>说白了，控制与跟踪就是解决一个问题：<strong>“车该怎么打方向盘，才能稳稳地跟上目标路径？”</strong></p>
+
+<p>我这些年调试AGV，最头疼的往往不是建图，而是控制。明明路径规划得好好的，车一跑起来就歪了，要么震荡，要么干脆冲出去。嗯，这里面的门道，我们今天一次讲透。</p>
+
+<p>这节课我们重点讲三种经典方法：<strong>纯追踪（Pure Pursuit）、Stanley算法、以及MPC（模型预测控制）</strong>。它们各有脾气，适用场景也不同。</p>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="320" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f9fafb; border-radius:12px;">
+  <rect x="10" y="10" width="780" height="300" fill="none" stroke="#4a90d9" stroke-width="2" rx="10"/>
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">控制与跟踪算法知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV路径跟踪</text>
+  
+  <!-- 三个分支 -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#e67e22" stroke-width="2"/>
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#27ae60" stroke-width="2"/>
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#8e44ad" stroke-width="2"/>
+  
+  <!-- 纯追踪 -->
+  <rect x="60" y="180" width="180" height="50" rx="8" fill="#fdf2e9" stroke="#e67e22" stroke-width="2"/>
+  <text x="150" y="210" text-anchor="middle" font-size="15" fill="#d35400" font-weight="bold">纯追踪算法</text>
+  
+  <!-- Stanley -->
+  <rect x="310" y="180" width="180" height="50" rx="8" fill="#e8f8f5" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="210" text-anchor="middle" font-size="15" fill="#1e8449" font-weight="bold">Stanley算法</text>
+  
+  <!-- MPC -->
+  <rect x="560" y="180" width="180" height="50" rx="8" fill="#f4ecf7" stroke="#8e44ad" stroke-width="2"/>
+  <text x="650" y="210" text-anchor="middle" font-size="15" fill="#6c3483" font-weight="bold">MPC控制</text>
+  
+  <!-- 特性标签 -->
+  <text x="150" y="250" text-anchor="middle" font-size="12" fill="#7f8c8d">几何法 · 前视距离</text>
+  <text x="400" y="250" text-anchor="middle" font-size="12" fill="#7f8c8d">基于前轮偏差 · 非线性能控</text>
+  <text x="650" y="250" text-anchor="middle" font-size="12" fill="#7f8c8d">模型预测 · 带约束优化</text>
+  
+  <text x="150" y="275" text-anchor="middle" font-size="11" fill="#bdc3c7">适用：低速、简单路径</text>
+  <text x="400" y="275" text-anchor="middle" font-size="11" fill="#bdc3c7">适用：中低速、平滑路径</text>
+  <text x="650" y="275" text-anchor="middle" font-size="11" fill="#bdc3c7">适用：高速、复杂约束</text>
+</svg>
+
+<h3>一、纯追踪算法——最直观的几何法</h3>
+
+<p>纯追踪算法，名字听着玄乎，其实原理特别简单。你想象一下：<strong>在目标路径上选一个前方的点，然后控制车头一直对准那个点开过去</strong>。就像你走路时盯着前方某个目标，自然就走过去了。</p>
+
+<p>它的核心公式是这样的：</p>
+
+<pre><code>// 纯追踪算法核心——计算前轮转角
+double computeSteerAngle(double L, double ld, double alpha) {
+    // L: 轴距
+    // ld: 前视距离（look-ahead distance）
+    // alpha: 车头方向与目标点的夹角
+    double delta = atan2(2.0 * L * sin(alpha), ld);
+    return delta;
+}</code></pre>
+
+<p>这里有个关键参数——<strong>前视距离 ld</strong>。我刚开始调这个参数时，踩过不少坑。ld 设得太小，车会左右震荡，像喝醉了酒；ld 设得太大，车又切弯太狠，走内线。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>前视距离一般取车速的 0.5~2 倍。低速时（0.5m/s），ld 取 0.5~1m；高速时（2m/s），ld 取 2~4m。你可以根据路径曲率动态调整——弯道小一点，直道大一点。
+</div>
+
+<p>纯追踪的优点很明显：实现简单，计算量小，适合低速AGV。缺点呢？它对路径曲率变化敏感，而且前视距离的整定比较依赖经验。</p>
+
+<h3>二、Stanley算法——基于前轮偏差的反馈控制</h3>
+
+<p>Stanley 算法是斯坦福大学参加 DARPA 挑战赛时用的方法。我个人觉得，它比纯追踪更「聪明」一点。</p>
+
+<p>Stanley 的核心思想是：<strong>同时考虑横向偏差和航向偏差</strong>。说白了，就是车不仅要看前方，还要看自己当前偏离了路径多少。</p>
+
+<pre><code>// Stanley 算法核心
+double stanleyControl(double crossTrackError, double headingError, double k, double v) {
+    // crossTrackError: 横向偏差（车到路径的垂直距离）
+    // headingError: 航向偏差（车头方向与路径切线方向的夹角）
+    // k: 增益系数
+    // v: 当前车速
+    double delta = headingError + atan2(k * crossTrackError, v);
+    // 限幅处理
+    return clamp(delta, -MAX_STEER_ANGLE, MAX_STEER_ANGLE);
+}</code></pre>
+
+<p>这里有个细节：<code>atan2(k * crossTrackError, v)</code> 这一项，车速 v 在分母上。这意味着车速越快，横向偏差的修正作用越小——这其实符合直觉：高速时猛打方向容易翻车。</p>
+
+<div class="highlight">
+  <strong>关键区别：</strong>纯追踪是「看前方一点追过去」，Stanley 是「看当前偏差和前方方向一起修正」。Stanley 的收敛性更好，尤其在路径曲率连续变化时。
+</div>
+
+<p>我曾经在一个仓库项目里，用 Stanley 算法跑 1.5m/s 的 AGV，路径跟踪误差能控制在 ±5cm 以内。纯追踪在同条件下，误差大概在 ±10cm。差距还是挺明显的。</p>
+
+<div class="warning">
+  <strong>注意：</strong>Stanley 算法假设车辆是前轮转向模型（阿克曼转向）。如果你的 AGV 是差速驱动（两轮独立驱动），需要先做运动学转换。我见过有人直接把差速车的线速度差当成前轮转角往里套，结果车原地打转——千万别这么干。
+</div>
+
+<h3>三、MPC控制——带约束的「预言家」</h3>
+
+<p>MPC（模型预测控制）是这三者里最复杂、也最强大的。它的思路是：<strong>每走一步，都往前预测几步，然后选一条最优的轨迹走</strong>。</p>
+
+<p>打个比方：纯追踪是「看着前方10米的目标点走」，Stanley 是「看着脚下和前方10米走」，而 MPC 是「看着前方50米的整段路，还要考虑油门、刹车、转向极限，然后决定怎么走」。</p>
+
+<p>MPC 的核心步骤：</p>
+
+<ol>
+  <li><strong>建立车辆模型</strong>——通常是运动学或动力学模型</li>
+  <li><strong>设定预测时域 N</strong>——比如往前预测 20 步</li>
+  <li><strong>构建代价函数</strong>——包括跟踪误差、控制量大小、控制量变化率</li>
+  <li><strong>施加约束</strong>——最大转向角、最大加速度、障碍物距离等</li>
+  <li><strong>在线求解优化问题</strong>——得到最优控制序列，只执行第一步</li>
+</ol>
+
+<pre><code>// MPC 代价函数示例（简化）
+// J = sum_{k=0}^{N-1} ( w_e * error(k)^2 + w_u * u(k)^2 + w_du * du(k)^2 )
+// 约束: |delta| &lt;= 30°, |a| &lt;= 1.0 m/s^2</code></pre>
+
+<p>MPC 最大的优势是<strong>能处理约束</strong>。比如你的 AGV 在狭窄通道里，既要跟踪路径，又不能撞墙，MPC 可以同时考虑这些约束，给出一个安全可行的控制量。</p>
+
+<p>但代价也很明显——计算量大。我早期在嵌入式板子上跑 MPC，一个控制周期 100ms，优化求解就要花 80ms，差点把 CPU 跑满。后来换了更高效的求解器，才降到 20ms 以内。</p>
+
+<div class="tip">
+  <strong>实用建议：</strong>如果你的 AGV 速度低于 1m/s，路径简单，用纯追踪就够了。速度 1~2m/s，路径有弯道，用 Stanley。速度 2m/s 以上，或者有严格的安全约束（比如人车混行），上 MPC。
+</div>
+
+<h3>三种算法对比</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>特性</th>
+      <th>纯追踪</th>
+      <th>Stanley</th>
+      <th>MPC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>原理类型</td>
+      <td>几何法</td>
+      <td>反馈控制</td>
+      <td>优化控制</td>
+    </tr>
+    <tr>
+      <td>计算复杂度</td>
+      <td>低</td>
+      <td>低</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>约束处理</td>
+      <td>不支持</td>
+      <td>不支持</td>
+      <td>原生支持</td>
+    </tr>
+    <tr>
+      <td>跟踪精度</td>
+      <td>中等</td>
+      <td>良好</td>
+      <td>优秀</td>
+    </tr>
+    <tr>
+      <td>参数整定难度</td>
+      <td>中等（前视距离）</td>
+      <td>简单（增益k）</td>
+      <td>复杂（权重+时域）</td>
+    </tr>
+    <tr>
+      <td>适用车速</td>
+      <td>低速（&lt;1m/s）</td>
+      <td>中低速（&lt;2m/s）</td>
+      <td>全速域</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>最后说一句实在的：<strong>没有最好的算法，只有最合适的算法</strong>。我见过有人用纯追踪在工厂里跑得好好的，也见过有人用 MPC 调了三个月还没上路。关键是根据你的 AGV 车型、运行速度、环境约束来选。</p>
+
+<p>嗯，控制与跟踪这块，今天就先聊到这儿。下次你们调试 AGV 时，如果发现车在画龙，不妨试试调整前视距离或者增益系数——有时候问题没那么复杂。</p>
+
+<div class="footer-nav">
+            <a href="22DynamicEnvPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24RosNavStack.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

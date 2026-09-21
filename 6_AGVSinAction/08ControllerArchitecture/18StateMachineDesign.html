@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 AGV控制器的状态机设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="active">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 AGV控制器的状态机设计：空闲态、运行态、充电态、异常态、状态转换条件与动作</h2>
+
+<p>状态机这东西，说白了就是AGV的“大脑决策器”。</p>
+<p>我刚开始做AGV那会儿，总觉得状态机不就是几个if-else嘛，有啥好设计的？结果第一次上路测试，车子在充电桩前反复横跳，差点把电池搞废了。嗯，从那以后我再也不敢小看状态机了。</p>
+<p>今天咱们就聊聊AGV控制器的核心——状态机。我习惯把AGV的状态归纳为四大类：<strong>空闲态、运行态、充电态、异常态</strong>。你想想看，AGV一辈子就在这几个状态里转悠，设计得好，它就是个靠谱的搬运工；设计得烂，它就是台“神经病”机器。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>状态机不是简单的状态罗列，而是状态之间的“交通规则”。规则定好了，AGV才不会乱跑、乱充、乱报错。</p>
+</div>
+
+<h3>18.1 四大核心状态定义</h3>
+
+<p>先给这四个状态画个像，咱们心里有个底。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>状态名称</th>
+      <th>状态标识</th>
+      <th>典型场景</th>
+      <th>核心特征</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>空闲态</td>
+      <td>IDLE</td>
+      <td>待命、等待任务</td>
+      <td>电机抱闸、通信待机、低功耗</td>
+    </tr>
+    <tr>
+      <td>运行态</td>
+      <td>RUNNING</td>
+      <td>执行导航、搬运任务</td>
+      <td>电机运转、传感器全开、实时控制</td>
+    </tr>
+    <tr>
+      <td>充电态</td>
+      <td>CHARGING</td>
+      <td>自动回充、手动充电</td>
+      <td>电池管理、充电接触器闭合、限流</td>
+    </tr>
+    <tr>
+      <td>异常态</td>
+      <td>ERROR</td>
+      <td>故障、急停、保护</td>
+      <td>停止运动、上报故障、等待恢复</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我在项目中遇到过一种情况：某款AGV在低电量时直接进入异常态，结果卡在通道中间，后面的车全堵死了。后来我改成先尝试进入充电态，实在充不上才报异常。你看，状态顺序也很重要。</p>
+
+<h3>18.2 状态转换条件与动作</h3>
+
+<p>状态转换，说白了就是“什么情况下，AGV该干什么事”。我习惯用一张图把逻辑理清楚，然后再写代码。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 空闲态 -->
+  <rect x="50" y="180" width="140" height="60" rx="10" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="120" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="#1976d2">空闲态</text>
+  
+  <!-- 运行态 -->
+  <rect x="330" y="50" width="140" height="60" rx="10" fill="#e8f5e9" stroke="#388e3c" stroke-width="2"/>
+  <text x="400" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#388e3c">运行态</text>
+  
+  <!-- 充电态 -->
+  <rect x="330" y="320" width="140" height="60" rx="10" fill="#fff3e0" stroke="#f57c00" stroke-width="2"/>
+  <text x="400" y="355" text-anchor="middle" font-size="16" font-weight="bold" fill="#f57c00">充电态</text>
+  
+  <!-- 异常态 -->
+  <rect x="600" y="180" width="140" height="60" rx="10" fill="#ffebee" stroke="#d32f2f" stroke-width="2"/>
+  <text x="670" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="#d32f2f">异常态</text>
+  
+  <!-- 箭头：空闲 -> 运行 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1976d2"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#388e3c"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f57c00"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d32f2f"/>
+    </marker>
+  </defs>
+  
+  <!-- 空闲 -> 运行 -->
+  <line x1="190" y1="200" x2="330" y2="110" stroke="#1976d2" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="240" y="140" font-size="12" fill="#1976d2">收到任务</text>
+  
+  <!-- 运行 -> 空闲 -->
+  <line x1="330" y1="90" x2="190" y2="190" stroke="#388e3c" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="230" y="170" font-size="12" fill="#388e3c">任务完成</text>
+  
+  <!-- 空闲 -> 充电 -->
+  <line x1="120" y1="240" x2="350" y2="340" stroke="#f57c00" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  <text x="200" y="300" font-size="12" fill="#f57c00">低电量/手动指令</text>
+  
+  <!-- 充电 -> 空闲 -->
+  <line x1="400" y1="320" x2="190" y2="240" stroke="#388e3c" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <text x="260" y="270" font-size="12" fill="#388e3c">充满/停止充电</text>
+  
+  <!-- 运行 -> 异常 -->
+  <line x1="470" y1="80" x2="600" y2="190" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="540" y="120" font-size="12" fill="#d32f2f">故障/急停</text>
+  
+  <!-- 充电 -> 异常 -->
+  <line x1="470" y1="350" x2="600" y2="230" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="550" y="300" font-size="12" fill="#d32f2f">充电故障</text>
+  
+  <!-- 空闲 -> 异常 -->
+  <line x1="190" y1="210" x2="600" y2="200" stroke="#d32f2f" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="390" y="195" font-size="12" fill="#d32f2f">系统自检失败</text>
+  
+  <!-- 异常 -> 空闲 -->
+  <line x1="600" y1="240" x2="190" y2="220" stroke="#388e3c" stroke-width="2" marker-end="url(#arrowGreen)" stroke-dasharray="5,5"/>
+  <text x="390" y="250" font-size="12" fill="#388e3c">故障恢复/手动复位</text>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">AGV状态机转换图</text>
+</svg>
+
+<p>这张图我画了好几个版本才定下来。你看，异常态可以回到空闲态，但绝对不能直接回到运行态。为什么？因为故障恢复后必须重新确认安全，这是底线。</p>
+
+<h3>18.3 状态转换条件详解</h3>
+
+<p>咱们把每个转换条件拆开揉碎了讲。我习惯用表格来整理，这样写代码时直接对着抄就行。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>源状态</th>
+      <th>目标状态</th>
+      <th>转换条件</th>
+      <th>转换动作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>空闲态</td>
+      <td>运行态</td>
+      <td>收到调度任务 &amp; 电量充足 &amp; 无故障</td>
+      <td>唤醒电机、加载路径、开启传感器</td>
+    </tr>
+    <tr>
+      <td>运行态</td>
+      <td>空闲态</td>
+      <td>任务完成 &amp; 到达目标点</td>
+      <td>停止电机、释放路径、进入低功耗</td>
+    </tr>
+    <tr>
+      <td>空闲态</td>
+      <td>充电态</td>
+      <td>电量低于阈值(如20%) 或 收到充电指令</td>
+      <td>导航至充电桩、对接充电触点</td>
+    </tr>
+    <tr>
+      <td>充电态</td>
+      <td>空闲态</td>
+      <td>电量充满(如95%) 或 收到停止充电指令</td>
+      <td>断开充电接触器、退出充电模式</td>
+    </tr>
+    <tr>
+      <td>任意态</td>
+      <td>异常态</td>
+      <td>急停按下、碰撞检测、电机过流、通信超时等</td>
+      <td>紧急制动、记录故障码、上报调度</td>
+    </tr>
+    <tr>
+      <td>异常态</td>
+      <td>空闲态</td>
+      <td>故障排除 &amp; 手动复位 &amp; 自检通过</td>
+      <td>清除故障码、恢复默认参数</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在异常态转换时忘记做“自检通过”这个条件，结果操作员一按复位，AGV直接冲出去撞墙了。从那以后，我规定异常态恢复必须经过完整的自检流程，少一步都不行。</p>
+</div>
+
+<h3>18.4 状态机代码实现框架</h3>
+
+<p>理论讲完了，咱们看看代码怎么写。我习惯用枚举+状态表的方式，清晰又好维护。</p>
+
+<pre><code>// 状态枚举定义
+typedef enum {
+    STATE_IDLE     = 0,
+    STATE_RUNNING  = 1,
+    STATE_CHARGING = 2,
+    STATE_ERROR    = 3
+} agv_state_t;
+
+// 状态转换表结构
+typedef struct {
+    agv_state_t  src_state;
+    agv_state_t  dst_state;
+    uint8_t      (*condition)(void);  // 条件函数指针
+    void         (*action)(void);     // 动作函数指针
+} state_transition_t;
+
+// 转换表实例
+state_transition_t g_trans_table[] = {
+    {STATE_IDLE,    STATE_RUNNING,  is_task_ready,     action_start_task},
+    {STATE_RUNNING, STATE_IDLE,    is_task_done,      action_stop_task},
+    {STATE_IDLE,    STATE_CHARGING, is_battery_low,   action_goto_charge},
+    {STATE_CHARGING, STATE_IDLE,   is_battery_full,   action_stop_charge},
+    {STATE_ANY,     STATE_ERROR,   is_fault_detected, action_emergency_stop},
+    {STATE_ERROR,   STATE_IDLE,    is_fault_cleared,  action_reset_system}
+};
+
+// 状态机主循环
+void agv_state_machine_run(void) {
+    for (int i = 0; i &lt; sizeof(g_trans_table)/sizeof(g_trans_table[0]); i++) {
+        state_transition_t *t = &amp;g_trans_table[i];
+        if (current_state == t-&gt;src_state || t-&gt;src_state == STATE_ANY) {
+            if (t-&gt;condition()) {
+                t-&gt;action();
+                current_state = t-&gt;dst_state;
+                printf("状态转换: %d -&gt; %d\n", t-&gt;src_state, t-&gt;dst_state);
+                break;
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>这段代码我用了好多年，核心思想就一个：<strong>把状态转换逻辑和数据分离</strong>。你想想看，如果以后要加一个新状态，比如“待充电态”，只需要在转换表里加一行，主循环完全不用动。</p>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>我建议把条件函数和动作函数都做成弱耦合的模块。比如条件函数只返回true/false，动作函数只执行具体操作。这样调试的时候，你可以单独测试每个条件，不用跑整个状态机。</p>
+</div>
+
+<h3>18.5 状态机设计中的常见陷阱</h3>
+
+<p>做状态机设计，有几个坑我踩过，你们注意避开。</p>
+
+<ul>
+  <li><strong>状态爆炸：</strong>别把每个子动作都搞成一个状态。比如“左转”、“右转”这些，应该归到运行态下的子状态，而不是顶层状态。</li>
+  <li><strong>转换死锁：</strong>两个状态互相转换，比如空闲->充电->空闲->充电，循环不停。我一般会加一个“转换次数计数器”，超过阈值就强制进异常态。</li>
+  <li><strong>遗漏异常处理：</strong>每个状态都要考虑“如果这时候出故障怎么办”。比如充电态时通信断了，是继续充还是报异常？我建议直接报异常，安全第一。</li>
+  <li><strong>状态持久化：</strong>AGV断电重启后，状态应该恢复成空闲态，而不是记住断电前的状态。我曾经遇到过重启后直接进入运行态，结果车子自己跑了的尴尬事。</li>
+</ul>
+
+<p>嗯，状态机设计就聊到这儿。说白了，状态机就是AGV的“行为准则”，定好了规矩，车子才能乖乖听话。你们在实际项目中，一定要把状态转换条件想清楚，尤其是异常处理路径，宁可多写几个条件，也别漏掉。</p>
+
+        <div class="footer-nav">
+            <a href="17Ros2AgvIntegration.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19CodeSpecUnitTest.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

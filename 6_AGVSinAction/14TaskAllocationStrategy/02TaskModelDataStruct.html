@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 任务建模与数据结构</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="active">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 任务建模与数据结构</h2>
+
+<p>大家好，我是老张。在AGV调度系统里摸爬滚打了十几年，今天咱们聊聊任务建模这件事。</p>
+
+<p>很多人觉得任务建模不就是定义几个字段吗？起点、终点、优先级，完事。其实没那么简单。我见过太多项目，前期任务模型没设计好，后期改得想哭。今天我把这些年踩过的坑、总结的经验，一次性讲清楚。</p>
+
+<h3>1.1 任务属性定义</h3>
+
+<p>一个任务，说白了就是告诉AGV「去干什么」。但怎么描述这个「干什么」，学问大了。</p>
+
+<h4>1.1.1 核心属性</h4>
+
+<p>我个人习惯把任务属性分成三类：<strong>定位属性</strong>、<strong>约束属性</strong>、<strong>状态属性</strong>。</p>
+
+<table>
+  <tr>
+    <th>属性类别</th>
+    <th>属性名称</th>
+    <th>说明</th>
+    <th>示例</th>
+  </tr>
+  <tr>
+    <td>定位属性</td>
+    <td>起点</td>
+    <td>任务起始位置</td>
+    <td>W01-入库口</td>
+  </tr>
+  <tr>
+    <td>定位属性</td>
+    <td>终点</td>
+    <td>任务目标位置</td>
+    <td>R05-货架位</td>
+  </tr>
+  <tr>
+    <td>约束属性</td>
+    <td>优先级</td>
+    <td>任务紧急程度</td>
+    <td>1（最高）~ 5（最低）</td>
+  </tr>
+  <tr>
+    <td>约束属性</td>
+    <td>时间窗</td>
+    <td>允许执行的时间范围</td>
+    <td>09:00 - 09:30</td>
+  </tr>
+  <tr>
+    <td>状态属性</td>
+    <td>任务状态</td>
+    <td>当前所处阶段</td>
+    <td>待分配、执行中、已完成</td>
+  </tr>
+</table>
+
+<p>这里我要特别强调一下<strong>时间窗</strong>。很多新手会忽略这个字段，觉得「任务来了就干呗」。但实际场景中，时间窗太重要了。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>时间窗是任务调度的「硬约束」。AGV必须在规定时间内到达指定位置，否则整个生产节拍都会被打乱。</p>
+</div>
+
+<p>我曾经在一个汽车零部件工厂做项目，客户说「任务没有时间要求」。结果上线后，AGV把物料送到工位时，工人已经下班了。后来我们加了时间窗属性，问题才解决。</p>
+
+<h4>1.1.2 扩展属性</h4>
+
+<p>除了上面这些，实际项目中我还会加几个扩展属性：</p>
+
+<ul>
+  <li><strong>任务类型</strong>：搬运、充电、待命、维修等</li>
+  <li><strong>负载信息</strong>：空载、满载、负载重量</li>
+  <li><strong>关联任务ID</strong>：用于任务链、任务依赖</li>
+  <li><strong>超时策略</strong>：超时后重试、取消、降级</li>
+</ul>
+
+<p>你想想看，如果没有「关联任务ID」，你怎么实现「先取A再送B」这种复合任务？</p>
+
+<h3>1.2 任务状态机</h3>
+
+<p>任务不是一成不变的。它会经历各种状态转换。我习惯用状态机来管理。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>状态机设计得好，代码逻辑会非常清晰。我见过有人用if-else写状态流转，那叫一个乱。</p>
+</div>
+
+<h4>1.2.1 标准状态定义</h4>
+
+<p>这是我常用的状态定义：</p>
+
+<pre><code>// 任务状态枚举
+enum TaskState {
+    PENDING,      // 待分配
+    ASSIGNED,     // 已分配
+    ACCEPTED,     // 已接受
+    EXECUTING,    // 执行中
+    COMPLETED,    // 已完成
+    FAILED,       // 失败
+    CANCELLED     // 已取消
+}</code></pre>
+
+<h4>1.2.2 状态转换规则</h4>
+
+<p>状态转换不是随便跳的。我总结了几条铁律：</p>
+
+<ul>
+  <li><strong>PENDING → ASSIGNED</strong>：调度器分配了AGV</li>
+  <li><strong>ASSIGNED → ACCEPTED</strong>：AGV确认接收任务</li>
+  <li><strong>ACCEPTED → EXECUTING</strong>：AGV开始移动</li>
+  <li><strong>EXECUTING → COMPLETED</strong>：任务正常结束</li>
+  <li><strong>任何状态 → FAILED</strong>：出现异常（AGV故障、路径阻塞等）</li>
+  <li><strong>PENDING/ASSIGNED → CANCELLED</strong>：人工取消或超时取消</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>千万不要让状态随意跳转。比如从「已完成」跳回「执行中」，这会导致数据混乱。我见过有人这么干，结果报表全错了。</p>
+</div>
+
+<p>嗯，这里要注意一点：状态机要支持<strong>回滚</strong>。比如AGV走到一半发现路堵了，任务状态要从「执行中」回退到「待分配」。这个逻辑很多新手会漏掉。</p>
+
+<h3>1.3 任务队列设计</h3>
+
+<p>任务队列是调度系统的「心脏」。所有任务都在这里排队，等待被分配。</p>
+
+<h4>1.3.1 队列结构</h4>
+
+<p>我一般用<strong>优先级队列</strong> + <strong>时间窗队列</strong>的组合：</p>
+
+<pre><code>// 任务队列数据结构
+class TaskQueue {
+    // 按优先级排序的队列
+    PriorityQueue&lt;Task&gt; priorityQueue;
+    
+    // 按时间窗排序的队列
+    PriorityQueue&lt;Task&gt; timeWindowQueue;
+    
+    // 所有任务的索引
+    HashMap&lt;String, Task&gt; taskIndex;
+}</code></pre>
+
+<p>为什么要两个队列？因为调度策略不同。紧急任务看优先级，定时任务看时间窗。</p>
+
+<h4>1.3.2 队列调度策略</h4>
+
+<p>我常用的策略有三种：</p>
+
+<ol>
+  <li><strong>优先级优先</strong>：高优先级任务先分配。适合紧急插单场景。</li>
+  <li><strong>时间窗优先</strong>：时间窗最早的任务先分配。适合准时制生产。</li>
+  <li><strong>混合策略</strong>：先按优先级分组，组内按时间窗排序。这是我最常用的。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>实战经验：</strong>混合策略有个坑——优先级高的任务可能会一直插队，导致低优先级任务永远得不到执行。我一般会加一个「最大等待时间」，超过这个时间的任务自动提升优先级。</p>
+</div>
+
+<h4>1.3.3 队列监控</h4>
+
+<p>队列不能只进不出。我习惯加几个监控指标：</p>
+
+<ul>
+  <li><strong>队列深度</strong>：当前排队任务数</li>
+  <li><strong>平均等待时间</strong>：任务从入队到出队的平均时间</li>
+  <li><strong>超时任务数</strong>：超过时间窗仍未分配的任务数</li>
+  <li><strong>任务完成率</strong>：已完成任务 / 总任务数</li>
+</ul>
+
+<p>这些指标能帮你快速发现系统瓶颈。比如队列深度突然增大，说明AGV不够用了。</p>
+
+<h3>1.4 知识体系总览</h3>
+
+<p>说了这么多，我画了一张图帮你理清思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">任务建模与数据结构知识体系</text>
+  
+  <!-- 三个核心模块 -->
+  <!-- 模块1：任务属性 -->
+  <rect x="50" y="80" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务属性定义</text>
+  
+  <!-- 模块2：状态机 -->
+  <rect x="300" y="80" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务状态机</text>
+  
+  <!-- 模块3：队列 -->
+  <rect x="550" y="80" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务队列设计</text>
+  
+  <!-- 连接线 -->
+  <line x1="250" y1="110" x2="300" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="500" y1="110" x2="550" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- 子属性 -->
+  <!-- 任务属性子项 -->
+  <rect x="30" y="180" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="80" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">起点/终点</text>
+  
+  <rect x="140" y="180" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="190" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">优先级</text>
+  
+  <rect x="80" y="240" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="130" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">时间窗</text>
+  
+  <!-- 状态机子项 -->
+  <rect x="280" y="180" width="80" height="40" rx="5" fill="#f1948a"/>
+  <text x="320" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">待分配</text>
+  
+  <rect x="370" y="180" width="80" height="40" rx="5" fill="#f1948a"/>
+  <text x="410" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">执行中</text>
+  
+  <rect x="460" y="180" width="80" height="40" rx="5" fill="#f1948a"/>
+  <text x="500" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">已完成</text>
+  
+  <rect x="320" y="240" width="80" height="40" rx="5" fill="#f1948a"/>
+  <text x="360" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">失败/取消</text>
+  
+  <!-- 队列子项 -->
+  <rect x="530" y="180" width="100" height="40" rx="5" fill="#82e0aa"/>
+  <text x="580" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">优先级队列</text>
+  
+  <rect x="640" y="180" width="100" height="40" rx="5" fill="#82e0aa"/>
+  <text x="690" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">时间窗队列</text>
+  
+  <rect x="580" y="240" width="100" height="40" rx="5" fill="#82e0aa"/>
+  <text x="630" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">混合策略</text>
+  
+  <!-- 连接子项到模块 -->
+  <line x1="100" y1="140" x2="80" y2="180" stroke="#85c1e9" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="180" y1="140" x2="180" y2="180" stroke="#85c1e9" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="140" y1="140" x2="130" y2="240" stroke="#85c1e9" stroke-width="1.5" stroke-dasharray="4"/>
+  
+  <line x1="350" y1="140" x2="320" y2="180" stroke="#f1948a" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="400" y1="140" x2="410" y2="180" stroke="#f1948a" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="450" y1="140" x2="500" y2="180" stroke="#f1948a" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="400" y1="140" x2="360" y2="240" stroke="#f1948a" stroke-width="1.5" stroke-dasharray="4"/>
+  
+  <line x1="600" y1="140" x2="580" y2="180" stroke="#82e0aa" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="650" y1="140" x2="690" y2="180" stroke="#82e0aa" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="625" y1="140" x2="630" y2="240" stroke="#82e0aa" stroke-width="1.5" stroke-dasharray="4"/>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="320" width="500" height="50" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="400" y="350" text-anchor="middle" font-size="14" fill="white" font-weight="bold">三者关系：属性定义 → 状态机管理 → 队列调度</text>
+  
+  <!-- 箭头 -->
+  <polygon points="400,310 390,295 410,295" fill="#f39c12"/>
+  <polygon points="400,370 390,385 410,385" fill="#f39c12"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="12" fill="#7f8c8d">任务属性是基础，状态机是过程管理，队列是调度核心</text>
+  <text x="400" y="445" text-anchor="middle" font-size="12" fill="#7f8c8d">三者缺一不可，共同构成完整的任务管理体系</text>
+</svg>
+
+<p>这张图把今天讲的内容串起来了。任务属性是基础，状态机管过程，队列管调度。三者配合，才能构建一个健壮的任务管理系统。</p>
+
+<div class="tip">
+  <p><strong>个人建议：</strong>刚开始做任务建模时，别想着一步到位。先搭一个简单的版本跑起来，再根据实际需求迭代。我第一个项目就是吃了这个亏，设计得太复杂，结果开发周期翻了一倍。</p>
+</div>
+
+<p>好了，任务建模这块就讲到这里。记住一句话：<strong>好的任务模型，能让调度算法事半功倍；烂的任务模型，再牛的算法也救不了</strong>。</p>
+
+<div class="footer-nav">
+            <a href="01DispatchSystemOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03ShortestPathTopology.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 仿真环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="active">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 仿真环境搭建：Gazebo仿真、传感器模型配置、场景设计</h2>
+
+<p>做AGV导航系统，最怕什么？</p>
+<p>怕真车撞了。怕传感器标定没做好。怕算法在实车上跑起来才发现逻辑漏洞。</p>
+<p>所以我个人的习惯是——先在仿真里把坑踩一遍。今天我们就聊聊Gazebo仿真环境的搭建，包括传感器怎么配、场景怎么设计。这些东西看着基础，但我在项目里见过太多人因为仿真没做好，后面调试花了三倍时间。</p>
+
+<h3>25.1 为什么选Gazebo？</h3>
+
+<p>市面上仿真工具有不少，比如Webots、CoppeliaSim、CARLA。但做AGV导航，我首选Gazebo。原因很简单：</p>
+
+<ul>
+  <li><strong>ROS集成度高</strong>——几乎所有的ROS导航栈都能直接对接Gazebo</li>
+  <li><strong>传感器模型丰富</strong>——激光雷达、IMU、里程计、摄像头，开箱即用</li>
+  <li><strong>物理引擎成熟</strong>——支持碰撞检测、摩擦力、惯性参数</li>
+  <li><strong>社区活跃</strong>——遇到问题基本都能搜到答案</li>
+</ul>
+
+<p>嗯，这里要注意一点：Gazebo和ROS的版本要匹配。我见过有人用ROS Noetic配Gazebo 11，结果死活打不开，最后发现是版本不兼容。建议直接用官方推荐的组合。</p>
+
+<div class="highlight">
+  <p><strong>推荐版本组合：</strong></p>
+  <ul>
+    <li>ROS Noetic + Gazebo 11（稳定）</li>
+    <li>ROS2 Humble + Gazebo Fortress（新项目推荐）</li>
+  </ul>
+</div>
+
+<h3>25.2 传感器模型配置</h3>
+
+<p>AGV导航最核心的传感器就三个：激光雷达、IMU、里程计。我们一个一个说。</p>
+
+<h4>25.2.1 激光雷达配置</h4>
+
+<p>激光雷达是AGV的「眼睛」。我建议用2D激光雷达做室内导航，比如Sick TIM系列或者Hokuyo URG系列。Gazebo里配置起来很简单：</p>
+
+<pre><code>&lt;!-- 激光雷达模型配置示例 --&gt;
+&lt;sensor name="laser" type="ray"&gt;
+  &lt;pose&gt;0 0 0.3 0 0 0&lt;/pose&gt;
+  &lt;ray&gt;
+    &lt;scan&gt;
+      &lt;horizontal&gt;
+        &lt;samples&gt;360&lt;/samples&gt;
+        &lt;resolution&gt;1&lt;/resolution&gt;
+        &lt;min_angle&gt;-3.14159&lt;/min_angle&gt;
+        &lt;max_angle&gt;3.14159&lt;/max_angle&gt;
+      &lt;/horizontal&gt;
+    &lt;/scan&gt;
+    &lt;range&gt;
+      &lt;min&gt;0.1&lt;/min&gt;
+      &lt;max&gt;30.0&lt;/max&gt;
+      &lt;resolution&gt;0.01&lt;/resolution&gt;
+    &lt;/range&gt;
+  &lt;/ray&gt;
+  &lt;plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so"&gt;
+    &lt;topicName&gt;/scan&lt;/topicName&gt;
+    &lt;frameName&gt;laser_frame&lt;/frameName&gt;
+  &lt;/plugin&gt;
+&lt;/sensor&gt;</code></pre>
+
+<p>这里有几个参数我特别想提醒你：</p>
+
+<ul>
+  <li><strong>samples</strong>——360线就是每圈360个点，够用了。我曾经试过720线，结果CPU负载直接飙到80%</li>
+  <li><strong>min_angle/max_angle</strong>——全向扫描就是-π到π。如果AGV只需要前方探测，可以缩小范围</li>
+  <li><strong>max</strong>——30米对于室内AGV足够了。室外的话建议设到50米</li>
+</ul>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>激光雷达的安装高度很关键。我一般装在0.3米左右，太低容易被地面杂物遮挡，太高又扫不到低矮障碍物。你可以根据AGV的实际尺寸调整。</p>
+</div>
+
+<h4>25.2.2 IMU配置</h4>
+
+<p>IMU提供角速度和加速度数据。AGV导航里，IMU主要用于航位推算和姿态估计。Gazebo里配置IMU也很直接：</p>
+
+<pre><code>&lt;sensor name="imu" type="imu"&gt;
+  &lt;pose&gt;0 0 0 0 0 0&lt;/pose&gt;
+  &lt;imu&gt;
+    &lt;noise&gt;
+      &lt;type&gt;gaussian&lt;/type&gt;
+      &lt;mean&gt;0.0&lt;/mean&gt;
+      &lt;stddev&gt;0.001&lt;/stddev&gt;
+    &lt;/noise&gt;
+  &lt;/imu&gt;
+  &lt;plugin name="gazebo_ros_imu" filename="libgazebo_ros_imu.so"&gt;
+    &lt;topicName&gt;/imu/data&lt;/topicName&gt;
+    &lt;frameName&gt;imu_frame&lt;/frameName&gt;
+  &lt;/plugin&gt;
+&lt;/sensor&gt;</code></pre>
+
+<p>为什么要在IMU上加噪声？因为真实的IMU数据就是有噪声的。如果你在仿真里用完美数据，到了实车上你会发现算法完全失灵。我刚开始做项目时就吃过这个亏——仿真里定位精度5厘米，实车上直接漂到半米。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>IMU的噪声参数要根据实际传感器来设。比如MPU6050的噪声水平就和ADIS16470差很多。建议先查一下你用的IMU的datasheet，再设置stddev。</p>
+</div>
+
+<h4>25.2.3 里程计配置</h4>
+
+<p>里程计通常来自轮式编码器。Gazebo里可以通过差速驱动插件来模拟：</p>
+
+<pre><code>&lt;plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so"&gt;
+  &lt;leftJoint&gt;left_wheel_joint&lt;/leftJoint&gt;
+  &lt;rightJoint&gt;right_wheel_joint&lt;/rightJoint&gt;
+  &lt;wheelSeparation&gt;0.4&lt;/wheelSeparation&gt;
+  &lt;wheelDiameter&gt;0.2&lt;/wheelDiameter&gt;
+  &lt;topicName&gt;/odom&lt;/topicName&gt;
+  &lt;frameName&gt;odom_frame&lt;/frameName&gt;
+&lt;/plugin&gt;</code></pre>
+
+<p>这里<code>wheelSeparation</code>和<code>wheelDiameter</code>必须和你的AGV模型一致。我见过有人随便填了个值，结果里程计算出来的位移和实际差了30%。</p>
+
+<h3>25.3 场景设计</h3>
+
+<p>场景设计决定了你的算法在什么环境下测试。我个人建议分三个阶段来设计场景：</p>
+
+<ol>
+  <li><strong>基础场景</strong>——空旷的仓库，只有几个柱子</li>
+  <li><strong>中等场景</strong>——有货架、通道、障碍物</li>
+  <li><strong>复杂场景</strong>——动态障碍物、狭窄通道、多楼层</li>
+</ol>
+
+<p>下面是一个简单的仓库场景示例：</p>
+
+<pre><code>&lt;!-- 仓库场景模型 --&gt;
+&lt;model name="warehouse"&gt;
+  &lt;static&gt;true&lt;/static&gt;
+  &lt;link name="wall"&gt;
+    &lt;collision name="collision"&gt;
+      &lt;geometry&gt;
+        &lt;box&gt;
+          &lt;size&gt;20 0.2 3&lt;/size&gt;
+        &lt;/box&gt;
+      &lt;/geometry&gt;
+    &lt;/collision&gt;
+    &lt;visual name="visual"&gt;
+      &lt;geometry&gt;
+        &lt;box&gt;
+          &lt;size&gt;20 0.2 3&lt;/size&gt;
+        &lt;/box&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+  &lt;/link&gt;
+&lt;/model&gt;</code></pre>
+
+<p>你想想看，如果只在空旷场景里测试，你的避障算法根本不会触发。等到实车上遇到一个纸箱，直接就撞上去了。所以我建议在场景里多放一些不同形状的障碍物——箱子、圆柱、斜坡，甚至模拟一些动态行人。</p>
+
+<h3>25.4 知识体系结构图</h3>
+
+<p>下面这张图总结了仿真环境搭建的核心逻辑：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">仿真环境搭建知识体系</text>
+  
+  <!-- 三个主模块 -->
+  <!-- Gazebo仿真 -->
+  <rect x="50" y="80" width="200" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Gazebo仿真引擎</text>
+  
+  <!-- 传感器模型 -->
+  <rect x="300" y="80" width="200" height="60" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">传感器模型配置</text>
+  
+  <!-- 场景设计 -->
+  <rect x="550" y="80" width="200" height="60" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">场景设计</text>
+  
+  <!-- 连接线 -->
+  <line x1="250" y1="110" x2="300" y2="110" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="500" y1="110" x2="550" y2="110" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- Gazebo子项 -->
+  <rect x="30" y="180" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="80" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">物理引擎</text>
+  
+  <rect x="140" y="180" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="190" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">ROS接口</text>
+  
+  <rect x="85" y="240" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="135" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">版本兼容</text>
+  
+  <!-- 传感器子项 -->
+  <rect x="280" y="180" width="80" height="40" rx="5" fill="#82e0aa"/>
+  <text x="320" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">激光雷达</text>
+  
+  <rect x="370" y="180" width="80" height="40" rx="5" fill="#82e0aa"/>
+  <text x="410" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">IMU</text>
+  
+  <rect x="460" y="180" width="80" height="40" rx="5" fill="#82e0aa"/>
+  <text x="500" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">里程计</text>
+  
+  <rect x="340" y="240" width="120" height="40" rx="5" fill="#82e0aa"/>
+  <text x="400" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">噪声参数设置</text>
+  
+  <!-- 场景子项 -->
+  <rect x="530" y="180" width="100" height="40" rx="5" fill="#f1948a"/>
+  <text x="580" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">基础场景</text>
+  
+  <rect x="640" y="180" width="100" height="40" rx="5" fill="#f1948a"/>
+  <text x="690" y="205" text-anchor="middle" font-size="12" fill="#2c3e50">中等场景</text>
+  
+  <rect x="585" y="240" width="100" height="40" rx="5" fill="#f1948a"/>
+  <text x="635" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">复杂场景</text>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="340" width="500" height="60" rx="10" fill="#9b59b6" opacity="0.8"/>
+  <text x="400" y="365" text-anchor="middle" font-size="14" fill="white">仿真验证 → 算法调优 → 实车部署</text>
+  <text x="400" y="385" text-anchor="middle" font-size="12" fill="#e8daef">减少实车调试风险，提升开发效率</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="300" x2="400" y2="340" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>25.5 避坑指南</h3>
+
+<p>最后分享几个我在项目中踩过的坑：</p>
+
+<ul>
+  <li><strong>坐标系混乱</strong>——Gazebo里默认是ENU（东-北-天），但ROS里常用FLU（前-左-上）。不统一的话，传感器数据全是错的。我建议在URDF里明确指定每个传感器的frame_id。</li>
+  <li><strong>时间戳问题</strong>——仿真时间戳和真实时间戳不一样。如果你用<code>ros::Time::now()</code>，在仿真里会出问题。要用<code>ros::Time(0)</code>来获取仿真时间。</li>
+  <li><strong>模型碰撞边界</strong>——有时候AGV模型明明看着没撞到东西，但Gazebo报碰撞。检查一下碰撞模型的边界框，可能比视觉模型大了一圈。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>仿真环境搭建好了之后，先跑一个简单的开环控制——让AGV直走1米，看里程计反馈是不是1米。这一步能发现80%的配置问题。</p>
+</div>
+
+<p>好了，关于仿真环境搭建就聊这么多。记住一句话：仿真越真实，实车越省心。下一节我们聊聊传感器融合的算法实现，到时候会用到今天搭建的仿真环境。</p>
+
+<div class="footer-nav">
+            <a href="24RosIntegration.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26HardwarePlatform.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

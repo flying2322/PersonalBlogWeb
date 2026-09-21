@@ -1,0 +1,412 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 AGV交通管制与多车协同</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="active">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 AGV交通管制与多车协同：多AGV冲突检测、交通管制策略（锁区/优先级/等待）、死锁检测与解除、编队行驶算法、多车协同仿真</h2>
+
+<p>多车协同，说白了就是让一群AGV在同一个场地里干活，还不打架、不堵车、不卡死。</p>
+<p>我刚开始做AGV系统时，觉得单机导航搞定就行了。结果第一次多车联调，三台车在十字路口堵成一团，调度员直接崩溃。嗯，从那以后我才真正重视起交通管制这块。</p>
+
+<h3>18.1 多AGV冲突检测</h3>
+
+<p>冲突检测是交通管制的前提。你连冲突都发现不了，谈何解决？</p>
+
+<p>常见的冲突类型有三种：</p>
+<ul>
+  <li><strong>节点冲突</strong>：多台AGV同时要占用同一个路径节点</li>
+  <li><strong>相向冲突</strong>：两台AGV在同一条路径上面对面行驶</li>
+  <li><strong>交叉冲突</strong>：AGV在交叉路口路径交叉</li>
+</ul>
+
+<p>我个人习惯用<strong>时空占用网格法</strong>来做冲突检测。说白了就是把地图划分成网格，每台AGV预占未来N秒内的网格，然后检查是否有重叠。</p>
+
+<pre><code>// 伪代码：时空占用网格冲突检测
+function detectConflict(agvList, mapGrid, timeHorizon):
+    for each agv in agvList:
+        // 预测未来路径
+        path = predictPath(agv, timeHorizon)
+        for each (position, time) in path:
+            gridKey = hash(position, time)
+            if gridKey in occupiedGrids:
+                return CONFLICT_DETECTED(agv, occupiedGrids[gridKey])
+            occupiedGrids[gridKey] = agv.id
+    return NO_CONFLICT</code></pre>
+
+<div class="tip">
+  <strong>我的经验</strong>：时间窗口别设太大，3-5秒就够了。设太大反而容易误报，AGV稍微停一下就被判定为冲突。
+</div>
+
+<h3>18.2 交通管制策略</h3>
+
+<p>检测到冲突后，怎么处理？我常用的策略有三种：锁区、优先级、等待。</p>
+
+<h4>18.2.1 锁区策略</h4>
+<p>锁区是最简单粗暴的方式。把冲突区域锁起来，只允许一台AGV进入。</p>
+<ul>
+  <li><strong>静态锁区</strong>：提前划分好锁区区域，比如十字路口、窄通道</li>
+  <li><strong>动态锁区</strong>：根据AGV实时位置动态生成锁区范围</li>
+</ul>
+
+<p>我在项目中遇到过一个问题：锁区范围设太大，导致整体效率下降30%。后来改成动态锁区，只锁AGV前后2米的范围，效率明显提升。</p>
+
+<h4>18.2.2 优先级策略</h4>
+<p>给每台AGV分配优先级，高优先级的先走。</p>
+
+<table>
+  <tr>
+    <th>优先级类型</th>
+    <th>说明</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>任务优先级</td>
+    <td>紧急任务优先</td>
+    <td>产线急单、异常处理</td>
+  </tr>
+  <tr>
+    <td>距离优先级</td>
+    <td>离冲突点近的优先</td>
+    <td>减少绕路成本</td>
+  </tr>
+  <tr>
+    <td>时间优先级</td>
+    <td>先到先服务</td>
+    <td>公平调度</td>
+  </tr>
+</table>
+
+<p>你想想看，如果两台AGV同时要过同一个路口，让离得近的先走，是不是更合理？</p>
+
+<h4>18.2.3 等待策略</h4>
+<p>低优先级的AGV在冲突点前等待，直到高优先级的通过。</p>
+
+<div class="warning">
+  <strong>注意</strong>：等待策略容易引发死锁。我曾经遇到过三台AGV互相等待，形成一个环，谁都不让谁。这种情况必须配合死锁检测机制。
+</div>
+
+<h3>18.3 死锁检测与解除</h3>
+
+<p>死锁，说白了就是AGV们互相卡住了，谁也动不了。</p>
+
+<p>死锁检测我推荐用<strong>资源分配图法</strong>。把AGV看作进程，把路径资源看作资源，检测是否存在循环等待。</p>
+
+<pre><code>// 死锁检测算法（简化版）
+function detectDeadlock(agvList):
+    // 构建等待图
+    waitGraph = {}
+    for each agv in agvList:
+        if agv.isWaiting():
+            waitGraph[agv.id] = agv.waitingFor
+    
+    // 检测环
+    visited = set()
+    for each agv in agvList:
+        if dfsCycleDetect(agv.id, waitGraph, visited):
+            return DEADLOCK_DETECTED(extractCycle(visited))
+    return NO_DEADLOCK</code></pre>
+
+<p>解除死锁的方法：</p>
+<ul>
+  <li><strong>撤销法</strong>：强制让一台AGV退出，比如让某台AGV倒车让路</li>
+  <li><strong>资源抢占法</strong>：临时释放部分资源，比如让AGV先让出路口</li>
+  <li><strong>回退法</strong>：让AGV回退到上一个安全点</li>
+</ul>
+
+<div class="tip">
+  <strong>避坑指南</strong>：我曾经在死锁解除时直接让AGV倒车，结果撞上了后面的AGV。后来我加了一个"倒车安全检测"，确保后面没车才倒车。
+</div>
+
+<h3>18.4 编队行驶算法</h3>
+
+<p>编队行驶，就是让多台AGV像火车一样排成一列走。好处是节省空间、提高通行效率。</p>
+
+<p>常用的编队算法：</p>
+<ul>
+  <li><strong>领航-跟随法</strong>：一台领航车，其他车跟随。简单可靠，我项目里用得最多</li>
+  <li><strong>虚拟结构法</strong>：所有车保持固定的相对位置。适合编队转弯</li>
+  <li><strong>行为法</strong>：每台车根据局部信息自主决策。灵活性高，但控制复杂</li>
+</ul>
+
+<pre><code>// 领航-跟随法编队控制
+class FormationController:
+    def __init__(self, leader_id, follow_distance=2.0):
+        self.leader_id = leader_id
+        self.follow_distance = follow_distance
+    
+    def computeFollowVelocity(self, follower, leader):
+        // 计算跟随车的目标速度
+        dx = leader.x - follower.x
+        dy = leader.y - follower.y
+        distance = sqrt(dx*dx + dy*dy)
+        
+        if distance > self.follow_distance + 0.5:
+            // 距离太远，加速跟上
+            return maxSpeed
+        elif distance < self.follow_distance - 0.5:
+            // 距离太近，减速
+            return minSpeed
+        else:
+            // 保持跟车距离
+            return leader.speed</code></pre>
+
+<p>编队行驶要注意转弯时的内轮差。我见过编队转弯时，后面的AGV直接切内线撞上了路沿。后来我加了转弯半径补偿，让后面的车走更大的弧线。</p>
+
+<h3>18.5 多车协同仿真</h3>
+
+<p>仿真，是验证多车协同策略最有效的手段。你不可能在真实产线上调试死锁解除，万一撞了车，损失就大了。</p>
+
+<p>我常用的仿真工具：</p>
+<ul>
+  <li><strong>Gazebo + ROS</strong>：物理仿真，精度高，适合验证编队控制</li>
+  <li><strong>MATLAB/Simulink</strong>：算法验证快，适合死锁检测算法调试</li>
+  <li><strong>自研轻量仿真器</strong>：针对特定场景，效率最高</li>
+</ul>
+
+<p>仿真时重点关注：</p>
+<ol>
+  <li>冲突检测的准确率（有没有漏报、误报）</li>
+  <li>交通管制的响应时间（检测到冲突到发出指令的延迟）</li>
+  <li>死锁检测的覆盖率（能不能发现所有死锁）</li>
+  <li>编队行驶的稳定性（转弯时会不会散架）</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：多车协同不是简单的"加个锁"就能解决的。冲突检测、交通管制、死锁处理、编队控制，这四个环节环环相扣。任何一个环节出问题，整个系统都会崩。</p>
+</div>
+
+<p>我建议你在做多车协同系统时，先从仿真开始。把各种极端情况都跑一遍，比如突然断电、通信延迟、路径阻塞。等仿真跑稳了，再上真车。这样能省下不少维修费。</p>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" style="width:100%;max-width:800px;margin:20px auto;display:block;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E3F2FD;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#BBDEFB;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="boxGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF3E0;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#FFE0B2;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="boxGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F3E5F5;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#E1BEE7;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" rx="10" fill="#FAFAFA" stroke="#E0E0E0" stroke-width="2"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">多AGV交通管制与协同系统架构</text>
+
+  <!-- 第一层：冲突检测 -->
+  <rect x="50" y="70" width="700" height="80" rx="8" fill="url(#boxGrad1)" stroke="#64B5F6" stroke-width="2"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565C0">1. 多AGV冲突检测</text>
+  <text x="150" y="120" text-anchor="middle" font-size="13" fill="#333">节点冲突</text>
+  <text x="350" y="120" text-anchor="middle" font-size="13" fill="#333">相向冲突</text>
+  <text x="550" y="120" text-anchor="middle" font-size="13" fill="#333">交叉冲突</text>
+  <text x="700" y="120" text-anchor="middle" font-size="13" fill="#333">时空占用网格法</text>
+
+  <!-- 箭头1 -->
+  <line x1="400" y1="150" x2="400" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 第二层：交通管制策略 -->
+  <rect x="50" y="185" width="700" height="80" rx="8" fill="url(#boxGrad2)" stroke="#81C784" stroke-width="2"/>
+  <text x="400" y="210" text-anchor="middle" font-size="16" font-weight="bold" fill="#2E7D32">2. 交通管制策略</text>
+  <text x="150" y="235" text-anchor="middle" font-size="13" fill="#333">锁区策略（静态/动态）</text>
+  <text x="400" y="235" text-anchor="middle" font-size="13" fill="#333">优先级策略（任务/距离/时间）</text>
+  <text x="650" y="235" text-anchor="middle" font-size="13" fill="#333">等待策略</text>
+
+  <!-- 箭头2 -->
+  <line x1="400" y1="265" x2="400" y2="295" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 第三层：死锁检测与解除 -->
+  <rect x="50" y="300" width="700" height="80" rx="8" fill="url(#boxGrad3)" stroke="#FFB74D" stroke-width="2"/>
+  <text x="400" y="325" text-anchor="middle" font-size="16" font-weight="bold" fill="#E65100">3. 死锁检测与解除</text>
+  <text x="150" y="350" text-anchor="middle" font-size="13" fill="#333">资源分配图法</text>
+  <text x="350" y="350" text-anchor="middle" font-size="13" fill="#333">撤销法 / 资源抢占法</text>
+  <text x="580" y="350" text-anchor="middle" font-size="13" fill="#333">回退法</text>
+
+  <!-- 箭头3 -->
+  <line x1="400" y1="380" x2="400" y2="410" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 第四层：编队行驶与仿真 -->
+  <rect x="50" y="415" width="700" height="70" rx="8" fill="url(#boxGrad4)" stroke="#CE93D8" stroke-width="2"/>
+  <text x="400" y="440" text-anchor="middle" font-size="16" font-weight="bold" fill="#6A1B9A">4. 编队行驶算法 + 多车协同仿真</text>
+  <text x="200" y="465" text-anchor="middle" font-size="13" fill="#333">领航-跟随法 / 虚拟结构法</text>
+  <text x="550" y="465" text-anchor="middle" font-size="13" fill="#333">Gazebo / MATLAB / 自研仿真器</text>
+
+  <!-- 右侧反馈箭头 -->
+  <path d="M 760 455 Q 780 455 780 300 Q 780 145 760 110" fill="none" stroke="#FF7043" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+  <text x="790" y="300" text-anchor="middle" font-size="12" fill="#FF7043" transform="rotate(90,790,300)">反馈优化</text>
+</svg>
+
+        <div class="footer-nav">
+            <a href="17DispatchArchitecture.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19TaskAndStateMachine.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 定位与建图模块设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="active">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 定位与建图模块设计：SLAM概述、激光SLAM、视觉SLAM、里程计融合</h2>
+
+<p>各位同学，今天我们来聊聊AGV控制器里最核心、也最让人头疼的模块——定位与建图。说白了，就是让机器人知道「我在哪」、「周围长什么样」。我做了这么多年AGV，见过太多因为定位不准导致撞墙、迷路的案例。嗯，这一章我们就把SLAM的底裤扒干净。</p>
+
+<h3>7.1 SLAM概述：先搞清楚它要解决什么问题</h3>
+
+<p>SLAM，全称是Simultaneous Localization and Mapping，同时定位与地图构建。你想想看，一个机器人进入陌生环境，它没有GPS，也没有预先的地图。它只能靠自己的传感器，一边走一边猜自己在哪里，同时还要把周围的环境画出来。这就是SLAM要干的事。</p>
+
+<p>我个人习惯把SLAM分成三个流派：</p>
+<ul>
+  <li><strong>激光SLAM</strong>：用激光雷达测距，精度高，但成本也高。适合室内结构化环境。</li>
+  <li><strong>视觉SLAM</strong>：用摄像头图像，成本低，但受光照影响大。适合特征丰富的场景。</li>
+  <li><strong>多传感器融合SLAM</strong>：把激光、视觉、IMU、轮式编码器全揉在一起。这是工业级AGV的标配。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>SLAM的本质是一个状态估计问题。我们用一个概率模型来描述机器人的位姿和地图特征点的不确定性。常用的框架是图优化（Graph-based SLAM）和滤波器（EKF/粒子滤波）。</p>
+</div>
+
+<p>我在项目中遇到过最坑的事：一个客户非要只用单线激光做SLAM，结果在长走廊里直接漂移了十几米。为什么？因为激光在长走廊里缺乏纵向特征，无法约束前进方向的位移。所以，别迷信单一传感器。</p>
+
+<h3>7.2 激光SLAM：Gmapping与Cartographer</h3>
+
+<p>激光SLAM是目前最成熟、最稳定的方案。我们重点讲两个：Gmapping和Cartographer。</p>
+
+<h4>7.2.1 Gmapping：经典但已过时</h4>
+
+<p>Gmapping是基于粒子滤波的2D激光SLAM。它的核心思想是用一堆粒子来近似机器人的位姿后验概率分布。每个粒子都维护一张地图，然后根据观测更新粒子的权重。</p>
+
+<p>优点很明显：实现简单，小场景下效果不错。缺点也很致命：粒子数量随环境增大指数级增长，而且没有回环检测。说白了，它不认路，走一圈回来它不知道这是同一个地方。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在50m×50m的仓库里用Gmapping，粒子数设到500个，CPU直接跑满。后来换成Cartographer，粒子数降到50个，效果反而更好。所以，大场景别用Gmapping。</p>
+</div>
+
+<h4>7.2.2 Cartographer：工业级首选</h4>
+
+<p>Cartographer是Google开源的激光SLAM方案。它采用图优化框架，支持2D和3D。核心创新点有两个：</p>
+<ul>
+  <li><strong>子图（Submap）机制</strong>：把地图切成小块，每个子图独立优化，最后再全局优化。这样计算量可控。</li>
+  <li><strong>回环检测</strong>：用分支定界法快速搜索历史子图，找到闭环后做全局优化。这是Gmapping没有的。</li>
+</ul>
+
+<p>我建议你在实际项目中这样配置Cartographer：</p>
+
+<pre><code># 典型配置参数（2D激光）
+TRAJECTORY_BUILDER_2D:
+  min_range: 0.3
+  max_range: 30.0
+  use_imu_data: true
+  ceres_scan_matcher:
+    occupied_space_weight: 1.0
+    translation_weight: 10.0
+    rotation_weight: 40.0
+
+POSE_GRAPH:
+  optimize_every_n_nodes: 90
+  constraint_builder:
+    loop_closure_translation_weight: 1.1e4
+    loop_closure_rotation_weight: 1.0e5
+  max_num_final_iterations: 200</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>Cartographer对IMU依赖很大。如果没有IMU，纯激光的Cartographer在快速旋转时容易丢位置。我踩过这个坑，后来加了IMU才稳定。</p>
+</div>
+
+<h3>7.3 视觉SLAM：ORB-SLAM3</h3>
+
+<p>视觉SLAM用摄像头代替激光雷达。成本低，但计算量大。目前最成熟的是ORB-SLAM系列，最新版是ORB-SLAM3。</p>
+
+<p>ORB-SLAM3的核心是：</p>
+<ul>
+  <li><strong>ORB特征点</strong>：旋转不变、尺度不变，比SIFT快很多。</li>
+  <li><strong>三线程架构</strong>：跟踪线程、局部建图线程、回环检测线程。并行处理，实时性不错。</li>
+  <li><strong>支持单目、双目、RGB-D</strong>：灵活适配不同硬件。</li>
+</ul>
+
+<p>但说实话，纯视觉SLAM在AGV上不太实用。为什么？因为AGV经常在纹理稀疏的环境（比如白墙、地板）运行，ORB特征点提取不出来。我试过在纯白走廊里跑ORB-SLAM，直接初始化失败。</p>
+
+<div class="highlight">
+  <p><strong>我的建议：</strong>视觉SLAM适合做辅助定位，比如在特征丰富的区域修正激光SLAM的累积误差。别指望它独当一面。</p>
+</div>
+
+<h3>7.4 里程计融合：IMU+轮式编码器</h3>
+
+<p>里程计融合是SLAM的「地基」。没有好的里程计，SLAM就是空中楼阁。我们通常把IMU和轮式编码器融合，得到高频、低延迟的位姿估计。</p>
+
+<h4>7.4.1 轮式编码器：简单但会打滑</h4>
+
+<p>轮式编码器直接测量车轮转速，通过运动学模型推算位移。优点是频率高（100Hz以上），缺点是打滑时完全失效。我见过一个案例：AGV在湿滑地面急刹车，编码器显示走了2米，实际只走了1.5米。这就是打滑误差。</p>
+
+<h4>7.4.2 IMU：不依赖轮子但会漂</h4>
+
+<p>IMU测量加速度和角速度，通过积分得到位姿。优点是不受打滑影响，缺点是积分漂移严重。你想想看，加速度积分一次得速度，再积分一次得位移，误差随时间平方增长。10秒后位置可能偏了十几米。</p>
+
+<h4>7.4.3 融合策略：互补滤波 vs EKF</h4>
+
+<p>把两者融合起来，取长补短。常用方法有两种：</p>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>优点</th>
+    <th>缺点</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>互补滤波</td>
+    <td>计算简单，延迟低</td>
+    <td>精度一般，无协方差估计</td>
+    <td>低成本MCU</td>
+  </tr>
+  <tr>
+    <td>扩展卡尔曼滤波（EKF）</td>
+    <td>精度高，可估计不确定性</td>
+    <td>计算量大，需要调参</td>
+    <td>高性能ARM/FPGA</td>
+  </tr>
+</table>
+
+<p>我个人习惯用EKF。下面是一个简化的融合模型：</p>
+
+<pre><code>// 状态向量: [x, y, theta, v, w]
+// 预测方程（基于IMU）
+x_k = x_{k-1} + v * cos(theta) * dt
+y_k = y_{k-1} + v * sin(theta) * dt
+theta_k = theta_{k-1} + w * dt
+
+// 观测方程（基于编码器）
+z_v = v_encoder + noise_v
+z_w = w_encoder + noise_w</code></pre>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>当检测到轮子打滑（比如编码器速度突变但IMU加速度正常），我建议临时降低编码器的观测权重。这样EKF会更信任IMU，避免被错误数据带偏。</p>
+</div>
+
+<h3>7.5 本章知识体系总览</h3>
+
+<p>下面这张图概括了定位与建图模块的核心逻辑。你可以把它当作设计时的参考框架。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">定位与建图模块知识体系</text>
+  
+  <!-- 传感器层 -->
+  <rect x="50" y="70" width="700" height="80" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">传感器层</text>
+  <text x="150" y="125" text-anchor="middle" font-size="14" fill="#333">激光雷达</text>
+  <text x="350" y="125" text-anchor="middle" font-size="14" fill="#333">摄像头</text>
+  <text x="550" y="125" text-anchor="middle" font-size="14" fill="#333">IMU</text>
+  <text x="700" y="125" text-anchor="middle" font-size="14" fill="#333">轮式编码器</text>
+  
+  <!-- 箭头1 -->
+  <line x1="400" y1="150" x2="400" y2="190" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 里程计融合层 -->
+  <rect x="150" y="190" width="500" height="70" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="215" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">里程计融合层</text>
+  <text x="400" y="240" text-anchor="middle" font-size="14" fill="#333">互补滤波 / EKF / 粒子滤波</text>
+  
+  <!-- 箭头2 -->
+  <line x1="400" y1="260" x2="400" y2="300" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- SLAM核心层 -->
+  <rect x="100" y="300" width="600" height="80" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="325" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">SLAM核心层</text>
+  <text x="250" y="355" text-anchor="middle" font-size="14" fill="#333">激光SLAM（Gmapping/Cartographer）</text>
+  <text x="550" y="355" text-anchor="middle" font-size="14" fill="#333">视觉SLAM（ORB-SLAM3）</text>
+  
+  <!-- 箭头3 -->
+  <line x1="400" y1="380" x2="400" y2="420" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出层 -->
+  <rect x="200" y="420" width="400" height="60" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="400" y="445" text-anchor="middle" font-size="16" font-weight="bold" fill="#c2185b">输出层</text>
+  <text x="400" y="465" text-anchor="middle" font-size="14" fill="#333">位姿估计 + 栅格地图 / 特征地图</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>嗯，这张图把整个流程串起来了。从传感器原始数据，到里程计融合，再到SLAM核心算法，最后输出位姿和地图。每一步都有坑，每一步都需要调参。我做了这么多年，最大的体会是：没有银弹。激光SLAM稳定但贵，视觉SLAM便宜但娇气，融合方案才是王道。</p>
+
+<div class="warning">
+  <p><strong>最后提醒：</strong>无论你用哪种方案，一定要做回环检测。没有回环的SLAM，走远了就是瞎猜。我曾经在一个环形仓库里测试，没开回环检测，走了三圈后地图已经扭曲得不成样子。开了回环检测，误差控制在5cm以内。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="06MotionControlModule.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08SensorFusionModule.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

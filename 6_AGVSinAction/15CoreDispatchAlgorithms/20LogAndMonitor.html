@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>20 调度系统日志与监控</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="active">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>20 调度系统日志与监控——ELK、监控指标与告警机制</h2>
+
+<p>大家好，我是老张。今天咱们聊聊调度系统里一个特别容易被忽视、但又特别要命的话题——日志与监控。</p>
+
+<p>说实话，我见过太多团队把精力全扑在调度算法上，结果系统一上线，出问题了连根毛都查不到。你想想看，AGV在仓库里乱跑，你连它当时在想什么都不知道，那多可怕？</p>
+
+<p>所以这一章，我把自己这些年踩过的坑、总结的经验，全掏出来给你。</p>
+
+<h3>1.1 日志系统设计：为什么非ELK不可？</h3>
+
+<p>先问个问题：你的AGV调度系统，一天会产生多少日志？</p>
+
+<p>我做过一个中型仓库项目，50台AGV，每台每秒上报一次状态。你算算，一天就是432万条日志。这还不算任务日志、异常日志、调试日志。</p>
+
+<p>用传统方式？<code>tail -f</code> 看文件？别闹了。</p>
+
+<p>我个人习惯用ELK（Elasticsearch + Logstash + Kibana）这套组合拳。为什么？因为它能让你在几秒内从几亿条日志里找到你想要的那一条。</p>
+
+<div class="highlight">
+  <p><strong>核心架构图：</strong></p>
+  <svg width="700" height="320" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="680" height="300" fill="#f0f8ff" stroke="#b0c4de" stroke-width="2" rx="8"/>
+    <text x="350" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">AGV调度系统日志架构（ELK）</text>
+    
+    <!-- AGV 节点 -->
+    <rect x="40" y="70" width="120" height="50" fill="#e8f5e9" stroke="#66bb6a" stroke-width="2" rx="6"/>
+    <text x="100" y="100" text-anchor="middle" font-size="13" fill="#2e7d32">AGV 1 ~ N</text>
+    
+    <!-- 箭头 -->
+    <line x1="160" y1="95" x2="220" y2="95" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Logstash -->
+    <rect x="220" y="70" width="130" height="50" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="6"/>
+    <text x="285" y="100" text-anchor="middle" font-size="13" fill="#e65100">Logstash</text>
+    
+    <!-- 箭头 -->
+    <line x1="350" y1="95" x2="410" y2="95" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Elasticsearch -->
+    <rect x="410" y="70" width="130" height="50" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="6"/>
+    <text x="475" y="100" text-anchor="middle" font-size="13" fill="#1565c0">Elasticsearch</text>
+    
+    <!-- 箭头 -->
+    <line x1="540" y1="95" x2="600" y2="95" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- Kibana -->
+    <rect x="600" y="70" width="80" height="50" fill="#fce4ec" stroke="#e91e63" stroke-width="2" rx="6"/>
+    <text x="640" y="100" text-anchor="middle" font-size="13" fill="#c2185b">Kibana</text>
+    
+    <!-- 下方说明 -->
+    <text x="100" y="170" text-anchor="middle" font-size="12" fill="#555">AGV上报日志</text>
+    <text x="285" y="170" text-anchor="middle" font-size="12" fill="#555">日志采集/解析/过滤</text>
+    <text x="475" y="170" text-anchor="middle" font-size="12" fill="#555">分布式存储/检索</text>
+    <text x="640" y="170" text-anchor="middle" font-size="12" fill="#555">可视化/分析</text>
+    
+    <!-- 告警线 -->
+    <line x1="475" y1="120" x2="475" y2="200" stroke="#e53935" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <rect x="420" y="200" width="110" height="40" fill="#ffebee" stroke="#e53935" stroke-width="1.5" rx="6"/>
+    <text x="475" y="225" text-anchor="middle" font-size="12" fill="#c62828">告警引擎</text>
+    
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<h3>1.2 日志分级与字段设计</h3>
+
+<p>日志不是越多越好。我曾经见过一个团队，把所有日志都打成了INFO级别，结果排查问题时，眼睛都快看瞎了。</p>
+
+<p>我建议这样分级：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background:#e3f2fd;">
+    <th>级别</th><th>含义</th><th>示例</th>
+  </tr>
+  <tr>
+    <td>ERROR</td><td>系统无法自动恢复的故障</td><td>AGV通信超时、任务执行失败</td>
+  </tr>
+  <tr>
+    <td>WARN</td><td>需要关注但不影响运行</td><td>路径拥堵、电量低于30%</td>
+  </tr>
+  <tr>
+    <td>INFO</td><td>关键业务流程节点</td><td>任务创建、AGV分配、任务完成</td>
+  </tr>
+  <tr>
+    <td>DEBUG</td><td>开发调试用，生产环境关闭</td><td>路径规划中间结果、状态机转换</td>
+  </tr>
+</table>
+
+<p>每个日志条目，我要求必须包含以下字段：</p>
+<ul>
+  <li><code>timestamp</code>：精确到毫秒的时间戳</li>
+  <li><code>agv_id</code>：AGV编号</li>
+  <li><code>task_id</code>：关联的任务ID</li>
+  <li><code>level</code>：日志级别</li>
+  <li><code>message</code>：日志内容</li>
+  <li><code>source</code>：产生日志的模块（如：path_planner、task_dispatcher）</li>
+</ul>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经因为没加task_id字段，排查问题时花了整整两天。后来我强制要求所有业务日志必须带上task_id，从此排查效率提升了10倍。</p>
+</div>
+
+<h3>1.3 监控指标：CPU、内存、网络</h3>
+
+<p>日志是事后分析，监控是实时预警。这两者缺一不可。</p>
+
+<p>我重点监控三个维度：</p>
+
+<h4>1.3.1 CPU使用率</h4>
+<p>调度系统是CPU密集型应用。路径规划、任务分配、冲突解决，哪个都吃CPU。</p>
+<p>我一般设置两个阈值：</p>
+<ul>
+  <li><strong>警告阈值：</strong>CPU > 70% 持续5分钟</li>
+  <li><strong>严重阈值：</strong>CPU > 90% 持续1分钟</li>
+</ul>
+<p>为什么会这样？因为CPU一旦超过90%，调度延迟会急剧增加，AGV就会出现“发呆”现象。</p>
+
+<h4>1.3.2 内存使用</h4>
+<p>Java写的调度系统，内存管理是个大坑。我遇到过内存泄漏导致系统崩溃的惨痛教训。</p>
+<p>重点关注：</p>
+<ul>
+  <li>JVM堆内存使用率</li>
+  <li>GC频率和停顿时间</li>
+  <li>非堆内存（Metaspace）使用量</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>内存监控不能只看总量。我见过一个案例，总内存只用了40%，但老年代已经满了，Full GC频繁触发，系统响应时间从10ms飙升到500ms。所以一定要分代监控。</p>
+</div>
+
+<h4>1.3.3 网络延迟与丢包</h4>
+<p>AGV调度系统对网络极其敏感。我做过测试，网络延迟从1ms增加到10ms，任务完成时间就会增加15%。</p>
+<p>监控指标：</p>
+<ul>
+  <li>AGV与调度服务器的TCP往返时间（RTT）</li>
+  <li>消息队列的积压数量</li>
+  <li>WebSocket连接数及断连频率</li>
+</ul>
+
+<h3>1.4 告警机制：别让告警变成噪音</h3>
+
+<p>告警设计不好，比没有告警更可怕。我见过一个团队，一天收到2000条告警，最后运维直接把告警群屏蔽了。</p>
+
+<p>我的原则是：<strong>每条告警都必须 actionable（可行动）</strong>。</p>
+
+<p>告警分级：</p>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background:#ffebee;">
+    <th>级别</th><th>响应时间</th><th>处理方式</th>
+  </tr>
+  <tr>
+    <td>P0（致命）</td><td>5分钟内</td><td>电话+短信+群@所有人</td>
+  </tr>
+  <tr>
+    <td>P1（严重）</td><td>15分钟内</td><td>短信+群@相关人员</td>
+  </tr>
+  <tr>
+    <td>P2（警告）</td><td>1小时内</td><td>群消息</td>
+  </tr>
+  <tr>
+    <td>P3（通知）</td><td>不强制</td><td>邮件/日报</td>
+  </tr>
+</table>
+
+<p>举个例子，P0级别的告警条件：</p>
+<ul>
+  <li>所有AGV同时离线（网络分区）</li>
+  <li>调度系统进程崩溃</li>
+  <li>数据库连接池耗尽</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>告警去重与聚合：</strong>我习惯用“告警风暴抑制”策略。比如同一台AGV连续10次上报通信超时，我只发一条告警，而不是10条。否则运维会被刷屏刷到崩溃。</p>
+</div>
+
+<h3>1.5 实战：一个完整的监控告警配置示例</h3>
+
+<p>最后，我分享一个实际项目中用的Prometheus告警规则片段：</p>
+
+<pre><code>groups:
+- name: agv_scheduling_alerts
+  rules:
+  - alert: HighCPUUsage
+    expr: cpu_usage_percent > 85
+    for: 3m
+    labels:
+      severity: critical
+    annotations:
+      summary: "调度服务器CPU使用率过高"
+      description: "当前CPU使用率 {{ $value }}%，已持续3分钟"
+
+  - alert: AGVConnectionLost
+    expr: agv_connected_count &lt; expected_agv_count * 0.8
+    for: 1m
+    labels:
+      severity: p0
+    annotations:
+      summary: "大量AGV离线"
+      description: "当前在线AGV数量 {{ $value }}，预期 {{ $labels.expected }}"</code></pre>
+
+<p>嗯，这里要注意：<code>for: 3m</code> 这个参数很关键。它表示指标持续异常3分钟才触发告警，能有效避免因为瞬时抖动导致的误报。</p>
+
+<p>好了，这一章的内容就到这里。日志和监控是调度系统的“眼睛”和“耳朵”，没有它们，你就是在盲人摸象。下一章咱们聊聊更深入的话题，到时候见。</p>
+
+<div class="footer-nav">
+            <a href="19SimulationPlatform.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="21SecurityDesign.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

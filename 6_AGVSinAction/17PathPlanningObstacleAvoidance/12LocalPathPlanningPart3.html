@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 局部路径规划算法（三）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="active">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 局部路径规划算法（三）——模型预测控制（MPC）在路径跟踪中的应用</h2>
+
+<p>各位好，欢迎来到局部路径规划的第三讲。前两讲我们聊了DWA和TEB，今天要聊的MPC，可以说是局部规划里的「重武器」了。</p>
+
+<p>说实话，我第一次接触MPC是在做AGV高速跟踪的项目时。当时用纯跟踪算法，低速还行，速度一上来，车就开始「画龙」。后来换成MPC，效果立竿见影。嗯，今天我就把这块的经验掰开揉碎了讲给你听。</p>
+
+<h3>12.1 为什么需要MPC？</h3>
+
+<p>先问个问题：DWA和TEB不好吗？</p>
+
+<p>好，但不够「前瞻」。DWA只看未来几秒内的速度窗口，TEB虽然考虑了时间，但本质上还是基于当前状态做优化。说白了，它们都是「近视眼」。</p>
+
+<p>MPC不一样。它像下棋一样，会往前看很多步。每走一步，都重新算一遍未来N步的最优轨迹。这种「滚动优化」的机制，让它在高速、大曲率路径下表现特别稳。</p>
+
+<p>我在项目中遇到过最典型的场景：AGV在仓库里以2m/s的速度过直角弯。用DWA时，每次到弯道前都要急刹车，效率很低。换成MPC后，它能提前预判弯道曲率，平滑减速过弯，效率提升了30%以上。</p>
+
+<h3>12.2 MPC的核心思想</h3>
+
+<p>MPC说白了就三步：</p>
+
+<ol>
+<li><strong>预测模型</strong>：用数学模型预测未来N步的状态</li>
+<li><strong>滚动优化</strong>：在每个控制周期，求解一个有限时域的最优控制问题</li>
+<li><strong>反馈校正</strong>：只执行第一步的控制量，然后重新预测、优化</li>
+</ol>
+
+<p>你想想看，这像不像我们开车时的操作？眼睛看着前方100米的路况，心里盘算着接下来几秒怎么打方向盘，然后只执行当前这一秒的动作。到了下一秒，再重新评估。</p>
+
+<div class="highlight">
+<p><strong>MPC vs 其他算法的核心区别：</strong></p>
+<ul>
+<li>DWA/TEB：开环控制，一次规划到底</li>
+<li>MPC：闭环控制，每步都在重新规划</li>
+</ul>
+</div>
+
+<h3>12.3 预测模型怎么建？</h3>
+
+<p>这里我以差速AGV为例，讲最常用的运动学模型。</p>
+
+<p>差速AGV的状态量通常取：<code>[x, y, θ, v, ω]</code>，其中x、y是位置，θ是朝向，v是线速度，ω是角速度。</p>
+
+<p>离散化的运动学方程长这样：</p>
+
+<pre><code>x(k+1) = x(k) + v(k)*cos(θ(k))*dt
+y(k+1) = y(k) + v(k)*sin(θ(k))*dt
+θ(k+1) = θ(k) + ω(k)*dt
+v(k+1) = v(k) + a(k)*dt
+ω(k+1) = ω(k) + α(k)*dt</code></pre>
+
+<p>其中a是线加速度，α是角加速度，这两个是控制量。</p>
+
+<p>我个人习惯把控制量设为加速度，而不是直接设速度。为什么？因为加速度更接近真实的电机控制接口，而且能自然地限制加加速度，让轨迹更平滑。</p>
+
+<h3>12.4 优化问题的构建</h3>
+
+<p>MPC的核心是一个优化问题。目标函数通常包含三部分：</p>
+
+<ol>
+<li><strong>路径跟踪误差</strong>：让AGV尽量贴近参考路径</li>
+<li><strong>控制量惩罚</strong>：避免猛打方向盘或急加速</li>
+<li><strong>终端代价</strong>：保证最终状态收敛</li>
+</ol>
+
+<p>我常用的目标函数形式：</p>
+
+<pre><code>min J = Σ (w1 * e_pos² + w2 * e_heading²) 
+       + Σ (w3 * a² + w4 * α²) 
+       + w5 * e_terminal²</code></pre>
+
+<p>其中e_pos是位置误差，e_heading是朝向误差。</p>
+
+<p>约束条件也很关键：</p>
+<ul>
+<li>速度限制：v_min ≤ v ≤ v_max</li>
+<li>加速度限制：a_min ≤ a ≤ a_max</li>
+<li>角速度限制：ω_min ≤ ω ≤ ω_max</li>
+<li>避障约束：距离障碍物≥安全距离</li>
+</ul>
+
+<div class="tip">
+<p><strong>避坑指南：</strong>我曾经在调MPC时，只加了速度约束没加加速度约束。结果AGV在急转弯时，虽然速度没超限，但加速度突变导致电机过载。后来加上加速度约束，问题就解决了。</p>
+</div>
+
+<h3>12.5 求解器怎么选？</h3>
+
+<p>MPC的优化问题通常是非线性、带约束的。求解器的选择直接影响实时性。</p>
+
+<table>
+<tr><th>求解器类型</th><th>优点</th><th>缺点</th><th>适用场景</th></tr>
+<tr><td>OSQP</td><td>速度快，适合二次规划</td><td>只能处理线性约束</td><td>线性MPC</td></tr>
+<tr><td>ACADO</td><td>支持非线性，代码生成</td><td>配置复杂</td><td>非线性MPC</td></tr>
+<tr><td>CasADi</td><td>灵活，支持多种求解器后端</td><td>学习曲线陡</td><td>研究原型</td></tr>
+<tr><td>自定义SQP</td><td>完全可控，轻量</td><td>开发工作量大</td><td>嵌入式平台</td></tr>
+</table>
+
+<p>我个人在工业项目中最常用的是OSQP。因为大部分场景下，把运动学模型线性化后，用二次规划就能得到不错的效果。而且OSQP的C语言接口，在STM32这类MCU上也能跑。</p>
+
+<h3>12.6 实战中的调参经验</h3>
+
+<p>调MPC参数，说白了就是调权重矩阵。我总结了一个「三步调参法」：</p>
+
+<ol>
+<li><strong>先调跟踪权重</strong>：把w1、w2调大，让AGV能跟上路径。这时候车可能会抖，没关系。</li>
+<li><strong>再调平滑权重</strong>：逐步增加w3、w4，直到轨迹变得平滑。注意不要加太多，否则跟踪误差会变大。</li>
+<li><strong>最后调预测时域</strong>：预测步数N太小，前瞻性不够；N太大，计算量爆炸。我一般从10步开始试，根据CPU负载往上加。</li>
+</ol>
+
+<div class="warning">
+<p><strong>注意：</strong>预测时域N和采样时间dt是联动的。N*dt就是总的预测时间。比如dt=0.1s，N=20，那么预测未来2秒。这个时间要覆盖AGV从当前速度到完全刹停的距离。</p>
+</div>
+
+<h3>12.7 避障怎么融入MPC？</h3>
+
+<p>MPC做避障，最直接的方法是把障碍物距离作为约束加进去。</p>
+
+<p>对于圆形障碍物，约束可以写成：</p>
+<pre><code>(x(k) - x_obs)² + (y(k) - y_obs)² ≥ r_safe²</code></pre>
+
+<p>但这个约束是非线性的，求解起来比较慢。我常用的技巧是把它线性化：</p>
+<pre><code>n_x * (x(k) - x_obs) + n_y * (y(k) - y_obs) ≥ r_safe</code></pre>
+
+<p>其中n_x、n_y是障碍物指向AGV的单位方向向量。这样就把非线性约束变成了线性约束，求解速度快很多。</p>
+
+<p>嗯，这里要注意：线性化后的约束只在当前时刻附近有效。如果障碍物突然出现，可能需要重新线性化。我在项目中遇到过这种情况，后来加了一个「约束更新」的机制，每步都重新计算线性化点。</p>
+
+<h3>12.8 知识体系总览</h3>
+
+<p>下面这张图总结了MPC在路径跟踪中的核心逻辑：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">MPC路径跟踪知识体系</text>
+  
+  <!-- 参考路径 -->
+  <rect x="50" y="80" width="160" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">参考路径</text>
+  <text x="130" y="135" text-anchor="middle" font-size="11" fill="white">全局规划 + 平滑处理</text>
+  
+  <!-- 箭头 -->
+  <line x1="210" y1="110" x2="280" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 预测模型 -->
+  <rect x="280" y="80" width="160" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="360" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">预测模型</text>
+  <text x="360" y="135" text-anchor="middle" font-size="11" fill="white">运动学/动力学方程</text>
+  
+  <!-- 箭头 -->
+  <line x1="440" y1="110" x2="510" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 优化求解 -->
+  <rect x="510" y="80" width="160" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="590" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">优化求解</text>
+  <text x="590" y="135" text-anchor="middle" font-size="11" fill="white">OSQP / CasADi</text>
+  
+  <!-- 箭头 -->
+  <line x1="670" y1="110" x2="740" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 控制输出 -->
+  <rect x="740" y="80" width="50" height="60" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="765" y="115" text-anchor="middle" font-size="12" fill="white" font-weight="bold">控制量</text>
+  
+  <!-- 反馈回路 -->
+  <path d="M 765 140 L 765 200 L 130 200 L 130 140" fill="none" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="450" y="195" text-anchor="middle" font-size="11" fill="#7f8c8d">状态反馈（每步更新）</text>
+  
+  <!-- 约束条件 -->
+  <rect x="50" y="240" width="200" height="80" rx="8" fill="#f39c12" opacity="0.8"/>
+  <text x="150" y="270" text-anchor="middle" font-size="14" fill="white" font-weight="bold">约束条件</text>
+  <text x="150" y="290" text-anchor="middle" font-size="11" fill="white">速度 / 加速度 / 角速度</text>
+  <text x="150" y="308" text-anchor="middle" font-size="11" fill="white">避障距离 / 控制量限幅</text>
+  
+  <!-- 目标函数 -->
+  <rect x="300" y="240" width="200" height="80" rx="8" fill="#1abc9c" opacity="0.8"/>
+  <text x="400" y="270" text-anchor="middle" font-size="14" fill="white" font-weight="bold">目标函数</text>
+  <text x="400" y="290" text-anchor="middle" font-size="11" fill="white">跟踪误差 + 控制代价</text>
+  <text x="400" y="308" text-anchor="middle" font-size="11" fill="white">终端代价 + 平滑项</text>
+  
+  <!-- 调参 -->
+  <rect x="550" y="240" width="200" height="80" rx="8" fill="#e67e22" opacity="0.8"/>
+  <text x="650" y="270" text-anchor="middle" font-size="14" fill="white" font-weight="bold">调参技巧</text>
+  <text x="650" y="290" text-anchor="middle" font-size="11" fill="white">权重矩阵 / 预测时域</text>
+  <text x="650" y="308" text-anchor="middle" font-size="11" fill="white">采样时间 / 约束松弛</text>
+  
+  <!-- 箭头连接约束和目标函数到优化求解 -->
+  <line x1="150" y1="240" x2="360" y2="140" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="400" y1="240" x2="500" y2="140" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="650" y1="240" x2="600" y2="140" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="400" text-anchor="middle" font-size="12" fill="#7f8c8d">核心流程：参考路径 → 预测模型 → 优化求解 → 控制输出 → 状态反馈</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>12.9 一个简单的代码框架</h3>
+
+<p>下面是一个MPC路径跟踪的伪代码框架，我用的是类似C++的语法：</p>
+
+<pre><code>// MPC主循环
+while (running) {
+    // 1. 获取当前状态
+    State current = getRobotState();
+    
+    // 2. 获取参考轨迹（未来N步）
+    vector&lt;State&gt; ref = getReferenceTrajectory(current, N);
+    
+    // 3. 构建优化问题
+    MPCProblem problem;
+    problem.setModel(motionModel);
+    problem.setCost(weights);
+    problem.setConstraints(velocityLimits, accelerationLimits);
+    
+    // 4. 添加避障约束
+    for (auto& obs : obstacles) {
+        problem.addObstacleConstraint(obs, current);
+    }
+    
+    // 5. 求解
+    MPCSolution sol = solver.solve(problem);
+    
+    // 6. 只执行第一步
+    Control cmd = sol.controls[0];
+    sendControl(cmd);
+    
+    // 7. 等待下一个控制周期
+    sleep(dt);
+}</code></pre>
+
+<p>这个框架看起来简单，但实际工程中坑不少。比如求解失败时的fallback策略、约束冲突时的松弛处理，这些都需要仔细设计。</p>
+
+<div class="tip">
+<p><strong>我的经验：</strong>刚开始做MPC时，别追求一步到位。先跑通线性MPC，再慢慢加非线性项。我见过太多人一上来就搞非线性MPC，结果调了两个月还没跑起来。</p>
+</div>
+
+<h3>12.10 总结</h3>
+
+<p>MPC在路径跟踪中的优势很明显：前瞻性强、能处理约束、闭环稳定。但代价是计算量大、调参复杂。</p>
+
+<p>如果你现在做的项目对实时性要求极高（比如1ms控制周期），那MPC可能不太合适。但如果你的控制周期在10ms以上，而且路径曲率变化大，MPC绝对值得一试。</p>
+
+<p>好了，关于MPC在路径跟踪中的应用，今天就聊到这里。记住：理论是骨架，实践才是血肉。多动手调参，你才能真正理解MPC的精髓。</p>
+
+<div class="footer-nav">
+            <a href="11LocalPathPlanningPart2.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13DynamicAvoidBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

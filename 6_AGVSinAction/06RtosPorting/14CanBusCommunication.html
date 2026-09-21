@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 CAN总线通信</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="active">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 CAN总线通信：CAN控制器初始化、CAN报文收发、CANopen协议栈移植</h2>
+
+<p>各位同学，咱们今天聊CAN总线。</p>
+<p>做AGV控制器，CAN总线是绕不开的坎。电机驱动器、激光雷达、IO模块，十有八九都挂在CAN总线上。我最早接触CAN是在一个仓储AGV项目上，当时被CANopen协议栈折腾得够呛，后来摸透了，发现其实就那么回事。</p>
+
+<h3>14.1 CAN控制器初始化——别小看这步</h3>
+
+<p>CAN控制器初始化，说白了就是让硬件准备好干活。我习惯把初始化拆成三步：</p>
+
+<ol>
+  <li><strong>引脚配置</strong>——把GPIO复用到CAN功能</li>
+  <li><strong>波特率设置</strong>——这个最容易翻车</li>
+  <li><strong>工作模式选择</strong>——正常模式还是环回模式</li>
+</ol>
+
+<p>先看一段我常用的初始化代码，基于STM32的bxCAN：</p>
+
+<pre><code>void CAN_Init(void)
+{
+    CAN_HandleTypeDef hcan;
+    
+    // 1. 使能时钟
+    __HAL_RCC_CAN1_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    
+    // 2. 引脚配置：PB8-CAN_RX, PB9-CAN_TX
+    GPIO_InitTypeDef gpio = {0};
+    gpio.Pin = GPIO_PIN_8 | GPIO_PIN_9;
+    gpio.Mode = GPIO_MODE_AF_PP;
+    gpio.Pull = GPIO_PULLUP;
+    gpio.Speed = GPIO_SPEED_FREQ_HIGH;
+    gpio.Alternate = GPIO_AF9_CAN1;
+    HAL_GPIO_Init(GPIOB, &amp;gpio);
+    
+    // 3. CAN参数配置
+    hcan.Instance = CAN1;
+    hcan.Init.Prescaler = 6;          // 分频系数
+    hcan.Init.Mode = CAN_MODE_NORMAL; // 正常模式
+    hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
+    hcan.Init.TimeSeg1 = CAN_BS1_13TQ;
+    hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
+    hcan.Init.TimeTriggeredMode = DISABLE;
+    hcan.Init.AutoBusOff = ENABLE;
+    hcan.Init.AutoWakeUp = DISABLE;
+    hcan.Init.AutoRetransmission = ENABLE;
+    hcan.Init.ReceiveFifoLocked = DISABLE;
+    hcan.Init.TransmitFifoPriority = DISABLE;
+    
+    HAL_CAN_Init(&amp;hcan);
+}</code></pre>
+
+<div class="warning">
+  <strong>⚠️ 注意：</strong>波特率计算别想当然。我见过有人直接把Prescaler设成1，结果总线死活不通。记住公式：<br>
+  <code>波特率 = 时钟频率 / (Prescaler × (BS1 + BS2 + 1))</code><br>
+  比如72MHz时钟，Prescaler=6，BS1=13，BS2=2，算出来就是：<br>
+  <code>72M / (6 × (13+2+1)) = 72M / 96 = 750kbps</code>
+</div>
+
+<h3>14.2 CAN报文收发——核心中的核心</h3>
+
+<p>CAN报文收发，其实就两个动作：发出去，收进来。但细节都在过滤器里。</p>
+
+<h4>14.2.1 发送报文</h4>
+
+<p>发送一个标准帧，我习惯这么写：</p>
+
+<pre><code>uint8_t CAN_SendMessage(uint32_t id, uint8_t *data, uint8_t len)
+{
+    CAN_TxHeaderTypeDef txHeader;
+    uint32_t txMailbox;
+    
+    txHeader.StdId = id;          // 标准ID，11位
+    txHeader.ExtId = 0;           // 扩展ID不用
+    txHeader.IDE = CAN_ID_STD;    // 标准帧
+    txHeader.RTR = CAN_RTR_DATA;  // 数据帧
+    txHeader.DLC = len;           // 数据长度
+    txHeader.TransmitGlobalTime = DISABLE;
+    
+    // 发送，等待邮箱空闲
+    if (HAL_CAN_AddTxMessage(&amp;hcan, &amp;txHeader, data, &amp;txMailbox) != HAL_OK)
+    {
+        return 1; // 发送失败
+    }
+    
+    // 等待发送完成
+    while (HAL_CAN_GetTxMailboxesFreeLevel(&amp;hcan) &lt; 3);
+    
+    return 0;
+}</code></pre>
+
+<p>这里有个坑——<strong>发送优先级</strong>。CAN控制器有三个发送邮箱，优先级由ID决定，ID越小优先级越高。我曾在项目里遇到电机控制指令被低优先级的诊断报文堵住，后来把电机指令ID设成0x001，问题就解决了。</p>
+
+<h4>14.2.2 接收报文与过滤器</h4>
+
+<p>接收报文，过滤器是关键。CAN总线上的报文很多，你只关心其中一部分。过滤器就是帮你筛选的。</p>
+
+<p>我常用的过滤器配置：</p>
+
+<pre><code>void CAN_FilterConfig(void)
+{
+    CAN_FilterTypeDef filter;
+    
+    filter.FilterBank = 0;           // 使用过滤器组0
+    filter.FilterMode = CAN_FILTERMODE_IDMASK;  // 掩码模式
+    filter.FilterScale = CAN_FILTERSCALE_32BIT; // 32位
+    filter.FilterIdHigh = 0x0000;    // 标准ID高16位
+    filter.FilterIdLow = 0x0000;     // 标准ID低16位
+    filter.FilterMaskIdHigh = 0x0000; // 掩码高16位
+    filter.FilterMaskIdLow = 0x0000; // 掩码低16位
+    filter.FilterFIFOAssignment = CAN_FILTER_FIFO0; // 关联到FIFO0
+    filter.FilterActivation = ENABLE;
+    filter.SlaveStartFilterBank = 14;
+    
+    HAL_CAN_ConfigFilter(&amp;hcan, &amp;filter);
+}</code></pre>
+
+<div class="tip">
+  <strong>💡 我的经验：</strong>调试阶段，把掩码全设成0，这样所有报文都能收到。等调通了再收紧过滤器。我曾经一上来就设了严格的过滤器，结果报文收不到，排查了半天才发现是过滤器把想要的报文也滤掉了。
+</div>
+
+<h3>14.3 CANopen协议栈移植——从零到跑通</h3>
+
+<p>CANopen，说白了就是CAN总线上的应用层协议。它定义了设备如何描述自己、如何通信。AGV控制器里，电机驱动器、IO模块几乎都支持CANopen。</p>
+
+<p>我移植过几个协议栈，最顺手的是<strong>CANopenNode</strong>。开源、轻量、文档全。移植步骤我总结为四步：</p>
+
+<ol>
+  <li><strong>硬件抽象层对接</strong>——把协议栈的发送/接收函数挂到你的CAN驱动上</li>
+  <li><strong>对象字典配置</strong>——定义你的设备有哪些参数、命令</li>
+  <li><strong>PDO/SDO配置</strong>——决定数据怎么传</li>
+  <li><strong>NMT状态机管理</strong>——设备启动、停止、预操作</li>
+</ol>
+
+<h4>14.3.1 硬件抽象层对接</h4>
+
+<p>CANopenNode要求你实现几个底层函数。我一般这么写：</p>
+
+<pre><code>// CAN发送回调
+void canSend(CAN_MSG *msg)
+{
+    CAN_SendMessage(msg-&gt;id, msg-&gt;data, msg-&gt;len);
+}
+
+// CAN接收回调（在中断中调用）
+void canReceive(uint32_t id, uint8_t *data, uint8_t len)
+{
+    CAN_MSG msg;
+    msg.id = id;
+    msg.len = len;
+    memcpy(msg.data, data, len);
+    
+    // 喂给协议栈
+    CO_CANinterrupt(&amp;canopenObj, &amp;msg);
+}</code></pre>
+
+<h4>14.3.2 对象字典配置</h4>
+
+<p>对象字典是CANopen的灵魂。每个设备都有一个对象字典，描述了所有参数。比如电机驱动器的目标速度在0x6040，实际速度在0x6041。</p>
+
+<p>我习惯用Excel管理对象字典，然后生成C代码。一个典型的条目：</p>
+
+<pre><code>// 对象字典条目：0x2000 - 自定义参数
+{
+    .Index = 0x2000,
+    .SubIndex = 0x00,
+    .ObjectType = OD_VAR,
+    .DataType = OD_UNSIGNED32,
+    .AccessType = O_RW,
+    .pData = &amp;customParam,
+    .attribute = ODA_SDO_RW
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>🔑 关键点：</strong>对象字典的索引范围有规定：</p>
+  <ul>
+    <li>0x1000-0x1FFF：通信对象（如设备类型、错误寄存器）</li>
+    <li>0x2000-0x5FFF：制造商特定对象（你自定义的参数放这里）</li>
+    <li>0x6000-0x9FFF：标准设备行规（如DS402电机驱动）</li>
+  </ul>
+</div>
+
+<h4>14.3.3 PDO配置——实时通信的关键</h4>
+
+<p>PDO（过程数据对象）用于实时数据交换。比如电机驱动器每10ms发送一次实际速度，这就是一个TPDO（发送PDO）。</p>
+
+<p>我常用的PDO映射：</p>
+
+<pre><code>// TPDO1：电机状态反馈
+// 映射：0x6041（状态字）+ 0x6064（实际位置）+ 0x606C（实际速度）
+{
+    .Index = 0x1800,    // TPDO1通信参数
+    .SubIndex = 0x02,   // 传输类型
+    .Value = 0xFE       // 事件触发（数据变化就发）
+},
+{
+    .Index = 0x1A00,    // TPDO1映射参数
+    .SubIndex = 0x00,   // 映射数量
+    .Value = 3          // 映射了3个对象
+},
+{
+    .Index = 0x1A00,
+    .SubIndex = 0x01,
+    .Value = 0x60410010 // 0x6041，子索引0，16位
+},
+{
+    .Index = 0x1A00,
+    .SubIndex = 0x02,
+    .Value = 0x60640020 // 0x6064，子索引0，32位
+},
+{
+    .Index = 0x1A00,
+    .SubIndex = 0x03,
+    .Value = 0x606C0010 // 0x606C，子索引0，16位
+}</code></pre>
+
+<div class="warning">
+  <strong>⚠️ 注意：</strong>PDO映射的总长度不能超过8字节。上面这个例子：16位+32位+16位=64位=8字节，刚好塞满一帧。我曾经贪心多映射了一个对象，结果数据被截断，排查了好久才发现是PDO长度超了。
+</div>
+
+<h3>14.4 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的CAN总线通信知识体系。你可以把它当成一个检查清单，看看自己掌握了哪些：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;margin:20px 0;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" rx="10" fill="#F0F8FF" stroke="#4A90D9" stroke-width="2"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2C3E50">CAN总线通信知识体系</text>
+  
+  <!-- 第一层：硬件基础 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498DB" stroke="#2980B9" stroke-width="2"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">硬件基础</text>
+  
+  <!-- 第二层：初始化 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#2ECC71" stroke="#27AE60" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">控制器初始化</text>
+  
+  <!-- 第三层：通信 -->
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#E67E22" stroke="#D35400" stroke-width="2"/>
+  <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">报文收发</text>
+  
+  <!-- 箭头：硬件→初始化 -->
+  <line x1="250" y1="95" x2="300" y2="95" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- 箭头：初始化→通信 -->
+  <line x1="500" y1="95" x2="550" y2="95" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 硬件子项 -->
+  <rect x="50" y="150" width="200" height="40" rx="5" fill="#AED6F1" stroke="#3498DB" stroke-width="1"/>
+  <text x="150" y="175" text-anchor="middle" font-size="13" fill="#2C3E50">CAN收发器（TJA1050等）</text>
+  
+  <rect x="50" y="200" width="200" height="40" rx="5" fill="#AED6F1" stroke="#3498DB" stroke-width="1"/>
+  <text x="150" y="225" text-anchor="middle" font-size="13" fill="#2C3E50">终端电阻（120Ω）</text>
+  
+  <rect x="50" y="250" width="200" height="40" rx="5" fill="#AED6F1" stroke="#3498DB" stroke-width="1"/>
+  <text x="150" y="275" text-anchor="middle" font-size="13" fill="#2C3E50">总线拓扑（差分信号）</text>
+  
+  <!-- 初始化子项 -->
+  <rect x="300" y="150" width="200" height="40" rx="5" fill="#A9DFBF" stroke="#2ECC71" stroke-width="1"/>
+  <text x="400" y="175" text-anchor="middle" font-size="13" fill="#2C3E50">引脚复用配置</text>
+  
+  <rect x="300" y="200" width="200" height="40" rx="5" fill="#A9DFBF" stroke="#2ECC71" stroke-width="1"/>
+  <text x="400" y="225" text-anchor="middle" font-size="13" fill="#2C3E50">波特率计算（TQ分配）</text>
+  
+  <rect x="300" y="250" width="200" height="40" rx="5" fill="#A9DFBF" stroke="#2ECC71" stroke-width="1"/>
+  <text x="400" y="275" text-anchor="middle" font-size="13" fill="#2C3E50">工作模式（正常/环回）</text>
+  
+  <!-- 通信子项 -->
+  <rect x="550" y="150" width="200" height="40" rx="5" fill="#FAD7A0" stroke="#E67E22" stroke-width="1"/>
+  <text x="650" y="175" text-anchor="middle" font-size="13" fill="#2C3E50">标准帧/扩展帧</text>
+  
+  <rect x="550" y="200" width="200" height="40" rx="5" fill="#FAD7A0" stroke="#E67E22" stroke-width="1"/>
+  <text x="650" y="225" text-anchor="middle" font-size="13" fill="#2C3E50">过滤器配置（ID掩码）</text>
+  
+  <rect x="550" y="250" width="200" height="40" rx="5" fill="#FAD7A0" stroke="#E67E22" stroke-width="1"/>
+  <text x="650" y="275" text-anchor="middle" font-size="13" fill="#2C3E50">发送邮箱与优先级</text>
+  
+  <!-- 第四层：CANopen协议栈 -->
+  <rect x="200" y="330" width="400" height="50" rx="8" fill="#9B59B6" stroke="#8E44AD" stroke-width="2"/>
+  <text x="400" y="360" text-anchor="middle" font-size="18" fill="white" font-weight="bold">CANopen协议栈移植</text>
+  
+  <!-- 箭头：通信→CANopen -->
+  <line x1="400" y1="290" x2="400" y2="330" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- CANopen子项 -->
+  <rect x="50" y="410" width="160" height="40" rx="5" fill="#D7BDE2" stroke="#9B59B6" stroke-width="1"/>
+  <text x="130" y="435" text-anchor="middle" font-size="12" fill="#2C3E50">硬件抽象层对接</text>
+  
+  <rect x="230" y="410" width="160" height="40" rx="5" fill="#D7BDE2" stroke="#9B59B6" stroke-width="1"/>
+  <text x="310" y="435" text-anchor="middle" font-size="12" fill="#2C3E50">对象字典配置</text>
+  
+  <rect x="410" y="410" width="160" height="40" rx="5" fill="#D7BDE2" stroke="#9B59B6" stroke-width="1"/>
+  <text x="490" y="435" text-anchor="middle" font-size="12" fill="#2C3E50">PDO/SDO配置</text>
+  
+  <rect x="590" y="410" width="160" height="40" rx="5" fill="#D7BDE2" stroke="#9B59B6" stroke-width="1"/>
+  <text x="670" y="435" text-anchor="middle" font-size="12" fill="#2C3E50">NMT状态机管理</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="485" text-anchor="middle" font-size="12" fill="#7F8C8D">从硬件到协议栈，层层递进，缺一不可</text>
+</svg>
+
+<h3>14.5 避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>终端电阻</strong>——CAN总线两端必须各加一个120Ω电阻。我见过有人只加了一个，结果总线反射严重，通信时好时坏。</li>
+  <li><strong>波特率一致性</strong>——总线上所有设备的波特率必须一致。差一点都连不上。我习惯用示波器量一下CAN_H和CAN_L的位时间，确认无误再上协议栈。</li>
+  <li><strong>CANopen节点ID</strong>——每个设备必须有唯一的节点ID。我曾在调试时忘了改ID，两个电机驱动器ID都是1，结果总线冲突，一个都动不了。</li>
+  <li><strong>心跳报文</strong>——CANopen设备默认会发心跳报文。如果收不到心跳，主站会认为设备离线。我建议把心跳周期设成100ms，既不会太频繁占用总线，又能及时检测掉线。</li>
+</ul>
+
+<p>嗯，CAN总线通信这块，说白了就是硬件配好、初始化做对、报文收发调通、协议栈移植跑起来。每一步都有坑，但摸透了就顺了。你们在实际项目中遇到什么问题，随时可以来问我。</p>
+
+<div class="highlight">
+  <p><strong>📌 课后练习：</strong></p>
+  <ol>
+    <li>在你的开发板上实现CAN控制器初始化，波特率设为500kbps</li>
+    <li>编写一个循环发送程序，每100ms发送一个标准帧，ID=0x123，数据为递增计数器</li>
+    <li>尝试移植CANopenNode协议栈，配置一个简单的对象字典（至少包含一个制造商特定对象）</li>
+  </ol>
+</div>
+
+<div class="footer-nav">
+            <a href="13AgvPeripheralDriver.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15WifiEthernet.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

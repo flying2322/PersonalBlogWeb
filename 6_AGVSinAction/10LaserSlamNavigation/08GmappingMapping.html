@@ -1,0 +1,345 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 Gmapping建图实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="active">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 Gmapping建图实战：bag包回放、launch文件编写、地图保存与格式转换、建图质量评估</h2>
+
+<p>好，咱们进入实战环节了。</p>
+<p>前面几章我们把Gmapping的理论、参数、数学模型都过了一遍。说实话，光看理论容易犯困。我当年学的时候也是这样，看了一堆概率公式，结果一上手还是懵的。所以这一章，咱们直接拿数据跑一遍。</p>
+<p>你会学到：怎么用bag包回放数据、怎么写launch文件、怎么保存地图、怎么转换格式，以及——怎么判断你建的地图到底行不行。</p>
+
+<h3>8.1 准备工作：数据与工具</h3>
+
+<p>先说说需要什么。</p>
+<ul>
+  <li><strong>ROS环境</strong>：我建议用Melodic或Noetic，Kinetic也行但有点老了</li>
+  <li><strong>Gmapping包</strong>：<code>sudo apt install ros-&lt;distro&gt;-gmapping</code></li>
+  <li><strong>bag包数据</strong>：包含激光雷达扫描、里程计、tf变换</li>
+</ul>
+
+<p>我个人习惯把bag包放在<code>~/data/</code>目录下，方便管理。你想想看，如果每次都要去翻文件夹找数据，多浪费时间。</p>
+
+<div class="tip">
+  <strong>小提示：</strong> 如果你手头没有现成的bag包，可以去ROS官网下载公开数据集。比如MIT的Stata Center数据集，或者我自己常用的“robot_security”包。注意看话题名称，确保有<code>/scan</code>和<code>/tf</code>。
+</div>
+
+<h3>8.2 Bag包回放：别急着跑</h3>
+
+<p>回放bag包，听起来简单——<code>rosbag play</code> 嘛。但这里有个坑。</p>
+
+<p><strong>速度控制</strong>：我建议用 <code>-r 0.5</code> 或 <code>-r 0.8</code> 慢速回放。为什么？</p>
+<p>因为Gmapping是实时算法，如果数据跑得太快，计算跟不上，建图质量会下降。我曾经有一次赶时间，用 <code>-r 2.0</code> 回放，结果地图歪歪扭扭的，后来才发现是回放速度太快了。</p>
+
+<pre><code># 慢速回放，方便观察
+rosbag play -r 0.5 your_data.bag
+
+# 如果想暂停观察，加 --pause
+rosbag play --pause your_data.bag
+</code></pre>
+
+<p>还有一个细节：<strong>时钟同步</strong>。有些bag包没有记录时间戳，或者时间戳是乱序的。这时候加 <code>--clock</code> 参数，让ROS使用bag包的时间作为系统时钟。</p>
+
+<pre><code>rosbag play --clock your_data.bag
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong> 如果bag包里的tf树不完整，Gmapping会直接罢工。回放前先用 <code>rosbag info your_data.bag</code> 检查一下话题列表，确保有 <code>/tf</code> 和 <code>/scan</code>。
+</div>
+
+<h3>8.3 Launch文件编写：我的模板</h3>
+
+<p>写launch文件，说白了就是把一堆节点串起来。我直接给你一个我常用的模板，你改改参数就能用。</p>
+
+<pre><code>&lt;launch&gt;
+    &lt;!-- 启动Gmapping节点 --&gt;
+    &lt;node name="slam_gmapping" pkg="gmapping" type="slam_gmapping" output="screen"&gt;
+        &lt;param name="base_frame" value="base_link"/&gt;
+        &lt;param name="odom_frame" value="odom"/&gt;
+        &lt;param name="map_frame" value="map"/&gt;
+        &lt;param name="map_update_interval" value="5.0"/&gt;
+        &lt;param name="maxUrange" value="5.0"/&gt;
+        &lt;param name="maxRange" value="6.0"/&gt;
+        &lt;param name="particles" value="30"/&gt;
+        &lt;param name="xmin" value="-10.0"/&gt;
+        &lt;param name="ymin" value="-10.0"/&gt;
+        &lt;param name="xmax" value="10.0"/&gt;
+        &lt;param name="ymax" value="10.0"/&gt;
+        &lt;param name="delta" value="0.05"/&gt;
+        &lt;param name="linearUpdate" value="0.5"/&gt;
+        &lt;param name="angularUpdate" value="0.2"/&gt;
+        &lt;param name="temporalUpdate" value="0.5"/&gt;
+        &lt;param name="resampleThreshold" value="0.5"/&gt;
+    &lt;/node&gt;
+
+    &lt;!-- 启动地图服务器（用于保存地图） --&gt;
+    &lt;node name="map_server" pkg="map_server" type="map_server" args="$(find your_pkg)/maps/my_map.yaml"/&gt;
+&lt;/launch&gt;
+</code></pre>
+
+<p>嗯，这里要注意几个参数：</p>
+<ul>
+  <li><strong>map_update_interval</strong>：我一般设5秒，太频繁了CPU扛不住，太慢了地图更新不及时</li>
+  <li><strong>particles</strong>：室内环境30个够用，室外复杂环境可以加到80，但别超过100，否则实时性会变差</li>
+  <li><strong>delta</strong>：地图分辨率，0.05米就是5厘米一格。我建议室内用0.05，室外用0.1</li>
+</ul>
+
+<div class="highlight">
+  <strong>核心经验：</strong> 如果你发现建图过程中地图抖动厉害，先检查 <code>linearUpdate</code> 和 <code>angularUpdate</code>。这两个参数控制着“移动多少才更新地图”。设得太小，更新太频繁，地图容易飘；设得太大，更新太慢，地图会滞后。
+</div>
+
+<h3>8.4 地图保存与格式转换</h3>
+
+<p>建完图了，怎么保存？</p>
+<p>用 <code>map_server</code> 包里的 <code>map_saver</code> 节点。命令很简单：</p>
+
+<pre><code>rosrun map_server map_saver -f my_map
+</code></pre>
+
+<p>这会生成两个文件：</p>
+<ul>
+  <li><strong>my_map.pgm</strong>：灰度图，白色是空闲区域，黑色是障碍物，灰色是未知区域</li>
+  <li><strong>my_map.yaml</strong>：元数据文件，包含分辨率、原点坐标、占用阈值等信息</li>
+</ul>
+
+<p>但有时候我们需要其他格式，比如PNG或者JPG。怎么做？</p>
+<p>我一般用 <strong>ImageMagick</strong> 转换：</p>
+
+<pre><code># PGM转PNG
+convert my_map.pgm my_map.png
+
+# 调整亮度对比度（让地图更清晰）
+convert my_map.pgm -auto-level my_map_enhanced.png
+</code></pre>
+
+<p>如果你需要把地图导入到导航软件（比如MATLAB或Python），可以用 <code>rosbag</code> 导出为CSV格式：</p>
+
+<pre><code>rostopic echo -b your_bag.bag /map > map_data.txt
+</code></pre>
+
+<p>但说实话，我更喜欢直接用Python脚本读取PGM文件，因为PGM是纯文本格式，解析起来很方便。</p>
+
+<div class="tip">
+  <strong>小技巧：</strong> 如果你发现保存的地图有黑边或者空白区域太多，检查一下launch文件里的 <code>xmin/ymin/xmax/ymax</code> 参数。这些参数定义了地图的边界范围。设得太小，地图会被裁剪；设得太大，地图文件会很大。
+</div>
+
+<h3>8.5 建图质量评估：别光看“像不像”</h3>
+
+<p>地图建完了，怎么看质量？</p>
+<p>很多人只看“像不像真实环境”。但说实话，这不够。我总结了一套评估标准：</p>
+
+<table>
+  <tr>
+    <th>评估维度</th>
+    <th>具体指标</th>
+    <th>我的经验值</th>
+  </tr>
+  <tr>
+    <td>几何一致性</td>
+    <td>墙壁是否平直？转角是否90度？</td>
+    <td>偏差小于0.1米算合格</td>
+  </tr>
+  <tr>
+    <td>闭环检测</td>
+    <td>走一圈回来，起点和终点是否重合？</td>
+    <td>偏差小于0.2米算优秀</td>
+  </tr>
+  <tr>
+    <td>噪声水平</td>
+    <td>地图上有没有“鬼影”或“毛刺”？</td>
+    <td>噪声点少于总像素的1%</td>
+  </tr>
+  <tr>
+    <td>未知区域占比</td>
+    <td>灰色区域太多说明探索不充分</td>
+    <td>未知区域小于20%</td>
+  </tr>
+  <tr>
+    <td>占用阈值</td>
+    <td>障碍物和空闲区域的区分是否清晰？</td>
+    <td>阈值在0.25-0.65之间</td>
+  </tr>
+</table>
+
+<p><strong>怎么量化评估？</strong></p>
+<p>我写过一个Python脚本，读取PGM文件后计算：</p>
+<ul>
+  <li>墙壁的直线度（用Hough变换检测直线，计算偏差）</li>
+  <li>闭环误差（手动标记起点和终点，计算欧氏距离）</li>
+  <li>噪声点比例（统计孤立像素点）</li>
+</ul>
+
+<p>但说实话，最直观的方法还是 <strong>肉眼观察 + 实际导航测试</strong>。你让机器人沿着地图走一遍，如果它能准确避开障碍物、到达目标点，那地图就是合格的。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经遇到过一个案例，地图看起来非常漂亮，墙壁笔直、转角清晰。但机器人一导航就撞墙。后来发现是地图的 <strong>原点坐标</strong> 设置错了。地图的原点应该和机器人的起始位置对齐，否则导航时坐标会偏移。所以保存地图后，一定要检查 <code>my_map.yaml</code> 里的 <code>origin</code> 字段。
+</div>
+
+<h3>8.6 本章小结</h3>
+
+<p>这一章我们走完了Gmapping建图的完整流程：从bag包回放，到launch文件编写，再到地图保存和格式转换，最后是质量评估。</p>
+<p>说白了，建图这件事，七分靠参数调优，三分靠数据质量。数据不好，参数调得再好也没用。所以下次你建图失败，先别急着调参数，回头看看你的bag包数据——激光雷达有没有丢帧？里程计有没有漂移？tf树是不是完整的？</p>
+<p>嗯，这些坑我都踩过。希望你少走弯路。</p>
+
+<div class="footer-nav">
+            <a href="07GmappingPrinciple.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09CartographerPrinciple.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

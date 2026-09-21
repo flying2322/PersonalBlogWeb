@@ -1,0 +1,427 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 路径规划基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="active">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 路径规划基础：Dijkstra算法、A*算法、DWA算法</h2>
+
+<p>各位做AGV的朋友，今天我们来聊聊路径规划。说实话，这是AGV导航系统里最核心的模块之一。没有好的路径规划，传感器融合得再好，车子也跑不起来。</p>
+
+<p>我个人习惯把路径规划分成两层：<strong>全局路径规划</strong>和<strong>局部路径规划</strong>。全局规划负责找一条从起点到终点的宏观路径，局部规划则负责处理实时避障和运动控制。今天要讲的Dijkstra和A*属于全局规划，DWA属于局部规划。</p>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#F0F8FF" rx="15"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2C3E50">AGV路径规划知识体系</text>
+  
+  <!-- 根节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="10" fill="#4A90D9" stroke="#2C3E50" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径规划</text>
+  
+  <!-- 分支线 -->
+  <line x1="350" y1="110" x2="200" y2="160" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="110" x2="600" y2="160" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 全局规划 -->
+  <rect x="100" y="160" width="200" height="45" rx="8" fill="#5CB85C" stroke="#2C3E50" stroke-width="2"/>
+  <text x="200" y="188" text-anchor="middle" font-size="16" fill="white" font-weight="bold">全局路径规划</text>
+  
+  <!-- 局部规划 -->
+  <rect x="500" y="160" width="200" height="45" rx="8" fill="#F0AD4E" stroke="#2C3E50" stroke-width="2"/>
+  <text x="600" y="188" text-anchor="middle" font-size="16" fill="white" font-weight="bold">局部路径规划</text>
+  
+  <!-- 全局子节点 -->
+  <line x1="150" y1="205" x2="120" y2="260" stroke="#5CB85C" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="200" y1="205" x2="200" y2="260" stroke="#5CB85C" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="250" y1="205" x2="280" y2="260" stroke="#5CB85C" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <rect x="60" y="265" width="130" height="40" rx="6" fill="#E8F5E9" stroke="#5CB85C" stroke-width="1.5"/>
+  <text x="125" y="290" text-anchor="middle" font-size="14" fill="#2C3E50">Dijkstra算法</text>
+  
+  <rect x="140" y="265" width="130" height="40" rx="6" fill="#E8F5E9" stroke="#5CB85C" stroke-width="1.5"/>
+  <text x="205" y="290" text-anchor="middle" font-size="14" fill="#2C3E50">A*算法</text>
+  
+  <rect x="220" y="265" width="130" height="40" rx="6" fill="#E8F5E9" stroke="#5CB85C" stroke-width="1.5"/>
+  <text x="285" y="290" text-anchor="middle" font-size="14" fill="#2C3E50">其他启发式算法</text>
+  
+  <!-- 局部子节点 -->
+  <line x1="550" y1="205" x2="550" y2="260" stroke="#F0AD4E" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="650" y1="205" x2="650" y2="260" stroke="#F0AD4E" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <rect x="480" y="265" width="140" height="40" rx="6" fill="#FFF3E0" stroke="#F0AD4E" stroke-width="1.5"/>
+  <text x="550" y="290" text-anchor="middle" font-size="14" fill="#2C3E50">DWA算法</text>
+  
+  <rect x="580" y="265" width="140" height="40" rx="6" fill="#FFF3E0" stroke="#F0AD4E" stroke-width="1.5"/>
+  <text x="650" y="290" text-anchor="middle" font-size="14" fill="#2C3E50">TEB / MPC</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="360" text-anchor="middle" font-size="13" fill="#666">核心逻辑：全局规划找方向 → 局部规划做避障 → 控制层执行</text>
+</svg>
+
+<h3>一、Dijkstra算法：最朴素的路径搜索</h3>
+
+<p>Dijkstra算法是路径规划里的"老前辈"了。它的思路很简单：从起点开始，一层一层往外扩展，直到找到终点。每次扩展都选当前代价最小的节点。</p>
+
+<p>说白了，这就是一个<strong>广度优先搜索</strong>的加权版本。每个节点都记录从起点到它的最短距离，然后不断更新。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>贪心策略 + 动态规划。每次选当前最优的节点，保证一旦节点被访问，它的最短路径就已经确定了。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：地图稍微大一点，Dijkstra就跑得很慢。为什么？因为它要遍历所有节点，没有方向性。你想想看，从北京到上海，它可能先往西藏方向搜一圈，再折回来。</p>
+
+<pre><code>// Dijkstra算法伪代码
+function Dijkstra(graph, start, goal):
+    dist[start] = 0
+    priority_queue.push((0, start))
+    
+    while priority_queue is not empty:
+        cost, current = priority_queue.pop()
+        
+        if current == goal:
+            return reconstruct_path()
+        
+        for neighbor in graph.neighbors(current):
+            new_cost = cost + graph.cost(current, neighbor)
+            if new_cost < dist[neighbor]:
+                dist[neighbor] = new_cost
+                priority_queue.push((new_cost, neighbor))
+    
+    return None  // 无路径</code></pre>
+
+<div class="tip">
+  <p><strong>实用建议：</strong>如果地图节点数超过1万，Dijkstra就不太合适了。我一般用它做小范围路径规划，或者作为其他算法的基准对比。</p>
+</div>
+
+<h3>二、A*算法：带方向感的路径搜索</h3>
+
+<p>A*算法是Dijkstra的升级版。它加了一个<strong>启发式函数</strong>，让搜索有了方向感。估价函数 f(n) = g(n) + h(n)，其中g(n)是实际代价，h(n)是估计代价。</p>
+
+<p>我曾经踩过一个坑：h(n)选错了，导致A*退化成Dijkstra。当时排查了半天，才发现是启发函数设计不合理。</p>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>h(n)必须满足<strong>可采纳性</strong>（admissible），即h(n) ≤ 实际代价。否则A*可能找不到最优路径。</p>
+</div>
+
+<p>常用的启发函数有几种：</p>
+
+<table>
+  <tr>
+    <th>启发函数</th>
+    <th>适用场景</th>
+    <th>计算公式</th>
+  </tr>
+  <tr>
+    <td>曼哈顿距离</td>
+    <td>四方向移动（上下左右）</td>
+    <td>|x1-x2| + |y1-y2|</td>
+  </tr>
+  <tr>
+    <td>欧几里得距离</td>
+    <td>八方向或自由移动</td>
+    <td>√[(x1-x2)² + (y1-y2)²]</td>
+  </tr>
+  <tr>
+    <td>对角线距离</td>
+    <td>八方向移动（带对角线）</td>
+    <td>max(|dx|, |dy|) + (√2-1)*min(|dx|, |dy|)</td>
+  </tr>
+</table>
+
+<pre><code>// A*算法伪代码
+function AStar(graph, start, goal):
+    open_set = priority_queue()
+    open_set.push(start, f(start))
+    came_from = empty_map
+    g_score[start] = 0
+    f_score[start] = h(start, goal)
+    
+    while open_set is not empty:
+        current = open_set.pop()
+        
+        if current == goal:
+            return reconstruct_path(came_from, current)
+        
+        for neighbor in graph.neighbors(current):
+            tentative_g = g_score[current] + graph.cost(current, neighbor)
+            if tentative_g < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g
+                f_score[neighbor] = g_score[neighbor] + h(neighbor, goal)
+                open_set.push(neighbor, f_score[neighbor])
+    
+    return None</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>在AGV项目中，我通常用A*做全局路径规划。地图用栅格表示，每个格子0.5米。A*能在几十毫秒内找到路径，完全满足实时性要求。</p>
+</div>
+
+<h3>三、DWA算法：动态窗口法</h3>
+
+<p>DWA（Dynamic Window Approach）是局部路径规划的经典算法。它不找全局路径，而是考虑当前时刻的速度和角速度，在<strong>速度空间</strong>里采样，然后选最优的一组。</p>
+
+<p>说白了，DWA就是在问：我接下来该以多快的速度、多大的转弯角度走？</p>
+
+<p>DWA有三个核心步骤：</p>
+
+<ol>
+  <li><strong>速度采样</strong>：在允许的速度范围内采样(v, ω)组合</li>
+  <li><strong>轨迹预测</strong>：对每个(v, ω)模拟一段时间的运动轨迹</li>
+  <li><strong>轨迹评价</strong>：用评价函数选最优轨迹</li>
+</ol>
+
+<p>评价函数通常包含三个项：</p>
+
+<ul>
+  <li><strong>方位角代价</strong>：轨迹终点朝向目标点的角度偏差</li>
+  <li><strong>障碍物代价</strong>：轨迹与最近障碍物的距离</li>
+  <li><strong>速度代价</strong>：鼓励高速行驶，提高效率</li>
+</ul>
+
+<pre><code>// DWA算法伪代码
+function DWA(robot_state, goal, obstacles):
+    // 1. 计算动态窗口
+    v_min = max(0, robot.v - max_accel * dt)
+    v_max = min(v_max_abs, robot.v + max_accel * dt)
+    w_min = max(-w_max_abs, robot.w - max_angular_accel * dt)
+    w_max = min(w_max_abs, robot.w + max_angular_accel * dt)
+    
+    best_trajectory = None
+    best_cost = INF
+    
+    // 2. 采样并评价
+    for v in [v_min : v_resolution : v_max]:
+        for w in [w_min : w_resolution : w_max]:
+            trajectory = simulate_trajectory(robot_state, v, w, predict_time)
+            
+            // 3. 评价
+            heading_cost = calc_heading_cost(trajectory, goal)
+            obstacle_cost = calc_obstacle_cost(trajectory, obstacles)
+            velocity_cost = calc_velocity_cost(v)
+            
+            total_cost = alpha * heading_cost + beta * obstacle_cost + gamma * velocity_cost
+            
+            if total_cost < best_cost:
+                best_cost = total_cost
+                best_trajectory = (v, w)
+    
+    return best_trajectory</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把障碍物代价的权重设得太高，结果AGV在空旷区域也龟速前进。后来调整了权重，让车子在安全前提下尽量快跑。权重调参是个细致活，建议先仿真再实车。</p>
+</div>
+
+<h3>四、三种算法的对比与选择</h3>
+
+<table>
+  <tr>
+    <th>特性</th>
+    <th>Dijkstra</th>
+    <th>A*</th>
+    <th>DWA</th>
+  </tr>
+  <tr>
+    <td>规划类型</td>
+    <td>全局</td>
+    <td>全局</td>
+    <td>局部</td>
+  </tr>
+  <tr>
+    <td>最优性</td>
+    <td>保证最优</td>
+    <td>保证最优（h可采纳）</td>
+    <td>次优（实时性优先）</td>
+  </tr>
+  <tr>
+    <td>计算速度</td>
+    <td>慢</td>
+    <td>快</td>
+    <td>很快</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>小地图、教学演示</td>
+    <td>静态环境全局规划</td>
+    <td>动态避障、实时控制</td>
+  </tr>
+</table>
+
+<p>在实际AGV系统中，我通常这样搭配：A*做全局规划，生成一条参考路径。DWA做局部规划，沿着参考路径走，同时避开动态障碍物。Dijkstra嘛，我一般只在调试时用，或者作为A*的对比基准。</p>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>路径规划没有银弹。全局规划选A*，局部规划选DWA，这是AGV领域最经典的组合拳。但具体参数怎么调，还得看你的车、你的场地、你的任务。</p>
+</div>
+
+<p>嗯，今天就聊到这儿。这三种算法够你应付大部分AGV路径规划场景了。记住，算法是死的，场景是活的。多动手调参，多跑仿真，慢慢就有感觉了。</p>
+
+<div class="footer-nav">
+            <a href="21MapBuilding.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23MotionControl.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 调度器实现</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="active">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 调度器实现：优先级抢占调度算法、时间片轮转调度、空闲任务与阻塞机制</h2>
+
+<p>调度器，说白了就是RTOS的「大脑」。它决定哪个任务该运行，哪个任务该歇着。我做了这么多年嵌入式，见过太多系统崩溃，十有八九是调度策略没搞对。今天咱们就把这块硬骨头啃下来。</p>
+
+<h3>7.1 优先级抢占调度算法</h3>
+
+<p>这是RTOS最核心的调度方式。它的规则很简单：<strong>谁优先级高，谁先跑</strong>。但实现起来，坑不少。</p>
+
+<p>我个人习惯把优先级分为0到255级，0最高，255最低。为什么这么分？因为ARM Cortex-M内核的NVIC就是这么设计的，直接映射到硬件中断优先级，省事。</p>
+
+<h4>7.1.1 就绪队列设计</h4>
+
+<p>每个优先级对应一个就绪队列。任务就绪了，就挂到对应队列的尾部。调度时，从最高优先级队列头部取任务。</p>
+
+<pre><code>/* 就绪队列结构 */
+typedef struct {
+    uint32_t    priority;           /* 优先级 */
+    List_t      task_list;          /* 任务链表 */
+} ReadyQueue_t;
+
+/* 全局就绪队列表 */
+static ReadyQueue_t ready_queue[CONFIG_MAX_PRIORITY];</code></pre>
+
+<p>这里有个关键点：<strong>如何快速找到最高优先级的就绪任务</strong>？</p>
+
+<p>我曾经在项目里用for循环遍历，结果在256级优先级下，每次调度要扫描256次。系统跑起来后，调度开销占了CPU的30%！后来改用位图法，一个32位变量就能表示256个优先级，用CLZ指令一条指令搞定。</p>
+
+<pre><code>/* 位图法查找最高优先级 */
+static inline uint32_t get_highest_ready_priority(void) {
+    uint32_t bit = __CLZ(ready_bitmap);  /* 前导零计数 */
+    return 31 - bit;
+}</code></pre>
+
+<div class="highlight">
+<p><strong>避坑指南</strong>：我曾经在STM32F103上移植FreeRTOS，就栽在优先级位数上。Cortex-M3只支持8位优先级，你硬要搞256级，结果就是优先级反转。记住：<strong>硬件支持多少级，软件就用多少级</strong>。</p>
+</div>
+
+<h4>7.1.2 抢占时机</h4>
+
+<p>抢占不是随时都能发生的。它发生在以下三个时刻：</p>
+
+<ul>
+    <li><strong>任务创建时</strong>：新任务优先级更高，立即抢占</li>
+    <li><strong>任务唤醒时</strong>：被唤醒的任务优先级高于当前任务</li>
+    <li><strong>时钟节拍中断时</strong>：时间片用完，检查是否有更高优先级任务</li>
+</ul>
+
+<p>嗯，这里要注意：<strong>中断服务函数里不能直接做任务切换</strong>。我见过新手在ISR里调用调度器，结果系统直接死机。正确做法是设置一个标志位，在中断退出时检查并触发PendSV异常，在PendSV里完成切换。</p>
+
+<h3>7.2 时间片轮转调度</h3>
+
+<p>优先级抢占保证了实时性，但有个问题：如果两个任务优先级相同，谁先跑？</p>
+
+<p>答案就是时间片轮转。每个任务跑一个固定时间片（比如10ms），时间到了就换下一个。说白了就是「轮流坐庄」。</p>
+
+<h4>7.2.1 时间片实现</h4>
+
+<p>时间片依赖于系统时钟节拍。每个任务有一个剩余时间片计数器，每次时钟中断减1，减到0就触发调度。</p>
+
+<pre><code>/* 任务控制块增加时间片字段 */
+typedef struct {
+    TaskStack_t    *stack;           /* 栈指针 */
+    uint32_t        priority;        /* 优先级 */
+    uint32_t        slice_remain;    /* 剩余时间片 */
+    uint32_t        slice_total;     /* 总时间片 */
+    /* ... 其他字段 */
+} TCB_t;
+
+/* 时钟节拍中断处理 */
+void SysTick_Handler(void) {
+    TCB_t *current = get_current_task();
+    
+    if (current->slice_remain &gt; 0) {
+        current->slice_remain--;
+    }
+    
+    if (current->slice_remain == 0) {
+        need_schedule = 1;  /* 触发调度 */
+    }
+}</code></pre>
+
+<div class="tip">
+<p><strong>我的经验</strong>：时间片别设太短。我见过有人设1ms，结果系统80%的时间都在做任务切换。一般10-50ms比较合适。如果任务对响应时间要求高，用优先级抢占就够了，别开时间片。</p>
+</div>
+
+<h4>7.2.2 轮转策略</h4>
+
+<p>时间片用完的任务，放到同优先级队列的尾部。下一个任务从队列头部取。这样大家轮流来，谁也不吃亏。</p>
+
+<p>你想想看，如果某个任务一直不主动让出CPU，时间片机制就是最后的保障。但要注意：<strong>时间片只对同优先级任务有效</strong>。高优先级任务来了，低优先级的立马靠边站。</p>
+
+<h3>7.3 空闲任务与阻塞机制</h3>
+
+<p>系统里没有任务可运行时，谁来干活？答案是空闲任务。它是系统自动创建的，优先级最低（255级）。</p>
+
+<h4>7.3.1 空闲任务的作用</h4>
+
+<ul>
+    <li><strong>统计CPU利用率</strong>：空闲任务运行的时间占比，就是CPU的空闲率</li>
+    <li><strong>清理任务资源</strong>：被删除的任务，由空闲任务释放内存</li>
+    <li><strong>进入低功耗模式</strong>：没事干就睡觉，省电</li>
+</ul>
+
+<pre><code>/* 空闲任务实现 */
+void idle_task(void *param) {
+    (void)param;
+    
+    while (1) {
+        /* 统计空闲时间 */
+        idle_count++;
+        
+        /* 清理已删除任务 */
+        cleanup_deleted_tasks();
+        
+        /* 进入低功耗模式 */
+        #ifdef CONFIG_POWER_SAVE
+        __WFI();  /* 等待中断 */
+        #endif
+    }
+}</code></pre>
+
+<div class="warning">
+<p><strong>警告</strong>：空闲任务里不能调用任何可能阻塞的函数！比如获取信号量、等待队列消息。我曾经在空闲任务里加了个延时，结果系统直接死锁——空闲任务阻塞了，没有任务能释放它。</p>
+</div>
+
+<h4>7.3.2 阻塞机制</h4>
+
+<p>任务为什么会被阻塞？说白了就是「等资源」。等信号量、等消息队列、等延时结束。阻塞状态的任务不在就绪队列里，调度器不会选它。</p>
+
+<p>阻塞的实现很简单：任务调用阻塞API时，把自己从就绪队列移除，挂到对应的等待队列。条件满足时，再移回就绪队列。</p>
+
+<pre><code>/* 任务延时阻塞 */
+void task_delay(uint32_t ticks) {
+    TCB_t *current = get_current_task();
+    
+    /* 从就绪队列移除 */
+    remove_from_ready_queue(current);
+    
+    /* 挂到延时队列 */
+    current-&gt;delay_remain = ticks;
+    add_to_delay_list(current);
+    
+    /* 触发调度 */
+    schedule();
+}</code></pre>
+
+<p>这里有个细节：<strong>时钟节拍中断里要检查延时队列</strong>。每个节拍把延时任务的计数器减1，减到0就唤醒。</p>
+
+<h3>7.4 调度器核心流程图</h3>
+
+<p>下面这张图是我手绘的调度器核心逻辑，你仔细看看，基本涵盖了所有场景：</p>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" font-family="Microsoft YaHei, sans-serif">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="processGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ecf0f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#bdc3c7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="decisionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f9e79f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f7dc6f;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <rect x="200" y="10" width="400" height="40" rx="8" fill="url(#headerGrad)"/>
+  <text x="400" y="37" text-anchor="middle" fill="white" font-size="18" font-weight="bold">调度器核心逻辑流程图</text>
+
+  <!-- 开始 -->
+  <rect x="300" y="70" width="200" height="40" rx="20" fill="#27ae60"/>
+  <text x="400" y="96" text-anchor="middle" fill="white" font-size="14" font-weight="bold">调度入口</text>
+
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 查找最高优先级 -->
+  <rect x="250" y="140" width="300" height="45" rx="6" fill="url(#processGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="400" y="168" text-anchor="middle" fill="#2c3e50" font-size="14">查找最高优先级的就绪任务</text>
+
+  <!-- 箭头 -->
+  <line x1="400" y1="185" x2="400" y2="215" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 判断是否有任务 -->
+  <polygon points="400,215 520,260 400,305 280,260" fill="url(#decisionGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="400" y="256" text-anchor="middle" fill="#2c3e50" font-size="13" font-weight="bold">有就绪任务？</text>
+  <text x="400" y="273" text-anchor="middle" fill="#2c3e50" font-size="11">(位图检查)</text>
+
+  <!-- 是 - 右侧 -->
+  <text x="530" y="253" fill="#27ae60" font-size="14" font-weight="bold">是</text>
+  <line x1="520" y1="260" x2="600" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 任务切换 -->
+  <rect x="600" y="235" width="160" height="50" rx="6" fill="#3498db" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="680" y="258" text-anchor="middle" fill="white" font-size="13" font-weight="bold">任务切换</text>
+  <text x="680" y="275" text-anchor="middle" fill="white" font-size="11">(PendSV触发)</text>
+
+  <!-- 箭头 -->
+  <line x1="680" y1="285" x2="680" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 运行新任务 -->
+  <rect x="600" y="340" width="160" height="45" rx="6" fill="url(#processGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="680" y="365" text-anchor="middle" fill="#2c3e50" font-size="13">运行新任务</text>
+
+  <!-- 箭头 -->
+  <line x1="680" y1="385" x2="680" y2="430" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 时间片检查 -->
+  <polygon points="680,430 760,460 680,490 600,460" fill="url(#decisionGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="680" y="456" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">时间片用完？</text>
+
+  <!-- 是 -->
+  <text x="770" y="453" fill="#e74c3c" font-size="13" font-weight="bold">是</text>
+  <line x1="760" y1="460" x2="800" y2="460" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <!-- 否 - 回到运行 -->
+  <text x="670" y="500" fill="#27ae60" font-size="13" font-weight="bold">否</text>
+  <line x1="600" y1="460" x2="540" y2="460" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="540" y1="460" x2="540" y2="365" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="540" y1="365" x2="600" y2="365" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)" stroke-dasharray="5,3"/>
+
+  <!-- 否 - 左侧 -->
+  <text x="270" y="253" fill="#e74c3c" font-size="14" font-weight="bold">否</text>
+  <line x1="280" y1="260" x2="200" y2="260" stroke="#e74c3c" stroke-width="2"/>
+
+  <!-- 运行空闲任务 -->
+  <rect x="100" y="235" width="160" height="50" rx="6" fill="#95a5a6" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="180" y="258" text-anchor="middle" fill="white" font-size="13" font-weight="bold">运行空闲任务</text>
+  <text x="180" y="275" text-anchor="middle" fill="white" font-size="11">(优先级最低)</text>
+
+  <!-- 箭头 -->
+  <line x1="180" y1="285" x2="180" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 空闲任务循环 -->
+  <rect x="100" y="340" width="160" height="45" rx="6" fill="url(#processGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="180" y="358" text-anchor="middle" fill="#2c3e50" font-size="12">统计CPU空闲率</text>
+  <text x="180" y="375" text-anchor="middle" fill="#2c3e50" font-size="12">清理已删除任务</text>
+
+  <!-- 箭头 -->
+  <line x1="180" y1="385" x2="180" y2="430" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 低功耗判断 -->
+  <polygon points="180,430 260,460 180,490 100,460" fill="url(#decisionGrad)" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="180" y="456" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">进入WFI？</text>
+
+  <!-- 是 -->
+  <text x="270" y="453" fill="#27ae60" font-size="13" font-weight="bold">是</text>
+  <line x1="260" y1="460" x2="320" y2="460" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- WFI -->
+  <rect x="320" y="440" width="100" height="40" rx="6" fill="#8e44ad" stroke="#2c3e50" stroke-width="1.5"/>
+  <text x="370" y="465" text-anchor="middle" fill="white" font-size="13" font-weight="bold">WFI指令</text>
+
+  <!-- 箭头 -->
+  <line x1="370" y1="480" x2="370" y2="530" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 中断唤醒 -->
+  <rect x="270" y="530" width="200" height="40" rx="20" fill="#e67e22"/>
+  <text x="370" y="556" text-anchor="middle" fill="white" font-size="13" font-weight="bold">中断唤醒 → 重新调度</text>
+
+  <!-- 否 -->
+  <text x="170" y="500" fill="#e74c3c" font-size="13" font-weight="bold">否</text>
+  <line x1="100" y1="460" x2="50" y2="460" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="50" y1="460" x2="50" y2="365" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="50" y1="365" x2="100" y2="365" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 图例 -->
+  <rect x="20" y="560" width="760" height="30" rx="5" fill="#ecf0f1" opacity="0.8"/>
+  <rect x="30" y="567" width="15" height="15" fill="#27ae60"/>
+  <text x="50" y="579" fill="#2c3e50" font-size="11">开始/结束</text>
+  <rect x="130" y="567" width="15" height="15" fill="#3498db"/>
+  <text x="150" y="579" fill="#2c3e50" font-size="11">任务切换</text>
+  <rect x="240" y="567" width="15" height="15" fill="#f7dc6f"/>
+  <text x="260" y="579" fill="#2c3e50" font-size="11">条件判断</text>
+  <rect x="350" y="567" width="15" height="15" fill="#95a5a6"/>
+  <text x="370" y="579" fill="#2c3e50" font-size="11">空闲任务</text>
+  <rect x="460" y="567" width="15" height="15" fill="#8e44ad"/>
+  <text x="480" y="579" fill="#2c3e50" font-size="11">低功耗</text>
+  <rect x="560" y="567" width="15" height="15" fill="#e67e22"/>
+  <text x="580" y="579" fill="#2c3e50" font-size="11">中断唤醒</text>
+</svg>
+
+<h3>7.5 调度器性能对比</h3>
+
+<p>不同调度策略各有优劣。我整理了一张表，方便你选型时参考：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <tr style="background-color:#3498db; color:white;">
+        <th>调度策略</th>
+        <th>实时性</th>
+        <th>公平性</th>
+        <th>CPU开销</th>
+        <th>适用场景</th>
+    </tr>
+    <tr>
+        <td>优先级抢占</td>
+        <td>高</td>
+        <td>低</td>
+        <td>低</td>
+        <td>强实时控制</td>
+    </tr>
+    <tr>
+        <td>时间片轮转</td>
+        <td>中</td>
+        <td>高</td>
+        <td>中</td>
+        <td>人机交互</td>
+    </tr>
+    <tr>
+        <td>优先级+时间片</td>
+        <td>高</td>
+        <td>中</td>
+        <td>中</td>
+        <td>综合系统</td>
+    </tr>
+    <tr>
+        <td>空闲任务</td>
+        <td>-</td>
+        <td>-</td>
+        <td>极低</td>
+        <td>后台处理</td>
+    </tr>
+</table>
+
+<div class="tip">
+<p><strong>我的建议</strong>：AGV控制器这种实时性要求高的场景，用「优先级抢占+同优先级时间片」的组合最稳妥。高优先级任务保证急停、避障等关键操作，同优先级任务用时间片保证公平。别搞太复杂，简单可靠才是王道。</p>
+</div>
+
+<p>好了，调度器的核心内容就这些。你写代码时记住一句话：<strong>调度器是RTOS的心脏，优先级是它的脉搏</strong>。搞懂了这些，移植任何RTOS都不在话下。</p>
+
+<div class="footer-nav">
+            <a href="06TaskCreateManage.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08InterruptManagement.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

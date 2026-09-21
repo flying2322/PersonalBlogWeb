@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 死锁检测与解除实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="active">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 死锁检测与解除实战：单行线场景下的死锁处理</h2>
+
+<h3>18.1 单行线场景：一个经典死锁模型</h3>
+
+<p>各位做AGV调度，肯定遇到过这种场景：</p>
+
+<p>一条窄巷子，只能走一辆车。两边各来一辆，面对面堵住了。谁也别想动。</p>
+
+<p>这就是单行线死锁。说白了，就是双向交通管制没做好。</p>
+
+<p>我在项目里遇到过最夸张的一次，三条单行线交叉，堵了8台车。现场工程师打电话说“车全停了，像僵尸一样”。嗯，那次之后我专门写了个死锁检测模块。</p>
+
+<h3>18.2 死锁检测：怎么判断“堵死了”？</h3>
+
+<p>检测死锁，核心就一句话：<strong>找环路</strong>。</p>
+
+<p>每台车占一个位置，申请下一个位置。如果A等B的位置，B等C的位置，C又等A的位置，那就是死锁。</p>
+
+<p>我习惯用<strong>资源分配图</strong>来建模。节点是车，边是“我在等你”。</p>
+
+<div class="highlight">
+  <p><strong>死锁检测算法（简化版）：</strong></p>
+  <ul>
+    <li>遍历所有等待中的车</li>
+    <li>从每台车出发，沿着“等待链”走</li>
+    <li>如果走回起点，说明有环 → 死锁</li>
+  </ul>
+</div>
+
+<p>代码实现其实不复杂。我贴一段核心逻辑：</p>
+
+<pre><code>def detect_deadlock(vehicles):
+    """
+    vehicles: dict, key=车ID, value=当前占用的路段ID
+    返回死锁环路上的车辆列表
+    """
+    waiting_graph = {}
+    for v in vehicles:
+        next_segment = get_next_segment(v)
+        if next_segment and is_occupied(next_segment):
+            owner = get_owner(next_segment)
+            waiting_graph[v] = owner
+    
+    # DFS找环
+    visited = set()
+    for start in waiting_graph:
+        if start in visited:
+            continue
+        path = []
+        current = start
+        while current and current not in visited:
+            visited.add(current)
+            path.append(current)
+            current = waiting_graph.get(current)
+        if current and current in path:
+            # 找到环
+            cycle_start = path.index(current)
+            return path[cycle_start:]
+    return None
+</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在检测时只检查了“直接等待”，忽略了“间接等待”。结果死锁已经形成，但检测模块说“一切正常”。后来加了递归搜索，才把问题解决。</p>
+</div>
+
+<h3>18.3 死锁解除：怎么“解扣”？</h3>
+
+<p>检测到死锁，下一步就是解除。单行线场景下，我常用的方法有三种：</p>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>原理</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>预留点让车</td>
+    <td>让一台车倒车到避让区</td>
+    <td>有避让点的单行线</td>
+  </tr>
+  <tr>
+    <td>路径重规划</td>
+    <td>给其中一台车找新路</td>
+    <td>有替代路径的网络</td>
+  </tr>
+  <tr>
+    <td>强制调度</td>
+    <td>人工介入，手动挪车</td>
+    <td>紧急情况，无其他方案</td>
+  </tr>
+</table>
+
+<p>我个人最推荐<strong>预留点让车</strong>。为什么呢？因为单行线场景下，重规划往往不现实——旁边根本没路。</p>
+
+<p>具体做法：</p>
+<ul>
+  <li>在单行线两端或中间，设置避让区</li>
+  <li>死锁时，让环路上优先级最低的车倒车进避让区</li>
+  <li>其他车先通过，再让避让车出来</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>倒车操作有风险。一定要确保倒车路径上没有其他车，而且避让区足够长。我见过一次倒车撞到后方车辆的事故，就是因为避让区长度算错了。</p>
+</div>
+
+<h3>18.4 实战案例：一个完整的死锁处理流程</h3>
+
+<p>拿我去年做的一个项目举例。仓库里有条30米长的单行线，两端各有一个工作站。那天来了4台车，两两相对，堵在中间。</p>
+
+<p>检测模块很快发现了环路：</p>
+<pre><code>死锁环: [AGV_03, AGV_07, AGV_05, AGV_01]
+等待关系:
+  AGV_03 → AGV_07
+  AGV_07 → AGV_05
+  AGV_05 → AGV_01
+  AGV_01 → AGV_03
+</code></pre>
+
+<p>解除步骤：</p>
+<ol>
+  <li>选出优先级最低的车：AGV_05（任务最不紧急）</li>
+  <li>命令AGV_05倒车到最近的避让区（距离8米）</li>
+  <li>其他三台车依次通过</li>
+  <li>AGV_05从避让区驶出，继续执行任务</li>
+</ol>
+
+<p>整个过程耗时约45秒。如果没做死锁检测，这几台车可能堵到天荒地老。</p>
+
+<h3>18.5 单行线场景下的设计建议</h3>
+
+<p>最后，给各位几个实用建议：</p>
+
+<ul>
+  <li><strong>设计阶段就考虑死锁</strong>：单行线尽量设计成环线，或者加避让区</li>
+  <li><strong>检测频率别太高</strong>：我一般每2秒检测一次，太频繁浪费算力</li>
+  <li><strong>解除操作要记录日志</strong>：方便事后分析，优化调度策略</li>
+  <li><strong>留好人工干预接口</strong>：自动解除失败时，能快速切到手动模式</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>一句话总结：</strong>单行线死锁，检测靠找环，解除靠让车。提前设计好避让区，比事后想办法强十倍。</p>
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">单行线死锁检测与解除流程图</text>
+  
+  <!-- 单行线 -->
+  <rect x="100" y="100" width="600" height="40" fill="#b0c4de" rx="5"/>
+  <text x="400" y="125" text-anchor="middle" font-size="14" fill="#333">单行线（双向通行）</text>
+  
+  <!-- 车辆 -->
+  <rect x="200" y="80" width="50" height="30" fill="#e74c3c" rx="5"/>
+  <text x="225" y="100" text-anchor="middle" font-size="12" fill="white">A</text>
+  
+  <rect x="350" y="80" width="50" height="30" fill="#3498db" rx="5"/>
+  <text x="375" y="100" text-anchor="middle" font-size="12" fill="white">B</text>
+  
+  <rect x="500" y="80" width="50" height="30" fill="#2ecc71" rx="5"/>
+  <text x="525" y="100" text-anchor="middle" font-size="12" fill="white">C</text>
+  
+  <!-- 等待箭头 -->
+  <defs>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+    </marker>
+  </defs>
+  
+  <!-- A等B -->
+  <line x1="250" y1="95" x2="350" y2="95" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <text x="300" y="90" text-anchor="middle" font-size="10" fill="#e74c3c">等</text>
+  
+  <!-- B等C -->
+  <line x1="400" y1="95" x2="500" y2="95" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <text x="450" y="90" text-anchor="middle" font-size="10" fill="#3498db">等</text>
+  
+  <!-- C等A（形成环路） -->
+  <path d="M 550 95 Q 600 50, 400 50 Q 200 50, 250 95" fill="none" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)" stroke-dasharray="5,5"/>
+  <text x="400" y="45" text-anchor="middle" font-size="10" fill="#2ecc71">等（形成死锁环）</text>
+  
+  <!-- 避让区 -->
+  <rect x="100" y="160" width="80" height="30" fill="#f39c12" rx="5"/>
+  <text x="140" y="180" text-anchor="middle" font-size="12" fill="white">避让区</text>
+  
+  <!-- 解除操作 -->
+  <rect x="250" y="160" width="100" height="30" fill="#9b59b6" rx="5"/>
+  <text x="300" y="180" text-anchor="middle" font-size="12" fill="white">C倒车</text>
+  
+  <rect x="400" y="160" width="100" height="30" fill="#1abc9c" rx="5"/>
+  <text x="450" y="180" text-anchor="middle" font-size="12" fill="white">A、B通过</text>
+  
+  <rect x="550" y="160" width="100" height="30" fill="#e67e22" rx="5"/>
+  <text x="600" y="180" text-anchor="middle" font-size="12" fill="white">C驶出</text>
+  
+  <!-- 流程箭头 -->
+  <line x1="180" y1="175" x2="250" y2="175" stroke="#333" stroke-width="2" marker-end="url(#arrowRed)"/>
+  <line x1="350" y1="175" x2="400" y2="175" stroke="#333" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="500" y1="175" x2="550" y2="175" stroke="#333" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 说明文字 -->
+  <text x="400" y="230" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">解除步骤</text>
+  <text x="400" y="250" text-anchor="middle" font-size="12" fill="#555">1. 检测到死锁环（A→B→C→A）</text>
+  <text x="400" y="270" text-anchor="middle" font-size="12" fill="#555">2. 选择优先级最低的C车倒车至避让区</text>
+  <text x="400" y="290" text-anchor="middle" font-size="12" fill="#555">3. A、B车依次通过单行线</text>
+  <text x="400" y="310" text-anchor="middle" font-size="12" fill="#555">4. C车从避让区驶出，继续任务</text>
+  
+  <!-- 底部提示 -->
+  <text x="400" y="360" text-anchor="middle" font-size="12" fill="#888">核心思想：找环 → 让车 → 解除</text>
+</svg>
+
+<div class="footer-nav">
+            <a href="17PetriNetAvoidance.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19MultiIntersectionDeadlock.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

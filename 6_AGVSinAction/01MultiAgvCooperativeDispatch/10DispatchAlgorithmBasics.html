@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 调度算法基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="active">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 调度算法基础：FCFS、最短路径优先、最早截止时间优先</h2>
+
+<p>调度算法，说白了就是AGV的大脑。多车协同跑起来，谁先走、谁后走、走哪条路，全靠它来拍板。</p>
+
+<p>我刚开始做AGV调度那会儿，觉得算法嘛，不就是排个队？后来踩了不少坑才明白——调度算法选不对，整个系统就跟堵车一样，谁也动不了。</p>
+
+<p>今天咱们聊三种最基础的调度算法。它们虽然简单，但却是所有复杂调度策略的基石。你想想看，连FCFS都搞不明白，后面那些花里胡哨的算法就更别谈了。</p>
+
+<h3>10.1 FCFS（先来先服务）</h3>
+
+<p>FCFS，全称First Come First Served。说白了就是排队——谁先来，谁先走。</p>
+
+<p>我记得第一次给客户演示系统，用的就是FCFS。客户问：“这跟超市排队有啥区别？”我说：“还真没太大区别，但超市排队不会撞车。”</p>
+
+<p><strong>核心逻辑：</strong></p>
+<ul>
+  <li>任务按到达时间排序</li>
+  <li>先到的任务先分配AGV</li>
+  <li>AGV执行完一个任务，再接下一个</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>优点：</strong></p>
+  <ul>
+    <li>实现简单，代码量少</li>
+    <li>公平性高，不会饿死任务</li>
+    <li>适合任务量少、负载低的场景</li>
+  </ul>
+  <p><strong>缺点：</strong></p>
+  <ul>
+    <li>不考虑任务紧急程度</li>
+    <li>不考虑AGV当前位置</li>
+    <li>长任务会阻塞后续短任务</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过这样一个场景：仓库里有台AGV正在执行一个远距离运输任务，耗时15分钟。后面来了个紧急补货任务，只需要2分钟。结果呢？紧急任务硬等了15分钟。客户差点急眼。</p>
+
+<p>这就是FCFS的典型问题——它太“老实”了，不会插队。</p>
+
+<h3>10.2 最短路径优先</h3>
+
+<p>最短路径优先，英文叫Shortest Path First，简称SPF。这个算法的思路很直接：哪个任务离AGV最近，就先干哪个。</p>
+
+<p>你可能会问：“这不就是贪心算法吗？”没错，就是贪心。每次选最优的，不考虑全局。</p>
+
+<p><strong>实现步骤：</strong></p>
+<ol>
+  <li>计算每个任务起点到AGV当前位置的距离</li>
+  <li>选择距离最短的任务</li>
+  <li>AGV执行任务，完成后重新计算</li>
+</ol>
+
+<pre><code>// 伪代码示例
+function selectTask(agv, taskList) {
+    let minDistance = Infinity;
+    let selectedTask = null;
+    
+    for (let task of taskList) {
+        let dist = calculateDistance(agv.position, task.startPoint);
+        if (dist &lt; minDistance) {
+            minDistance = dist;
+            selectedTask = task;
+        }
+    }
+    
+    return selectedTask;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>最短路径优先在AGV数量多、任务密集的场景下表现不错。但要注意——它容易导致“局部最优”。我曾经调试过一个系统，AGV总是围着仓库门口转，因为门口的任务离它最近。结果仓库深处的任务一直没人管。</p>
+</div>
+
+<p>嗯，这里要注意：最短路径优先不是真的算路径，而是算直线距离。实际路径要考虑障碍物、单向道、充电区等因素。我建议在计算距离时，至少加上一个“路径可行性”的判断。</p>
+
+<h3>10.3 最早截止时间优先</h3>
+
+<p>最早截止时间优先，Earliest Deadline First，简称EDF。这个算法关注的是“时间”——哪个任务最急，就先干哪个。</p>
+
+<p>我在做汽车零部件产线调度时，EDF用得最多。产线上的物料必须在规定时间内送到工位，晚了就停线。停线一分钟，损失好几万。你说急不急？</p>
+
+<p><strong>核心思想：</strong></p>
+<ul>
+  <li>每个任务有一个截止时间</li>
+  <li>截止时间越早，优先级越高</li>
+  <li>AGV优先执行截止时间最早的任务</li>
+</ul>
+
+<table>
+  <tr>
+    <th>任务ID</th>
+    <th>截止时间</th>
+    <th>优先级</th>
+  </tr>
+  <tr>
+    <td>T001</td>
+    <td>10:00</td>
+    <td>高</td>
+  </tr>
+  <tr>
+    <td>T002</td>
+    <td>10:15</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>T003</td>
+    <td>10:30</td>
+    <td>低</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经犯过一个错误——只按截止时间排序，没考虑任务执行时间。结果有个截止时间很早但执行时间很长的任务，把其他任务全堵死了。后来我加了一个“可行性检查”：如果当前AGV无法在截止时间前完成任务，就标记为“超时任务”，交给备用AGV处理。</p>
+</div>
+
+<p>EDF的另一个坑是“多米诺效应”。一个任务超时，可能导致后续一连串任务都超时。我建议在调度系统中加入“动态优先级调整”机制——任务越接近截止时间，优先级越高。</p>
+
+<h3>10.4 三种算法对比</h3>
+
+<p>说了这么多，咱们来做个对比。我习惯用一张表来总结：</p>
+
+<table>
+  <tr>
+    <th>算法</th>
+    <th>适用场景</th>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>FCFS</td>
+    <td>任务量少、负载低</td>
+    <td>公平、简单</td>
+    <td>不考虑紧急程度</td>
+  </tr>
+  <tr>
+    <td>SPF</td>
+    <td>AGV数量多、任务密集</td>
+    <td>响应快、吞吐量高</td>
+    <td>局部最优、远任务被饿死</td>
+  </tr>
+  <tr>
+    <td>EDF</td>
+    <td>有严格时间要求的场景</td>
+    <td>满足截止时间</td>
+    <td>多米诺效应、实现复杂</td>
+  </tr>
+</table>
+
+<p>你想想看，实际项目中很少只用一种算法。我一般会组合使用：比如FCFS做基础排序，再叠加EDF的优先级调整。或者SPF选任务，但加上截止时间约束。</p>
+
+<h3>10.5 调度算法核心逻辑图</h3>
+
+<p>下面这张图，是我自己画的一个调度算法选择流程。你可以把它当作一个决策树：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">调度算法选择流程</text>
+  
+  <!-- 开始节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务到达</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断：是否有截止时间 -->
+  <polygon points="400,140 520,190 400,240 280,190" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">有截止时间？</text>
+  
+  <!-- 箭头：是 -->
+  <line x1="520" y1="190" x2="620" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="570" y="180" text-anchor="middle" font-size="12" fill="#27ae60">是</text>
+  
+  <!-- EDF节点 -->
+  <rect x="620" y="165" width="160" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="700" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">EDF调度</text>
+  
+  <!-- 箭头：否 -->
+  <line x1="280" y1="190" x2="180" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="230" y="180" text-anchor="middle" font-size="12" fill="#e74c3c">否</text>
+  
+  <!-- 判断：任务密集？ -->
+  <polygon points="180,140 300,190 180,240 60,190" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="180" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">任务密集？</text>
+  
+  <!-- 箭头：是 -->
+  <line x1="60" y1="190" x2="60" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="50" y="250" text-anchor="middle" font-size="12" fill="#27ae60">是</text>
+  
+  <!-- SPF节点 -->
+  <rect x="10" y="300" width="100" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="60" y="330" text-anchor="middle" font-size="14" fill="white" font-weight="bold">SPF调度</text>
+  
+  <!-- 箭头：否 -->
+  <line x1="300" y1="190" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="360" y="250" text-anchor="middle" font-size="12" fill="#e74c3c">否</text>
+  
+  <!-- FCFS节点 -->
+  <rect x="350" y="300" width="100" height="50" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="330" text-anchor="middle" font-size="14" fill="white" font-weight="bold">FCFS调度</text>
+  
+  <!-- 箭头汇聚 -->
+  <line x1="60" y1="350" x2="60" y2="400" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="350" x2="400" y2="400" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="700" y1="215" x2="700" y2="400" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="60" y1="400" x2="700" y2="400" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 结束节点 -->
+  <rect x="300" y="400" width="200" height="50" rx="25" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="430" text-anchor="middle" font-size="16" fill="white" font-weight="bold">执行任务</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图的核心逻辑是：先看任务有没有截止时间要求，有就用EDF；没有的话，看任务密集程度，密集用SPF，稀疏用FCFS。当然，这只是个简化模型。实际项目中，我还会考虑AGV的电量、路径拥堵情况、任务优先级权重等因素。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>刚开始做调度系统，别想着一步到位。先用FCFS跑起来，再逐步加入SPF和EDF的优化。我见过太多人一上来就搞复杂算法，结果系统跑都跑不起来。</p>
+</div>
+
+<p>好了，三种基础调度算法就聊到这儿。记住一句话：没有最好的算法，只有最合适的算法。选算法之前，先搞清楚你的业务场景。</p>
+
+<div class="footer-nav">
+            <a href="09DataStorage.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11AdvancedDispatchAlgorithms.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV导航系统抗干扰调优技巧 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV导航系统抗干扰调优技巧</h1>
+    <div class="subhead">
+        <span>🔐 实战调优 · 系统级抗干扰</span>
+        <span>v2.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV导航算法工程师</strong> — 深入定位与抗干扰底层</li>
+                <li><strong>机器人系统集成工程师</strong> — 构建高鲁棒导航系统</li>
+                <li><strong>嵌入式/硬件工程师</strong> — 电磁屏蔽、传感器选型与布局</li>
+                <li><strong>自动化/物流行业从业者</strong> — 提升AGV现场部署稳定性</li>
+                <li><strong>高校学生/研究者</strong> — 多传感器融合、滤波与调优实践</li>
+                <li><strong>技术管理者/架构师</strong> — 抗干扰设计规范与团队能力建设</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握30章抗干扰体系</strong> — 从干扰源分类到前沿技术全覆盖</li>
+                <li><strong>独立诊断与解决干扰问题</strong> — 电磁、振动、光噪、地面纹理等</li>
+                <li><strong>精通多传感器融合抗干扰</strong> — 卡尔曼滤波、异常剔除、时间同步</li>
+                <li><strong>实战调优工具链与自动化</strong> — ROS2诊断、贝叶斯优化、仿真环境</li>
+                <li><strong>行业标准与认证认知</strong> — EMC测试、功能安全、ISO/IEC/GB</li>
+                <li><strong>从调优工程师到架构师</strong> — 设计规范、故障诊断、成长路径</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>抗干扰基础：</strong>AGV导航系统干扰源分类（电磁干扰、机械振动、环境光噪、地面纹理），干扰对定位精度的影响分析，抗干扰调优的总体思路与原则。</li>
+        <li data-index="2"><strong>传感器选型与布局：</strong>激光雷达、IMU、编码器、视觉相机等传感器的抗干扰特性对比，传感器安装位置与角度优化，冗余传感器融合策略。</li>
+        <li data-index="3"><strong>电磁屏蔽与滤波：</strong>电机驱动与通信线缆的电磁屏蔽设计，电源滤波与信号滤波电路选型，接地与等电位连接技巧。</li>
+        <li data-index="4"><strong>机械减振与结构优化：</strong>AGV底盘与传感器支架的减振设计，橡胶垫与弹簧减振器选型，紧固件防松与动态平衡调整。</li>
+        <li data-index="5"><strong>环境光噪抑制：</strong>激光雷达抗环境光干扰算法（多脉冲、编码调制），视觉相机曝光与增益自适应调节，红外补光与滤光片应用。</li>
+        <li data-index="6"><strong>地面纹理适应性：</strong>不同地面材质（环氧地坪、水泥地、钢板）对导航的影响，自适应纹理匹配算法，地面标记与二维码辅助定位。</li>
+        <li data-index="7"><strong>多传感器融合抗干扰：</strong>卡尔曼滤波与粒子滤波在融合中的应用，异常传感器数据剔除策略（卡方检验、残差分析），时间戳对齐与数据同步。</li>
+        <li data-index="8"><strong>定位算法鲁棒性增强：</strong>自适应蒙特卡洛定位（AMCL）参数调优，粒子数量与重采样策略，动态障碍物干扰下的定位保持。</li>
+        <li data-index="9"><strong>路径规划抗干扰：</strong>动态窗口法（DWA）参数调优，局部路径规划中的避障与重规划，全局路径的平滑与曲率约束。</li>
+        <li data-index="10"><strong>运动控制抗干扰：</strong>PID控制器抗积分饱和与微分先行，前馈补偿与扰动观测器设计，电机电流环与速度环参数整定。</li>
+        <li data-index="11"><strong>通信抗干扰：</strong>无线通信（WiFi、UWB、5G）的抗干扰选型与信道切换，通信协议中的重传与校验机制，多AGV通信冲突避免。</li>
+        <li data-index="12"><strong>软件滤波与数据处理：</strong>滑动平均滤波、中值滤波、低通滤波在传感器数据中的应用，异常值检测与插值修复，数据平滑与降噪。</li>
+        <li data-index="13"><strong>标定与校准：</strong>激光雷达与IMU外参标定方法，编码器刻度系数校准，视觉相机内参标定与畸变校正。</li>
+        <li data-index="14"><strong>环境建模与地图优化：</strong>栅格地图与特征地图的抗干扰更新策略，动态障碍物地图剔除，多时相地图融合与更新。</li>
+        <li data-index="15"><strong>故障诊断与自恢复：</strong>传感器故障检测与隔离（FDIR），定位丢失后的重定位策略，系统异常状态下的安全降级模式。</li>
+        <li data-index="16"><strong>抗干扰测试方法论：</strong>干扰注入测试（电磁、振动、光照），定位精度与鲁棒性量化指标（RMSE、CEP、定位成功率），测试场景设计与自动化测试。</li>
+        <li data-index="17"><strong>案例实战：</strong>电磁干扰导致定位跳变分析与解决，地面反光导致激光雷达误检测处理，振动导致IMU漂移的调优案例。</li>
+        <li data-index="18"><strong>抗干扰调优工具链：</strong>ROS2中的诊断工具（diagnostics）、数据录制与回放（rosbag）、可视化分析（PlotJuggler、Foxglove）。</li>
+        <li data-index="19"><strong>参数调优自动化：</strong>贝叶斯优化与网格搜索在参数调优中的应用，基于强化学习的自适应参数调整，参数调优的仿真环境搭建。</li>
+        <li data-index="20"><strong>抗干扰设计规范：</strong>AGV导航系统抗干扰设计检查清单，硬件选型与布局规范，软件架构与容错设计规范。</li>
+        <li data-index="21"><strong>激光雷达抗干扰进阶：</strong>多回波技术、抗干扰波形设计、动态阈值调整，激光雷达与毫米波雷达融合抗干扰。</li>
+        <li data-index="22"><strong>IMU抗干扰进阶：</strong>IMU温度补偿与振动补偿，零偏稳定性与随机游走抑制，IMU与轮式里程计融合抗干扰。</li>
+        <li data-index="23"><strong>视觉导航抗干扰：</strong>视觉SLAM中的光照鲁棒性增强，特征点匹配抗干扰（RANSAC、GMS），视觉与激光雷达深度融合。</li>
+        <li data-index="24"><strong>多AGV协同抗干扰：</strong>多车通信干扰与协调调度，协同定位中的相对观测抗干扰，分布式地图更新与一致性维护。</li>
+        <li data-index="25"><strong>深度学习抗干扰：</strong>基于深度学习的传感器数据去噪，异常检测网络在干扰识别中的应用，端到端抗干扰导航模型。</li>
+        <li data-index="26"><strong>实时性与抗干扰平衡：</strong>算法复杂度与实时性约束，多线程与任务优先级调度，硬件加速（FPGA、GPU）在抗干扰中的应用。</li>
+        <li data-index="27"><strong>抗干扰调优实战流程：</strong>从问题定位、数据分析、参数调整到验证闭环，调优日志记录与复盘方法，调优经验库构建。</li>
+        <li data-index="28"><strong>行业标准与认证：</strong>AGV导航系统抗干扰相关标准（ISO、IEC、GB），电磁兼容性（EMC）测试与认证，功能安全与抗干扰关系。</li>
+        <li data-index="29"><strong>前沿抗干扰技术：</strong>基于事件相机的抗干扰导航，量子传感器在导航中的应用展望，数字孪生驱动的抗干扰调优。</li>
+        <li data-index="30"><strong>课程总结与进阶路径：</strong>抗干扰调优核心知识体系回顾，推荐学习资源与工具，从调优工程师到系统架构师的成长路径。</li>
+    </ul>
+    
+</div>
+</body>
+</html>

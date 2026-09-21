@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 启发式搜索入门</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="active">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 启发式搜索入门：启发式函数概念、贪心最佳优先搜索、A星算法的直觉理解</h2>
+
+<p>各位同学，今天我们来聊聊启发式搜索。说实话，我刚入行那会儿，对“启发式”这三个字特别犯怵——总觉得这是什么高深莫测的数学魔法。后来做项目做多了才发现，说白了就是“凭经验猜一猜，但猜得有道理”。</p>
+
+<h3>4.1 什么是启发式函数？</h3>
+
+<p>先问大家一个问题：你在一个陌生城市找一家餐厅，你会怎么走？</p>
+
+<p>正常人肯定不会把所有路口都走一遍吧？你会先看地图，判断餐厅大概在哪个方向，然后朝着那个方向走。这个“大概方向”的判断，就是启发式。</p>
+
+<p><strong>启发式函数（Heuristic Function）</strong>，用数学语言说，就是<code>h(n)</code>——它估算从当前节点<code>n</code>到目标节点的代价。注意我的用词：“估算”。它不是精确值，而是预测值。</p>
+
+<div class="highlight">
+  <p><strong>核心公式：</strong></p>
+  <p><code>h(n) = 从节点n到目标节点的估计代价</code></p>
+  <p>常见的启发式函数：</p>
+  <ul>
+    <li><strong>曼哈顿距离</strong>：<code>|x1-x2| + |y1-y2|</code>（适合四方向移动）</li>
+    <li><strong>欧几里得距离</strong>：<code>sqrt((x1-x2)² + (y1-y2)²)</code>（适合任意方向移动）</li>
+    <li><strong>切比雪夫距离</strong>：<code>max(|x1-x2|, |y1-y2|)</code>（适合八方向移动）</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过最典型的坑：有人直接用欧几里得距离做AGV的路径估计，结果路径老是穿墙。为什么？因为AGV只能走网格，不能斜着飞啊！所以选启发式函数，一定要匹配你的运动模型。</p>
+
+<h3>4.2 贪心最佳优先搜索</h3>
+
+<p>理解了启发式函数，咱们先看一个最简单的应用——<strong>贪心最佳优先搜索（Greedy Best-First Search）</strong>。</p>
+
+<p>它的逻辑特别直白：<strong>每次都选离目标最近的节点</strong>。只看<code>h(n)</code>，不看已经走了多远。</p>
+
+<pre><code>// 伪代码：贪心最佳优先搜索
+openList.add(startNode);
+
+while (openList不为空) {
+    currentNode = openList中h(n)最小的节点;
+    
+    if (currentNode == goalNode) {
+        return 成功;
+    }
+    
+    openList.remove(currentNode);
+    closedList.add(currentNode);
+    
+    for (neighbor : currentNode的邻居) {
+        if (neighbor 不在 closedList 中) {
+            neighbor.parent = currentNode;
+            openList.add(neighbor);
+        }
+    }
+}
+</code></pre>
+
+<p>你想想看，这算法有什么问题？</p>
+
+<p>嗯，它太“贪心”了。我曾经用这个算法给AGV规划路径，结果遇到一个U形障碍物，小车直接冲进去，然后在里面转圈圈——因为它只看目标方向，不知道先绕路才是更优解。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经在仓库项目中用贪心最佳优先搜索做路径规划，结果AGV频繁陷入局部最优。后来我加了个“历史代价”才解决问题。记住：贪心算法适合障碍物少的场景，复杂环境慎用。</p>
+</div>
+
+<h3>4.3 A星算法的直觉理解</h3>
+
+<p>好了，重头戏来了。<strong>A星算法</strong>，说白了就是“贪心最佳优先搜索”和“Dijkstra算法”的合体。</p>
+
+<p>Dijkstra算法只看已经走了多远（<code>g(n)</code>），贪心最佳优先搜索只看还要走多远（<code>h(n)</code>）。A星呢？两个都看：</p>
+
+<div class="highlight">
+  <p><strong>A星核心公式：</strong></p>
+  <p><code>f(n) = g(n) + h(n)</code></p>
+  <ul>
+    <li><code>g(n)</code>：从起点到当前节点<code>n</code>的实际代价</li>
+    <li><code>h(n)</code>：从当前节点<code>n</code>到目标节点的估计代价</li>
+    <li><code>f(n)</code>：总估计代价</li>
+  </ul>
+</div>
+
+<p>我个人的理解方式是这样的：<code>g(n)</code>是“过去”，<code>h(n)</code>是“未来”，<code>f(n)</code>是“全局视野”。</p>
+
+<p>举个生活中的例子：你要从北京去上海。</p>
+<ul>
+  <li>Dijkstra算法：先把北京所有路口走一遍，再走天津所有路口……太慢了</li>
+  <li>贪心最佳优先搜索：直接朝上海方向冲，遇到黄河就傻眼了</li>
+  <li>A星算法：先看地图，知道上海在东南方向，但也要考虑已经走了多远，综合判断</li>
+</ul>
+
+<p>是不是一下子就理解了？</p>
+
+<h3>4.4 启发式函数对A星的影响</h3>
+
+<p>这里有个关键点：<strong>启发式函数的选择直接决定了A星的行为</strong>。</p>
+
+<table>
+  <tr>
+    <th>h(n) 的情况</th>
+    <th>算法行为</th>
+    <th>实际效果</th>
+  </tr>
+  <tr>
+    <td>h(n) = 0</td>
+    <td>A星退化为Dijkstra</td>
+    <td>保证最优解，但搜索范围大</td>
+  </tr>
+  <tr>
+    <td>h(n) ≤ 实际代价</td>
+    <td>可采纳的启发式</td>
+    <td>保证最优解，效率较高</td>
+  </tr>
+  <tr>
+    <td>h(n) = 实际代价</td>
+    <td>完美启发式</td>
+    <td>只走最优路径，效率最高</td>
+  </tr>
+  <tr>
+    <td>h(n) > 实际代价</td>
+    <td>不可采纳的启发式</td>
+    <td>可能不是最优解，但更快</td>
+  </tr>
+</table>
+
+<p>我在做AGV调度系统时，就遇到过这个权衡。客户要求“路径必须最优”，那我就用曼哈顿距离（可采纳的）。另一个项目要求“实时响应”，我就稍微放大h(n)的值，牺牲一点最优性换取速度。</p>
+
+<div class="tip">
+  <p><strong>个人经验：</strong></p>
+  <p>如果你不确定选什么启发式函数，先用曼哈顿距离。它在大多数网格地图上表现都不错。等系统跑起来后，再根据实际性能调优。</p>
+</div>
+
+<h3>4.5 本章知识体系</h3>
+
+<p>下面这张图，是我自己总结的启发式搜索知识体系。你看一遍，应该就能把今天的内容串起来了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">启发式搜索知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">启发式搜索</text>
+  
+  <!-- 三个分支 -->
+  <!-- 分支1：启发式函数 -->
+  <line x1="350" y1="120" x2="150" y2="200" stroke="#3498db" stroke-width="2"/>
+  <rect x="70" y="190" width="160" height="50" rx="10" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="150" y="220" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">启发式函数 h(n)</text>
+  
+  <!-- 分支2：贪心最佳优先 -->
+  <line x1="400" y1="120" x2="400" y2="200" stroke="#3498db" stroke-width="2"/>
+  <rect x="310" y="190" width="180" height="50" rx="10" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="400" y="220" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">贪心最佳优先搜索</text>
+  
+  <!-- 分支3：A星算法 -->
+  <line x1="450" y1="120" x2="650" y2="200" stroke="#3498db" stroke-width="2"/>
+  <rect x="570" y="190" width="160" height="50" rx="10" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="650" y="220" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">A星算法</text>
+  
+  <!-- 启发式函数子节点 -->
+  <line x1="100" y1="240" x2="60" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="20" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="80" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">曼哈顿距离</text>
+  
+  <line x1="150" y1="240" x2="150" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="90" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="150" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">欧几里得距离</text>
+  
+  <line x1="200" y1="240" x2="240" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="180" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="240" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">切比雪夫距离</text>
+  
+  <!-- 贪心最佳优先子节点 -->
+  <line x1="350" y1="240" x2="300" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="240" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="300" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">只看 h(n)</text>
+  
+  <line x1="400" y1="240" x2="400" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="340" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">容易局部最优</text>
+  
+  <line x1="450" y1="240" x2="500" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="440" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="500" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">适合简单场景</text>
+  
+  <!-- A星子节点 -->
+  <line x1="600" y1="240" x2="550" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="490" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="550" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">f(n) = g(n) + h(n)</text>
+  
+  <line x1="650" y1="240" x2="650" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="590" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="650" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">兼顾过去与未来</text>
+  
+  <line x1="700" y1="240" x2="750" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+  <rect x="690" y="300" width="120" height="40" rx="8" fill="#f9f9f9" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="750" y="325" text-anchor="middle" font-size="12" fill="#7f8c8d">可采纳性保证</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="400" width="400" height="60" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2" opacity="0.8"/>
+  <text x="400" y="425" text-anchor="middle" font-size="14" fill="white" font-weight="bold">核心思想：用启发式函数引导搜索方向</text>
+  <text x="400" y="445" text-anchor="middle" font-size="12" fill="white">同时保证路径最优性和搜索效率</text>
+</svg>
+
+<p>这张图把今天的内容都串起来了。你看，启发式函数是基础，贪心最佳优先搜索和A星算法都是它的应用。区别在于：贪心只看未来，A星兼顾过去和未来。</p>
+
+<p>好了，今天的内容就到这里。记住一句话：<strong>启发式搜索不是魔法，而是有策略的猜测</strong>。下一章我们会手写A星的代码实现，到时候你就知道它到底有多强了。</p>
+
+<div class="footer-nav">
+            <a href="03GraphSearchBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05AStarCorePrinciple.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

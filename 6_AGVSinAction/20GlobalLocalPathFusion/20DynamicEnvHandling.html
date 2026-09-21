@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>20 动态环境处理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="active">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>20 动态环境处理：动态障碍物预测、速度障碍法（VO）、交互博弈、时空联合规划</h2>
+
+<p>各位做AGV的朋友，咱们今天聊点硬核的——动态环境处理。</p>
+
+<p>说实话，静态环境下的路径规划，现在开源方案一抓一大把。但真正让AGV从实验室走向工厂、走向医院、走向商超的，恰恰是动态环境的处理能力。我见过太多AGV在静态测试中跑得飞起，一到真实场景就原地打转，或者跟人“跳探戈”。</p>
+
+<p>为什么会这样？因为真实世界是活的。人、其他机器人、叉车、手推车……这些东西不会按你规划的路径走。所以，这一章我们重点解决一个问题：<strong>当周围的一切都在动，你的AGV该怎么决策？</strong></p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>动态环境处理不是单一算法能搞定的，它需要“预测-决策-规划”三层联动。预测是眼睛，决策是大脑，规划是手脚。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; height:auto; margin:20px auto; display:block; background:#f0f8ff; border-radius:12px; border:2px solid #b0d4e8;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c7fb8"/>
+    </marker>
+  </defs>
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#1a5276">动态环境处理知识体系</text>
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#2c7fb8" stroke="#1a5276" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态环境处理</text>
+  <!-- 四个分支 -->
+  <!-- 分支1：动态障碍物预测 -->
+  <line x1="300" y1="95" x2="120" y2="180" stroke="#2c7fb8" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="40" y="170" width="160" height="60" rx="10" fill="#d4e6f1" stroke="#2c7fb8" stroke-width="1.5"/>
+  <text x="120" y="195" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">动态障碍物预测</text>
+  <text x="120" y="215" text-anchor="middle" font-size="11" fill="#2c3e50">卡尔曼滤波 / 社会力模型</text>
+  <!-- 分支2：速度障碍法 -->
+  <line x1="400" y1="120" x2="400" y2="200" stroke="#2c7fb8" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="310" y="200" width="180" height="60" rx="10" fill="#d4e6f1" stroke="#2c7fb8" stroke-width="1.5"/>
+  <text x="400" y="225" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">速度障碍法（VO）</text>
+  <text x="400" y="245" text-anchor="middle" font-size="11" fill="#2c3e50">碰撞锥 / 速度空间选择</text>
+  <!-- 分支3：交互博弈 -->
+  <line x1="500" y1="95" x2="680" y2="180" stroke="#2c7fb8" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="600" y="170" width="160" height="60" rx="10" fill="#d4e6f1" stroke="#2c7fb8" stroke-width="1.5"/>
+  <text x="680" y="195" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">交互博弈</text>
+  <text x="680" y="215" text-anchor="middle" font-size="11" fill="#2c3e50">纳什均衡 / 社会意识</text>
+  <!-- 分支4：时空联合规划 -->
+  <line x1="400" y1="120" x2="400" y2="300" stroke="#2c7fb8" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="290" y="300" width="220" height="60" rx="10" fill="#d4e6f1" stroke="#2c7fb8" stroke-width="1.5"/>
+  <text x="400" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#1a5276">时空联合规划</text>
+  <text x="400" y="345" text-anchor="middle" font-size="11" fill="#2c3e50">ST图 / 时空A* / 轨迹优化</text>
+  <!-- 底部总结 -->
+  <rect x="250" y="400" width="300" height="40" rx="8" fill="#e8f8f5" stroke="#1abc9c" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="400" y="425" text-anchor="middle" font-size="13" fill="#0e6655">预测 → 决策 → 规划，三层联动</text>
+</svg>
+
+<h3>20.1 动态障碍物预测：先看三步，再走一步</h3>
+
+<p>我个人习惯把动态障碍物预测比作“下棋”。高手下棋，不是看当前这一步，而是看后面三步。AGV也一样，它需要知道周围的人和机器接下来几秒会往哪走。</p>
+
+<p>预测方法有很多，我挑三个最实用的讲：</p>
+
+<h4>20.1.1 基于运动模型的预测</h4>
+
+<p>这是最基础的方法。假设障碍物保持当前运动状态不变，用卡尔曼滤波或粒子滤波去跟踪。</p>
+
+<pre><code>// 伪代码：卡尔曼滤波预测障碍物位置
+// 状态向量: [x, y, vx, vy]
+// 预测步长: dt = 0.1s
+
+void predictObstacle(State&amp; s, float dt) {
+    // 状态转移矩阵 F
+    s.x += s.vx * dt;
+    s.y += s.vy * dt;
+    // 协方差更新（略）
+}</code></pre>
+
+<p>嗯，这里要注意：<strong>这种方法的假设太强了</strong>。人突然转身怎么办？叉车突然加速怎么办？我在项目里吃过这个亏——AGV以为行人会直走，结果人家突然拐弯，差点撞上。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>基于运动模型的预测只适合短期预测（1秒以内）。超过2秒，误差会急剧放大。所以别指望它能预测5秒后的位置。</p>
+</div>
+
+<h4>20.1.2 基于社会力模型的预测</h4>
+
+<p>社会力模型（Social Force Model）是Helbing提出来的，原本用于模拟人群疏散。它假设每个行人受到三种力：</p>
+
+<ul>
+  <li><strong>驱动力</strong>：想去目标点的力</li>
+  <li><strong>排斥力</strong>：避开障碍物和其他人的力</li>
+  <li><strong>吸引力</strong>：被某些目标吸引的力（比如出口、货架）</li>
+</ul>
+
+<p>说白了，就是给每个行人算一个合力，然后预测它的运动趋势。这个方法比纯运动模型准一些，因为它考虑了“意图”。</p>
+
+<p>但有个坑——<strong>社会力模型需要知道行人的目标点</strong>。在工厂里，你很难知道每个工人要去哪。所以实际应用中，我一般用社会力模型做定性判断，比如“这个人大概率会往左走”，而不是精确预测轨迹。</p>
+
+<h4>20.1.3 基于学习的预测</h4>
+
+<p>最近几年，基于LSTM、Transformer的轨迹预测火得不行。比如Social-LSTM，它能把周围所有人的轨迹编码成一个“社会张量”，然后预测每个人的未来轨迹。</p>
+
+<p>说实话，效果确实好，但部署成本高。我在一个仓储项目里试过，模型跑在Jetson Xavier上，推理时间要15ms，勉强能接受。但如果你用的是低端MCU，就别想了。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在AGV上部署过一个深度学习预测模型，结果发现模型在仿真里跑得飞起，一到真实场景就崩。为什么？因为训练数据里没有“人突然蹲下捡东西”这种场景。所以，<strong>数据覆盖度比模型复杂度更重要</strong>。</p>
+</div>
+
+<h3>20.2 速度障碍法（VO）：让AGV学会“让一让”</h3>
+
+<p>预测完了，接下来就是决策。速度障碍法（Velocity Obstacle，简称VO）是我个人非常喜欢的一个方法。它不规划路径，而是直接告诉你：<strong>哪些速度是安全的，哪些会撞</strong>。</p>
+
+<p>核心思想很简单：</p>
+
+<ol>
+  <li>把AGV和障碍物都抽象成圆（或凸多边形）</li>
+  <li>在速度空间里，找出所有会导致碰撞的速度向量</li>
+  <li>从剩余的安全速度里选一个最优的</li>
+</ol>
+
+<p>你想想看，这就像开车时，你看到前面有辆车，你脑子里会快速判断：“我如果保持这个速度会撞，我得减速或者变道。”VO做的就是这件事。</p>
+
+<pre><code>// 速度障碍法核心逻辑（简化版）
+// AGV位置: pa, 速度: va
+// 障碍物位置: pb, 速度: vb
+// 安全半径: ra + rb
+
+bool isVelocitySafe(Vector2 va, Vector2 vb, Vector2 pa, Vector2 pb) {
+    Vector2 relVel = va - vb;          // 相对速度
+    Vector2 relPos = pb - pa;          // 相对位置
+    float dist = relPos.length();
+    
+    // 计算碰撞锥的半角
+    float halfAngle = asin((ra + rb) / dist);
+    
+    // 判断相对速度是否在碰撞锥内
+    float angle = angleBetween(relVel, relPos);
+    return abs(angle) > halfAngle;
+}</code></pre>
+
+<p>但VO有个问题——<strong>它假设障碍物会保持当前速度</strong>。如果对方突然变向，VO就失效了。所以后来有了RVO（Reciprocal VO）和ORCA（Optimal Reciprocal Collision Avoidance），加入了“互相避让”的机制。</p>
+
+<div class="highlight">
+  <p><strong>我的建议：</strong>在工厂AGV场景中，用ORCA比用原始VO更靠谱。因为ORCA考虑了双方都在避让的情况，不会出现“两个人互相让，结果让到一起去”的尴尬局面。</p>
+</div>
+
+<h3>20.3 交互博弈：当AGV学会“读心术”</h3>
+
+<p>VO虽然好用，但它有个隐含假设：<strong>障碍物不会主动配合你</strong>。但在真实场景中，人和机器是会互动的。比如你推着购物车走向一个人，对方会下意识地让开。这种“你让我，我让你”的交互，就是博弈论要解决的问题。</p>
+
+<p>交互博弈的核心是<strong>纳什均衡</strong>——每个智能体都选择对自己最有利的策略，同时考虑对方的策略。在AGV场景中，可以建模成：</p>
+
+<ul>
+  <li><strong>策略空间</strong>：左转、右转、减速、加速、停止</li>
+  <li><strong>收益函数</strong>：到达目标的时间 + 碰撞惩罚 + 舒适度惩罚</li>
+  <li><strong>求解目标</strong>：找到一组策略，使得任何一方单方面改变策略都不会获益</li>
+</ul>
+
+<p>听起来很完美对吧？但实际做起来，计算量巨大。两个智能体还好，如果场景里有5个、10个，求解纳什均衡的复杂度是指数级的。</p>
+
+<p>所以我在实际项目中，用的是<strong>简化版博弈</strong>：只考虑AGV和最近的一个障碍物之间的博弈，其他障碍物用VO处理。这样既保留了博弈的“交互感”，又不会把算力吃光。</p>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>在博弈模型中，给“让行”行为加一个小的正收益。这样AGV会倾向于主动让行，而不是等对方让。这在人机交互中特别重要——人会觉得这AGV“有礼貌”。</p>
+</div>
+
+<h3>20.4 时空联合规划：把时间维度拉进来</h3>
+
+<p>前面讲的预测、VO、博弈，本质上都是在做“瞬时决策”。但AGV的路径是一条连续的轨迹，不能只看当前这一帧。所以我们需要<strong>时空联合规划</strong>——把时间作为一个维度，和空间一起规划。</p>
+
+<p>最经典的方法是<strong>ST图（Space-Time Graph）</strong>：</p>
+
+<ul>
+  <li>横轴是时间 t</li>
+  <li>纵轴是路径里程 s（沿着参考路径的距离）</li>
+  <li>每个点 (s, t) 表示“在t时刻，AGV在路径上的s位置”</li>
+  <li>动态障碍物的轨迹在ST图上表现为“障碍物区域”</li>
+</ul>
+
+<p>然后，问题就变成了：<strong>在ST图上找一条从起点到终点的、不穿过障碍物区域的路径</strong>。这可以用A*或者动态规划来解。</p>
+
+<pre><code>// 时空A*搜索（简化版）
+struct STNode {
+    float s;      // 路径里程
+    float t;      // 时间
+    float cost;   // 累计代价
+};
+
+// 启发式函数：假设匀速行驶到终点
+float heuristic(STNode node, float s_goal) {
+    float remaining = s_goal - node.s;
+    return remaining / MAX_SPEED;
+}
+
+// 扩展节点：考虑加速、减速、匀速三种动作
+vector&lt;STNode&gt; expand(STNode node) {
+    vector&lt;STNode&gt; children;
+    float dt = 0.1;  // 时间步长
+    for (float acc : {-MAX_ACC, 0, MAX_ACC}) {
+        float v_new = node.v + acc * dt;
+        v_new = clamp(v_new, MIN_SPEED, MAX_SPEED);
+        float s_new = node.s + v_new * dt;
+        float t_new = node.t + dt;
+        // 检查是否与障碍物碰撞
+        if (!isColliding(s_new, t_new)) {
+            children.push_back({s_new, t_new, node.cost + cost(acc)});
+        }
+    }
+    return children;
+}</code></pre>
+
+<p>ST图的好处是直观，但缺点也很明显——<strong>它假设AGV沿着固定路径走</strong>。如果AGV需要横向避让（比如变道），ST图就搞不定了。这时候需要<strong>时空联合轨迹优化</strong>，把横向偏移也作为优化变量。</p>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>在ST图上做规划时，时间步长设得太小（0.01s），结果搜索空间爆炸，AGV在原地算了3秒才动。后来我把步长调到0.2s，虽然轨迹粗糙了点，但实时性好了很多。记住：<strong>实时性优先，精度次之</strong>。</p>
+</div>
+
+<h3>20.5 实战中的融合策略</h3>
+
+<p>讲了这么多，你可能会问：这些方法到底怎么组合在一起用？</p>
+
+<p>我分享一个我在项目中验证过的融合框架：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>层级</th>
+      <th>方法</th>
+      <th>更新频率</th>
+      <th>输出</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>预测层</td>
+      <td>卡尔曼滤波 + 社会力模型</td>
+      <td>10Hz</td>
+      <td>障碍物未来3秒的预测轨迹</td>
+    </tr>
+    <tr>
+      <td>决策层</td>
+      <td>ORCA + 简化博弈</td>
+      <td>20Hz</td>
+      <td>当前时刻的最优速度向量</td>
+    </tr>
+    <tr>
+      <td>规划层</td>
+      <td>时空A* + 轨迹优化</td>
+      <td>2Hz</td>
+      <td>未来5秒的平滑轨迹</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这个框架的核心思路是：<strong>高频做决策，低频做规划</strong>。决策层（ORCA）每50ms更新一次，保证AGV能快速响应突发情况；规划层（时空A*）每500ms更新一次，保证轨迹的全局最优性。</p>
+
+<p>嗯，这里有个细节要注意：<strong>决策层的输出和规划层的输出不能冲突</strong>。我一般让规划层生成一条“参考轨迹”，决策层在参考轨迹附近做微调。如果决策层发现必须大幅偏离参考轨迹（比如有人突然冲出来），就触发规划层重新规划。</p>
+
+<div class="highlight">
+  <p><strong>总结一句话：</strong>动态环境处理没有银弹。预测、VO、博弈、时空规划，每个方法都有自己的适用场景。我的做法是——<strong>用预测看未来，用VO保安全，用博弈懂人心，用时空规划定全局</strong>。四者结合，才能让AGV在真实世界中跑得稳、跑得顺。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="19BehaviorPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="21MultiAgvCoopPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

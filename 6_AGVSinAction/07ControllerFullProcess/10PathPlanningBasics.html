@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 路径规划基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="active">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 路径规划基础</h2>
+
+<p>各位同学，今天我们来聊聊AGV的「大脑」——路径规划。说实话，这是整个控制器开发中最有意思的部分，也是我当年踩坑最多的地方。</p>
+
+<p>路径规划说白了就三件事：<strong>全局路径规划、局部路径规划、路径平滑</strong>。我习惯把它们比作「看地图」、「看路况」和「走稳当」。你想想看，光有地图不看路况会撞墙，光看路况不看地图会迷路，走起来还一抖一抖的，那用户体验得多差？</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>全局规划找方向，局部规划避障碍，平滑处理保舒适。三者缺一不可。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block; background:#f0f8ff; border-radius:12px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="160" width="200" height="60" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="198" text-anchor="middle" fill="white" font-size="20" font-weight="bold">路径规划</text>
+  
+  <!-- 三个分支 -->
+  <line x1="300" y1="190" x2="150" y2="80" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="190" x2="650" y2="80" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="220" x2="400" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 全局规划 -->
+  <rect x="50" y="20" width="200" height="60" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="58" text-anchor="middle" fill="white" font-size="18" font-weight="bold">全局路径规划</text>
+  <text x="150" y="75" text-anchor="middle" fill="white" font-size="12">A*算法</text>
+  
+  <!-- 局部规划 -->
+  <rect x="550" y="20" width="200" height="60" rx="10" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="650" y="58" text-anchor="middle" fill="white" font-size="18" font-weight="bold">局部路径规划</text>
+  <text x="650" y="75" text-anchor="middle" fill="white" font-size="12">DWA算法</text>
+  
+  <!-- 路径平滑 -->
+  <rect x="300" y="320" width="200" height="60" rx="10" fill="#f39c12" stroke="#d68910" stroke-width="2"/>
+  <text x="400" y="358" text-anchor="middle" fill="white" font-size="18" font-weight="bold">路径平滑</text>
+  <text x="400" y="375" text-anchor="middle" fill="white" font-size="12">贝塞尔曲线</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="395" text-anchor="middle" fill="#7f8c8d" font-size="13">三者协同工作：全局→局部→平滑</text>
+</svg>
+
+<h3>10.1 全局路径规划：A*算法</h3>
+
+<p>A*算法，我愿称之为「路径规划界的瑞士军刀」。它结合了Dijkstra的完备性和贪心算法的效率，说白了就是<strong>既保证能找到路，又尽量少走弯路</strong>。</p>
+
+<p>核心公式其实很简单：<code>F = G + H</code>。G是起点到当前点的实际代价，H是当前点到终点的估计代价。我当年第一次看这个公式时觉得「就这？」——后来才发现，真正的坑全在H函数的设计上。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>H函数用欧几里得距离还是曼哈顿距离，直接影响搜索效率。在AGV场景下，我建议用<strong>对角线距离</strong>，因为它更符合AGV的运动特性。我曾经在一个仓库项目里用曼哈顿距离，结果搜索节点多了30%，后来换成对角线距离，速度直接起飞。</p>
+</div>
+
+<p>来看一个简化版的A*实现：</p>
+
+<pre><code>// A* 核心逻辑（C语言风格伪代码）
+typedef struct {
+    int x, y;
+    float g, h, f;
+    Node* parent;
+} Node;
+
+Node* a_star_search(GridMap* map, Node* start, Node* goal) {
+    open_list.push(start);
+    start->g = 0;
+    start->h = heuristic(start, goal);  // 对角线距离
+    start->f = start->g + start->h;
+    
+    while (!open_list.empty()) {
+        Node* current = open_list.pop_min_f();  // 取f值最小的节点
+        
+        if (current == goal) {
+            return reconstruct_path(current);  // 回溯路径
+        }
+        
+        closed_list.push(current);
+        
+        // 遍历8个邻居
+        for (int i = 0; i < 8; i++) {
+            Node* neighbor = get_neighbor(map, current, i);
+            if (!neighbor || closed_list.contains(neighbor)) continue;
+            if (!is_walkable(map, neighbor)) continue;
+            
+            float tentative_g = current->g + distance(current, neighbor);
+            
+            if (!open_list.contains(neighbor)) {
+                neighbor->g = tentative_g;
+                neighbor->h = heuristic(neighbor, goal);
+                neighbor->f = neighbor->g + neighbor->h;
+                neighbor->parent = current;
+                open_list.push(neighbor);
+            } else if (tentative_g < neighbor->g) {
+                // 找到更优路径，更新
+                neighbor->g = tentative_g;
+                neighbor->f = neighbor->g + neighbor->h;
+                neighbor->parent = current;
+            }
+        }
+    }
+    return NULL;  // 无路可走
+}</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个密集货架仓库里，A*跑出来的路径贴着障碍物边缘走，AGV稍微有点定位误差就撞上了。后来我加了<strong>障碍物膨胀层</strong>——把障碍物边界向外扩展半个车宽。嗯，从此再没出过碰撞事故。</p>
+</div>
+
+<h3>10.2 局部路径规划：DWA算法</h3>
+
+<p>全局路径规划完了，是不是就万事大吉了？当然不是。你想想看，地图是静态的，但实际环境里可能有临时障碍物、有人走动、有叉车经过。这时候就需要DWA（动态窗口法）上场了。</p>
+
+<p>DWA的核心思想其实很朴素：<strong>在速度空间里采样，找一条能走、走得快、还不撞墙的轨迹</strong>。我习惯把它理解成「在方向盘和油门之间找平衡」。</p>
+
+<p>DWA的步骤就三步：</p>
+
+<ol>
+  <li><strong>速度采样</strong>：在当前速度附近，生成一组候选速度对 (v, ω)</li>
+  <li><strong>轨迹预测</strong>：对每个速度对，模拟未来一段时间的运动轨迹</li>
+  <li><strong>轨迹评价</strong>：用评价函数给每条轨迹打分，选最好的</li>
+</ol>
+
+<p>评价函数通常长这样：</p>
+
+<pre><code>// DWA 评价函数
+float evaluate_trajectory(Trajectory* traj, Node* goal, ObstacleList* obstacles) {
+    float heading_cost = calc_heading_cost(traj, goal);     // 朝向目标
+    float clearance_cost = calc_clearance_cost(traj, obstacles); // 避障
+    float velocity_cost = calc_velocity_cost(traj);         // 速度奖励
+    
+    // 加权求和，权重系数需要调参
+    return alpha * heading_cost + beta * clearance_cost + gamma * velocity_cost;
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>调参心得：</strong>alpha、beta、gamma这三个权重，我调了整整两周才找到感觉。alpha太大，AGV会直愣愣冲向目标，不管障碍物；beta太大，AGV会绕远路，像个胆小鬼；gamma太大，AGV会飙车，急转弯时差点翻车。最终我用的比例是<strong>0.4 : 0.4 : 0.2</strong>，你们可以以此为起点微调。</p>
+</div>
+
+<h3>10.3 路径平滑：贝塞尔曲线</h3>
+
+<p>A*规划出来的路径是什么样？是一段段直线，拐角处是尖的。你想想看，AGV在尖角处要停下来、原地转向、再启动——效率低不说，对电机和电池都是折磨。</p>
+
+<p>这时候就需要贝塞尔曲线来「润色」了。说白了，就是用一条光滑的曲线把那些尖角「抹圆」了。</p>
+
+<p>三阶贝塞尔曲线的公式：</p>
+
+<pre><code>// 三阶贝塞尔曲线
+Point bezier_curve(Point p0, Point p1, Point p2, Point p3, float t) {
+    float u = 1 - t;
+    float x = u*u*u * p0.x + 3*u*u*t * p1.x + 3*u*t*t * p2.x + t*t*t * p3.x;
+    float y = u*u*u * p0.y + 3*u*u*t * p1.y + 3*u*t*t * p2.y + t*t*t * p3.y;
+    return (Point){x, y};
+}</code></pre>
+
+<p>p0和p3是路径的两个端点，p1和p2是控制点——控制点决定了曲线的弯曲程度。我习惯把控制点放在路径拐角的角平分线上，距离拐角点约1/3路径长度的地方。</p>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>不要对整个路径做平滑，只对<strong>拐角处</strong>做局部平滑。我曾经试过对整个路径做贝塞尔拟合，结果路径变得太「软」，AGV走起来像喝醉了酒。后来改成只对角度变化大于30°的拐点做平滑，效果立竿见影。</p>
+</div>
+
+<h3>10.4 三者的协同工作</h3>
+
+<p>这三个算法不是各干各的，而是流水线作业：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <tr style="background:#e8f4f8;">
+    <th>步骤</th>
+    <th>算法</th>
+    <th>输入</th>
+    <th>输出</th>
+    <th>频率</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>A*</td>
+    <td>静态地图、起点、终点</td>
+    <td>全局路径（节点序列）</td>
+    <td>任务开始时执行一次</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>贝塞尔平滑</td>
+    <td>全局路径节点</td>
+    <td>平滑路径（密集点序列）</td>
+    <td>全局路径更新后执行</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>DWA</td>
+    <td>平滑路径、局部障碍物</td>
+    <td>实时速度指令 (v, ω)</td>
+    <td>10-50Hz 实时运行</td>
+  </tr>
+</table>
+
+<p>实际运行时，A*和贝塞尔在后台跑，DWA在前台高频运行。DWA会沿着平滑路径走，同时实时避障。如果遇到无法绕过的障碍物，DWA会报告「我搞不定」，然后触发A*重新规划。</p>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>DWA的轨迹预测时间窗口设得太短（0.5秒），结果AGV在高速时来不及刹车，撞上了突然出现的障碍物。后来我把预测窗口延长到2秒，同时加入了<strong>紧急制动逻辑</strong>——当障碍物距离小于安全阈值时，不管评价函数怎么打分，直接刹车。安全第一，效率第二。</p>
+</div>
+
+<p>好了，路径规划的基础就讲到这里。这三个算法是AGV控制器的核心，也是面试时的高频考点。你们先把代码跑通，下一章我们聊聊更高级的优化技巧。</p>
+
+<hr style="margin:30px 0; border:1px dashed #ccc;">
+
+        <div class="footer-nav">
+            <a href="09KinematicModel.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11LocalizationAndMapping.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

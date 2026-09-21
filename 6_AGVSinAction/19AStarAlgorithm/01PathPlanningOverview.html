@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV与路径规划概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="active">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV与路径规划概述</h2>
+
+<p>大家好，我是老张。在移动机器人这行摸爬滚打了十来年，今天咱们来聊聊AGV路径规划这件事。说实话，A星算法是我个人最常用的路径搜索算法，没有之一。为什么？因为它够直观，够稳定，而且落地效果好。</p>
+
+<p>先别急着看代码，咱们得先把基础打牢。这一章，我带你从AGV是什么开始，一步步搞清楚路径规划到底在解决什么问题，以及A星算法凭什么能成为AGV领域的“标配”。</p>
+
+<h3>1.1 AGV到底是什么？</h3>
+
+<p>AGV，全称Automated Guided Vehicle，中文叫自动导引运输车。说白了，就是一辆能自己跑的小车，不需要人开。</p>
+
+<p>你想想看，工厂里那些几百公斤的物料，靠人工推？不现实。靠叉车来回跑？效率低还危险。AGV就是干这个的——自动把货从A点运到B点。</p>
+
+<p>我2016年第一次接触AGV项目，是在一个汽车零部件仓库。当时客户要求：24小时不间断运行，误差不超过2厘米。嗯，那会儿我才意识到，路径规划不是“能走就行”，而是“怎么走得稳、走得准”。</p>
+
+<div class="highlight">
+  <strong>AGV的核心特征：</strong>
+  <ul>
+    <li>自动行驶：无需人工驾驶</li>
+    <li>路径可控：按预设或实时规划的路径移动</li>
+    <li>安全避障：能检测并避开障碍物</li>
+    <li>精准定位：到达目标位置的误差通常在厘米级</li>
+  </ul>
+</div>
+
+<h3>1.2 AGV的应用场景</h3>
+
+<p>AGV的应用场景比你想象的要多。我简单列几个常见的：</p>
+
+<table>
+  <tr>
+    <th>行业</th>
+    <th>典型场景</th>
+    <th>我遇到过的坑</th>
+  </tr>
+  <tr>
+    <td>仓储物流</td>
+    <td>电商仓库的货到人拣选</td>
+    <td>货架摆放不规则，路径规划经常死锁</td>
+  </tr>
+  <tr>
+    <td>制造业</td>
+    <td>产线物料配送</td>
+    <td>多车协同容易撞车，调度算法要跟上</td>
+  </tr>
+  <tr>
+    <td>医院</td>
+    <td>药品、标本自动运输</td>
+    <td>走廊窄、人流量大，避障策略要灵活</td>
+  </tr>
+  <tr>
+    <td>港口</td>
+    <td>集装箱自动搬运</td>
+    <td>室外环境，GPS信号不稳定，得靠激光SLAM</td>
+  </tr>
+</table>
+
+<p>你看，不同场景对路径规划的要求完全不一样。仓库里要的是效率，医院里要的是安全，港口要的是鲁棒性。所以，没有一套算法能通吃所有场景。但A星算法，是绝大多数场景的“起点”。</p>
+
+<h3>1.3 路径规划的核心问题</h3>
+
+<p>路径规划，说白了就是回答三个问题：</p>
+
+<ol>
+  <li><strong>从哪到哪？</strong>——起点和终点的坐标</li>
+  <li><strong>怎么走？</strong>——路径的形状和长度</li>
+  <li><strong>能不能走？</strong>——避开障碍物，满足约束条件</li>
+</ol>
+
+<p>但实际工程中，问题远不止这些。我举个例子：</p>
+
+<p>有一次，我在一个电子厂部署AGV。车间里到处都是工作台、物料架、还有临时堆放的纸箱。地图看起来很简单，但实际跑起来，AGV经常卡在某个角落出不来。为什么？因为路径规划只考虑了“能不能走”，没考虑“好不好走”。</p>
+
+<p>所以，真正的路径规划核心问题，我总结为以下几点：</p>
+
+<div class="tip">
+  <strong>路径规划核心问题清单：</strong>
+  <ul>
+    <li><strong>可达性</strong>：是否存在一条从起点到终点的可行路径？</li>
+    <li><strong>最优性</strong>：在满足约束的前提下，路径是否最短/最快/最省电？</li>
+    <li><strong>实时性</strong>：规划算法能不能在毫秒级给出结果？</li>
+    <li><strong>鲁棒性</strong>：遇到动态障碍物时，能不能快速重规划？</li>
+    <li><strong>平滑性</strong>：路径是否适合AGV的运动学约束？</li>
+  </ul>
+</div>
+
+<p>你想想看，如果路径规划只追求“最短路径”，结果AGV在拐弯处急停急转，货物都甩出去了，那还有什么意义？</p>
+
+<h3>1.4 A星算法在AGV中的地位</h3>
+
+<p>好了，终于聊到A星了。A星算法，全称A* Search Algorithm，是1968年由Peter Hart、Nils Nilsson和Bertram Raphael提出的。到现在快60年了，依然是路径规划领域最经典的算法之一。</p>
+
+<p>为什么A星这么能打？我个人觉得有这几个原因：</p>
+
+<ul>
+  <li><strong>启发式搜索</strong>：不像Dijkstra那样“地毯式”搜索，A星有方向感，效率高</li>
+  <li><strong>保证最优</strong>：只要启发函数设计得当，A星能找到最短路径</li>
+  <li><strong>易于实现</strong>：核心逻辑就几十行代码，调试起来也方便</li>
+  <li><strong>扩展性强</strong>：可以轻松加入各种约束，比如转向代价、高度限制等</li>
+</ul>
+
+<p>我在做AGV项目时，90%的场景直接用A星就能搞定。剩下的10%，要么是地图太大需要分层规划，要么是动态环境需要D* Lite。但不管怎么变，A星的思想始终贯穿其中。</p>
+
+<div class="warning">
+  <strong>注意：</strong>A星算法不是万能的。如果你遇到以下情况，可能需要考虑其他算法：
+  <ul>
+    <li>地图非常大（比如几万个节点）——考虑分层A星或JPS</li>
+    <li>环境动态变化频繁——考虑D* Lite或RRT*</li>
+    <li>需要多车协同——考虑基于冲突的搜索（CBS）</li>
+  </ul>
+</div>
+
+<p>但话说回来，不懂A星，你很难真正理解这些进阶算法。所以，咱们这门课就从A星开始，一步步吃透它。</p>
+
+<h3>1.5 本章知识体系</h3>
+
+<p>为了让你对本章内容有个整体印象，我画了一张图。这张图展示了AGV路径规划的知识脉络，以及A星算法在整个体系中的位置。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV路径规划知识体系</text>
+  
+  <!-- 第一层：AGV基础 -->
+  <rect x="50" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV基础</text>
+  <text x="150" y="120" text-anchor="middle" font-size="12" fill="white">定义 | 分类 | 应用场景</text>
+  
+  <!-- 箭头 -->
+  <line x1="250" y1="100" x2="320" y2="100" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：路径规划核心 -->
+  <rect x="320" y="70" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="420" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径规划核心</text>
+  <text x="420" y="120" text-anchor="middle" font-size="12" fill="white">可达性 | 最优性 | 实时性</text>
+  
+  <!-- 箭头 -->
+  <line x1="520" y1="100" x2="590" y2="100" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：A星算法 -->
+  <rect x="590" y="70" width="160" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="670" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">A星算法</text>
+  <text x="670" y="120" text-anchor="middle" font-size="12" fill="white">启发式搜索</text>
+  
+  <!-- 向下分支 -->
+  <line x1="150" y1="130" x2="150" y2="200" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="420" y1="130" x2="420" y2="200" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="670" y1="130" x2="670" y2="200" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 水平连接线 -->
+  <line x1="150" y1="200" x2="670" y2="200" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 向下箭头 -->
+  <line x1="410" y1="200" x2="410" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：算法扩展 -->
+  <rect x="250" y="260" width="300" height="50" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="290" text-anchor="middle" font-size="15" fill="white" font-weight="bold">算法扩展：D* Lite | JPS | CBS</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="400" y1="310" x2="400" y2="360" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第五层：工程落地 -->
+  <rect x="200" y="360" width="400" height="50" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="400" y="390" text-anchor="middle" font-size="15" fill="white" font-weight="bold">工程落地：地图构建 | 定位 | 控制 | 调度</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="450" text-anchor="middle" font-size="13" fill="#7f8c8d">本章重点：AGV基础 → 路径规划核心 → A星算法定位</text>
+  
+  <!-- 高亮框 -->
+  <rect x="580" y="65" width="180" height="70" rx="10" fill="none" stroke="#27ae60" stroke-width="3" stroke-dasharray="5,5"/>
+</svg>
+
+<p>这张图你看懂了吗？从上到下，从AGV基础到工程落地，A星算法正好卡在中间——它既是路径规划的核心方法，又是更高级算法的基石。所以，学好A星，你就掌握了AGV路径规划的“内功心法”。</p>
+
+<div class="tip">
+  <strong>我的建议：</strong>初学者不要一上来就啃论文。先搞懂A星的基本原理，然后用Python或C++实现一遍。跑通之后，再去看那些花里胡哨的改进版本。这样学，效率最高。
+</div>
+
+<p>好了，第一章就聊到这儿。记住，AGV路径规划不是玄学，是工程。A星算法也不是万能药，但它是你工具箱里最趁手的那把扳手。下一章，咱们正式进入A星算法的核心——启发函数和搜索流程。</p>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02EnvModelingBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

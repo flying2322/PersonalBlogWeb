@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>30 课程总结与项目实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="active">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>30 课程总结与项目实战——从零搭建一个仓储AGV路径规划原型系统</h2>
+
+<p>好，终于到了最后一讲。</p>
+<p>说实话，每次讲到这一章，我都有点感慨。前面二十九讲，我们从AGV的硬件选型聊到调度算法，从地图建模讲到冲突解决。现在，是时候把这些零散的知识点串起来了。</p>
+<p>这一讲，我们不谈理论，只动手。我会带着你，从零开始，搭建一个能跑起来的仓储AGV路径规划原型系统。嗯，说白了，就是把你学过的所有东西，揉成一个能用的东西。</p>
+
+<h3>一、原型系统的整体架构</h3>
+
+<p>先看看我们要搭什么。我个人习惯，动手前先画张图，把脑子里的东西理清楚。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>一个最小可用的AGV调度系统，至少包含三个模块——地图管理、路径规划、任务调度。这三个模块互相配合，才能让AGV跑起来。</p>
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">仓储AGV路径规划原型系统架构</text>
+  
+  <!-- 三个主模块 -->
+  <rect x="50" y="80" width="200" height="120" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="150" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">地图管理模块</text>
+  <text x="150" y="145" text-anchor="middle" font-size="12" fill="#555">栅格地图构建</text>
+  <text x="150" y="165" text-anchor="middle" font-size="12" fill="#555">障碍物标记</text>
+  <text x="150" y="185" text-anchor="middle" font-size="12" fill="#555">拓扑节点生成</text>
+
+  <rect x="300" y="80" width="200" height="120" rx="10" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">路径规划模块</text>
+  <text x="400" y="145" text-anchor="middle" font-size="12" fill="#555">A*算法实现</text>
+  <text x="400" y="165" text-anchor="middle" font-size="12" fill="#555">路径平滑处理</text>
+  <text x="400" y="185" text-anchor="middle" font-size="12" fill="#555">多AGV避让</text>
+
+  <rect x="550" y="80" width="200" height="120" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="650" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">任务调度模块</text>
+  <text x="650" y="145" text-anchor="middle" font-size="12" fill="#555">任务队列管理</text>
+  <text x="650" y="165" text-anchor="middle" font-size="12" fill="#555">AGV分配策略</text>
+  <text x="650" y="185" text-anchor="middle" font-size="12" fill="#555">状态监控</text>
+
+  <!-- 连接箭头 -->
+  <line x1="250" y1="140" x2="300" y2="140" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="140" x2="550" y2="140" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+
+  <!-- 数据流说明 -->
+  <rect x="100" y="250" width="600" height="100" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <text x="400" y="280" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">数据流向</text>
+  <text x="400" y="305" text-anchor="middle" font-size="12" fill="#555">地图数据 → 路径规划 → 任务调度 → AGV执行</text>
+  <text x="400" y="325" text-anchor="middle" font-size="12" fill="#555">AGV状态反馈 → 任务调度更新 → 重新规划（闭环）</text>
+
+  <!-- 底部说明 -->
+  <text x="400" y="380" text-anchor="middle" font-size="11" fill="#999">图：原型系统三大模块及数据流向</text>
+</svg>
+
+<p>你看，这个架构图其实很简单。但我在项目中吃过亏——一开始把架构搞得太复杂，结果代码写了一堆，跑起来全是bug。后来我学乖了，先搭最小系统，再慢慢加功能。</p>
+
+<h3>二、第一步：构建地图</h3>
+
+<p>地图是AGV的眼睛。没有地图，路径规划就是瞎搞。</p>
+
+<p>我建议用栅格地图，简单直观。每个格子要么是空地（0），要么是障碍物（1）。仓库里的货架、柱子、充电桩，都标记成障碍物。</p>
+
+<pre><code># 地图定义示例
+warehouse_map = [
+    [0, 0, 0, 1, 0, 0, 0],
+    [0, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0, 0, 0],
+    [0, 1, 1, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 1, 0, 0, 0]
+]
+
+# 起点和终点
+start = (0, 0)
+goal = (6, 6)
+</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>实际项目中，地图不会手写。一般是从CAD图纸或者激光雷达扫描数据自动生成。但做原型时，手写一个10x10的地图就够了，重点是验证算法。</p>
+</div>
+
+<h3>三、第二步：实现A*路径规划</h3>
+
+<p>路径规划的核心算法，我们选A*。为什么？因为它在仓储场景里够用，而且实现起来不复杂。</p>
+
+<p>我曾经在一个项目里试过Dijkstra，结果AGV绕了远路，被客户吐槽“这机器人是不是路痴”。后来换成A*，加了启发式函数，路径就顺了。</p>
+
+<pre><code>import heapq
+
+def heuristic(a, b):
+    # 曼哈顿距离
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def a_star_search(grid, start, goal):
+    rows, cols = len(grid), len(grid[0])
+    open_set = []
+    heapq.heappush(open_set, (0, start))
+    
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, goal)}
+    
+    while open_set:
+        current = heapq.heappop(open_set)[1]
+        
+        if current == goal:
+            # 重建路径
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            return path[::-1]
+        
+        # 四个方向
+        for dx, dy in [(-1,0), (1,0), (0,-1), (0,1)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            
+            if 0 <= neighbor[0] < rows and 0 <= neighbor[1] < cols:
+                if grid[neighbor[0]][neighbor[1]] == 1:  # 障碍物
+                    continue
+                
+                tentative_g = g_score[current] + 1
+                
+                if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                    came_from[neighbor] = current
+                    g_score[neighbor] = tentative_g
+                    f_score[neighbor] = tentative_g + heuristic(neighbor, goal)
+                    heapq.heappush(open_set, (f_score[neighbor], neighbor))
+    
+    return None  # 无路径
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>这段代码只处理了单AGV的情况。多AGV时，你还要考虑路径冲突。我遇到过两台AGV在十字路口“顶牛”，就是因为没做冲突检测。后面我们会加一个简单的避让逻辑。</p>
+</div>
+
+<h3>四、第三步：任务调度与多AGV管理</h3>
+
+<p>单台AGV跑起来不难，难的是多台一起跑。你想想看，仓库里五六台AGV同时干活，如果调度不好，那就是一场“车祸现场”。</p>
+
+<p>我的做法是：用一个任务队列，按优先级分配。每台AGV执行任务前，先检查路径上有没有其他AGV。如果有，就等一等，或者重新规划。</p>
+
+<pre><code>class AGV:
+    def __init__(self, id, start_pos):
+        self.id = id
+        self.position = start_pos
+        self.path = []
+        self.status = "idle"  # idle, moving, blocked, done
+    
+    def assign_task(self, goal, grid, other_agvs):
+        # 先规划路径
+        path = a_star_search(grid, self.position, goal)
+        if path is None:
+            print(f"AGV{self.id}: 无法到达目标点")
+            return False
+        
+        # 检查路径冲突
+        for pos in path:
+            for other in other_agvs:
+                if other.id != self.id and other.position == pos:
+                    print(f"AGV{self.id}: 路径被AGV{other.id}占用，等待中...")
+                    self.status = "blocked"
+                    return False
+        
+        self.path = path
+        self.status = "moving"
+        return True
+    
+    def move(self):
+        if self.path and self.status == "moving":
+            next_pos = self.path.pop(0)
+            self.position = next_pos
+            if not self.path:
+                self.status = "done"
+                print(f"AGV{self.id}: 任务完成")
+</code></pre>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>调度系统的灵魂是“状态机”。每台AGV的状态要清晰——空闲、移动中、阻塞、完成。状态乱了，调度就崩了。</p>
+</div>
+
+<h3>五、第四步：可视化与调试</h3>
+
+<p>代码写完了，怎么看效果？我建议加一个简单的可视化界面。不用太花哨，能显示地图、AGV位置、路径就行。</p>
+
+<p>我个人习惯用matplotlib做原型验证，快，而且够用。</p>
+
+<pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+def visualize(grid, agvs):
+    grid_vis = np.array(grid, dtype=float)
+    
+    # 标记AGV位置
+    for agv in agvs:
+        grid_vis[agv.position] = 0.5  # 灰色表示AGV
+    
+    plt.imshow(grid_vis, cmap='gray_r', origin='upper')
+    
+    # 画路径
+    for agv in agvs:
+        if agv.path:
+            path_x = [p[1] for p in agv.path]
+            path_y = [p[0] for p in agv.path]
+            plt.plot(path_x, path_y, 'b-', linewidth=2, label=f'AGV{agv.id}')
+    
+    plt.legend()
+    plt.title('AGV路径规划可视化')
+    plt.show()
+</code></pre>
+
+<div class="tip">
+  <p><strong>调试心得：</strong>可视化不只是为了好看。有一次我发现AGV老是走回头路，一看可视化，原来是路径平滑没做好，路径上有“锯齿”。加了个平滑函数，问题就解决了。</p>
+</div>
+
+<h3>六、完整运行流程</h3>
+
+<p>好了，所有模块都齐了。我们跑一遍看看。</p>
+
+<pre><code># 初始化地图
+grid = warehouse_map
+
+# 创建两台AGV
+agv1 = AGV(1, (0, 0))
+agv2 = AGV(2, (6, 0))
+
+# 分配任务
+agv1.assign_task((6, 6), grid, [agv1, agv2])
+agv2.assign_task((0, 6), grid, [agv1, agv2])
+
+# 模拟运行
+for step in range(20):
+    print(f"--- 第{step+1}步 ---")
+    agv1.move()
+    agv2.move()
+    
+    # 检查阻塞，重新规划
+    if agv1.status == "blocked":
+        agv1.assign_task((6, 6), grid, [agv1, agv2])
+    if agv2.status == "blocked":
+        agv2.assign_task((0, 6), grid, [agv1, agv2])
+    
+    if agv1.status == "done" and agv2.status == "done":
+        print("所有任务完成！")
+        break
+
+# 可视化
+visualize(grid, [agv1, agv2])
+</code></pre>
+
+<p>运行结果应该是：两台AGV各自出发，在中间相遇时，一台等待，另一台先过。然后继续前进，最终都到达目标点。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经遇到过一个问题——AGV在等待时，如果等待时间太长，后面的任务会堆积。后来我加了一个“超时重规划”机制：如果AGV阻塞超过3秒，就重新规划一条绕行的路径。效果不错。</p>
+</div>
+
+<h3>七、总结：从原型到产品</h3>
+
+<p>这个原型系统，虽然简单，但五脏俱全。你学会了：</p>
+
+<ul>
+  <li><strong>地图构建</strong>——用栅格表示仓储环境</li>
+  <li><strong>路径规划</strong>——A*算法找最短路径</li>
+  <li><strong>任务调度</strong>——多AGV的分配与冲突解决</li>
+  <li><strong>可视化调试</strong>——用图形验证算法正确性</li>
+</ul>
+
+<p>但说实话，原型和产品之间，还有很长的路要走。比如：</p>
+
+<ul>
+  <li>地图要支持动态更新（货架移动了怎么办？）</li>
+  <li>算法要优化性能（仓库大了，A*跑得慢怎么办？）</li>
+  <li>系统要加容错（AGV没电了、网络断了怎么办？）</li>
+</ul>
+
+<p>这些，就是你在实际项目中要解决的问题了。</p>
+
+<div class="highlight">
+  <p><strong>最后说一句：</strong>做AGV系统，不要追求一步到位。先让一台AGV跑起来，再让两台跑起来，然后才是十台、百台。每一步都踩稳了，系统才可靠。</p>
+</div>
+
+<p>好了，课程到这里就结束了。希望这三十讲，能帮你打开仓储自动化的大门。以后你在项目中遇到AGV路径规划的问题，记得回来翻翻这些内容。嗯，祝你好运。</p>
+
+<div class="footer-nav">
+            <a href="29FrontierTrends.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="javascript:void(0)">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

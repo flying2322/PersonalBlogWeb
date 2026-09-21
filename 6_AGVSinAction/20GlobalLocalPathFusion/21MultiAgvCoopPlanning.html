@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 多AGV协同规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="active">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 多AGV协同规划：交通管制、优先级调度、死锁避免、分布式与集中式对比</h2>
+
+<p>好，咱们今天聊点硬核的。单台AGV跑得再溜，也就是个“独行侠”。真正考验系统能力的，是几十台甚至上百台AGV在同一个车间里穿梭。这时候，协同规划就成了核心中的核心。</p>
+
+<p>我见过不少项目，单机测试时一切完美，一上多车就乱成一锅粥——堵车、死锁、空跑，甚至撞车。说白了，多AGV协同不是简单的“1+1=2”，而是要把交通管制、优先级调度、死锁避免这些机制揉在一起。今天我就把这几块掰开揉碎了讲。</p>
+
+<div class="highlight">
+    <p><strong>核心观点：</strong>多AGV协同的本质，是在有限的空间和时间内，让所有AGV安全、高效地完成各自任务。没有完美的算法，只有最适合场景的工程方案。</p>
+</div>
+
+<h3>一、交通管制：别让AGV“堵车”</h3>
+
+<p>先说说交通管制。这玩意儿跟城市交通管理很像——你不能让所有车都同时冲进同一个路口。</p>
+
+<p>在AGV系统里，交通管制通常分两级：<strong>路段级</strong>和<strong>节点级</strong>。</p>
+
+<ul>
+    <li><strong>路段级管制：</strong>把地图划分成若干路段，每个路段同一时间只允许一台AGV进入。这有点像单行线。</li>
+    <li><strong>节点级管制：</strong>在交叉口、转弯处设置“虚拟红绿灯”，AGV到达前需要申请通行权。</li>
+</ul>
+
+<p>我个人习惯用<strong>资源锁</strong>的方式来实现。每个路段或节点就是一个资源，AGV要经过就必须先“上锁”。</p>
+
+<pre><code>// 伪代码：路段资源锁申请
+bool RequestPathSegment(AGV_ID, Segment_ID) {
+    if (segment_locks[Segment_ID] == FREE) {
+        segment_locks[Segment_ID] = LOCKED_BY(AGV_ID);
+        return true;
+    } else {
+        // 加入等待队列
+        waiting_queue[Segment_ID].push(AGV_ID);
+        return false;
+    }
+}</code></pre>
+
+<p>嗯，这里要注意：<strong>锁的粒度</strong>很关键。锁得太细（比如每个网格一个锁），管理开销大；锁得太粗（比如整条路径一个锁），效率低。我一般建议按<strong>AGV车身长度+安全距离</strong>来划分路段长度。</p>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong>我曾经在一个项目里把路段划得太短，结果AGV频繁申请锁、释放锁，通信开销反而比执行任务还大。后来调整为“两倍车长”作为最小路段，问题就解决了。</p>
+</div>
+
+<h3>二、优先级调度：谁先走？</h3>
+
+<p>交通管制解决了“能不能走”的问题，但没解决“谁先走”。这就轮到优先级调度上场了。</p>
+
+<p>优先级不是随便定的。我总结了几种常见策略：</p>
+
+<ol>
+    <li><strong>任务紧急度优先：</strong>交货时间越紧的AGV，优先级越高。</li>
+    <li><strong>距离终点近优先：</strong>快到的AGV先走，避免它绕路。</li>
+    <li><strong>负载类型优先：</strong>比如载有危险品的AGV优先通行。</li>
+    <li><strong>FCFS（先到先得）：</strong>最简单，但效率不一定高。</li>
+</ol>
+
+<p>实际项目中，我通常把优先级设计成一个<strong>动态加权值</strong>：</p>
+
+<pre><code>priority = w1 * urgency + w2 * distance_to_goal + w3 * load_type</code></pre>
+
+<p>权重w1、w2、w3需要根据现场情况调参。我记得有一次在汽车工厂，因为物料配送有严格的节拍要求，我把w1（紧急度）调得特别高，结果其他AGV全被堵在后面。后来加了“最大等待时间”限制，才平衡过来。</p>
+
+<div class="warning">
+    <p><strong>注意：</strong>优先级调度不能“饿死”低优先级AGV。一定要设置超时机制——如果某台AGV等待超过阈值，自动提升它的优先级。</p>
+</div>
+
+<h3>三、死锁避免：别让AGV“僵住”</h3>
+
+<p>死锁是多AGV系统里最头疼的问题。四台AGV互相堵住，谁也动不了——你想想看，这场景多尴尬。</p>
+
+<p>死锁的四个必要条件（互斥、持有并等待、不可剥夺、循环等待）在AGV系统里很容易满足。所以我们要主动避免。</p>
+
+<p>我常用的方法有三种：</p>
+
+<table>
+    <tr>
+        <th>方法</th>
+        <th>原理</th>
+        <th>适用场景</th>
+    </tr>
+    <tr>
+        <td>银行家算法</td>
+        <td>预分配资源，检查安全性</td>
+        <td>小规模系统（&lt;10台）</td>
+    </tr>
+    <tr>
+        <td>资源排序法</td>
+        <td>给所有资源编号，AGV按序申请</td>
+        <td>地图结构简单</td>
+    </tr>
+    <tr>
+        <td>超时回退法</td>
+        <td>检测到死锁后，强制某台AGV后退</td>
+        <td>大规模系统</td>
+    </tr>
+</table>
+
+<p>我个人最推荐<strong>资源排序法</strong>。为什么？因为它简单、可靠、计算量小。你想想看，只要所有AGV都按同一个顺序申请资源，循环等待就不可能发生。</p>
+
+<pre><code>// 资源排序法示例
+// 所有路段按ID排序，AGV只能按递增顺序申请
+bool RequestResource(AGV_ID, Resource_ID) {
+    if (Resource_ID &lt; last_acquired_id) {
+        // 违反顺序，拒绝
+        return false;
+    }
+    // 正常申请逻辑...
+}</code></pre>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong>我曾经在一个项目里只用了超时回退法，结果死锁频繁触发，AGV反复后退、前进，效率极低。后来加上资源排序法作为预防，死锁基本没再出现过。</p>
+</div>
+
+<h3>四、分布式 vs 集中式：选哪个？</h3>
+
+<p>这是架构层面的选择。两种方案各有千秋，我直接上对比表：</p>
+
+<table>
+    <tr>
+        <th>维度</th>
+        <th>集中式</th>
+        <th>分布式</th>
+    </tr>
+    <tr>
+        <td>决策速度</td>
+        <td>快（单点决策）</td>
+        <td>慢（需要协商）</td>
+    </tr>
+    <tr>
+        <td>扩展性</td>
+        <td>差（中心节点瓶颈）</td>
+        <td>好（可动态加入AGV）</td>
+    </tr>
+    <tr>
+        <td>鲁棒性</td>
+        <td>差（中心挂了全瘫）</td>
+        <td>好（单台故障不影响整体）</td>
+    </tr>
+    <tr>
+        <td>实现复杂度</td>
+        <td>低</td>
+        <td>高</td>
+    </tr>
+    <tr>
+        <td>典型算法</td>
+        <td>全局A* + 交通管制</td>
+        <td>拍卖算法、合同网协议</td>
+    </tr>
+</table>
+
+<p>我的建议是：<strong>20台以下用集中式，20台以上考虑分布式</strong>。但这不是绝对的——如果对实时性要求极高（比如AGV速度超过2m/s），集中式可能扛不住。</p>
+
+<p>我记得有个物流仓库项目，初期规划30台AGV，客户坚持用集中式。结果上线后，中心服务器CPU跑满，决策延迟从50ms飙升到500ms。后来我们改成“集中调度+局部自治”的混合架构——全局路径由中心规划，局部避障和交通管制由AGV自己处理。这才把问题解决。</p>
+
+<div class="highlight">
+    <p><strong>我的经验：</strong>纯集中式或纯分布式都很少见。实际工程中，90%的系统都是混合架构——集中式做全局优化，分布式做局部应急。</p>
+</div>
+
+<h3>五、知识体系总览</h3>
+
+<p>说了这么多，我画张图帮你理清思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">多AGV协同规划知识体系</text>
+    
+    <!-- 四个核心模块 -->
+    <!-- 交通管制 -->
+    <rect x="50" y="80" width="160" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="130" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">交通管制</text>
+    
+    <!-- 优先级调度 -->
+    <rect x="240" y="80" width="160" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="320" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">优先级调度</text>
+    
+    <!-- 死锁避免 -->
+    <rect x="430" y="80" width="160" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="510" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">死锁避免</text>
+    
+    <!-- 架构选择 -->
+    <rect x="620" y="80" width="160" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+    <text x="700" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">架构选择</text>
+    
+    <!-- 连接线 -->
+    <line x1="210" y1="110" x2="240" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="110" x2="430" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="590" y1="110" x2="620" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 子项 -->
+    <!-- 交通管制子项 -->
+    <rect x="30" y="170" width="200" height="40" rx="5" fill="#d5e8f7"/>
+    <text x="130" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">路段级管制 · 节点级管制</text>
+    
+    <!-- 优先级子项 -->
+    <rect x="220" y="170" width="200" height="40" rx="5" fill="#fadbd8"/>
+    <text x="320" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">紧急度 · 距离 · 负载类型</text>
+    
+    <!-- 死锁子项 -->
+    <rect x="410" y="170" width="200" height="40" rx="5" fill="#d5f5e3"/>
+    <text x="510" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">银行家 · 资源排序 · 超时回退</text>
+    
+    <!-- 架构子项 -->
+    <rect x="600" y="170" width="200" height="40" rx="5" fill="#e8daef"/>
+    <text x="700" y="195" text-anchor="middle" font-size="13" fill="#2c3e50">集中式 · 分布式 · 混合式</text>
+    
+    <!-- 连接线 -->
+    <line x1="130" y1="140" x2="130" y2="170" stroke="#3498db" stroke-width="2"/>
+    <line x1="320" y1="140" x2="320" y2="170" stroke="#e74c3c" stroke-width="2"/>
+    <line x1="510" y1="140" x2="510" y2="170" stroke="#2ecc71" stroke-width="2"/>
+    <line x1="700" y1="140" x2="700" y2="170" stroke="#9b59b6" stroke-width="2"/>
+    
+    <!-- 底部总结 -->
+    <rect x="150" y="250" width="500" height="80" rx="10" fill="#f39c12" opacity="0.8"/>
+    <text x="400" y="280" text-anchor="middle" font-size="16" fill="white" font-weight="bold">核心目标：安全 + 高效 + 可扩展</text>
+    <text x="400" y="310" text-anchor="middle" font-size="13" fill="white">没有银弹，只有最适合场景的工程方案</text>
+    
+    <!-- 箭头指向 -->
+    <line x1="400" y1="210" x2="400" y2="250" stroke="#f39c12" stroke-width="3" marker-end="url(#arrow)"/>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L9,3 z" fill="#f39c12"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>这张图把今天讲的内容串起来了。四个模块相互依赖，缺一不可。交通管制是基础，优先级调度是优化，死锁避免是保障，架构选择是骨架。</p>
+
+<p>好了，今天就聊到这儿。多AGV协同是个大话题，光靠一节课肯定讲不完。但只要你把交通管制、优先级调度、死锁避免这三个核心机制吃透，再根据场景选对架构，大部分问题都能搞定。</p>
+
+<div class="highlight">
+    <p><strong>最后说一句：</strong>别迷信算法。我在现场见过太多“理论上完美”的方案，实际跑起来一塌糊涂。多AGV协同，说到底是个工程问题——多去现场看看AGV怎么跑的，比看一百篇论文都管用。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="20DynamicEnvHandling.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

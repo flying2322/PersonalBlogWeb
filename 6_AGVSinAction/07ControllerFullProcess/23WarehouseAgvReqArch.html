@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 项目实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="active">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 项目实战：仓储AGV（一）——需求分析、系统架构设计、硬件选型清单</h2>
+
+<p>各位同学，大家好。从今天开始，我们正式进入《AGV控制器开发全流程实战》的核心环节——项目实战。</p>
+
+<p>前面讲了那么多理论、算法、协议栈，说实话，都是铺垫。真正让你成长最快的，就是亲手把一个AGV从零干到跑起来。我个人习惯是，先想清楚“要做什么”，再动手。所以这第一章节，我们不写一行代码，只做三件事：<strong>需求分析、系统架构设计、硬件选型</strong>。</p>
+
+<p>嗯，这三步走扎实了，后面写代码、调参数，你心里才有底。我曾经见过一个团队，上来就画PCB、写驱动，结果做到一半发现电机扭矩不够，载重上不去，整个方案推倒重来。说白了，就是需求没理清。</p>
+
+<h3>一、需求分析：你到底要造一台什么样的AGV？</h3>
+
+<p>先问自己一个问题：这台AGV用在什么场景？</p>
+
+<p>我们这次的项目背景是<strong>仓储环境</strong>。具体来说，是一个中型电商仓库，货架高度3米，巷道宽度1.2米，地面是环氧地坪，平整度不错。AGV需要完成的任务是：从A点取货，运到B点，再返回A点，循环往复。</p>
+
+<p>好，基于这个场景，我梳理出几个核心需求：</p>
+
+<ul>
+  <li><strong>载重能力</strong>：单次搬运货物重量 ≤ 200kg（含货架自重）</li>
+  <li><strong>运行速度</strong>：空载最大速度 1.5m/s，满载最大速度 1.0m/s</li>
+  <li><strong>导航方式</strong>：磁条导航 + 二维码地标辅助定位（成本可控，精度够用）</li>
+  <li><strong>定位精度</strong>：停车误差 ±10mm，角度误差 ±1°</li>
+  <li><strong>续航要求</strong>：连续工作8小时，支持自动回充</li>
+  <li><strong>安全要求</strong>：前后激光避障，急停按钮，声光报警</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>这里有个坑，我提醒一下：</strong>很多新手会把“最大速度”定得很高，觉得越快越好。但你想想看，仓储巷道那么窄，转弯半径有限，速度一快，急停距离就长，容易撞货架。我曾经在项目里吃过这个亏，后来老老实实把速度降下来，反而整体效率更高了。</p>
+</div>
+
+<h3>二、系统架构设计：分层解耦，各司其职</h3>
+
+<p>需求明确了，接下来就是搭架子。我个人习惯把AGV控制器分成四层，从下往上分别是：</p>
+
+<ol>
+  <li><strong>驱动层</strong>：直接跟硬件打交道，电机控制、传感器采集、IO读写</li>
+  <li><strong>算法层</strong>：导航解算、路径规划、运动控制、避障决策</li>
+  <li><strong>调度层</strong>：任务管理、状态机、与上位机通信</li>
+  <li><strong>应用层</strong>：人机交互、日志记录、参数配置</li>
+</ol>
+
+<p>为什么要分层？说白了，就是为了好维护、好扩展。比如你以后想换一种导航方式，从磁条换成激光SLAM，只需要改算法层，驱动层和应用层基本不动。这就是架构设计的意义。</p>
+
+<p>下面我画了一张系统架构图，帮你直观理解各层之间的关系：</p>
+
+<svg width="720" height="480" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f9f9f9; border:1px solid #ddd; border-radius:8px;">
+  <!-- 标题 -->
+  <text x="360" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">AGV控制器系统架构图</text>
+  
+  <!-- 应用层 -->
+  <rect x="60" y="50" width="600" height="70" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="360" y="80" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">应用层</text>
+  <text x="360" y="100" text-anchor="middle" font-size="12" fill="#333">人机交互界面 | 日志管理 | 参数配置 | 状态显示</text>
+  
+  <!-- 调度层 -->
+  <rect x="60" y="140" width="600" height="70" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="360" y="170" text-anchor="middle" font-size="14" font-weight="bold" fill="#e65100">调度层</text>
+  <text x="360" y="190" text-anchor="middle" font-size="12" fill="#333">任务队列管理 | 状态机调度 | 上位机通信 (TCP/Modbus)</text>
+  
+  <!-- 算法层 -->
+  <rect x="60" y="230" width="600" height="70" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="360" y="260" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">算法层</text>
+  <text x="360" y="280" text-anchor="middle" font-size="12" fill="#333">导航解算 | 路径规划 (A*) | 运动控制 (PID) | 避障决策</text>
+  
+  <!-- 驱动层 -->
+  <rect x="60" y="320" width="600" height="70" rx="8" fill="#fce4ec" stroke="#e53935" stroke-width="2"/>
+  <text x="360" y="350" text-anchor="middle" font-size="14" font-weight="bold" fill="#c62828">驱动层</text>
+  <text x="360" y="370" text-anchor="middle" font-size="12" fill="#333">电机驱动 (PWM) | 传感器采集 (磁条/二维码/激光) | IO控制</text>
+  
+  <!-- 硬件层 -->
+  <rect x="60" y="410" width="600" height="50" rx="8" fill="#f3e5f5" stroke="#8e24aa" stroke-width="2"/>
+  <text x="360" y="440" text-anchor="middle" font-size="14" font-weight="bold" fill="#6a1b9a">硬件层</text>
+  
+  <!-- 箭头 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+  <line x1="360" y1="120" x2="360" y2="138" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="210" x2="360" y2="228" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="300" x2="360" y2="318" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="360" y1="390" x2="360" y2="408" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>
+
+<p>你看，每一层只跟相邻层通信，驱动层不会直接去处理任务调度，算法层也不关心你用的是直流电机还是步进电机。这种设计，说白了就是“各司其职”。</p>
+
+<h3>三、硬件选型清单：把钱花在刀刃上</h3>
+
+<p>架构搭好了，接下来就是选硬件。这部分我直接给出一份清单，都是经过实际项目验证的。你照着买，基本不会翻车。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%; border-collapse:collapse; margin:15px 0;">
+  <tr style="background:#e3f2fd;">
+    <th>模块</th>
+    <th>型号/规格</th>
+    <th>数量</th>
+    <th>备注</th>
+  </tr>
+  <tr>
+    <td>主控制器</td>
+    <td>STM32F407VGT6</td>
+    <td>1</td>
+    <td>168MHz主频，足够跑导航算法</td>
+  </tr>
+  <tr>
+    <td>电机驱动</td>
+    <td>TB67H450 (双H桥)</td>
+    <td>2</td>
+    <td>支持4A峰值电流，带电流检测</td>
+  </tr>
+  <tr>
+    <td>直流电机</td>
+    <td>24V 200W 带编码器</td>
+    <td>2</td>
+    <td>霍尔编码器，线数500</td>
+  </tr>
+  <tr>
+    <td>磁条传感器</td>
+    <td>LM393 8路模拟输出</td>
+    <td>1</td>
+    <td>检测磁条偏移量，精度1mm</td>
+  </tr>
+  <tr>
+    <td>二维码相机</td>
+    <td>OpenMV Cam H7</td>
+    <td>1</td>
+    <td>用于地标定位，精度±5mm</td>
+  </tr>
+  <tr>
+    <td>激光雷达</td>
+    <td>RPLIDAR A1M8</td>
+    <td>2</td>
+    <td>前后各一个，12米测距</td>
+  </tr>
+  <tr>
+    <td>电池</td>
+    <td>24V 20Ah 磷酸铁锂</td>
+    <td>1</td>
+    <td>带BMS保护板</td>
+  </tr>
+  <tr>
+    <td>无线模块</td>
+    <td>ESP8266 (WiFi)</td>
+    <td>1</td>
+    <td>与上位机通信</td>
+  </tr>
+  <tr>
+    <td>显示屏</td>
+    <td>3.5寸 TFT 触摸屏</td>
+    <td>1</td>
+    <td>用于本地调试和状态显示</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>选型小技巧：</strong>主控芯片我选了STM32F4系列，没选F1。为什么？因为F4有硬件浮点运算单元（FPU），跑PID和路径规划时，计算速度快很多。你想想看，如果每次算位置都要几十微秒，控制周期就拉长了，车跑起来会一抖一抖的。我在第一个项目里用的F103，后来发现算力不够，硬着头皮换了F4，多花了两周改代码。所以一开始就选对，省心。</p>
+</div>
+
+<h3>四、避坑指南：硬件选型中的常见问题</h3>
+
+<p>这部分是我个人经验总结，你仔细看看，能省不少钱和时间。</p>
+
+<ul>
+  <li><strong>电机和驱动器的匹配</strong>：驱动器的峰值电流一定要大于电机堵转电流。我曾经选了一款驱动器，标称3A，结果电机堵转时电流冲到4.5A，直接把驱动芯片烧了。后来换成了TB67H450，余量留了30%，再没出过问题。</li>
+  <li><strong>编码器线数不是越高越好</strong>：500线的编码器，配合4倍频，分辨率已经到2000脉冲/圈，对于仓储AGV完全够用。线数太高，主控中断频率也高，反而浪费算力。</li>
+  <li><strong>激光雷达的安装位置</strong>：前后各一个，安装高度离地20cm左右。太低容易扫到地面杂物，太高又看不到低矮障碍物。这个高度是我试了三次才确定的。</li>
+  <li><strong>电池容量计算</strong>：AGV满载运行时，电机功耗约400W（两个电机各200W），加上控制器、传感器、无线模块，总功耗约500W。24V系统，电流约21A。20Ah的电池，理论上能跑接近1小时。但实际要考虑放电深度（一般留20%余量），所以实际续航约45分钟。要跑8小时，需要配160Ah的电池，但那样太重了。所以实际项目中，我们采用<strong>自动回充</strong>方案，工作30分钟，回充10分钟，循环进行。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>千万不要为了省钱买二手电机或电池。电机编码器一旦老化，脉冲信号会丢步，定位精度直接崩掉。电池更不用说了，二手锂电池内阻大，放电能力差，AGV爬坡时电压一掉，控制器直接复位。这个坑我踩过，教训深刻。</p>
+</div>
+
+<h3>五、本章小结</h3>
+
+<p>好，到这为止，我们完成了项目实战的第一步。你手里应该有了：</p>
+
+<ul>
+  <li>一份清晰的需求文档</li>
+  <li>一张四层系统架构图</li>
+  <li>一份完整的硬件选型清单</li>
+</ul>
+
+<p>这些东西，就是后面所有工作的地基。地基稳了，楼才能盖得高。下一章节，我们会开始搭建开发环境，配置STM32的工程模板，把驱动层的代码写起来。</p>
+
+<p>嗯，今天就到这里。有什么问题，欢迎在课程群里讨论。记住，做项目别急，想清楚再动手，比什么都重要。</p>
+
+<div class="footer-nav">
+            <a href="22IndustryStandards.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24WarehouseAgvDriverComm.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

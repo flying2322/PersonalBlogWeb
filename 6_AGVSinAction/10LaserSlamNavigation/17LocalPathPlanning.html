@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 局部路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="active">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 局部路径规划：DWA算法、TEB算法、MPC控制、动态窗口参数调优</h2>
+
+<p>局部路径规划，说白了就是让AGV在“当下”怎么走。全局规划给了你一条大方向，但实际跑起来，前面突然冒出个纸箱、地上有个坑，你得自己想办法绕过去。这就是局部规划干的事。</p>
+
+<p>我这些年折腾下来，最常用的就是DWA、TEB和MPC这三板斧。它们各有脾气，也各有绝活。今天咱们就掰开揉碎了聊聊。</p>
+
+<h3>17.1 DWA算法：动态窗口法</h3>
+
+<p>DWA全称是Dynamic Window Approach。名字挺唬人，核心思想其实很简单：<strong>在速度空间里采样，找一条最安全、最快的路</strong>。</p>
+
+<p>你想想看，AGV能跑多快、能转多急，是有物理极限的。DWA就在这个“动态窗口”里，生成一堆候选速度对（线速度v，角速度ω），然后挨个打分。</p>
+
+<div class="highlight">
+  <p><strong>核心三要素：</strong></p>
+  <ul>
+    <li><strong>方位角评价</strong>：朝着目标方向走的，得分高</li>
+    <li><strong>障碍物距离评价</strong>：离障碍物越远，得分高</li>
+    <li><strong>速度评价</strong>：跑得越快，得分高</li>
+  </ul>
+</div>
+
+<p>我在项目里遇到过一个问题：AGV在窄通道里来回摇摆，就是过不去。后来发现是障碍物距离评价的权重设得太低了，车总想贴着墙走。调高权重后，车就老实了。</p>
+
+<p>DWA的伪代码长这样：</p>
+
+<pre><code>// DWA核心伪代码
+function dwa_control(robot_pose, goal, obstacles):
+    // 1. 计算动态窗口
+    v_min = max(0, current_v - max_accel * dt)
+    v_max = min(max_v, current_v + max_accel * dt)
+    w_min = max(-max_w, current_w - max_alpha * dt)
+    w_max = min(max_w, current_w + max_alpha * dt)
+    
+    best_traj = null
+    best_score = -inf
+    
+    // 2. 采样速度对
+    for v in [v_min : v_resolution : v_max]:
+        for w in [w_min : w_resolution : w_max]:
+            // 3. 模拟轨迹
+            traj = simulate_trajectory(robot_pose, v, w, dt)
+            
+            // 4. 碰撞检测
+            if collision_detected(traj, obstacles):
+                continue
+            
+            // 5. 评价打分
+            heading_score = calc_heading(traj, goal)
+            dist_score = calc_clearance(traj, obstacles)
+            vel_score = abs(v) / max_v
+            
+            total_score = alpha * heading_score 
+                        + beta * dist_score 
+                        + gamma * vel_score
+            
+            if total_score > best_score:
+                best_score = total_score
+                best_traj = traj
+    
+    return best_traj
+</code></pre>
+
+<div class="tip">
+  <p><strong>调参小技巧：</strong></p>
+  <p>我习惯先调beta（障碍物距离权重），保证安全。再调alpha（方位角权重），让车别跑偏。最后调gamma（速度权重），别让车太怂。</p>
+</div>
+
+<h3>17.2 TEB算法：时间弹性带</h3>
+
+<p>TEB，全称Timed Elastic Band。它把路径看成一条“橡皮筋”，可以拉伸、压缩，但必须避开障碍物。</p>
+
+<p>DWA只考虑当前时刻，TEB则考虑未来一段时间的轨迹。它优化的是<strong>一系列位姿点</strong>，每个点都带时间戳。</p>
+
+<p>为什么会这样？因为TEB把路径规划转化成了一个<strong>稀疏图优化问题</strong>。节点是位姿，边是约束（速度、加速度、障碍物距离）。</p>
+
+<p>我记得有一次做仓储AGV，货架之间的通道只有80cm宽。DWA死活过不去，换成TEB后，车像泥鳅一样滑过去了。原因就是TEB能“预判”未来几秒的位姿，提前调整方向。</p>
+
+<p>TEB的优化目标函数：</p>
+
+<pre><code>// TEB优化目标
+minimize: 
+    J = w_path * f_path +        // 路径长度
+        w_time * f_time +        // 总时间
+        w_obstacle * f_obstacle + // 障碍物距离
+        w_vel * f_velocity +     // 速度约束
+        w_acc * f_acceleration   // 加速度约束
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>TEB计算量比DWA大不少。如果AGV的算力有限（比如用STM32），建议把优化迭代次数控制在10次以内。我踩过这个坑，车跑着跑着就卡住了。</p>
+</div>
+
+<h3>17.3 MPC控制：模型预测控制</h3>
+
+<p>MPC，Model Predictive Control。它和TEB有点像，但更“硬核”。MPC基于系统的动力学模型，预测未来N步的状态，然后求解一个带约束的最优控制问题。</p>
+
+<p>说白了，MPC是“算一步，看三步”。每一步都重新计算，所以鲁棒性很强。</p>
+
+<p>MPC的典型流程：</p>
+
+<ol>
+  <li><strong>建立模型</strong>：AGV的运动学模型（差速、阿克曼等）</li>
+  <li><strong>预测未来</strong>：给定控制序列，预测未来N步的状态</li>
+  <li><strong>求解优化</strong>：最小化跟踪误差和控制代价</li>
+  <li><strong>执行第一步</strong>：只执行第一个控制量</li>
+  <li><strong>滚动优化</strong>：下一时刻重复1-4</li>
+</ol>
+
+<p>我在做重载AGV（载重5吨）时，必须用MPC。因为惯性大，DWA和TEB都控制不住，车会冲出安全边界。MPC能显式地把加速度、角速度约束写进优化问题里，保证不翻车。</p>
+
+<p>一个简化的MPC代码框架：</p>
+
+<pre><code>// MPC核心步骤
+function mpc_control(state_ref, state_current):
+    // 1. 初始化优化问题
+    Q = diag([q_x, q_y, q_theta])  // 状态权重
+    R = diag([r_v, r_w])           // 控制权重
+    
+    // 2. 构建预测模型（差速模型）
+    for k in 0:N-1:
+        x_k+1 = x_k + v_k * cos(theta_k) * dt
+        y_k+1 = y_k + v_k * sin(theta_k) * dt
+        theta_k+1 = theta_k + w_k * dt
+    
+    // 3. 求解二次规划
+    min J = sum(||state_k - state_ref_k||^2_Q) 
+          + sum(||control_k||^2_R)
+    subject to:
+        v_min &lt;= v_k &lt;= v_max
+        w_min &lt;= w_k &lt;= w_max
+        acc_min &lt;= (v_k+1 - v_k)/dt &lt;= acc_max
+    
+    // 4. 返回第一个控制量
+    return control_0
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>MPC的预测时域N一般取10-20。N太小，效果和DWA差不多；N太大，算不过来。实时性要求高的场景，N取10就够了。</p>
+</div>
+
+<h3>17.4 动态窗口参数调优</h3>
+
+<p>不管用DWA、TEB还是MPC，最终都要面对参数调优。我总结了一套“三步走”的方法：</p>
+
+<table>
+  <tr>
+    <th>步骤</th>
+    <th>做什么</th>
+    <th>怎么调</th>
+  </tr>
+  <tr>
+    <td>第一步</td>
+    <td>调安全参数</td>
+    <td>增大障碍物距离权重，减小最大速度</td>
+  </tr>
+  <tr>
+    <td>第二步</td>
+    <td>调效率参数</td>
+    <td>增大速度权重，减小加速度限制</td>
+  </tr>
+  <tr>
+    <td>第三步</td>
+    <td>调平滑参数</td>
+    <td>增大转角代价，减小角速度变化率</td>
+  </tr>
+</table>
+
+<p>我曾经在一个项目里，光调参数就花了两天。后来发现是动态窗口的采样分辨率设得太粗了。把v_resolution从0.1降到0.05，w_resolution从0.2降到0.1，路径立马顺滑了。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把最大加速度设得太大，结果AGV启动时直接打滑，里程计都飞了。加速度一定要根据电机和地面摩擦系数来算，别拍脑袋。</p>
+</div>
+
+<h3>17.5 三种算法对比</h3>
+
+<p>最后给个对比表，方便你选型：</p>
+
+<table>
+  <tr>
+    <th>算法</th>
+    <th>优点</th>
+    <th>缺点</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>DWA</td>
+    <td>计算快、实现简单</td>
+    <td>只考虑当前时刻，容易陷入局部最优</td>
+    <td>轻载AGV、低速场景</td>
+  </tr>
+  <tr>
+    <td>TEB</td>
+    <td>轨迹平滑、能过窄通道</td>
+    <td>计算量中等，参数多</td>
+    <td>仓储AGV、窄通道场景</td>
+  </tr>
+  <tr>
+    <td>MPC</td>
+    <td>鲁棒性强、能处理约束</td>
+    <td>计算量大、建模复杂</td>
+    <td>重载AGV、高速场景</td>
+  </tr>
+</table>
+
+<p>嗯，局部路径规划就聊到这儿。记住一句话：<strong>没有最好的算法，只有最合适的参数</strong>。多动手调，多跑仿真，你也能成为调参大师。</p>
+
+<div class="highlight">
+  <p><strong>核心要点回顾：</strong></p>
+  <ul>
+    <li>DWA：速度空间采样，适合快速响应</li>
+    <li>TEB：时间弹性带优化，适合复杂环境</li>
+    <li>MPC：模型预测控制，适合高动态场景</li>
+    <li>参数调优：安全→效率→平滑，三步走</li>
+  </ul>
+</div>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">局部路径规划核心逻辑</text>
+  
+  <!-- 全局路径输入 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">全局路径输入</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 传感器数据 -->
+  <rect x="50" y="170" width="180" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="140" y="200" text-anchor="middle" font-size="16" fill="white" font-weight="bold">传感器数据（激光/里程计）</text>
+  
+  <!-- 机器人状态 -->
+  <rect x="570" y="170" width="180" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="660" y="200" text-anchor="middle" font-size="16" fill="white" font-weight="bold">机器人当前位姿</text>
+  
+  <!-- 箭头 -->
+  <line x1="230" y1="195" x2="300" y2="195" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="570" y1="195" x2="500" y2="195" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 三大算法 -->
+  <rect x="100" y="260" width="180" height="60" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="190" y="285" text-anchor="middle" font-size="16" fill="white" font-weight="bold">DWA算法</text>
+  <text x="190" y="305" text-anchor="middle" font-size="12" fill="white">速度空间采样</text>
+  
+  <rect x="310" y="260" width="180" height="60" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" font-size="16" fill="white" font-weight="bold">TEB算法</text>
+  <text x="400" y="305" text-anchor="middle" font-size="12" fill="white">时间弹性带优化</text>
+  
+  <rect x="520" y="260" width="180" height="60" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="610" y="285" text-anchor="middle" font-size="16" fill="white" font-weight="bold">MPC控制</text>
+  <text x="610" y="305" text-anchor="middle" font-size="12" fill="white">模型预测控制</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="160" x2="400" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="220" x2="190" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="220" x2="400" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="220" x2="610" y2="260" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 参数调优 -->
+  <rect x="250" y="360" width="300" height="50" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="390" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态窗口参数调优</text>
+  
+  <!-- 箭头 -->
+  <line x1="190" y1="320" x2="300" y2="360" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="320" x2="400" y2="360" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="610" y1="320" x2="500" y2="360" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="300" y="440" width="200" height="40" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="465" text-anchor="middle" font-size="16" fill="white" font-weight="bold">速度指令输出</text>
+  
+  <line x1="400" y1="410" x2="400" y2="440" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+        <div class="footer-nav">
+            <a href="16GlobalPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18MoveBaseFramework.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

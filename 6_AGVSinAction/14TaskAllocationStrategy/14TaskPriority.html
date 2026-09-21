@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 任务优先级策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="active">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 任务优先级策略：静态优先级（FIFO、EDF）、动态优先级（基于截止时间、基于价值密度）</h2>
+
+<p>各位同行，今天我们来聊聊任务优先级策略。说实话，这是AGV调度系统里最让我头疼，也最有意思的一块。</p>
+
+<p>你想想看，仓库里几十台AGV同时跑，任务一个接一个地来。谁先走？谁后走？搞不好就是死锁、拥堵、订单超时。我见过太多项目，算法写得花里胡哨，结果现场一跑就崩。说白了，优先级策略没选对。</p>
+
+<p>我个人习惯把优先级策略分成两大类：<strong>静态优先级</strong>和<strong>动态优先级</strong>。咱们一个一个说。</p>
+
+<h3>14.1 静态优先级：简单粗暴，但够用</h3>
+
+<p>静态优先级，就是任务一进来，优先级就定死了。后面不管发生什么，都不改。好处是啥？实现简单，CPU开销小。坏处呢？不够灵活。</p>
+
+<h4>14.1.1 FIFO（先进先出）</h4>
+
+<p>FIFO，说白了就是排队。谁先来，谁先干。这招在任务量不大、紧急程度差不多的时候特别好使。</p>
+
+<p>我记得有一次给一个电商仓库做调度。白天订单少，FIFO跑得稳稳的。但一到双十一大促，订单像潮水一样涌进来。FIFO就扛不住了——一个普通订单排在前头，后面加急订单只能干等着。</p>
+
+<div class="highlight">
+  <strong>适用场景：</strong>任务类型单一、无紧急程度差异、系统负载较低。
+</div>
+
+<h4>14.1.2 EDF（最早截止时间优先）</h4>
+
+<p>EDF就聪明一点了。它不看谁先来，看谁最急。每个任务都有一个截止时间，谁的时间最近，谁先执行。</p>
+
+<p>我做过一个产线配送项目，每个工位都有严格的物料到达时间窗口。EDF就特别合适。举个例子：</p>
+
+<pre><code>// 伪代码示例：EDF调度核心逻辑
+Task taskA = { id: "A", deadline: 10:30:00 };
+Task taskB = { id: "B", deadline: 10:25:00 };
+Task taskC = { id: "C", deadline: 10:35:00 };
+
+// 按截止时间排序
+priorityQueue.sortByDeadline();
+// 结果：B -> A -> C
+</code></pre>
+
+<p>嗯，这里要注意。EDF有个坑——如果任务太多，CPU可能一直在做排序。我建议任务队列长度控制在200以内，否则性能会下降。</p>
+
+<div class="warning">
+  <strong>我曾经踩过的坑：</strong>EDF在任务量突增时，会出现“多米诺效应”——一个任务超时，导致后续所有任务都跟着超时。解决方案是引入“松弛时间”概念，给每个任务留点余量。
+</div>
+
+<h3>14.2 动态优先级：灵活，但复杂</h3>
+
+<p>动态优先级就不一样了。任务的优先级不是一成不变的，它会随着时间、系统状态、任务价值等因素动态调整。说白了，就是“见风使舵”。</p>
+
+<h4>14.2.1 基于截止时间的动态优先级</h4>
+
+<p>这个和EDF有点像，但更灵活。任务的优先级会随着时间推移而升高。比如一个任务还有10分钟截止，优先级是5；还剩5分钟，优先级升到8；还剩1分钟，优先级直接拉满到10。</p>
+
+<p>我管这叫“紧迫度递增策略”。在医疗物流AGV项目里，这招特别好使。运送紧急药品的AGV，越接近截止时间，优先级越高，其他AGV都得给它让路。</p>
+
+<pre><code>// 动态优先级计算示例
+function calculatePriority(task) {
+    let remainingTime = task.deadline - currentTime;
+    let basePriority = task.basePriority;
+    
+    // 紧迫度因子：剩余时间越少，因子越大
+    let urgencyFactor = 1 + (1 / (remainingTime + 1));
+    
+    return basePriority * urgencyFactor;
+}
+</code></pre>
+
+<div class="tip">
+  <strong>我的经验：</strong>动态优先级更新不要太频繁。我一般设置每5秒或每完成一个任务后更新一次。太频繁了，调度器自己先累趴了。
+</div>
+
+<h4>14.2.2 基于价值密度的动态优先级</h4>
+
+<p>这个策略，我个人觉得是最“聪明”的。它不光看任务急不急，还看任务“值不值”。</p>
+
+<p>价值密度 = 任务价值 / 任务耗时。</p>
+
+<p>举个例子：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>任务</th>
+      <th>价值（元）</th>
+      <th>耗时（分钟）</th>
+      <th>价值密度</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>运送VIP订单</td>
+      <td>500</td>
+      <td>10</td>
+      <td>50</td>
+    </tr>
+    <tr>
+      <td>运送普通补货</td>
+      <td>100</td>
+      <td>5</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>运送退货</td>
+      <td>50</td>
+      <td>8</td>
+      <td>6.25</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>你看，虽然VIP订单价值高，但耗时也长。普通补货虽然价值低，但耗时短，价值密度反而更高。在系统繁忙时，优先处理价值密度高的任务，整体收益最大。</p>
+
+<p>我在一个跨境电商仓库用过这个策略。当时有个场景：一台AGV正在执行退货任务，突然来了一个高价值订单。系统自动把退货任务挂起，先跑高价值订单。结果呢？当天整体吞吐量提升了15%。</p>
+
+<div class="warning">
+  <strong>注意：</strong>价值密度策略有个前提——你得能准确评估每个任务的价值和耗时。如果评估不准，那就是瞎指挥。我建议用历史数据做机器学习模型，动态预测任务耗时。
+</div>
+
+<h3>14.3 知识体系总览</h3>
+
+<p>说了这么多，我画了一张图，帮你理清思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">任务优先级策略知识体系</text>
+  
+  <!-- 根节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务优先级策略</text>
+  
+  <!-- 连线到两个分支 -->
+  <line x1="350" y1="110" x2="200" y2="160" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="450" y1="110" x2="600" y2="160" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 静态优先级 -->
+  <rect x="100" y="160" width="200" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="200" y="190" text-anchor="middle" font-size="16" fill="white" font-weight="bold">静态优先级</text>
+  
+  <!-- 动态优先级 -->
+  <rect x="500" y="160" width="200" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="600" y="190" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态优先级</text>
+  
+  <!-- 静态子节点连线 -->
+  <line x1="150" y1="210" x2="120" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="250" y1="210" x2="280" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- FIFO -->
+  <rect x="40" y="270" width="160" height="45" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="120" y="297" text-anchor="middle" font-size="14" fill="white">FIFO（先进先出）</text>
+  
+  <!-- EDF -->
+  <rect x="200" y="270" width="160" height="45" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="280" y="297" text-anchor="middle" font-size="14" fill="white">EDF（最早截止时间）</text>
+  
+  <!-- 动态子节点连线 -->
+  <line x1="550" y1="210" x2="520" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="650" y1="210" x2="680" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 基于截止时间 -->
+  <rect x="440" y="270" width="160" height="45" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="520" y="297" text-anchor="middle" font-size="14" fill="white">基于截止时间</text>
+  
+  <!-- 基于价值密度 -->
+  <rect x="600" y="270" width="160" height="45" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="680" y="297" text-anchor="middle" font-size="14" fill="white">基于价值密度</text>
+  
+  <!-- 底部说明 -->
+  <rect x="100" y="360" width="600" height="110" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="385" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">策略选择建议</text>
+  <text x="120" y="410" font-size="12" fill="#34495e">• 任务类型单一、负载低 → FIFO</text>
+  <text x="120" y="430" font-size="12" fill="#34495e">• 有明确截止时间要求 → EDF 或 动态截止时间</text>
+  <text x="120" y="450" font-size="12" fill="#34495e">• 追求整体收益最大化 → 价值密度策略</text>
+</svg>
+
+<h3>14.4 实战建议</h3>
+
+<p>说了这么多理论，最后给点实在的。</p>
+
+<ul>
+  <li><strong>不要迷信任何一种策略。</strong>我见过有人非要用EDF，结果现场全是普通任务，EDF和FIFO效果一样，还多花了CPU。选策略要看场景。</li>
+  <li><strong>混合策略往往更香。</strong>我现在的做法是：先用静态优先级做粗筛，再用动态优先级做细调。比如FIFO排队，但紧急任务可以插队。</li>
+  <li><strong>一定要有兜底机制。</strong>不管用什么策略，都要设置最大等待时间。一个任务等太久，直接提升到最高优先级。这叫“饥饿保护”。</li>
+</ul>
+
+<div class="tip">
+  <strong>一个小技巧：</strong>在系统上线初期，先用FIFO跑一段时间，收集数据。然后根据数据调整策略参数。别一上来就上复杂的动态策略，容易翻车。
+</div>
+
+<p>好了，关于任务优先级策略，今天就聊到这儿。记住一句话：没有最好的策略，只有最合适的策略。多试、多调、多总结，你也能成为调度高手。</p>
+
+<div class="footer-nav">
+            <a href="13ParticleSwarmAlloc.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15ChargeAndTaskDispatch.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

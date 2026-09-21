@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 调度系统高可用设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="active">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 调度系统高可用设计</h2>
+
+<p>调度系统一旦挂了，AGV就全趴窝了。这不是开玩笑。</p>
+
+<p>我参与过好几个工厂的项目，最怕的就是半夜接到电话说调度系统宕机了。生产线停一分钟，损失就是几万块。所以高可用设计，说白了就是让系统「怎么都死不了」。</p>
+
+<h3>18.1 主备切换：双机热备的核心逻辑</h3>
+
+<p>主备切换是最基础的高可用手段。两台服务器，一台主一台备。主节点干活，备节点待命。</p>
+
+<p>但这里有个坑：备节点不能真的闲着。我曾经见过一个项目，备机平时什么都不做，结果主节点挂了之后，备机启动花了5分钟——因为缓存全空了，数据库连接池要重建。</p>
+
+<div class="tip">
+  <strong>我的建议：</strong>备机要保持「温备」状态。数据库连接、缓存预热、内存数据结构，都要提前准备好。切换时只需要改个IP，几秒钟搞定。
+</div>
+
+<p>主备切换的核心流程是这样的：</p>
+
+<pre><code>1. 主节点定时发送心跳（比如每1秒一次）
+2. 备节点连续3次收不到心跳，判定主节点挂了
+3. 备节点拉起所有服务，接管虚拟IP
+4. 通知所有AGV切换连接地址
+5. 原主节点恢复后，自动降级为备节点</code></pre>
+
+<p>嗯，这里要注意：心跳间隔不能太短，否则网络抖动就会误切换。我习惯设成1秒一次，连续3次失败才切换。这样既保证响应速度，又避免频繁切换。</p>
+
+<h3>18.2 负载均衡：别让一台机器扛所有活</h3>
+
+<p>单机再强也扛不住几百台AGV同时上报位置。负载均衡就是把请求分散到多台机器上。</p>
+
+<p>我个人比较喜欢用一致性哈希来做AGV的负载分配。为什么？因为AGV的ID是固定的，用哈希可以把同一台AGV的请求始终路由到同一台服务器上。这样缓存命中率高，状态维护也简单。</p>
+
+<div class="highlight">
+  <strong>关键点：</strong>AGV调度系统不适合用轮询负载均衡。因为AGV的状态是连续的，如果每次请求都落到不同服务器，状态同步的成本会非常高。
+</div>
+
+<p>我做过一个对比测试：</p>
+
+<table>
+  <tr>
+    <th>负载均衡策略</th>
+    <th>缓存命中率</th>
+    <th>状态同步开销</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>轮询</td>
+    <td>低（约30%）</td>
+    <td>高</td>
+    <td>无状态服务</td>
+  </tr>
+  <tr>
+    <td>一致性哈希</td>
+    <td>高（约90%）</td>
+    <td>低</td>
+    <td>AGV调度、会话保持</td>
+  </tr>
+  <tr>
+    <td>最少连接</td>
+    <td>中（约60%）</td>
+    <td>中</td>
+    <td>计算密集型任务</td>
+  </tr>
+</table>
+
+<p>你看，一致性哈希在AGV场景下优势明显。但要注意节点增减时的数据迁移问题。我一般会设置200个虚拟节点，这样增减机器时，只有少量AGV需要重新分配。</p>
+
+<h3>18.3 数据备份与恢复：别等到丢了才后悔</h3>
+
+<p>数据备份这件事，我吃过亏。有一次数据库磁盘坏了，才发现备份脚本已经三个月没跑成功过——因为磁盘空间满了。</p>
+
+<p>从那以后，我定了个规矩：备份必须有三份，而且每周要演练一次恢复流程。</p>
+
+<p>AGV调度系统需要备份的数据包括：</p>
+
+<ul>
+  <li><strong>任务数据：</strong>所有已下发和正在执行的任务</li>
+  <li><strong>AGV状态：</strong>每台AGV的当前位置、电量、任务进度</li>
+  <li><strong>地图数据：</strong>路径网络、站点信息、障碍物</li>
+  <li><strong>配置数据：</strong>调度参数、策略配置、用户权限</li>
+</ul>
+
+<div class="warning">
+  <strong>注意：</strong>AGV的状态数据变化非常快，每秒都可能更新。全量备份不现实，必须用增量备份+实时同步。
+</div>
+
+<p>我常用的方案是：</p>
+
+<pre><code>实时层：Redis主从同步（毫秒级）
+近实时层：Binlog增量同步（秒级）
+离线层：每日全量备份（凌晨3点）
+异地层：跨机房冷备（每周一次）</code></pre>
+
+<p>恢复的时候，先恢复离线全量备份，再回放增量日志，最后从Redis同步最新状态。整个过程控制在5分钟以内。</p>
+
+<h3>18.4 故障转移机制：系统自愈的艺术</h3>
+
+<p>故障转移不是等系统挂了再处理，而是要让系统自己「感觉到不对劲」就提前行动。</p>
+
+<p>我设计过一个三级故障转移机制：</p>
+
+<ol>
+  <li><strong>一级：服务降级</strong>
+    <ul>
+      <li>检测到CPU超过80%，自动关闭非核心功能（比如历史查询、报表生成）</li>
+      <li>保证任务调度和AGV通信不受影响</li>
+    </ul>
+  </li>
+  <li><strong>二级：节点切换</strong>
+    <ul>
+      <li>检测到某个服务实例无响应，自动从注册中心摘除</li>
+      <li>请求转发到其他健康节点</li>
+    </ul>
+  </li>
+  <li><strong>三级：整体容灾</strong>
+    <ul>
+      <li>整个机房断电或网络中断，自动切换到异地灾备中心</li>
+      <li>AGV自动进入「降级运行模式」，按预设路径返回充电站</li>
+    </ul>
+  </li>
+</ol>
+
+<p>这里有个细节：AGV在调度系统故障时不能傻等。我让AGV本地缓存了最近100条任务指令，即使网络断了，也能继续执行完当前任务。等系统恢复后再上报结果。</p>
+
+<div class="highlight">
+  <strong>核心思想：</strong>故障转移不是「出了事再补救」，而是「出了事还能继续干活」。系统可以降级，但不能停摆。
+</div>
+
+<h3>18.5 避坑指南：我踩过的那些坑</h3>
+
+<p>做高可用设计这么多年，踩过的坑能写一本书。挑几个典型的说说：</p>
+
+<ul>
+  <li><strong>坑一：心跳检测太频繁</strong>——曾经设成100毫秒一次，结果网络抖动导致主备来回切换，AGV像无头苍蝇一样乱跑。后来改成1秒一次，加了个「切换冷却期」。</li>
+  <li><strong>坑二：备份只存一份</strong>——磁盘坏了才发现备份也在同一台机器上。现在强制要求至少三份，而且不能在同一机房。</li>
+  <li><strong>坑三：没考虑网络分区</strong>——主备之间网络断了，两边都以为对方挂了，同时开始接管。这就是「脑裂」。解决方案是引入仲裁节点，或者用RAFT协议。</li>
+  <li><strong>坑四：恢复流程没演练</strong>——文档写得很漂亮，真到恢复时发现脚本路径不对、密码过期、依赖版本不匹配。现在每季度必须做一次故障演练。</li>
+</ul>
+
+<p>嗯，说到演练，我建议你从最简单的场景开始：手动停掉主节点，看备节点能不能自动接管。然后逐步增加复杂度：断网、断电、磁盘满、内存泄漏。每次演练都要记录恢复时间，持续优化。</p>
+
+<p>高可用设计没有银弹。它是一系列权衡的结果：成本 vs 可靠性，复杂度 vs 可维护性。我的经验是：先保证核心链路的高可用，再逐步扩展到周边服务。别一开始就想搞「两地三中心」，先把主备切换做好，就已经能覆盖90%的故障场景了。</p>
+
+<div class="footer-nav">
+            <a href="17DatabaseDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19SimulationPlatform.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 职业发展</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="active">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 职业发展：AGV工程师技能树、面试常见问题、开源项目贡献指南</h2>
+
+<p>做AGV控制器开发这些年，我带过不少新人，也面试过上百号人。很多人问我：到底怎么才算一个合格的AGV工程师？今天我就把压箱底的经验掏出来，跟你聊聊这个职业的成长路径。</p>
+
+<p>说白了，AGV工程师是个“杂家”。你得懂硬件，也得会写代码，还得能调算法。我见过太多人只盯着一个点死磕，结果项目里一遇到跨领域的问题就抓瞎。嗯，咱们今天就把这事掰扯清楚。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>AGV工程师不是“码农”，也不是“硬件工”，而是一个系统集成者。你的价值在于让轮子转起来，并且转得稳、转得准。</p>
+</div>
+
+<h3>一、AGV工程师技能树</h3>
+
+<p>我把技能树分成三个层次：地基、支柱、塔尖。你想想看，盖楼是不是也得这么来？</p>
+
+<h4>1. 地基层：硬核基础</h4>
+<ul>
+  <li><strong>嵌入式C/C++：</strong>这是吃饭的家伙。我面试时必问指针和内存管理，能答透的人不多。</li>
+  <li><strong>实时操作系统（RTOS）：</strong>FreeRTOS、RT-Thread至少精通一个。任务调度、信号量、消息队列，这些是基本功。</li>
+  <li><strong>电机控制原理：</strong>直流有刷、无刷、步进，你得知道它们的脾气。PID调参是入门，但能调好的人真不多。</li>
+  <li><strong>传感器接口：</strong>编码器、IMU、激光雷达、超声波。I2C、SPI、UART、CAN，这些总线你得玩得转。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>刚入行时，我花了大半年死磕FreeRTOS的任务优先级设计。有一次因为优先级反转，AGV在转弯时直接撞墙。从那以后，我对RTOS的调度机制再也不敢马虎。</p>
+</div>
+
+<h4>2. 支柱层：核心算法</h4>
+<ul>
+  <li><strong>运动控制：</strong>差速模型、阿克曼模型、全向轮模型。你得能从数学上推导出轮子转速和车身速度的关系。</li>
+  <li><strong>路径规划：</strong>A*、Dijkstra、RRT。别只会调库，要能手撕伪代码。</li>
+  <li><strong>定位与建图：</strong>卡尔曼滤波、粒子滤波、ICP匹配。我建议从一维卡尔曼滤波开始学，别一上来就搞SLAM。</li>
+  <li><strong>避障策略：</strong>DWA（动态窗口法）、VFH（向量场直方图）。这些算法在ROS里都有现成的，但你要理解背后的代价函数设计。</li>
+</ul>
+
+<h4>3. 塔尖层：系统思维</h4>
+<ul>
+  <li><strong>软硬件协同设计：</strong>选型时，MCU的算力、内存、外设资源要跟算法需求匹配。我曾经因为选了颗低端MCU，导致路径规划跑不动，最后只能降级算法。</li>
+  <li><strong>调试与排障：</strong>逻辑分析仪、示波器、串口打印，这些工具要熟练。我习惯在关键节点加调试灯，一眼就能看出程序卡在哪。</li>
+  <li><strong>项目管理：</strong>Git版本控制、需求文档、测试用例。别觉得这些是“虚的”，项目一复杂，没有规范就是灾难。</li>
+</ul>
+
+<!-- SVG 技能树结构图 -->
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4CAF50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2E7D32;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196F3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565C0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9800;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E65100;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 塔尖 -->
+  <polygon points="400,30 300,130 500,130" fill="url(#grad3)" stroke="#BF360C" stroke-width="2"/>
+  <text x="400" y="95" text-anchor="middle" fill="white" font-size="16" font-weight="bold">系统思维</text>
+  <text x="400" y="115" text-anchor="middle" fill="white" font-size="12">软硬件协同 · 调试排障 · 项目管理</text>
+
+  <!-- 支柱层 -->
+  <rect x="150" y="150" width="500" height="120" rx="10" fill="url(#grad2)" stroke="#0D47A1" stroke-width="2"/>
+  <text x="400" y="185" text-anchor="middle" fill="white" font-size="18" font-weight="bold">核心算法</text>
+  <text x="400" y="210" text-anchor="middle" fill="white" font-size="13">运动控制 · 路径规划 · 定位建图 · 避障策略</text>
+  <text x="400" y="235" text-anchor="middle" fill="white" font-size="12">差速模型 · A* · 卡尔曼滤波 · DWA</text>
+  <text x="400" y="255" text-anchor="middle" fill="white" font-size="12">阿克曼 · Dijkstra · 粒子滤波 · VFH</text>
+
+  <!-- 地基层 -->
+  <rect x="50" y="290" width="700" height="120" rx="10" fill="url(#grad1)" stroke="#1B5E20" stroke-width="2"/>
+  <text x="400" y="325" text-anchor="middle" fill="white" font-size="18" font-weight="bold">硬核基础</text>
+  <text x="400" y="350" text-anchor="middle" fill="white" font-size="13">嵌入式C/C++ · RTOS · 电机控制 · 传感器接口</text>
+  <text x="400" y="375" text-anchor="middle" fill="white" font-size="12">FreeRTOS · PID调参 · 编码器 · I2C/SPI/UART/CAN</text>
+  <text x="400" y="395" text-anchor="middle" fill="white" font-size="12">RT-Thread · 无刷电机 · IMU · 激光雷达</text>
+
+  <!-- 连接线 -->
+  <line x1="400" y1="130" x2="400" y2="150" stroke="#555" stroke-width="3"/>
+  <line x1="400" y1="270" x2="400" y2="290" stroke="#555" stroke-width="3"/>
+
+  <!-- 底部说明 -->
+  <text x="400" y="450" text-anchor="middle" fill="#666" font-size="14">AGV工程师技能树 · 从地基到塔尖</text>
+  <text x="400" y="475" text-anchor="middle" fill="#999" font-size="12">基础不牢，地动山摇 · 算法不精，寸步难行 · 思维不广，难成大器</text>
+</svg>
+
+<h3>二、面试常见问题</h3>
+
+<p>我面试过很多人，也被人面试过。总结下来，AGV岗位的面试题其实有套路。我把它分成三类：基础题、算法题、场景题。</p>
+
+<h4>1. 基础题（必考）</h4>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#E3F2FD;">
+    <th>问题</th>
+    <th>考察点</th>
+    <th>我的建议</th>
+  </tr>
+  <tr>
+    <td>指针和引用的区别？</td>
+    <td>C++基础</td>
+    <td>别只背概念，要能说出底层实现</td>
+  </tr>
+  <tr>
+    <td>FreeRTOS任务栈大小怎么估算？</td>
+    <td>RTOS实战</td>
+    <td>我习惯先给个保守值，再通过调试工具实测</td>
+  </tr>
+  <tr>
+    <td>PID参数怎么调？</td>
+    <td>控制理论</td>
+    <td>先P后I再D，但要注意积分饱和</td>
+  </tr>
+  <tr>
+    <td>CAN总线仲裁机制？</td>
+    <td>通信协议</td>
+    <td>按优先级逐位仲裁，ID越小优先级越高</td>
+  </tr>
+</table>
+
+<h4>2. 算法题（核心）</h4>
+<ul>
+  <li><strong>手撕A*算法：</strong>别只写伪代码，要能写出完整的C实现。包括open list、close list的管理，启发式函数的选择。</li>
+  <li><strong>卡尔曼滤波推导：</strong>从状态预测到观测更新，五个公式要能默写。我面试时会让候选人画信息流图。</li>
+  <li><strong>差速模型正逆解：</strong>给定左右轮速度，求车体线速度和角速度。反过来也要会。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经面试过一个候选人，简历上写着“精通SLAM”。我问了他一个简单问题：激光雷达数据怎么做畸变校正？他支支吾吾答不上来。所以，别在简历上写“精通”，除非你真的能扛住追问。</p>
+</div>
+
+<h4>3. 场景题（拉差距）</h4>
+<ul>
+  <li><strong>场景一：</strong>AGV在仓库里突然原地打转，可能是什么原因？——编码器故障、轮子打滑、IMU漂移，你得能列出排查清单。</li>
+  <li><strong>场景二：</strong>两辆AGV在窄通道相遇，怎么避免死锁？——交通管制、优先级调度、预留路径，这些都是考点。</li>
+  <li><strong>场景三：</strong>电池电量低时，AGV应该怎么处理？——降速运行、就近充电、任务重分配，要能说出完整的策略。</li>
+</ul>
+
+<h3>三、开源项目贡献指南</h3>
+
+<p>说实话，我入行时最大的成长来自读开源代码。ROS Navigation Stack、Cartographer、TEB Local Planner，这些项目我都啃过。你想想看，能跟全球顶尖工程师学写代码，这机会多难得？</p>
+
+<h4>1. 怎么选项目？</h4>
+<ul>
+  <li><strong>入门级：</strong>Arduino的AGV小车项目、SimpleFOC（无刷电机控制）。代码量小，适合练手。</li>
+  <li><strong>进阶级：</strong>ROS Navigation Stack、move_base。代码量大，但文档齐全。</li>
+  <li><strong>骨灰级：</strong>Autoware（自动驾驶）、PX4（无人机飞控）。这些是工业级项目，能啃下来就是大神。</li>
+</ul>
+
+<h4>2. 怎么读代码？</h4>
+<p>我个人的习惯是“三遍法”：</p>
+<ol>
+  <li><strong>第一遍：</strong>跑起来。先编译、安装、跑demo，看效果。</li>
+  <li><strong>第二遍：</strong>画流程。把main函数到核心算法的调用链画出来。</li>
+  <li><strong>第三遍：</strong>改代码。改一个参数，看效果变化。改一个逻辑，看会不会崩。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>读ROS Navigation的costmap_2d时，我花了整整两周才搞懂膨胀层的实现。但搞懂之后，我对路径规划的避障逻辑豁然开朗。值！</p>
+</div>
+
+<h4>3. 怎么贡献？</h4>
+<ul>
+  <li><strong>从文档开始：</strong>修一个typo、补一个注释，这是最友好的入门方式。</li>
+  <li><strong>修小bug：</strong>在issue里找“good first issue”标签，从简单的开始。</li>
+  <li><strong>提PR的规范：</strong>代码风格要一致、commit message要清晰、测试要覆盖。我见过太多PR因为格式问题被驳回。</li>
+</ul>
+
+<pre><code>// 一个规范的commit message示例
+// 类型: 简短描述（50字以内）
+// 
+// 详细说明（72字换行）
+// 1. 为什么做这个修改
+// 2. 怎么实现的
+// 3. 有什么副作用
+
+fix: 修复DWA算法中速度采样越界问题
+
+在动态窗口法中，速度采样范围未考虑最大加速度限制，
+导致规划出的轨迹在急转弯时超出电机能力。
+添加了加速度约束检查，确保采样速度在物理可行范围内。
+Closes #1234
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>别一上来就提大PR。我见过有人提交了3000行代码的PR，结果review了两个月还没合并。从小处着手，建立信任，再逐步深入。</p>
+</div>
+
+<p>好了，关于职业发展这块，我就聊这么多。技能树要慢慢点，面试要提前准备，开源项目要持续贡献。这条路没有捷径，但每一步都算数。记住，AGV工程师的核心竞争力不是你会多少工具，而是你能解决多少实际问题。</p>
+
+<div class="footer-nav">
+            <a href="28FrontierTech.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30CourseSummaryOutlook.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

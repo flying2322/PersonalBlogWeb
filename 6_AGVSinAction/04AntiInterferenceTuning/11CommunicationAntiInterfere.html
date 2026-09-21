@@ -1,0 +1,348 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 通信抗干扰</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="active">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 通信抗干扰：无线通信（WiFi、UWB、5G）的抗干扰选型与信道切换，通信协议中的重传与校验机制，多AGV通信冲突避免</h2>
+
+<p>做AGV导航这么多年，我踩过最大的坑，就是通信问题。</p>
+<p>你想想看，AGV跑得再稳，定位算得再准，一旦通信断了或者数据错了，那整个系统就跟断了线的风筝一样。我见过一个项目，AGV在仓库里突然失联，直接撞上了货架，原因就是WiFi信号被旁边新装的变频器干扰了。</p>
+<p>所以这一章，咱们就聊聊通信抗干扰这件事。说白了，就是怎么让AGV的“耳朵”和“嘴巴”在嘈杂的工厂环境里还能正常工作。</p>
+
+<h3>11.1 无线通信选型：WiFi、UWB、5G，到底选哪个？</h3>
+
+<p>很多刚入行的朋友问我：“到底用哪种无线通信好？”我的回答是：没有最好的，只有最合适的。每种技术都有自己的脾气。</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>通信技术</th>
+            <th>优点</th>
+            <th>缺点</th>
+            <th>适用场景</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>WiFi (2.4/5GHz)</td>
+            <td>成本低，部署方便，生态成熟</td>
+            <td>干扰源多（微波炉、蓝牙），时延不稳定</td>
+            <td>中小型仓库，对时延要求不高的场景</td>
+        </tr>
+        <tr>
+            <td>UWB</td>
+            <td>抗多径干扰强，定位精度高，时延低</td>
+            <td>覆盖范围小，基站部署密度高，成本较高</td>
+            <td>高精度定位+通信融合的场景</td>
+        </tr>
+        <tr>
+            <td>5G (URLLC)</td>
+            <td>超低时延（1ms），高可靠性，大带宽</td>
+            <td>需要专网或运营商覆盖，成本最高</td>
+            <td>大型工厂、港口、对实时性要求极高的场景</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="highlight">
+    <p><strong>我个人习惯</strong>：如果项目预算有限，且AGV数量在20台以内，我会优先考虑WiFi 5GHz频段。为什么？因为5GHz频段干扰比2.4GHz少得多。但如果你需要亚米级的定位，那UWB几乎是唯一选择。至于5G，嗯，目前还是“土豪”方案，但未来一定是趋势。</p>
+</div>
+
+<h3>11.2 信道切换：别让AGV在“堵车”的路上越走越远</h3>
+
+<p>我在项目中遇到过最头疼的事，就是WiFi信道拥塞。工厂里几十台AGV同时通信，再加上员工的手机、平板，2.4GHz频段简直就像早高峰的北京三环。</p>
+
+<p><strong>信道切换的核心思路</strong>：让AGV和AP（接入点）能自动避开拥堵的信道。</p>
+
+<ul>
+    <li><strong>动态信道选择（DFS）</strong>：AP会定期扫描周围环境，如果发现当前信道干扰太大，就自动切换到更干净的信道。但要注意，切换过程会有短暂断连，一般100-300ms。对于AGV来说，这个时间窗口需要靠运动控制算法来“扛过去”。</li>
+    <li><strong>客户端引导</strong>：AGV本身也可以主动检测信号质量。如果RSSI（信号强度）低于-75dBm，或者丢包率超过5%，就应该主动触发信道切换请求。</li>
+    <li><strong>信道黑名单</strong>：我建议把那些“钉子户”干扰源（比如固定频段的工业设备）所在的信道加入黑名单，避免AGV反复尝试连接。</li>
+</ul>
+
+<div class="tip">
+    <p><strong>避坑指南</strong>：我曾经在一个项目里，发现AGV总是在某个区域掉线。排查了半天，原来是旁边有个老式微波炉，一加热就干扰2.4GHz信号。后来我们把AGV全部切换到5GHz，问题就解决了。所以，<strong>部署前一定要做现场频谱分析</strong>，别偷懒。</p>
+</div>
+
+<h3>11.3 通信协议中的重传与校验：数据错了，比丢了更可怕</h3>
+
+<p>你想想看，如果AGV收到的指令是“前进1米”，但因为数据错误变成了“前进10米”，那后果是什么？所以，通信协议里的重传和校验机制，就是最后一道防线。</p>
+
+<p><strong>常用的校验机制</strong>：</p>
+<ul>
+    <li><strong>CRC32（循环冗余校验）</strong>：这是最常用的。发送方计算数据的CRC值，接收方重新计算并比对。如果不一样，说明数据被篡改了。</li>
+    <li><strong>ACK/NACK机制</strong>：接收方收到数据后，回复一个确认包（ACK）或者否认包（NACK）。发送方如果没收到ACK，就重传。</li>
+    <li><strong>超时重传</strong>：发送方发出数据后，启动一个定时器。如果在规定时间内没收到ACK，就认为数据丢了，自动重传。</li>
+</ul>
+
+<p><strong>重传策略的优化</strong>：</p>
+<ul>
+    <li><strong>指数退避</strong>：第一次重传等100ms，第二次等200ms，第三次等400ms……这样可以避免网络拥塞时大家疯狂重传，导致“雪崩效应”。</li>
+    <li><strong>选择性重传</strong>：只重传丢失的那几个包，而不是整个数据流。这在UDP协议中很常见。</li>
+</ul>
+
+<div class="warning">
+    <p><strong>注意</strong>：重传次数不能太多。我一般设置最多重传3次，如果3次都失败，就认为通信链路已经断了，AGV应该立即执行安全停车程序。否则，AGV可能会带着错误的数据继续运行，那太危险了。</p>
+</div>
+
+<h3>11.4 多AGV通信冲突避免：别让AGV“抢话筒”</h3>
+
+<p>多台AGV同时跟调度系统通信，就像一群人在一个房间里同时说话，谁也听不清谁。这就是通信冲突。</p>
+
+<p><strong>常见的冲突避免机制</strong>：</p>
+<ul>
+    <li><strong>TDMA（时分多址）</strong>：给每台AGV分配一个固定的时间片。比如AGV1在0-10ms通信，AGV2在10-20ms通信。这样就不会冲突了。但缺点是，如果某台AGV没数据要发，时间片就浪费了。</li>
+    <li><strong>CSMA/CA（载波侦听多路访问/冲突避免）</strong>：AGV在发送数据前，先“听”一下信道是不是空闲。如果空闲就发，如果忙就等一会儿再试。WiFi用的就是这种机制。但问题是，当AGV数量很多时，碰撞概率会急剧上升。</li>
+    <li><strong>轮询机制</strong>：调度系统主动点名，问每台AGV“你有没有数据要发？”AGV被点到才能发言。这种方式最可控，但轮询一圈的时间会随着AGV数量增加而变长。</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>我的建议</strong>：对于超过30台AGV的大型项目，我倾向于使用TDMA+轮询的混合模式。调度系统用轮询来下发关键指令（比如路径变更），而AGV用TDMA来上报状态数据（比如位置、电量）。这样既保证了关键指令的实时性，又避免了状态数据上报时的冲突。</p>
+</div>
+
+<h3>11.5 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的通信抗干扰知识框架。你可以把它当作一个检查清单，做项目时对照着看，基本不会漏掉关键点。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="780" height="480" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+    <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV通信抗干扰知识体系</text>
+    
+    <!-- 第一层：三大支柱 -->
+    <rect x="50" y="70" width="200" height="50" fill="#e3f2fd" stroke="#1976d2" stroke-width="2" rx="8"/>
+    <text x="150" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">无线选型</text>
+    
+    <rect x="300" y="70" width="200" height="50" fill="#e8f5e9" stroke="#388e3c" stroke-width="2" rx="8"/>
+    <text x="400" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">信道与协议</text>
+    
+    <rect x="550" y="70" width="200" height="50" fill="#fff3e0" stroke="#f57c00" stroke-width="2" rx="8"/>
+    <text x="650" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#e65100">冲突避免</text>
+    
+    <!-- 连线 -->
+    <line x1="150" y1="120" x2="100" y2="180" stroke="#1976d2" stroke-width="2"/>
+    <line x1="150" y1="120" x2="200" y2="180" stroke="#1976d2" stroke-width="2"/>
+    <line x1="400" y1="120" x2="350" y2="180" stroke="#388e3c" stroke-width="2"/>
+    <line x1="400" y1="120" x2="450" y2="180" stroke="#388e3c" stroke-width="2"/>
+    <line x1="650" y1="120" x2="600" y2="180" stroke="#f57c00" stroke-width="2"/>
+    <line x1="650" y1="120" x2="700" y2="180" stroke="#f57c00" stroke-width="2"/>
+    
+    <!-- 第二层：具体技术 -->
+    <rect x="30" y="180" width="140" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="5"/>
+    <text x="100" y="205" text-anchor="middle" font-size="12" fill="#1565c0">WiFi 5GHz</text>
+    
+    <rect x="180" y="180" width="140" height="40" fill="#bbdefb" stroke="#1976d2" stroke-width="1" rx="5"/>
+    <text x="250" y="205" text-anchor="middle" font-size="12" fill="#1565c0">UWB</text>
+    
+    <rect x="280" y="180" width="140" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="5"/>
+    <text x="350" y="205" text-anchor="middle" font-size="12" fill="#2e7d32">DFS信道切换</text>
+    
+    <rect x="430" y="180" width="140" height="40" fill="#c8e6c9" stroke="#388e3c" stroke-width="1" rx="5"/>
+    <text x="500" y="205" text-anchor="middle" font-size="12" fill="#2e7d32">CRC32校验</text>
+    
+    <rect x="530" y="180" width="140" height="40" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="5"/>
+    <text x="600" y="205" text-anchor="middle" font-size="12" fill="#e65100">TDMA</text>
+    
+    <rect x="680" y="180" width="100" height="40" fill="#ffe0b2" stroke="#f57c00" stroke-width="1" rx="5"/>
+    <text x="730" y="205" text-anchor="middle" font-size="12" fill="#e65100">轮询</text>
+    
+    <!-- 第三层：关键参数 -->
+    <rect x="50" y="260" width="120" height="35" fill="#e3f2fd" stroke="#90caf9" stroke-width="1" rx="5"/>
+    <text x="110" y="282" text-anchor="middle" font-size="11" fill="#1565c0">RSSI > -75dBm</text>
+    
+    <rect x="200" y="260" width="120" height="35" fill="#e3f2fd" stroke="#90caf9" stroke-width="1" rx="5"/>
+    <text x="260" y="282" text-anchor="middle" font-size="11" fill="#1565c0">丢包率 < 5%</text>
+    
+    <rect x="300" y="260" width="140" height="35" fill="#c8e6c9" stroke="#a5d6a7" stroke-width="1" rx="5"/>
+    <text x="370" y="282" text-anchor="middle" font-size="11" fill="#2e7d32">重传次数 ≤ 3</text>
+    
+    <rect x="460" y="260" width="140" height="35" fill="#c8e6c9" stroke="#a5d6a7" stroke-width="1" rx="5"/>
+    <text x="530" y="282" text-anchor="middle" font-size="11" fill="#2e7d32">超时重传 100ms</text>
+    
+    <rect x="580" y="260" width="120" height="35" fill="#ffe0b2" stroke="#ffcc80" stroke-width="1" rx="5"/>
+    <text x="640" y="282" text-anchor="middle" font-size="11" fill="#e65100">时间片分配</text>
+    
+    <!-- 底部总结 -->
+    <rect x="150" y="340" width="500" height="60" fill="#fce4ec" stroke="#e91e63" stroke-width="2" rx="10"/>
+    <text x="400" y="365" text-anchor="middle" font-size="14" font-weight="bold" fill="#c2185b">核心原则：冗余设计 + 现场实测</text>
+    <text x="400" y="385" text-anchor="middle" font-size="12" fill="#c2185b">不要相信理论值，一定要去现场跑一遍</text>
+    
+    <!-- 箭头 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+        </marker>
+    </defs>
+    <line x1="400" y1="400" x2="400" y2="440" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <rect x="250" y="440" width="300" height="30" fill="#f3e5f5" stroke="#9c27b0" stroke-width="1" rx="5"/>
+    <text x="400" y="460" text-anchor="middle" font-size="12" fill="#7b1fa2">最终目标：AGV不掉线、不错码、不冲突</text>
+</svg>
+
+<p>嗯，这张图基本把通信抗干扰的核心逻辑串起来了。从选型到信道切换，再到协议校验和冲突避免，每一步都不能少。</p>
+
+<div class="tip">
+    <p><strong>最后说一句</strong>：通信抗干扰这件事，没有一劳永逸的解决方案。我每次做新项目，都会带着频谱仪去现场扫一遍，看看有没有隐藏的干扰源。有时候，一个不起眼的变频器、一台老旧的电机，就能让你的AGV通信瘫痪。所以，<strong>现场实测比任何理论都重要</strong>。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="10MotionControlAntiInterfere.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12SoftwareFilterData.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

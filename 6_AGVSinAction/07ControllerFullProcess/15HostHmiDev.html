@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 上位机与HMI开发</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="active">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 上位机与HMI开发：Qt/C++上位机框架、串口/网络通信、实时数据显示、远程控制指令下发</h2>
+
+<p>说到AGV的上位机开发，我个人觉得这是整个系统里最「看得见摸得着」的部分。你想想看，底层控制写得再好，如果上位机界面卡顿、数据延迟、指令发不出去，那客户第一印象就崩了。我这些年带项目，踩过不少坑，今天就把Qt/C++做AGV上位机的核心套路掰开揉碎讲给你听。</p>
+
+<h3>15.1 为什么选Qt/C++？</h3>
+
+<p>其实市面上能做上位机的框架不少，C#、Python都有。但我个人习惯用Qt/C++，原因有三：</p>
+<ul>
+  <li><strong>跨平台</strong>：Windows调试、Linux部署，一套代码搞定。我在现场遇到过客户突然要换工控机系统，Qt直接重新编译就行，不用重写。</li>
+  <li><strong>性能硬核</strong>：AGV实时数据刷新频率高，C++底层操作内存，延迟可控。用Python做实时曲线，数据量一大就容易卡顿。</li>
+  <li><strong>生态成熟</strong>：Qt的串口类QSerialPort、网络类QTcpSocket都是现成的，省去自己封装协议的时间。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心观点</strong>：上位机不是「能显示数据就行」，而是要稳定、低延迟、易维护。Qt/C++在这三点上平衡得最好。</p>
+</div>
+
+<h3>15.2 上位机整体架构</h3>
+
+<p>先给你看一张我常用的架构图，这是我自己项目里总结出来的分层思路：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="700" height="400" fill="#f0f8ff" stroke="#b0c4de" stroke-width="2" rx="8"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">AGV上位机软件架构（Qt/C++）</text>
+  
+  <!-- 第一层：UI层 -->
+  <rect x="60" y="60" width="600" height="60" fill="#e6f3ff" stroke="#4a90d9" stroke-width="2" rx="6"/>
+  <text x="360" y="85" text-anchor="middle" font-size="15" font-weight="bold" fill="#1a5276">UI层（QWidget / QML）</text>
+  <text x="360" y="105" text-anchor="middle" font-size="12" fill="#2c3e50">实时仪表盘 | 地图显示 | 指令面板 | 日志窗口</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="120" x2="360" y2="150" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 第二层：业务逻辑层 -->
+  <rect x="60" y="150" width="600" height="60" fill="#fff3e0" stroke="#e67e22" stroke-width="2" rx="6"/>
+  <text x="360" y="175" text-anchor="middle" font-size="15" font-weight="bold" fill="#a04000">业务逻辑层</text>
+  <text x="360" y="195" text-anchor="middle" font-size="12" fill="#2c3e50">数据解析 | 指令封装 | 状态机 | 路径规划接口</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="210" x2="360" y2="240" stroke="#e67e22" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  
+  <!-- 第三层：通信层 -->
+  <rect x="60" y="240" width="600" height="60" fill="#e8f8f5" stroke="#27ae60" stroke-width="2" rx="6"/>
+  <text x="360" y="265" text-anchor="middle" font-size="15" font-weight="bold" fill="#1e8449">通信层</text>
+  <text x="360" y="285" text-anchor="middle" font-size="12" fill="#2c3e50">串口通信（QSerialPort） | TCP/UDP（QTcpSocket）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="300" x2="360" y2="330" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 第四层：硬件抽象层 -->
+  <rect x="60" y="330" width="600" height="60" fill="#f5eef8" stroke="#8e44ad" stroke-width="2" rx="6"/>
+  <text x="360" y="355" text-anchor="middle" font-size="15" font-weight="bold" fill="#6c3483">硬件抽象层</text>
+  <text x="360" y="375" text-anchor="middle" font-size="12" fill="#2c3e50">串口转USB | 以太网 | 4G/WiFi | 协议适配</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a90d9"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e67e22"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边说明 -->
+  <text x="30" y="100" font-size="11" fill="#7f8c8d" transform="rotate(-90,30,100)">数据流方向</text>
+</svg>
+
+<p>嗯，这张图你多看两眼。每一层各司其职，上层不关心下层怎么收发数据，下层不关心上层怎么显示。我在早期项目里犯过一个错——把数据解析和界面刷新写在一起，结果改个显示样式就得动通信代码，维护起来想哭。</p>
+
+<h3>15.3 串口通信实战</h3>
+
+<p>AGV和上位机最常用的物理连接就是串口。别觉得串口老，工业现场它最可靠。Qt里用<code>QSerialPort</code>，代码其实很简洁：</p>
+
+<pre><code>// 串口初始化
+QSerialPort *serial = new QSerialPort(this);
+serial-&gt;setPortName("COM3");
+serial-&gt;setBaudRate(QSerialPort::Baud115200);
+serial-&gt;setDataBits(QSerialPort::Data8);
+serial-&gt;setParity(QSerialPort::NoParity);
+serial-&gt;setStopBits(QSerialPort::OneStop);
+
+if (serial-&gt;open(QIODevice::ReadWrite)) {
+    qDebug() &lt;&lt; "串口打开成功";
+} else {
+    qDebug() &lt;&lt; "串口打开失败:" &lt;&lt; serial-&gt;errorString();
+}
+
+// 接收数据（信号槽方式）
+connect(serial, &amp;QSerialPort::readyRead, this, [=]() {
+    QByteArray data = serial-&gt;readAll();
+    // 这里做协议解析
+    parseAGVData(data);
+});</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在项目里直接用<code>readAll()</code>，结果数据量大时粘包严重。后来改成按协议帧头帧尾做缓存解析，才稳定下来。建议你定义一个环形缓冲区，逐字节处理。</p>
+</div>
+
+<h3>15.4 网络通信（TCP）</h3>
+
+<p>当AGV数量多、距离远时，串口就不够用了。这时候得上TCP。Qt的<code>QTcpSocket</code>用起来跟串口很像，但多了个连接管理：</p>
+
+<pre><code>// TCP客户端
+QTcpSocket *tcpSocket = new QTcpSocket(this);
+tcpSocket-&gt;connectToHost("192.168.1.100", 8080);
+
+if (tcpSocket-&gt;waitForConnected(3000)) {
+    qDebug() &lt;&lt; "TCP连接成功";
+} else {
+    qDebug() &lt;&lt; "连接超时";
+}
+
+// 发送指令
+QByteArray cmd = buildCommand("MOVE", 100, 200);
+tcpSocket-&gt;write(cmd);
+
+// 接收数据
+connect(tcpSocket, &amp;QTcpSocket::readyRead, this, [=]() {
+    QByteArray data = tcpSocket-&gt;readAll();
+    processNetworkData(data);
+});</code></pre>
+
+<p>这里有个细节：TCP是流式协议，没有消息边界。我建议你在应用层自己定义协议头，比如用4字节表示数据长度，这样接收方就能准确切分消息。</p>
+
+<h3>15.5 实时数据显示</h3>
+
+<p>AGV上位机最核心的界面就是实时数据面板。我一般用<code>QTableWidget</code>配合定时器刷新：</p>
+
+<pre><code>// 定时器刷新（50ms间隔）
+QTimer *timer = new QTimer(this);
+connect(timer, &amp;QTimer::timeout, this, &amp;MainWindow::updateDisplay);
+timer-&gt;start(50);
+
+void MainWindow::updateDisplay() {
+    // 更新电池电量
+    ui-&gt;batteryBar-&gt;setValue(currentData.battery);
+    
+    // 更新速度
+    ui-&gt;speedLabel-&gt;setText(
+        QString("速度: %1 m/s").arg(currentData.speed, 0, 'f', 2));
+    
+    // 更新坐标
+    ui-&gt;posLabel-&gt;setText(
+        QString("X: %1  Y: %2").arg(currentData.x).arg(currentData.y));
+    
+    // 更新状态指示灯
+    if (currentData.status == ERROR) {
+        ui-&gt;statusLed-&gt;setStyleSheet("background-color: red;");
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：UI刷新别放在数据接收线程里！Qt的UI操作必须在主线程。我见过有人直接在<code>readyRead</code>槽里更新界面，程序跑一会儿就崩溃。正确做法是用信号槽跨线程通信，或者用<code>QMetaObject::invokeMethod</code>。</p>
+</div>
+
+<h3>15.6 远程控制指令下发</h3>
+
+<p>控制指令下发，说白了就是上位机给AGV发一串字节。但这里有个设计要点——指令要有确认机制。我常用的协议格式是这样的：</p>
+
+<table border="1" cellpadding="6" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e6f3ff;">
+    <th>字段</th>
+    <th>长度</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>帧头</td>
+    <td>2字节</td>
+    <td>0xAA 0x55</td>
+  </tr>
+  <tr>
+    <td>指令ID</td>
+    <td>1字节</td>
+    <td>0x01=启动, 0x02=停止, 0x03=设置速度</td>
+  </tr>
+  <tr>
+    <td>数据长度</td>
+    <td>2字节</td>
+    <td>后续数据字节数</td>
+  </tr>
+  <tr>
+    <td>数据体</td>
+    <td>N字节</td>
+    <td>具体参数</td>
+  </tr>
+  <tr>
+    <td>校验</td>
+    <td>1字节</td>
+    <td>异或校验</td>
+  </tr>
+  <tr>
+    <td>帧尾</td>
+    <td>2字节</td>
+    <td>0x0D 0x0A</td>
+  </tr>
+</table>
+
+<p>指令下发代码示例：</p>
+
+<pre><code>void MainWindow::sendCommand(quint8 cmdId, QByteArray params) {
+    QByteArray frame;
+    frame.append(0xAA);
+    frame.append(0x55);
+    frame.append(cmdId);
+    
+    quint16 len = params.size();
+    frame.append((len &gt;&gt; 8) &amp; 0xFF);
+    frame.append(len &amp; 0xFF);
+    frame.append(params);
+    
+    // 异或校验
+    quint8 checksum = 0;
+    for (int i = 0; i &lt; frame.size(); i++) {
+        checksum ^= frame[i];
+    }
+    frame.append(checksum);
+    frame.append(0x0D);
+    frame.append(0x0A);
+    
+    // 发送
+    if (serial-&gt;isOpen()) {
+        serial-&gt;write(frame);
+    } else if (tcpSocket-&gt;state() == QAbstractSocket::ConnectedState) {
+        tcpSocket-&gt;write(frame);
+    }
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>经验之谈</strong>：指令下发后一定要等AGV回复ACK。我遇到过无线网络丢包，指令发了但AGV没收到，结果车还在原地不动。后来加了超时重发机制，3秒没收到ACK就重发，最多重试3次。</p>
+</div>
+
+<h3>15.7 日志与调试</h3>
+
+<p>最后说个容易被忽略的点——日志系统。AGV跑起来后，上位机要记录所有收发数据、状态变化、异常事件。我习惯用<code>qInstallMessageHandler</code>重定向日志到文件：</p>
+
+<pre><code>void customMessageHandler(QtMsgType type, const QMessageLogContext &amp;ctx, const QString &amp;msg) {
+    QFile file("agv_log.txt");
+    if (file.open(QIODevice::Append)) {
+        QTextStream stream(&amp;file);
+        stream &lt;&lt; QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz") &lt;&lt; " ";
+        stream &lt;&lt; msg &lt;&lt; "\n";
+        file.close();
+    }
+}
+
+// 在main函数中安装
+int main(int argc, char *argv[]) {
+    qInstallMessageHandler(customMessageHandler);
+    QApplication app(argc, argv);
+    // ...
+}</code></pre>
+
+<p>有了日志，现场出问题才能快速定位。我曾经靠日志里的时间戳，发现某次指令延迟是因为串口缓冲区满了，后来加了流量控制才解决。</p>
+
+<p>好了，上位机开发这块核心内容就这些。Qt/C++做AGV上位机，说白了就是「通信+显示+控制」三个环。把每一层拆开做，别混在一起，后面维护起来你会感谢自己的。</p>
+
+<div class="footer-nav">
+            <a href="14StateMachineTask.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16IntegrationAndTest.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

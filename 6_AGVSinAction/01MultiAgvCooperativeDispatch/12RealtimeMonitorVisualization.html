@@ -1,0 +1,489 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 实时监控与可视化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="active">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 实时监控与可视化</h2>
+
+<p>各位同学，今天我们来聊聊调度系统的「眼睛」——实时监控与可视化。说实话，我见过太多调度系统，算法再牛，界面一团糟，现场工程师根本不敢用。你想想看，AGV在车间里跑，你连它在哪都不知道，这调度谁敢信？</p>
+
+<h3>12.1 为什么需要实时监控？</h3>
+
+<p>AGV调度系统不是写完代码就完事了。它是个24小时运转的活系统。我参与过一个项目，上线第一天，调度算法跑得挺好，但操作员盯着黑乎乎的终端，完全不知道AGV在干嘛。结果呢？一个AGV卡在角落里，系统还在给它派任务，白白浪费了半小时产能。</p>
+
+<p>实时监控要解决三个核心问题：</p>
+<ul>
+    <li><strong>位置可见</strong>：AGV当前在哪，往哪走，速度多少</li>
+    <li><strong>状态可知</strong>：是空闲、执行任务、充电还是故障</li>
+    <li><strong>异常可预警</strong>：电量低、路径堵塞、通信中断，得第一时间弹出来</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>核心观点</strong>：监控不是「看个热闹」，而是让操作员在3秒内判断「系统是否健康」。</p>
+</div>
+
+<h3>12.2 WebSocket：让数据「推」起来</h3>
+
+<p>传统的HTTP轮询，说白了就是前端每隔几秒问一次「有更新吗？」。这在AGV场景下根本行不通。AGV位置每秒都在变，轮询间隔短了服务器扛不住，长了数据滞后严重。</p>
+
+<p>WebSocket就解决了这个问题。它建立一条长连接，服务端有数据就主动推过来。我习惯用Spring Boot + Netty做WebSocket服务端，前端用原生WebSocket API或者Socket.IO。</p>
+
+<p>下面是一个简单的服务端推送示例：</p>
+
+<pre><code>// 服务端（Java + Spring Boot）
+@ServerEndpoint("/ws/agv/{agvId}")
+public class AgvWebSocket {
+    
+    @OnOpen
+    public void onOpen(Session session, @PathParam("agvId") String agvId) {
+        // 记录连接，用于后续推送
+        SessionManager.add(agvId, session);
+        System.out.println("AGV " + agvId + " 监控连接建立");
+    }
+    
+    // 推送AGV位置
+    public void pushPosition(String agvId, double x, double y, double speed) {
+        JSONObject msg = new JSONObject();
+        msg.put("type", "position");
+        msg.put("agvId", agvId);
+        msg.put("x", x);
+        msg.put("y", y);
+        msg.put("speed", speed);
+        msg.put("timestamp", System.currentTimeMillis());
+        
+        Session session = SessionManager.get(agvId);
+        if (session != null && session.isOpen()) {
+            session.getBasicRemote().sendText(msg.toString());
+        }
+    }
+}</code></pre>
+
+<p>前端接收也很简单：</p>
+
+<pre><code>// 前端（JavaScript）
+const ws = new WebSocket('ws://localhost:8080/ws/agv/AGV001');
+
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if (data.type === 'position') {
+        // 更新地图上的AGV位置
+        updateAgvPosition(data.agvId, data.x, data.y, data.speed);
+    }
+};</code></pre>
+
+<div class="tip">
+    <p><strong>避坑指南</strong>：我曾经遇到过WebSocket连接频繁断开的问题。后来发现是心跳机制没做好。建议每30秒发一次心跳包，服务端60秒没收到就主动断开，避免僵尸连接占用资源。</p>
+</div>
+
+<h3>12.3 前端图表库：让数据「活」起来</h3>
+
+<p>光有原始数据不够，得可视化。我个人比较喜欢用ECharts，它图表类型丰富，社区活跃，中文文档也全。当然，如果你追求轻量，Chart.js也不错。</p>
+
+<p>AGV调度系统里，我常用这几类图表：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>图表类型</th>
+            <th>用途</th>
+            <th>更新频率</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>折线图</td>
+            <td>AGV速度、电量随时间变化</td>
+            <td>1秒/次</td>
+        </tr>
+        <tr>
+            <td>柱状图</td>
+            <td>各AGV任务完成数对比</td>
+            <td>10秒/次</td>
+        </tr>
+        <tr>
+            <td>饼图</td>
+            <td>AGV状态分布（空闲/忙碌/充电/故障）</td>
+            <td>5秒/次</td>
+        </tr>
+        <tr>
+            <td>仪表盘</td>
+            <td>系统整体吞吐量、拥堵指数</td>
+            <td>实时</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>举个例子，AGV电量监控的折线图，代码大概这样：</p>
+
+<pre><code>// ECharts 折线图示例
+const chart = echarts.init(document.getElementById('batteryChart'));
+
+function updateBatteryChart(agvId, batteryLevel) {
+    // 维护一个长度为60的滑动窗口（最近60秒数据）
+    if (!chartData[agvId]) {
+        chartData[agvId] = { time: [], value: [] };
+    }
+    
+    const now = new Date().toLocaleTimeString();
+    chartData[agvId].time.push(now);
+    chartData[agvId].value.push(batteryLevel);
+    
+    // 只保留最近60个点
+    if (chartData[agvId].time.length > 60) {
+        chartData[agvId].time.shift();
+        chartData[agvId].value.shift();
+    }
+    
+    chart.setOption({
+        xAxis: { data: chartData[agvId].time },
+        series: [{
+            name: agvId,
+            type: 'line',
+            data: chartData[agvId].value,
+            smooth: true
+        }]
+    });
+}
+
+// 通过WebSocket接收数据后调用
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if (data.type === 'battery') {
+        updateBatteryChart(data.agvId, data.level);
+    }
+};</code></pre>
+
+<div class="warning">
+    <p><strong>注意</strong>：图表数据不能无限堆积。我见过一个系统跑了三天，前端浏览器直接卡死——因为图表里存了上万个数据点。一定要做数据裁剪，比如只保留最近5分钟的数据，或者做降采样。</p>
+</div>
+
+<h3>12.4 地图渲染：AGV的「实时位置」</h3>
+
+<p>这是监控系统最直观的部分。说白了，就是在地图上画AGV，然后让它动起来。</p>
+
+<p>地图渲染我推荐用Canvas或者Leaflet。如果车间地图是平面图，Canvas就够用了。如果需要叠加卫星图或建筑图，Leaflet更合适。</p>
+
+<p>下面是一个简单的Canvas地图渲染逻辑：</p>
+
+<pre><code>// Canvas 地图渲染
+class AgvMap {
+    constructor(canvasId, mapImageUrl) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.agvs = {};  // 存储所有AGV的位置和状态
+        
+        // 加载地图背景
+        this.bgImage = new Image();
+        this.bgImage.src = mapImageUrl;
+        this.bgImage.onload = () => this.render();
+    }
+    
+    // 更新AGV位置（由WebSocket触发）
+    updateAgv(agvId, x, y, angle, status) {
+        this.agvs[agvId] = { x, y, angle, status };
+        this.render();
+    }
+    
+    render() {
+        // 清空画布
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // 绘制地图背景
+        this.ctx.drawImage(this.bgImage, 0, 0);
+        
+        // 绘制所有AGV
+        for (let id in this.agvs) {
+            const agv = this.agvs[id];
+            
+            // 根据状态设置颜色
+            let color = '#4CAF50';  // 正常
+            if (agv.status === 'charging') color = '#FFC107';
+            if (agv.status === 'fault') color = '#F44336';
+            
+            // 绘制AGV（简化为一个带方向的圆点）
+            this.ctx.beginPath();
+            this.ctx.arc(agv.x, agv.y, 8, 0, Math.PI * 2);
+            this.ctx.fillStyle = color;
+            this.ctx.fill();
+            
+            // 绘制方向指示
+            this.ctx.beginPath();
+            this.ctx.moveTo(agv.x, agv.y);
+            this.ctx.lineTo(
+                agv.x + 12 * Math.cos(agv.angle),
+                agv.y + 12 * Math.sin(agv.angle)
+            );
+            this.ctx.strokeStyle = '#333';
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+            
+            // 显示AGV编号
+            this.ctx.fillStyle = '#000';
+            this.ctx.font = '10px Arial';
+            this.ctx.fillText(id, agv.x + 12, agv.y - 12);
+        }
+    }
+}
+
+// 使用示例
+const map = new AgvMap('mapCanvas', '/images/workshop.png');
+
+// WebSocket收到位置更新
+ws.onmessage = function(event) {
+    const data = JSON.parse(event.data);
+    if (data.type === 'position') {
+        map.updateAgv(data.agvId, data.x, data.y, data.angle, data.status);
+    }
+};</code></pre>
+
+<div class="tip">
+    <p><strong>个人经验</strong>：地图上的AGV图标不要用真实照片，太卡了。用简单的几何图形加颜色区分状态就行。我一般用圆形表示正常，三角形表示故障，闪电符号表示充电。操作员一眼就能看出问题。</p>
+</div>
+
+<h3>12.5 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的实时监控与可视化的核心逻辑。你把它理解透了，整个章节就通了。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">实时监控与可视化核心架构</text>
+    
+    <!-- 数据源 -->
+    <rect x="50" y="80" width="180" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="140" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV 数据源</text>
+    <text x="140" y="135" text-anchor="middle" font-size="12" fill="white">位置/状态/电量/任务</text>
+    
+    <!-- 箭头1 -->
+    <line x1="230" y1="110" x2="290" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- WebSocket -->
+    <rect x="290" y="80" width="180" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="380" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">WebSocket 推送</text>
+    <text x="380" y="135" text-anchor="middle" font-size="12" fill="white">长连接/实时推送/心跳</text>
+    
+    <!-- 箭头2 -->
+    <line x1="470" y1="110" x2="530" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 前端处理 -->
+    <rect x="530" y="80" width="180" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+    <text x="620" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">前端数据解析</text>
+    <text x="620" y="135" text-anchor="middle" font-size="12" fill="white">JSON解析/数据裁剪</text>
+    
+    <!-- 分支箭头 -->
+    <line x1="620" y1="140" x2="620" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="620" y1="140" x2="300" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="620" y1="140" x2="940" y2="190" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 图表渲染 -->
+    <rect x="150" y="190" width="300" height="80" rx="8" fill="#f39c12" opacity="0.9"/>
+    <text x="300" y="225" text-anchor="middle" font-size="16" fill="white" font-weight="bold">📊 图表渲染 (ECharts)</text>
+    <text x="300" y="245" text-anchor="middle" font-size="12" fill="white">折线图/柱状图/饼图/仪表盘</text>
+    <text x="300" y="260" text-anchor="middle" font-size="12" fill="white">电量趋势/任务统计/状态分布</text>
+    
+    <!-- 地图渲染 -->
+    <rect x="500" y="190" width="250" height="80" rx="8" fill="#9b59b6" opacity="0.9"/>
+    <text x="625" y="225" text-anchor="middle" font-size="16" fill="white" font-weight="bold">🗺️ 地图渲染 (Canvas)</text>
+    <text x="625" y="245" text-anchor="middle" font-size="12" fill="white">AGV位置/方向/状态颜色</text>
+    <text x="625" y="260" text-anchor="middle" font-size="12" fill="white">地图背景/实时更新</text>
+    
+    <!-- 箭头到用户 -->
+    <line x1="300" y1="270" x2="300" y2="330" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="625" y1="270" x2="625" y2="330" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 用户 -->
+    <rect x="200" y="330" width="400" height="50" rx="25" fill="#2c3e50" opacity="0.9"/>
+    <text x="400" y="360" text-anchor="middle" font-size="18" fill="white" font-weight="bold">👨‍💻 操作员 / 监控大屏</text>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>嗯，这张图把整个流程串起来了。AGV数据通过WebSocket推到前端，前端再分发给图表和地图去渲染。操作员看到的就是一个实时更新的「活地图」。</p>
+
+<h3>12.6 性能优化：别让监控拖垮系统</h3>
+
+<p>最后聊点实战经验。监控系统本身不能成为性能瓶颈。我遇到过最夸张的情况：监控页面打开后，CPU直接飙到90%，因为每秒钟渲染了50个AGV的动画。</p>
+
+<p>几个优化建议：</p>
+<ul>
+    <li><strong>数据降频</strong>：AGV位置每秒变化10次，但前端每秒更新2次就够了。人眼根本看不出区别。</li>
+    <li><strong>离屏渲染</strong>：地图背景图提前渲染到离屏Canvas上，每次只更新AGV图标，别重绘整个地图。</li>
+    <li><strong>虚拟列表</strong>：如果AGV数量超过50台，列表展示时用虚拟滚动，只渲染可见区域。</li>
+    <li><strong>Web Worker</strong>：数据解析这种计算密集型的任务，丢到Worker线程里，别阻塞UI。</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>总结一下</strong>：实时监控不是「把数据扔到页面上」就完事了。WebSocket保证数据及时性，图表库让数据可读，地图渲染让位置直观。三者配合好，操作员才能对系统「一眼看透」。</p>
+</div>
+
+<p>好了，这一章就到这里。记住，监控系统是调度系统的「面子」，也是「里子」。面子不好看，没人敢用；里子不扎实，数据不准，再好看也没用。</p>
+
+<div class="footer-nav">
+            <a href="11AdvancedDispatchAlgorithms.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

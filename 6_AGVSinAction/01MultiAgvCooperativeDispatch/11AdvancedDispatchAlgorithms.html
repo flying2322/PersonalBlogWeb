@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 高级调度算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="active">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 高级调度算法：遗传算法、粒子群算法、强化学习入门</h2>
+
+<p>各位同学，欢迎来到高级调度算法的章节。</p>
+<p>说实话，前面我们聊的调度策略，比如先到先得、最短路径优先，都属于“规则型”算法。它们简单、稳定，但遇到复杂场景就有点力不从心了。比如几十台AGV在密集仓库里穿梭，还要考虑充电、避让、任务优先级……这时候，我们就得请出“智能优化算法”了。</p>
+<p>我个人习惯把这类算法叫做“仿生派”。因为它们很多灵感都来自大自然。今天咱们就聊三个最常用的：遗传算法、粒子群算法，还有最近特别火的强化学习。</p>
+
+<h3>11.1 遗传算法：让AGV学会“优胜劣汰”</h3>
+
+<p>遗传算法（GA），说白了就是模拟生物进化。你想想看，生物进化靠什么？靠“选择”、“交叉”和“变异”。遗传算法也一样。</p>
+<p>在AGV调度里，我们把一个调度方案（比如AGV1去A点，AGV2去B点……）看作一个“个体”。一堆个体组成“种群”。然后我们让它们一代代进化，最终找到最优解。</p>
+
+<div class="highlight">
+  <p><strong>核心流程：</strong></p>
+  <ol>
+    <li><strong>编码</strong>：把调度方案变成一串数字或二进制码。比如“AGV1→任务3→任务1”编码成 [1,3,1]。</li>
+    <li><strong>适应度函数</strong>：评价这个方案好不好。比如总路径最短、等待时间最少。</li>
+    <li><strong>选择</strong>：适应度高的个体，有更大机会“繁殖”下一代。</li>
+    <li><strong>交叉</strong>：两个父代交换部分基因，产生新个体。</li>
+    <li><strong>变异</strong>：随机改变某个基因，防止陷入局部最优。</li>
+  </ol>
+</div>
+
+<p>我在项目中遇到过一个问题：AGV数量一多，编码长度就爆炸，算法跑得特别慢。后来我用了“分段编码”，把每台AGV的任务序列分开，效果好了很多。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经把交叉率设得太高（0.9以上），结果算法像抽风一样，好不容易找到的好方案全被破坏了。后来我控制在0.6~0.8之间，变异率0.01~0.1，稳定多了。</p>
+</div>
+
+<pre><code>// 伪代码示例：遗传算法核心循环
+for (int gen = 0; gen &lt; MAX_GEN; gen++) {
+    // 计算每个个体的适应度
+    for (Individual ind : population) {
+        ind.fitness = evaluate(ind); // 比如计算总路径长度
+    }
+    // 选择：轮盘赌法
+    List&lt;Individual&gt; selected = selectByRoulette(population);
+    // 交叉：单点交叉
+    List&lt;Individual&gt; offspring = crossover(selected, CROSS_RATE);
+    // 变异：随机翻转基因
+    mutate(offspring, MUTATE_RATE);
+    // 生成新种群
+    population = offspring;
+}
+</code></pre>
+
+<h3>11.2 粒子群算法：让AGV像鸟群一样协作</h3>
+
+<p>粒子群算法（PSO）是另一种思路。它模拟鸟群觅食：每只鸟（粒子）知道自己当前的位置，也知道群体里谁离食物最近。然后它调整自己的速度和方向，向最优位置靠拢。</p>
+<p>在AGV调度里，每个粒子就是一个“潜在解”。粒子有位置（调度方案）和速度（调整方向）。每次迭代，粒子会参考两个信息：</p>
+<ul>
+  <li><strong>个体最优（pBest）</strong>：这个粒子自己找到过的最好方案。</li>
+  <li><strong>全局最优（gBest）</strong>：整个群体找到过的最好方案。</li>
+</ul>
+
+<p>然后粒子更新自己的速度和位置。公式很简单：</p>
+<pre><code>v_new = w * v_old + c1 * r1 * (pBest - x) + c2 * r2 * (gBest - x)
+x_new = x + v_new</code></pre>
+<p>其中w是惯性权重，c1、c2是学习因子，r1、r2是随机数。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong></p>
+  <p>粒子群算法容易“早熟收敛”——就是所有粒子都挤到局部最优附近，跳不出来。我建议w从0.9线性递减到0.4，前期探索，后期开发。c1和c2都设成2.0左右，效果比较均衡。</p>
+</div>
+
+<p>我记得有一次做多AGV路径规划，遗传算法跑了200代还没收敛，粒子群算法50代就找到了差不多的解。但粒子群对离散问题（比如任务分配）处理起来有点别扭，需要做离散化处理。</p>
+
+<h3>11.3 强化学习：让AGV自己“试错”成长</h3>
+
+<p>强化学习（RL）跟前两个算法完全不同。它不靠模拟进化，也不靠群体协作，而是让智能体（AGV）在环境中“试错”，通过奖励和惩罚来学习最优策略。</p>
+<p>你想想看，这就像训练一只小狗：做对了给零食，做错了轻轻拍一下。慢慢地，小狗就知道该怎么做。</p>
+
+<p>在AGV调度里，强化学习的核心要素是：</p>
+<ul>
+  <li><strong>状态（State）</strong>：当前AGV的位置、任务队列、地图拥堵情况等。</li>
+  <li><strong>动作（Action）</strong>：AGV下一步的选择，比如去哪个站点、走哪条路。</li>
+  <li><strong>奖励（Reward）</strong>：完成任务给正奖励，碰撞或绕路给负奖励。</li>
+  <li><strong>策略（Policy）</strong>：AGV根据状态选择动作的规则。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>常用算法：</strong></p>
+  <ul>
+    <li><strong>Q-Learning</strong>：最基础的表格型方法，适合状态空间小的情况。</li>
+    <li><strong>Deep Q-Network (DQN)</strong>：用神经网络代替Q表，处理大规模状态空间。</li>
+    <li><strong>Policy Gradient</strong>：直接优化策略，适合连续动作空间。</li>
+  </ul>
+</div>
+
+<p>我个人觉得，强化学习在AGV调度里最有潜力的应用是“动态调度”。比如突然来了一个紧急任务，或者某条路堵了，传统算法要重新计算，而强化学习模型可以实时调整。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经在仿真环境里训练了一个DQN模型，效果特别好。结果一上真实AGV，直接翻车。为什么？因为仿真和现实的“状态分布”不一样。后来我加了“域随机化”，在仿真里随机改变地图、任务分布，模型才泛化过来。</p>
+</div>
+
+<pre><code># 伪代码示例：Q-Learning更新
+def update_q_table(state, action, reward, next_state):
+    # 当前Q值
+    current_q = q_table[state][action]
+    # 下一状态的最大Q值
+    max_next_q = max(q_table[next_state])
+    # Q值更新公式
+    new_q = current_q + alpha * (reward + gamma * max_next_q - current_q)
+    q_table[state][action] = new_q</code></pre>
+
+<h3>11.4 三种算法的对比与选择</h3>
+
+<p>说了这么多，到底该用哪个？我整理了一个表格，方便你对比：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>算法</th>
+      <th>适用场景</th>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>遗传算法</td>
+      <td>离线调度、任务分配</td>
+      <td>全局搜索能力强，适合离散问题</td>
+      <td>收敛慢，参数敏感</td>
+    </tr>
+    <tr>
+      <td>粒子群算法</td>
+      <td>路径规划、参数优化</td>
+      <td>收敛快，实现简单</td>
+      <td>容易早熟，不适合离散问题</td>
+    </tr>
+    <tr>
+      <td>强化学习</td>
+      <td>动态调度、实时决策</td>
+      <td>能适应环境变化，可在线学习</td>
+      <td>训练时间长，需要大量数据</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>嗯，这里要注意：没有银弹。我见过有人非要用强化学习解决一个简单的静态调度问题，结果训练了三天三夜，还不如遗传算法跑10分钟。反过来，也有人用遗传算法做实时调度，结果AGV都到站了，算法还没算完。</p>
+
+<p>我的建议是：</p>
+<ul>
+  <li>如果任务固定、环境不变，用遗传算法或粒子群算法。</li>
+  <li>如果环境动态变化、需要实时响应，考虑强化学习。</li>
+  <li>如果条件允许，可以混合使用：遗传算法做离线预调度，强化学习做在线微调。</li>
+</ul>
+
+<h3>11.5 本章知识体系图</h3>
+
+<p>为了让你更直观地理解这三种算法的关系，我画了一张图：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">高级调度算法知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV多车协同调度</text>
+  
+  <!-- 三条主线 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="160" x2="150" y2="200" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="160" x2="400" y2="200" stroke="#27ae60" stroke-width="2"/>
+  <line x1="400" y1="160" x2="650" y2="200" stroke="#f39c12" stroke-width="2"/>
+  
+  <!-- 遗传算法 -->
+  <rect x="50" y="190" width="200" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="220" text-anchor="middle" font-size="16" fill="white" font-weight="bold">遗传算法 (GA)</text>
+  
+  <text x="150" y="270" text-anchor="middle" font-size="13" fill="#555">模拟生物进化</text>
+  <text x="150" y="290" text-anchor="middle" font-size="13" fill="#555">选择、交叉、变异</text>
+  <text x="150" y="310" text-anchor="middle" font-size="13" fill="#555">适合离线调度</text>
+  
+  <!-- 粒子群算法 -->
+  <rect x="300" y="190" width="200" height="50" rx="10" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="400" y="220" text-anchor="middle" font-size="16" fill="white" font-weight="bold">粒子群算法 (PSO)</text>
+  
+  <text x="400" y="270" text-anchor="middle" font-size="13" fill="#555">模拟鸟群觅食</text>
+  <text x="400" y="290" text-anchor="middle" font-size="13" fill="#555">个体最优+全局最优</text>
+  <text x="400" y="310" text-anchor="middle" font-size="13" fill="#555">收敛快，易早熟</text>
+  
+  <!-- 强化学习 -->
+  <rect x="550" y="190" width="200" height="50" rx="10" fill="#f39c12" stroke="#d68910" stroke-width="2"/>
+  <text x="650" y="220" text-anchor="middle" font-size="16" fill="white" font-weight="bold">强化学习 (RL)</text>
+  
+  <text x="650" y="270" text-anchor="middle" font-size="13" fill="#555">试错学习</text>
+  <text x="650" y="290" text-anchor="middle" font-size="13" fill="#555">状态-动作-奖励</text>
+  <text x="650" y="310" text-anchor="middle" font-size="13" fill="#555">适合动态调度</text>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="380" width="600" height="90" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">选择建议</text>
+  <text x="400" y="435" text-anchor="middle" font-size="13" fill="#555">静态环境 → GA 或 PSO</text>
+  <text x="400" y="455" text-anchor="middle" font-size="13" fill="#555">动态环境 → RL</text>
+  <text x="400" y="475" text-anchor="middle" font-size="13" fill="#555">混合方案 → GA离线 + RL在线</text>
+</svg>
+
+<p>这张图把三种算法的核心思想、适用场景和选择建议都串起来了。你可以把它当作一个快速参考。</p>
+
+<div class="footer-nav">
+            <a href="10DispatchAlgorithmBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12RealtimeMonitorVisualization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

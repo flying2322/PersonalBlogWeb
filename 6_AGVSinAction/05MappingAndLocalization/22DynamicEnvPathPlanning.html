@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 动态环境下的路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="active">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 动态环境下的路径规划——RRT*、Hybrid A*、速度障碍法</h2>
+
+<p>各位，欢迎来到第二十二讲。</p>
+<p>前面我们聊了很多静态地图下的路径规划。但说实话，真实世界哪有那么安静？AGV跑着跑着，前面突然冒出个人，或者另一台AGV抢道，这都是家常便饭。所以，<strong>动态环境下的路径规划</strong>，才是真正考验系统实用性的地方。</p>
+<p>我个人习惯把动态规划分成两类：一类是<strong>反应式</strong>的，看到障碍物再躲；另一类是<strong>预测式</strong>的，提前算好别人的轨迹，再规划自己的路。今天要讲的三个方法，正好覆盖了这两个方向。</p>
+
+<h3>一、RRT*：在动态中重新生长</h3>
+
+<p>RRT* 大家不陌生了，它最大的优点是<strong>渐进最优</strong>。但在动态环境下，我们不能每次都从头开始规划——那样太慢了。</p>
+<p>我遇到过这样一个场景：AGV在仓库里执行任务，地图突然更新了（比如新堆了一个货架）。如果重新跑一遍RRT*，计算量很大，而且会浪费之前已经探索过的路径信息。</p>
+<p>怎么办？<strong>重用之前的树结构</strong>。</p>
+<p>具体做法是：</p>
+<ul>
+    <li>当环境变化时，先检查树中哪些节点所在的区域发生了变化</li>
+    <li>把这些节点标记为“无效”，并剪掉它们的分支</li>
+    <li>从剩下的有效节点继续生长RRT*</li>
+</ul>
+
+<p>嗯，这里要注意：<strong>剪枝不能太激进</strong>。我曾经因为剪掉太多节点，导致树变得稀疏，最后路径质量反而下降了。我的经验是，只剪掉那些<strong>直接与障碍物碰撞</strong>的节点，保留那些虽然靠近障碍物但还没撞上的节点——它们可能还有用。</p>
+
+<div class="highlight">
+    <p><strong>核心要点：</strong>动态RRT*的关键在于“增量式更新”，而不是“全量重规划”。</p>
+</div>
+
+<h3>二、Hybrid A*：考虑运动学的动态规划</h3>
+
+<p>RRT* 在无障碍空间里很好用，但它生成的路径往往是一堆折线，AGV根本走不了——因为AGV有转弯半径、有加速度限制。</p>
+<p>Hybrid A* 就是来解决这个问题的。它把<strong>车辆的运动学模型</strong>直接集成到了搜索过程中。</p>
+<p>说白了，Hybrid A* 不是在栅格地图上随便跳，而是按照AGV的实际运动能力来扩展节点。比如，你告诉它“我的AGV最小转弯半径是0.5米”，那它就不会生成一个90度急转弯的路径。</p>
+
+<p>在动态环境下，Hybrid A* 的优势更明显：</p>
+<ul>
+    <li>它生成的路径是<strong>可执行的</strong>，不需要后处理平滑</li>
+    <li>当障碍物移动时，它可以在<strong>运动学约束下</strong>快速调整路径</li>
+    <li>它天然支持<strong>Reeds-Shepp曲线</strong>，可以处理倒车、原地掉头等复杂动作</li>
+</ul>
+
+<div class="tip">
+    <p><strong>我的经验：</strong>Hybrid A* 的计算量比普通A*大不少。我建议在动态环境中，把搜索的“时间窗口”设短一点——比如只规划未来3秒的路径，然后滚动更新。这样既能保证实时性，又不会让计算爆炸。</p>
+</div>
+
+<h3>三、速度障碍法：躲开移动的“麻烦”</h3>
+
+<p>前面两个方法都是“规划路径”，而速度障碍法（Velocity Obstacle, VO）是另一种思路——<strong>调整速度</strong>。</p>
+<p>你想想看，当AGV遇到一个移动的人或另一台AGV时，其实不需要完全重新规划路径。很多时候，只需要<strong>减速、加速或者稍微偏一点</strong>就能避开。</p>
+<p>速度障碍法的核心思想是：</p>
+<ol>
+    <li>把障碍物的运动状态（位置、速度、方向）映射到AGV的速度空间里</li>
+    <li>找出那些会导致碰撞的速度组合，这些组合就是“速度障碍区”</li>
+    <li>在速度障碍区之外，选择一个最优的速度</li>
+</ol>
+
+<p>我举个例子。假设AGV以1m/s的速度前进，前方有个人以0.5m/s横穿。通过计算，你会发现：如果AGV保持1m/s直行，就会撞上。但如果你把速度降到0.3m/s，或者稍微向左偏一点，就能安全通过。</p>
+
+<div class="warning">
+    <p><strong>注意：</strong>速度障碍法有一个假设——障碍物会保持当前运动状态。如果障碍物突然变向，那就需要重新计算。我曾经在测试中遇到过一个人突然转身往回走，AGV差点撞上。所以，<strong>一定要设置安全余量</strong>，比如把障碍物的半径扩大20%。</p>
+</div>
+
+<h3>四、三种方法的对比与选择</h3>
+
+<p>这三种方法各有适用场景。我整理了一个表格，方便大家对比：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>方法</th>
+            <th>适用场景</th>
+            <th>优点</th>
+            <th>缺点</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>RRT*</td>
+            <td>大范围、稀疏动态障碍物</td>
+            <td>渐进最优、可增量更新</td>
+            <td>路径不平滑、不考虑运动学</td>
+        </tr>
+        <tr>
+            <td>Hybrid A*</td>
+            <td>需要精确运动控制的场景</td>
+            <td>路径可执行、支持复杂动作</td>
+            <td>计算量大、不适合高动态</td>
+        </tr>
+        <tr>
+            <td>速度障碍法</td>
+            <td>密集动态障碍物、实时避障</td>
+            <td>反应快、计算量小</td>
+            <td>只考虑速度、不考虑路径形状</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>在实际项目中，我通常会把它们<strong>组合使用</strong>。比如：用Hybrid A*做全局规划，生成一条参考路径；然后用速度障碍法做局部避障，实时调整速度。这样既保证了路径的可执行性，又有了快速反应的能力。</p>
+
+<h3>五、知识体系总览</h3>
+
+<p>下面这张图，把本章的核心逻辑串起来了：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">动态环境路径规划知识体系</text>
+    
+    <!-- 三个方法框 -->
+    <rect x="50" y="80" width="200" height="120" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+    <text x="150" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">RRT*</text>
+    <text x="150" y="135" text-anchor="middle" font-size="13" fill="#555">增量式更新</text>
+    <text x="150" y="155" text-anchor="middle" font-size="13" fill="#555">渐进最优</text>
+    <text x="150" y="175" text-anchor="middle" font-size="13" fill="#555">剪枝与重用</text>
+    
+    <rect x="300" y="80" width="200" height="120" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+    <text x="400" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">Hybrid A*</text>
+    <text x="400" y="135" text-anchor="middle" font-size="13" fill="#555">运动学约束</text>
+    <text x="400" y="155" text-anchor="middle" font-size="13" fill="#555">Reeds-Shepp曲线</text>
+    <text x="400" y="175" text-anchor="middle" font-size="13" fill="#555">滚动时域规划</text>
+    
+    <rect x="550" y="80" width="200" height="120" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+    <text x="650" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">速度障碍法</text>
+    <text x="650" y="135" text-anchor="middle" font-size="13" fill="#555">速度空间映射</text>
+    <text x="650" y="155" text-anchor="middle" font-size="13" fill="#555">实时避障</text>
+    <text x="650" y="175" text-anchor="middle" font-size="13" fill="#555">安全余量设置</text>
+    
+    <!-- 连接线 -->
+    <line x1="250" y1="140" x2="300" y2="140" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="500" y1="140" x2="550" y2="140" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- 底部总结 -->
+    <rect x="150" y="250" width="500" height="100" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+    <text x="400" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="#c2185b">组合使用策略</text>
+    <text x="400" y="305" text-anchor="middle" font-size="13" fill="#555">Hybrid A* 做全局规划 + 速度障碍法做局部避障</text>
+    <text x="400" y="325" text-anchor="middle" font-size="13" fill="#555">RRT* 用于地图更新后的快速重规划</text>
+    
+    <!-- 箭头 -->
+    <polygon points="400,250 395,240 405,240" fill="#e91e63"/>
+    <polygon points="400,250 395,260 405,260" fill="#e91e63"/>
+</svg>
+
+<p>你看，这三种方法不是互斥的，而是互补的。RRT* 负责“探索”，Hybrid A* 负责“执行”，速度障碍法负责“应急”。把它们组合好，你的AGV就能在动态环境中游刃有余。</p>
+
+<div class="highlight">
+    <p><strong>最后说一句：</strong>动态环境规划没有银弹。我做了这么多年，最大的体会就是——<strong>理解你的场景，选择合适的方法，然后做好参数调优</strong>。别指望一个算法解决所有问题。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="21PathPlanningBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23ControlAndTracking.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

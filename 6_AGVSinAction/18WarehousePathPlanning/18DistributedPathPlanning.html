@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 分布式路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="active">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 分布式路径规划：协商机制、市场机制、蚁群算法在调度中的应用</h2>
+
+<p>各位，前面我们聊了单机调度、集中式规划。但说实话，在真实的仓储现场，几百台AGV同时跑，你指望一个中央大脑算完所有路径？不现实。我见过一个项目，中央服务器CPU直接飙到100%，调度指令延迟超过2秒，AGV全堵在路口——那场面，跟早高峰的北京三环似的。</p>
+
+<p>所以，分布式路径规划就派上用场了。说白了，就是把决策权下放，让AGV自己商量着来。今天咱们就聊聊三种主流思路：协商机制、市场机制、还有蚁群算法。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>分布式规划不是不要中央调度，而是让中央做宏观决策，AGV做微观博弈。各司其职，系统才跑得稳。</p>
+</div>
+
+<h3>18.1 协商机制：AGV之间的“交通规则”</h3>
+
+<p>协商机制，你可以想象成一群司机在路口互相打手势。没有红绿灯，全靠默契。</p>
+
+<p>在AGV调度里，最常见的协商方式是<strong>优先级协商</strong>和<strong>资源预留</strong>。</p>
+
+<ul>
+  <li><strong>优先级协商：</strong>每台AGV根据任务紧急程度、剩余电量、距离目标远近，算出一个优先级。路口相遇时，优先级低的让行。</li>
+  <li><strong>资源预留：</strong>AGV要经过某个路段，先广播“我要用这条路”，其他AGV收到后，如果自己也要用，就协商时间窗口。</li>
+</ul>
+
+<p>我在一个电商仓库里用过这种方法。当时有40台AGV，中央调度压力太大。我们改成AGV自己协商路口通行权。嗯，效果不错，但有个坑——<strong>死锁</strong>。两台AGV互相让行，谁也不动。后来加了个超时重协商机制，才算解决。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>协商机制适合AGV数量在50台以下的场景。再多了，广播消息会爆炸，网络先扛不住。</p>
+</div>
+
+<h3>18.2 市场机制：用“钱”解决路径冲突</h3>
+
+<p>市场机制，说白了就是给路径定价。AGV想要走某条路，得“出价”。谁出价高，谁先走。</p>
+
+<p>怎么定价？一般考虑三个因素：</p>
+
+<ol>
+  <li><strong>路径长度：</strong>越短的路，价格越高。</li>
+  <li><strong>拥堵程度：</strong>当前路段上有多少AGV，越多越贵。</li>
+  <li><strong>任务紧急度：</strong>紧急订单的AGV，预算更高。</li>
+</ol>
+
+<p>举个例子。假设AGV-A和AGV-B都要经过路口X。AGV-A的任务是补货，不急。AGV-B的任务是出库，客户等着呢。那AGV-B出价10元，AGV-A出价5元。路口X就分配给AGV-B。</p>
+
+<p>你可能会问：“这钱是虚拟的吧？”对，就是虚拟货币。系统给每台AGV分配初始预算，完成任务赚取奖励，消耗路径支付费用。形成一个闭环经济系统。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>市场机制有个问题——<strong>恶意竞价</strong>。我曾经遇到过一台AGV因为程序bug，疯狂出价抢路，导致其他AGV全饿死。后来加了预算上限和异常检测，才算稳住。</p>
+</div>
+
+<h3>18.3 蚁群算法：向大自然学习</h3>
+
+<p>蚁群算法，这个大家可能听过。蚂蚁找食物，会在路上留下信息素。其他蚂蚁闻到信息素浓度高，就知道这条路好走。</p>
+
+<p>在AGV调度里，我们把信息素换成<strong>路径权重</strong>。AGV每走一次，就给这条路加分。其他AGV规划路径时，优先选权重高的路。</p>
+
+<p>算法核心步骤：</p>
+
+<pre><code>1. 初始化：所有路径权重相同
+2. 每台AGV根据权重选择路径（概率选择）
+3. AGV走完后，更新路径权重（增加信息素）
+4. 路径权重随时间衰减（模拟信息素挥发）
+5. 重复步骤2-4，直到系统收敛</code></pre>
+
+<p>我当年在一个汽车零部件仓库试过蚁群算法。200台AGV，刚开始乱成一锅粥。跑了大概30分钟，路径权重稳定了，AGV自动形成了几条主干道。说实话，效果比我想象的好。</p>
+
+<p>但蚁群算法也有短板：<strong>收敛慢</strong>。如果仓库布局经常变，算法还没收敛，布局又改了。所以它更适合<strong>静态或半静态</strong>的场景。</p>
+
+<h3>18.4 三种方法的对比</h3>
+
+<p>我整理了一张表，方便你对比：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>适用场景</th>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>协商机制</td>
+      <td>小规模（&lt;50台）</td>
+      <td>实现简单，实时性好</td>
+      <td>容易死锁，扩展性差</td>
+    </tr>
+    <tr>
+      <td>市场机制</td>
+      <td>中规模（50-200台）</td>
+      <td>灵活性高，能处理紧急任务</td>
+      <td>需要虚拟经济系统，有恶意竞价风险</td>
+    </tr>
+    <tr>
+      <td>蚁群算法</td>
+      <td>大规模（&gt;200台），静态布局</td>
+      <td>自组织，鲁棒性强</td>
+      <td>收敛慢，不适合动态布局</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>18.5 核心逻辑流程图</h3>
+
+<p>下面这张图，展示了三种方法在分布式路径规划中的核心逻辑：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">分布式路径规划核心逻辑</text>
+  
+  <!-- 中央调度层 -->
+  <rect x="250" y="70" width="300" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">中央调度层（宏观决策）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 三种方法 -->
+  <rect x="50" y="170" width="200" height="80" rx="8" fill="#e74c3c" opacity="0.85"/>
+  <text x="150" y="200" text-anchor="middle" font-size="14" fill="white" font-weight="bold">协商机制</text>
+  <text x="150" y="225" text-anchor="middle" font-size="12" fill="white">AGV互相协商优先级</text>
+  <text x="150" y="240" text-anchor="middle" font-size="12" fill="white">资源预留 + 死锁检测</text>
+  
+  <rect x="300" y="170" width="200" height="80" rx="8" fill="#27ae60" opacity="0.85"/>
+  <text x="400" y="200" text-anchor="middle" font-size="14" fill="white" font-weight="bold">市场机制</text>
+  <text x="400" y="225" text-anchor="middle" font-size="12" fill="white">路径定价 + 虚拟货币</text>
+  <text x="400" y="240" text-anchor="middle" font-size="12" fill="white">出价竞争 + 预算管理</text>
+  
+  <rect x="550" y="170" width="200" height="80" rx="8" fill="#8e44ad" opacity="0.85"/>
+  <text x="650" y="200" text-anchor="middle" font-size="14" fill="white" font-weight="bold">蚁群算法</text>
+  <text x="650" y="225" text-anchor="middle" font-size="12" fill="white">信息素 + 路径权重</text>
+  <text x="650" y="240" text-anchor="middle" font-size="12" fill="white">概率选择 + 权重衰减</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="150" y1="250" x2="150" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="250" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="250" x2="650" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 执行层 -->
+  <rect x="250" y="310" width="300" height="50" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="340" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV执行层（微观博弈）</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="400" y1="360" x2="400" y2="400" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="200" y="410" width="400" height="50" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="400" y="440" text-anchor="middle" font-size="16" fill="white" font-weight="bold">输出：无冲突路径 + 高吞吐量</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>18.6 实际项目中的选择建议</h3>
+
+<p>说了这么多，到底怎么选？我个人的经验是：</p>
+
+<ul>
+  <li><strong>如果你项目刚起步，AGV不到30台：</strong>用协商机制。简单，好调试。我第一个项目就是这么干的。</li>
+  <li><strong>如果业务有紧急订单，需要动态调整：</strong>上市场机制。给紧急任务更高的预算，自然能抢到好路。</li>
+  <li><strong>如果仓库布局稳定，AGV数量上百：</strong>试试蚁群算法。前期花点时间调参，后面基本不用管。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>三种方法可以混合使用。比如，用蚁群算法做离线路径规划，用市场机制做在线冲突解决。我在一个项目中这么干过，效果1+1&gt;2。</p>
+</div>
+
+<p>好了，分布式路径规划就聊到这儿。记住，没有银弹。每种方法都有它的脾气，关键是你得摸透它。</p>
+
+<div class="footer-nav">
+            <a href="17CentralizedPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19PathSmoothInterp.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 板级支持包（BSP）开发</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="active">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 板级支持包（BSP）开发：GPIO驱动封装、UART驱动（中断+轮询）、定时器驱动</h2>
+
+<p>各位同学，欢迎来到BSP开发的核心环节。说实话，很多初学者觉得BSP就是写几个寄存器，没什么技术含量。但我在项目中踩过的坑告诉我——BSP写得好不好，直接决定了你上层应用是「如丝般顺滑」还是「天天加班找bug」。</p>
+
+<p>今天我们就来聊聊三个最基础的驱动：GPIO、UART和定时器。别小看它们，你想想看，一个AGV控制器里，传感器信号采集靠GPIO，与上位机通信靠UART，任务调度和PWM生成靠定时器。这三板斧耍好了，你的RTOS才算真正跑起来了。</p>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block; background:#f8f9fa; border-radius:12px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a90d9"/>
+    </marker>
+  </defs>
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">BSP 板级支持包</text>
+  <!-- 分支线 -->
+  <line x1="350" y1="70" x2="200" y2="130" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="70" x2="400" y2="130" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="450" y1="70" x2="600" y2="130" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- GPIO 模块 -->
+  <rect x="80" y="130" width="240" height="100" rx="10" fill="#e8f4fd" stroke="#4a90d9" stroke-width="2"/>
+  <text x="200" y="160" text-anchor="middle" fill="#2c5f8a" font-size="16" font-weight="bold">GPIO 驱动</text>
+  <text x="200" y="185" text-anchor="middle" fill="#555" font-size="13">输入/输出/中断</text>
+  <text x="200" y="205" text-anchor="middle" fill="#555" font-size="13">寄存器封装 + 回调机制</text>
+  <!-- UART 模块 -->
+  <rect x="320" y="130" width="160" height="100" rx="10" fill="#e8f4fd" stroke="#4a90d9" stroke-width="2"/>
+  <text x="400" y="160" text-anchor="middle" fill="#2c5f8a" font-size="16" font-weight="bold">UART 驱动</text>
+  <text x="400" y="185" text-anchor="middle" fill="#555" font-size="13">中断模式</text>
+  <text x="400" y="205" text-anchor="middle" fill="#555" font-size="13">轮询模式</text>
+  <!-- 定时器模块 -->
+  <rect x="480" y="130" width="240" height="100" rx="10" fill="#e8f4fd" stroke="#4a90d9" stroke-width="2"/>
+  <text x="600" y="160" text-anchor="middle" fill="#2c5f8a" font-size="16" font-weight="bold">定时器驱动</text>
+  <text x="600" y="185" text-anchor="middle" fill="#555" font-size="13">系统时钟节拍</text>
+  <text x="600" y="205" text-anchor="middle" fill="#555" font-size="13">PWM / 延时 / 超时检测</text>
+  <!-- 底部总结 -->
+  <rect x="200" y="280" width="400" height="50" rx="10" fill="#fff3cd" stroke="#ffc107" stroke-width="2"/>
+  <text x="400" y="312" text-anchor="middle" fill="#856404" font-size="15">三者协同：GPIO感知 → UART通信 → 定时器调度</text>
+</svg>
+
+<h3>12.1 GPIO驱动封装——别再用裸寄存器了</h3>
+
+<p>我个人习惯，写GPIO驱动第一步不是写代码，而是先画个「引脚资源表」。你想想看，一个AGV控制器少说几十个GPIO，电机方向、编码器输入、限位开关、蜂鸣器……如果不统一管理，后期维护就是灾难。</p>
+
+<p>我建议的封装思路是这样的：</p>
+
+<ul>
+  <li><strong>结构体抽象</strong>：把GPIO的端口、引脚号、模式、上下拉、速度等信息打包成一个结构体</li>
+  <li><strong>初始化函数</strong>：传入结构体指针，一次性配置所有参数</li>
+  <li><strong>读写接口</strong>：PinWrite(pin, level) 和 PinRead(pin)，简单明了</li>
+  <li><strong>中断回调</strong>：注册中断服务函数，支持上升沿/下降沿/双边沿触发</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：GPIO驱动要「面向对象」一点。别在应用层直接操作寄存器，否则换个芯片平台，你所有代码都得重写。</p>
+</div>
+
+<p>来看一个简化的GPIO驱动结构体定义：</p>
+
+<pre><code>/* gpio.h */
+typedef struct {
+    uint32_t port;      /* GPIOA ~ GPIOH */
+    uint16_t pin;       /* 0 ~ 15 */
+    uint8_t  mode;      /* 输入/输出/复用/模拟 */
+    uint8_t  pull;      /* 上拉/下拉/浮空 */
+    uint8_t  speed;     /* 低速/中速/高速 */
+    void     (*irq_callback)(void);  /* 中断回调函数指针 */
+} gpio_cfg_t;
+
+/* 初始化接口 */
+int32_t gpio_init(gpio_cfg_t *cfg);
+
+/* 读写接口 */
+void    gpio_pin_write(gpio_cfg_t *cfg, uint8_t level);
+uint8_t gpio_pin_read(gpio_cfg_t *cfg);</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在一个项目中，把GPIO中断回调函数直接放在了中断向量表里。结果后来要支持多个引脚中断，代码改得面目全非。后来我改用「回调函数注册表」的方式，每个引脚可以独立注册回调，清爽多了。</p>
+</div>
+
+<h3>12.2 UART驱动——中断和轮询，两手都要硬</h3>
+
+<p>UART驱动是BSP里最「人格分裂」的一个模块。为什么这么说？因为你要同时支持两种模式：中断模式和轮询模式。</p>
+
+<p>轮询模式简单粗暴，适合调试阶段或者低速率通信。但AGV控制器在运行时，你不可能让CPU一直傻等着串口数据——这时候就必须上中断了。</p>
+
+<p>我一般这样设计UART驱动：</p>
+
+<ul>
+  <li><strong>环形缓冲区</strong>：接收和发送各一个环形缓冲区，中断服务程序只管往缓冲区里塞数据</li>
+  <li><strong>API分层</strong>：底层是寄存器操作，中间层是缓冲区管理，上层是标准接口（如printf重定向）</li>
+  <li><strong>超时机制</strong>：接收数据时加个超时判断，防止死等</li>
+</ul>
+
+<p>来看UART中断接收的核心逻辑：</p>
+
+<pre><code>/* uart.c - 中断接收示例 */
+static uint8_t rx_buffer[UART_RX_BUF_SIZE];
+static volatile uint16_t rx_head = 0;
+static volatile uint16_t rx_tail = 0;
+
+void uart_irq_handler(void)
+{
+    uint8_t data;
+    if (USART-&gt;SR &amp; USART_SR_RXNE) {
+        data = USART-&gt;DR;
+        /* 计算下一个位置，环形缓冲 */
+        uint16_t next = (rx_head + 1) % UART_RX_BUF_SIZE;
+        if (next != rx_tail) {  /* 缓冲区未满 */
+            rx_buffer[rx_head] = data;
+            rx_head = next;
+        }
+        /* 如果满了，可以置一个溢出标志，或者丢弃旧数据 */
+    }
+}
+
+/* 应用层读取一个字节，非阻塞 */
+int32_t uart_read_byte(uint8_t *byte, uint32_t timeout_ms)
+{
+    uint32_t tick_start = get_sys_tick();
+    while (rx_head == rx_tail) {
+        if (get_sys_tick() - tick_start &gt; timeout_ms) {
+            return -1;  /* 超时 */
+        }
+    }
+    *byte = rx_buffer[rx_tail];
+    rx_tail = (rx_tail + 1) % UART_RX_BUF_SIZE;
+    return 0;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：中断服务程序里千万不要做复杂操作！我见过有人直接在UART中断里调用printf，结果递归中断直接死机。记住：中断里只做数据搬运，处理逻辑放到任务里。</p>
+</div>
+
+<p>轮询模式就简单多了，适合打印调试信息：</p>
+
+<pre><code>/* 轮询发送 - 简单粗暴 */
+void uart_poll_send(uint8_t data)
+{
+    /* 等待发送寄存器空 */
+    while (!(USART-&gt;SR &amp; USART_SR_TXE));
+    USART-&gt;DR = data;
+}</code></pre>
+
+<p>嗯，这里要注意：轮询发送在RTOS里要加个任务延时或者信号量，别让低优先级任务把CPU占死了。</p>
+
+<h3>12.3 定时器驱动——RTOS的心脏起搏器</h3>
+
+<p>定时器驱动是BSP里最容易被低估的模块。说白了，没有定时器，你的RTOS就是个「死系统」——任务调度靠它，延时靠它，PWM生成也靠它。</p>
+
+<p>我一般把定时器驱动分成三个层次：</p>
+
+<ol>
+  <li><strong>系统节拍定时器</strong>：通常用SysTick或者一个通用定时器，产生1ms或10ms的周期性中断，驱动RTOS的调度器</li>
+  <li><strong>硬件定时器管理</strong>：封装多个硬件定时器，提供开启、停止、设置周期、获取计数值等接口</li>
+  <li><strong>软件定时器</strong>：基于硬件定时器，实现多个软件定时器，支持单次和周期模式</li>
+</ol>
+
+<p>我个人习惯，系统节拍定时器用SysTick就够了，简单可靠。但如果你需要高精度的PWM或者输入捕获，那就得用通用定时器了。</p>
+
+<p>来看系统节拍定时器的初始化：</p>
+
+<pre><code>/* systick.c - 系统节拍初始化 */
+void systick_init(uint32_t tick_hz)
+{
+    /* 假设系统时钟为 72MHz */
+    uint32_t reload = 72000000 / tick_hz - 1;
+    SysTick-&gt;LOAD = reload;
+    SysTick-&gt;VAL  = 0;
+    SysTick-&gt;CTRL = SysTick_CTRL_CLKSOURCE_Msk |
+                    SysTick_CTRL_TICKINT_Msk   |
+                    SysTick_CTRL_ENABLE_Msk;
+}
+
+/* SysTick 中断服务程序 */
+void SysTick_Handler(void)
+{
+    /* 递增系统滴答计数 */
+    sys_tick_count++;
+    /* 通知RTOS内核：一个节拍过去了 */
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
+        xPortSysTickHandler();
+    }
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点</strong>：系统节拍中断的优先级要设置好。我一般把它设为RTOS允许的最高优先级，但比硬实时中断（比如电机急停）低一级。这样既保证了任务调度的实时性，又不会阻塞关键硬件中断。</p>
+</div>
+
+<p>对于通用定时器，我封装了这样一个接口：</p>
+
+<pre><code>/* timer.h */
+typedef void (*timer_callback_t)(void *arg);
+
+typedef struct {
+    TIM_TypeDef *instance;   /* TIM1 ~ TIM8 等 */
+    uint32_t     period_us;  /* 周期，单位微秒 */
+    uint8_t      auto_reload;/* 是否自动重装载 */
+    timer_callback_t callback;
+    void        *arg;
+} hw_timer_t;
+
+int32_t hw_timer_init(hw_timer_t *tmr);
+int32_t hw_timer_start(hw_timer_t *tmr);
+int32_t hw_timer_stop(hw_timer_t *tmr);</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈</strong>：我曾经在一个AGV项目里，用定时器做超声波传感器的触发信号。一开始直接用软件延时，结果测距数据抖动得厉害。后来改用硬件定时器产生40kHz的方波，数据稳如老狗。所以说，能用硬件定时器解决的问题，别用软件去扛。</p>
+</div>
+
+<h3>12.4 三个驱动的协同工作</h3>
+
+<p>最后，我想聊聊这三个驱动怎么配合。你想想看，一个典型的AGV控制场景是这样的：</p>
+
+<ul>
+  <li>GPIO检测到限位开关被触发（中断）</li>
+  <li>UART把状态信息发送给上位机</li>
+  <li>定时器产生PWM信号，控制电机减速停止</li>
+</ul>
+
+<p>这三个驱动不是孤立的。我建议在BSP层提供一个统一的「中断管理」机制，把GPIO中断、UART中断、定时器中断都注册到一个表中，方便调试和优先级管理。</p>
+
+<p>嗯，今天就先聊到这里。驱动开发没有捷径，多写多测，慢慢就有感觉了。记住我一句话：<strong>BSP写得好，应用层开发就像在高速公路上开车；BSP写得烂，那就是在泥巴地里推车。</strong></p>
+
+<div class="footer-nav">
+            <a href="11CpuPortInterface.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13AgvPeripheralDriver.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 路径规划基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="active">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 路径规划基础——全局路径规划与局部路径规划</h2>
+
+<p>各位同学，今天我们来聊聊AGV导航里最核心的一个环节——路径规划。说白了，就是让小车知道“怎么走”的问题。</p>
+
+<p>我个人习惯把路径规划分成两个层次：<strong>全局路径规划</strong>和<strong>局部路径规划</strong>。全局规划负责“大方向”，局部规划负责“躲障碍”。两者缺一不可。</p>
+
+<h3>一、全局路径规划：从A到B的宏观路线</h3>
+
+<p>全局路径规划，就是在地图上找一条从起点到终点的可行路径。我刚开始做AGV项目时，总觉得这步很简单——不就是找条路吗？后来发现，地图大了、障碍多了，计算量能把你CPU跑冒烟。</p>
+
+<h4>1. Dijkstra算法：最朴素的“地毯式搜索”</h4>
+
+<p>Dijkstra算法，说白了就是“从起点开始，一层一层往外扩”。它保证能找到最短路径，但效率嘛……你想想看，如果地图有10000个节点，它可能要遍历8000个才能找到目标。</p>
+
+<p><strong>核心思想：</strong></p>
+<ul>
+  <li>维护一个距离表，记录每个节点到起点的最短距离</li>
+  <li>每次从未访问的节点中选距离最小的，更新它的邻居</li>
+  <li>直到所有节点都被访问，或者到达目标点</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>适用场景：</strong>地图不大、对路径长度要求绝对最优的场景。比如仓库里固定路线的AGV。</p>
+</div>
+
+<pre><code>// Dijkstra伪代码
+function Dijkstra(graph, start, end):
+    dist[start] = 0
+    visited = {}
+    while visited 未包含所有节点:
+        u = 未访问节点中dist最小的
+        visited.add(u)
+        if u == end: break
+        for v in u的邻居:
+            if dist[u] + weight(u,v) < dist[v]:
+                dist[v] = dist[u] + weight(u,v)
+                prev[v] = u
+    return 回溯prev得到路径</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>我在一个工厂项目里用过Dijkstra，地图节点大概5000个，每次规划要跑200ms。后来发现其实不需要每次都重新规划——把路径缓存起来，除非障碍物变了，否则直接用缓存。嗯，这里要注意，缓存失效策略要设计好。</p>
+</div>
+
+<h4>2. A*算法：带“方向感”的搜索</h4>
+
+<p>A*算法是Dijkstra的升级版。它加了一个“启发式函数”，告诉搜索方向“往目标那边走”。</p>
+
+<p><strong>为什么A*比Dijkstra快？</strong></p>
+<p>Dijkstra是“无头苍蝇”，四面八方都搜。A*是“有目标的苍蝇”，知道目标在东南方向，就优先往东南搜。你想想看，效率能差多少？</p>
+
+<p><strong>核心公式：</strong></p>
+<pre><code>f(n) = g(n) + h(n)
+- g(n): 从起点到当前节点n的实际代价
+- h(n): 从节点n到终点的估计代价（启发式函数）
+- f(n): 节点n的总估计代价</code></pre>
+
+<p>启发式函数h(n)的选择很关键。我建议用<strong>欧几里得距离</strong>或<strong>曼哈顿距离</strong>。如果h(n)低估了实际距离，A*保证能找到最优解；如果高估了，可能找不到最优解，但速度更快。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中用了曼哈顿距离做启发式，结果地图上有斜角障碍物，A*绕了一大圈。后来换成欧几里得距离，路径就合理了。所以，启发式函数的选择要结合地图特点。</p>
+</div>
+
+<pre><code>// A*伪代码
+function AStar(graph, start, end):
+    openSet = {start}
+    g[start] = 0
+    f[start] = h(start, end)
+    while openSet 不为空:
+        current = openSet中f值最小的节点
+        if current == end: return 回溯路径
+        openSet.remove(current)
+        for neighbor in current的邻居:
+            tentative_g = g[current] + cost(current, neighbor)
+            if tentative_g < g[neighbor]:
+                g[neighbor] = tentative_g
+                f[neighbor] = g[neighbor] + h(neighbor, end)
+                prev[neighbor] = current
+                if neighbor not in openSet:
+                    openSet.add(neighbor)
+    return 无路径</code></pre>
+
+<h3>二、局部路径规划：动态避障的“微观操作”</h3>
+
+<p>全局路径规划给出了宏观路线，但实际运行时，路上可能有临时障碍物——比如突然出现的人、叉车、掉落的箱子。这时候就需要局部路径规划来“见招拆招”。</p>
+
+<h4>1. DWA算法：速度空间的“暴力枚举”</h4>
+
+<p>DWA（Dynamic Window Approach），中文叫动态窗口法。它的思路很简单：<strong>在当前速度附近采样，选一个最好的速度执行</strong>。</p>
+
+<p><strong>核心步骤：</strong></p>
+<ol>
+  <li><strong>速度空间采样：</strong>在当前线速度v和角速度ω附近，采样一组(v, ω)组合</li>
+  <li><strong>轨迹预测：</strong>对每个(v, ω)组合，模拟未来一小段时间的运动轨迹</li>
+  <li><strong>轨迹评价：</strong>用评价函数给每条轨迹打分</li>
+  <li><strong>选择最优：</strong>选得分最高的(v, ω)执行</li>
+</ol>
+
+<p><strong>评价函数通常包含三个部分：</strong></p>
+<ul>
+  <li><strong>朝向代价：</strong>轨迹终点与目标方向的偏差</li>
+  <li><strong>障碍物代价：</strong>轨迹与最近障碍物的距离</li>
+  <li><strong>速度代价：</strong>鼓励高速行驶，提高效率</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>DWA的参数调优是个体力活。我记得在一个项目里，障碍物代价权重调大了，AGV在空旷区域也龟速前进；调小了，又容易撞到东西。后来我用了<strong>自适应权重</strong>——障碍物近时加大障碍物代价，远时加大速度代价。效果还不错。</p>
+</div>
+
+<h4>2. TEB算法：带时间约束的“弹性带”</h4>
+
+<p>TEB（Timed Elastic Band），中文叫时间弹性带。它把路径看作一条“橡皮筋”，通过优化来调整路径的形状和时间分配。</p>
+
+<p><strong>核心思想：</strong></p>
+<ul>
+  <li>路径由一系列位姿点组成，每个点带时间戳</li>
+  <li>通过优化目标函数，让路径更平滑、更安全、更高效</li>
+  <li>目标函数包括：路径长度、障碍物距离、速度限制、加速度限制等</li>
+</ul>
+
+<p><strong>DWA vs TEB：怎么选？</strong></p>
+<table>
+  <tr>
+    <th>对比项</th>
+    <th>DWA</th>
+    <th>TEB</th>
+  </tr>
+  <tr>
+    <td>计算复杂度</td>
+    <td>低，适合嵌入式</td>
+    <td>高，需要较强算力</td>
+  </tr>
+  <tr>
+    <td>路径平滑度</td>
+    <td>一般</td>
+    <td>好，可生成平滑轨迹</td>
+  </tr>
+  <tr>
+    <td>动态避障</td>
+    <td>反应快</td>
+    <td>可预测障碍物运动</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>简单环境、低速AGV</td>
+    <td>复杂环境、高速AGV</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你用的是STM32这类MCU，老老实实用DWA。如果用的是Jetson或工控机，可以考虑TEB。我在一个仓储项目里试过TEB，路径确实平滑，但CPU占用率飙到60%——后来还是换回了DWA。</p>
+</div>
+
+<h3>三、全局+局部：双剑合璧</h3>
+
+<p>实际项目中，全局规划和局部规划是配合使用的：</p>
+<ol>
+  <li>全局规划（A*）先生成一条宏观路径</li>
+  <li>局部规划（DWA或TEB）沿着这条路径前进，同时实时避障</li>
+  <li>如果局部规划发现路径被完全堵死，就触发全局重规划</li>
+</ol>
+
+<p>嗯，这里要注意：<strong>全局重规划不能太频繁</strong>。我曾经遇到过一个bug，AGV每次遇到小障碍就重规划，结果路径一直在变，小车在原地打转。后来加了“重规划冷却时间”——5秒内不重复规划，问题就解决了。</p>
+
+<h3>四、本章小结</h3>
+
+<p>路径规划是AGV导航的“大脑”。全局规划负责“想好怎么走”，局部规划负责“走好每一步”。</p>
+<ul>
+  <li><strong>Dijkstra：</strong>保证最优，但慢。适合小地图。</li>
+  <li><strong>A*：</strong>带方向感的搜索，效率高。最常用。</li>
+  <li><strong>DWA：</strong>速度空间采样，反应快。适合嵌入式。</li>
+  <li><strong>TEB：</strong>弹性带优化，路径平滑。适合高性能平台。</li>
+</ul>
+
+<p>我个人习惯：<strong>A* + DWA</strong> 是黄金组合，90%的场景都能搞定。剩下的10%，要么地图太大需要分层规划，要么环境太复杂需要TEB。</p>
+
+<div class="warning">
+  <p><strong>最后提醒：</strong>路径规划不是“调好参数就完事”的。实际部署时，一定要做<strong>边界测试</strong>——比如障碍物紧贴路径、多AGV交汇、传感器噪声等场景。我吃过这个亏，不说了，都是泪。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="20MultiSensorFusionLocalization.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22DynamicEnvPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

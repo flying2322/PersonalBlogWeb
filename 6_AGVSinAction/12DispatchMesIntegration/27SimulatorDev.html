@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>27 模拟器开发</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="active">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>27 模拟器开发：AGV模拟器、MES模拟器、场景模拟器、压力测试模拟器</h2>
+
+<p>说实话，做AGV调度系统与MES对接，最怕什么？</p>
+<p>怕现场跑起来才发现问题。AGV撞了、任务丢了、MES那边没收到反馈……这些坑，我年轻时都踩过。后来我学乖了——先模拟，再上线。</p>
+<p>这一章，我们就聊聊怎么开发一套完整的模拟器体系。包括AGV模拟器、MES模拟器、场景模拟器，还有压力测试模拟器。说白了，就是让你在不上真车、不连真MES的情况下，把整个系统跑一遍。</p>
+
+<h3>27.1 为什么需要模拟器？</h3>
+
+<p>我在一个汽车零部件工厂做过项目。当时AGV调度系统开发完了，但MES那边还在改接口。现场AGV也没到位。怎么办？干等？</p>
+<p>不行。我花了三天时间，写了个简单的AGV模拟器和MES模拟器。调度系统跑起来，模拟器假装是AGV，假装是MES。结果提前发现了三个接口字段不匹配的问题。要是等到现场再发现，那可就尴尬了。</p>
+
+<p>模拟器的核心价值就三点：</p>
+<ul>
+  <li><strong>解耦依赖</strong>——AGV没到货，MES没上线，你照样能开发测试</li>
+  <li><strong>复现异常</strong>——模拟网络延迟、AGV故障、任务超时，这些在真实环境很难触发</li>
+  <li><strong>压力测试</strong>——看看系统到底能扛多少台AGV、多少并发任务</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>模拟器不是玩具，是工程利器。我见过太多项目，现场调试花了两周，其实一半问题在模拟阶段就能解决。</p>
+</div>
+
+<h3>27.2 AGV模拟器</h3>
+
+<p>AGV模拟器，说白了就是假装自己是AGV。它要能接收调度系统的指令，然后假装移动、假装取货、假装报状态。</p>
+
+<p>我习惯把AGV模拟器拆成三个模块：</p>
+
+<h4>27.2.1 通信模块</h4>
+<p>模拟器要能跟调度系统建立连接。通常用TCP、HTTP或者MQTT。我推荐MQTT，因为它在模拟多台AGV时更灵活。</p>
+
+<pre><code>// 伪代码：AGV模拟器通信模块
+class AgvSimulator:
+    def __init__(self, agv_id, broker_url):
+        self.agv_id = agv_id
+        self.client = mqtt.Client(agv_id)
+        self.client.on_message = self.on_command
+        
+    def connect(self):
+        self.client.connect(broker_url)
+        # 订阅调度系统下发的指令主题
+        self.client.subscribe(f"agv/{self.agv_id}/command")
+        
+    def on_command(self, client, userdata, msg):
+        # 解析指令，比如：去A点、取货、放货
+        command = json.loads(msg.payload)
+        self.execute_command(command)
+        
+    def report_status(self, status):
+        # 上报位置、状态、电量等
+        topic = f"agv/{self.agv_id}/status"
+        self.client.publish(topic, json.dumps(status))</code></pre>
+
+<h4>27.2.2 运动模拟模块</h4>
+<p>AGV收到移动指令后，不能瞬间到达。要模拟移动时间。我一般用线性插值，加上一点随机抖动。</p>
+
+<pre><code>def move_to(self, target_x, target_y):
+    # 计算距离
+    distance = math.sqrt((target_x - self.x)**2 + (target_y - self.y)**2)
+    # 假设速度1m/s，加上随机延迟模拟路况
+    travel_time = distance / 1.0 + random.uniform(0, 2)
+    time.sleep(travel_time)
+    self.x, self.y = target_x, target_y
+    self.report_status({"x": self.x, "y": self.y, "state": "idle"})</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经把运动模拟写得太完美，每次移动时间都精确到毫秒。结果上线后发现，真实AGV因为避障、转弯，时间波动很大。后来我在模拟器里加了随机延迟，才更贴近真实。</p>
+</div>
+
+<h4>27.2.3 状态机模块</h4>
+<p>AGV有状态：空闲、行驶中、取货中、充电中、故障。模拟器要能正确切换状态。</p>
+
+<table>
+  <tr><th>当前状态</th><th>收到指令</th><th>下一状态</th></tr>
+  <tr><td>空闲</td><td>移动指令</td><td>行驶中</td></tr>
+  <tr><td>行驶中</td><td>到达</td><td>空闲</td></tr>
+  <tr><td>空闲</td><td>取货指令</td><td>取货中</td></tr>
+  <tr><td>取货中</td><td>完成</td><td>空闲</td></tr>
+  <tr><td>任意</td><td>故障指令</td><td>故障</td></tr>
+</table>
+
+<h3>27.3 MES模拟器</h3>
+
+<p>MES模拟器，就是假装自己是MES系统。它要能接收调度系统上报的任务状态，也能下发生产任务。</p>
+
+<p>我一般把MES模拟器做得简单点，重点模拟几个核心接口：</p>
+
+<ul>
+  <li><strong>任务下发接口</strong>——MES告诉调度系统：现在有个物料要从A运到B</li>
+  <li><strong>状态查询接口</strong>——MES问调度系统：那个任务怎么样了？</li>
+  <li><strong>异常上报接口</strong>——调度系统告诉MES：AGV故障了，任务完不成</li>
+</ul>
+
+<pre><code>class MesSimulator:
+    def __init__(self):
+        self.tasks = []
+        self.task_id_counter = 0
+        
+    def create_task(self, from_location, to_location, priority=1):
+        # MES创建任务
+        task = {
+            "task_id": f"TASK_{self.task_id_counter}",
+            "from": from_location,
+            "to": to_location,
+            "priority": priority,
+            "status": "pending"
+        }
+        self.tasks.append(task)
+        self.task_id_counter += 1
+        # 通过API发送给调度系统
+        requests.post("http://scheduler/api/task", json=task)
+        return task
+        
+    def query_task_status(self, task_id):
+        # 查询任务状态
+        response = requests.get(f"http://scheduler/api/task/{task_id}")
+        return response.json()</code></pre>
+
+<div class="highlight">
+  <p><strong>我的习惯：</strong>MES模拟器里我会加一个"自动任务生成器"。每隔几秒自动下发一个任务，模拟真实产线的节拍。这样调度系统就能持续跑起来，不用手动点来点去。</p>
+</div>
+
+<h3>27.4 场景模拟器</h3>
+
+<p>场景模拟器，是最高级的玩法。它不只是模拟单个AGV或MES，而是模拟整个工厂环境。</p>
+
+<p>我做过一个场景模拟器，里面包含：</p>
+<ul>
+  <li>地图数据（路径、站点、充电桩位置）</li>
+  <li>多台AGV同时运行</li>
+  <li>MES持续下发任务</li>
+  <li>随机事件（AGV故障、道路堵塞、任务取消）</li>
+</ul>
+
+<p>场景模拟器的核心是<strong>时间驱动</strong>。不是真实时间，而是模拟时间。你可以让模拟器跑得比真实时间快10倍，这样一小时就能模拟出10小时的运行情况。</p>
+
+<pre><code>class ScenarioSimulator:
+    def __init__(self, map_data, agv_count=10):
+        self.map = Map(map_data)
+        self.agvs = [AgvSimulator(f"AGV_{i}") for i in range(agv_count)]
+        self.mes = MesSimulator()
+        self.clock = 0  # 模拟时钟
+        
+    def run(self, simulation_hours=8, speed_factor=10):
+        # speed_factor=10 表示模拟时间比真实时间快10倍
+        end_time = simulation_hours * 3600  # 转为秒
+        while self.clock < end_time:
+            # 每模拟秒处理一次
+            self.tick()
+            self.clock += 1
+            # 真实时间等待
+            time.sleep(1 / speed_factor)
+            
+    def tick(self):
+        # 检查是否有新任务
+        if self.clock % 30 == 0:  # 每30模拟秒下发一个任务
+            self.mes.create_task(random_location(), random_location())
+        # 更新所有AGV状态
+        for agv in self.agvs:
+            agv.tick()</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈：</strong>场景模拟器里一定要加随机事件。我曾经不加随机事件，模拟结果完美得不像话。结果上线第一天，一台AGV卡在路口，整个系统就乱了。后来我在模拟器里加了"随机故障率"，才把调度系统的容错机制逼出来。</p>
+</div>
+
+<h3>27.5 压力测试模拟器</h3>
+
+<p>压力测试模拟器，就是往死里压你的系统。看看它到底能扛多少。</p>
+
+<p>我一般关注几个指标：</p>
+<ul>
+  <li><strong>最大AGV数量</strong>——调度系统能同时管理多少台AGV？</li>
+  <li><strong>最大任务并发</strong>——一秒内下发100个任务，系统会不会崩溃？</li>
+  <li><strong>响应时间</strong>——从任务下达到AGV开始执行，需要多久？</li>
+  <li><strong>资源消耗</strong>——CPU、内存、网络带宽</li>
+</ul>
+
+<p>压力测试模拟器的写法，其实就是把AGV模拟器和MES模拟器放大100倍。</p>
+
+<pre><code>class StressTestSimulator:
+    def __init__(self, agv_count=100, task_rate=10):
+        # agv_count: 模拟100台AGV
+        # task_rate: 每秒下发10个任务
+        self.agvs = [AgvSimulator(f"AGV_{i}") for i in range(agv_count)]
+        self.task_rate = task_rate
+        
+    def run_stress_test(self, duration_minutes=10):
+        start_time = time.time()
+        task_count = 0
+        while time.time() - start_time < duration_minutes * 60:
+            # 按任务率下发任务
+            for _ in range(self.task_rate):
+                self.create_task()
+                task_count += 1
+            time.sleep(1)
+        print(f"共下发 {task_count} 个任务")
+        print(f"平均响应时间: {self.calc_avg_response_time()} ms")</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>压力测试时，你的开发机可能先扛不住。我试过在一台8G内存的笔记本上模拟200台AGV，结果调度系统没崩，笔记本先蓝屏了。建议压力测试在服务器上跑，或者用分布式模拟器。</p>
+</div>
+
+<h3>27.6 模拟器架构总览</h3>
+
+<p>下面这张图，是我做模拟器时常用的架构。四个模拟器各司其职，又互相配合。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">模拟器架构总览</text>
+  
+  <!-- 四个模拟器模块 -->
+  <!-- AGV模拟器 -->
+  <rect x="50" y="80" width="160" height="120" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="130" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">AGV模拟器</text>
+  <text x="130" y="135" text-anchor="middle" font-size="12" fill="#555">通信模块</text>
+  <text x="130" y="155" text-anchor="middle" font-size="12" fill="#555">运动模拟模块</text>
+  <text x="130" y="175" text-anchor="middle" font-size="12" fill="#555">状态机模块</text>
+  
+  <!-- MES模拟器 -->
+  <rect x="320" y="80" width="160" height="120" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">MES模拟器</text>
+  <text x="400" y="135" text-anchor="middle" font-size="12" fill="#555">任务下发接口</text>
+  <text x="400" y="155" text-anchor="middle" font-size="12" fill="#555">状态查询接口</text>
+  <text x="400" y="175" text-anchor="middle" font-size="12" fill="#555">异常上报接口</text>
+  
+  <!-- 场景模拟器 -->
+  <rect x="50" y="260" width="160" height="120" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="130" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">场景模拟器</text>
+  <text x="130" y="315" text-anchor="middle" font-size="12" fill="#555">地图数据</text>
+  <text x="130" y="335" text-anchor="middle" font-size="12" fill="#555">多AGV协同</text>
+  <text x="130" y="355" text-anchor="middle" font-size="12" fill="#555">随机事件</text>
+  
+  <!-- 压力测试模拟器 -->
+  <rect x="320" y="260" width="160" height="120" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="400" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">压力测试模拟器</text>
+  <text x="400" y="315" text-anchor="middle" font-size="12" fill="#555">最大AGV数量</text>
+  <text x="400" y="335" text-anchor="middle" font-size="12" fill="#555">任务并发测试</text>
+  <text x="400" y="355" text-anchor="middle" font-size="12" fill="#555">响应时间监控</text>
+  
+  <!-- 中心调度系统 -->
+  <rect x="240" y="420" width="320" height="50" rx="25" fill="#7c4dff" stroke="#651fff" stroke-width="2"/>
+  <text x="400" y="450" text-anchor="middle" font-size="16" font-weight="bold" fill="white">AGV调度系统（被测试对象）</text>
+  
+  <!-- 连接线 -->
+  <line x1="210" y1="140" x2="320" y2="140" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="265" y="135" text-anchor="middle" font-size="10" fill="#666">MQTT/HTTP</text>
+  
+  <line x1="130" y1="200" x2="130" y2="260" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="145" y="235" text-anchor="middle" font-size="10" fill="#666">集成</text>
+  
+  <line x1="400" y1="200" x2="400" y2="260" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="415" y="235" text-anchor="middle" font-size="10" fill="#666">集成</text>
+  
+  <line x1="130" y1="380" x2="240" y2="445" stroke="#999" stroke-width="1.5"/>
+  <line x1="400" y1="380" x2="400" y2="420" stroke="#999" stroke-width="1.5"/>
+  <line x1="480" y1="445" x2="560" y2="445" stroke="#999" stroke-width="1.5"/>
+  
+  <!-- 图例 -->
+  <rect x="600" y="80" width="180" height="200" rx="8" fill="white" stroke="#ccc" stroke-width="1"/>
+  <text x="690" y="105" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">图例</text>
+  <rect x="615" y="120" width="20" height="15" fill="#e8f5e9" stroke="#4caf50" stroke-width="1"/>
+  <text x="645" y="133" font-size="12" fill="#555">AGV模拟器</text>
+  <rect x="615" y="145" width="20" height="15" fill="#e3f2fd" stroke="#2196f3" stroke-width="1"/>
+  <text x="645" y="158" font-size="12" fill="#555">MES模拟器</text>
+  <rect x="615" y="170" width="20" height="15" fill="#fff3e0" stroke="#ff9800" stroke-width="1"/>
+  <text x="645" y="183" font-size="12" fill="#555">场景模拟器</text>
+  <rect x="615" y="195" width="20" height="15" fill="#fce4ec" stroke="#e91e63" stroke-width="1"/>
+  <text x="645" y="208" font-size="12" fill="#555">压力测试模拟器</text>
+  <rect x="615" y="220" width="20" height="15" fill="#7c4dff" stroke="#651fff" stroke-width="1"/>
+  <text x="645" y="233" font-size="12" fill="#555">调度系统</text>
+  <line x1="615" y1="255" x2="635" y2="255" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="645" y="258" font-size="12" fill="#555">通信连接</text>
+</svg>
+
+<p>你看，四个模拟器围绕调度系统，各自扮演不同角色。AGV模拟器假装是车，MES模拟器假装是工厂系统，场景模拟器把两者整合起来，压力测试模拟器则负责往死里压。</p>
+
+<h3>27.7 我的建议</h3>
+
+<p>做模拟器，别想着一次做完美。我一般分三步走：</p>
+<ol>
+  <li><strong>先做AGV模拟器</strong>——能跑通基本指令就行</li>
+  <li><strong>再加MES模拟器</strong>——能自动下发任务</li>
+  <li><strong>最后整合成场景模拟器</strong>——加上随机事件和压力测试</li>
+</ol>
+
+<p>嗯，模拟器这东西，投入产出比极高。花三天写模拟器，可能省下三周的现场调试时间。这笔账，你算算看。</p>
+
+<div class="highlight">
+  <p><strong>一句话总结：</strong>模拟器不是替代真实环境，而是让你在真实环境出问题之前，先把问题找出来。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="26SecondaryDevExtend.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="28ProjectManagement.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

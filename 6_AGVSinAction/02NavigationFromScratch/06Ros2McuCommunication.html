@@ -1,0 +1,448 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 ROS2与底层MCU通信</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="active">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 ROS2与底层MCU通信</h2>
+
+<p>做AGV最头疼的是什么？我个人觉得，就是上层算法和底层电机之间的“沟通障碍”。ROS2跑在Linux上，MCU跑在裸机或RTOS上，这两个世界怎么对话？说白了，就是这一章要解决的问题。</p>
+
+<p>我在做第一台AGV原型机时，就踩过这个坑。上层规划好了路径，下发了速度指令，结果车子原地打转。查了半天，发现是串口通信丢包了。嗯，从那以后，我对通信协议的设计就格外上心。</p>
+
+<h3>6.1 为什么需要ros2_serial？</h3>
+
+<p>ROS2的节点通信默认走DDS，这玩意儿在Linux上跑得飞起。但MCU呢？大部分MCU跑不了完整的DDS实现，资源不够。怎么办？</p>
+
+<p>最简单的方案就是串口。串口硬件简单，几乎所有MCU都支持。我们需要一个桥梁——在ROS2端封装一个驱动节点，把速度指令通过串口发下去；在MCU端解析串口数据，控制电机，再把里程计数据传回来。</p>
+
+<p>这个桥梁，就是ros2_serial。说白了，它就是一个自定义的串口通信协议，专门为AGV的上下位机通信设计的。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>ROS2节点 ↔ 串口驱动 ↔ 物理串口 ↔ MCU串口中断 ↔ 电机控制/编码器采集</p>
+</div>
+
+<h3>6.2 自定义消息格式设计</h3>
+
+<p>通信协议设计，我建议遵循一个原则：<strong>简单、可扩展、带校验</strong>。别搞太复杂，否则调试起来想哭。</p>
+
+<p>我常用的帧格式是这样的：</p>
+
+<pre><code>| 帧头(2字节) | 消息ID(1字节) | 数据长度(1字节) | 数据体(N字节) | 校验和(1字节) | 帧尾(1字节) |
+| 0xAA 0x55    | 0x01          | 0x08            | ...           | XOR校验       | 0x0A        |</code></pre>
+
+<p>帧头用0xAA 0x55，帧尾用0x0A（换行符），方便调试时用串口助手直接看。消息ID用来区分是速度指令还是里程计反馈。</p>
+
+<p><strong>速度指令消息（ID=0x01）：</strong></p>
+<pre><code>| 线速度(m/s) float32 | 角速度(rad/s) float32 |
+| 4字节               | 4字节                 |</code></pre>
+
+<p><strong>里程计反馈消息（ID=0x02）：</strong></p>
+<pre><code>| 左轮里程(m) float32 | 右轮里程(m) float32 | 左轮速度(m/s) float32 | 右轮速度(m/s) float32 |
+| 4字节               | 4字节               | 4字节                 | 4字节                 |</code></pre>
+
+<p>为什么用float32？因为精度够用，而且MCU处理float比double快。我在项目里试过double，结果STM32F103处理起来明显卡顿，后来全改成float了。</p>
+
+<h3>6.3 ROS2端驱动编写</h3>
+
+<p>ROS2端我们写一个串口驱动节点，用C++实现。核心逻辑就是：订阅/cmd_vel话题，打包成自定义帧，通过串口发出去；同时从串口读取数据，解析成里程计，发布到/odom话题。</p>
+
+<p>代码骨架如下：</p>
+
+<pre><code>class SerialBridge : public rclcpp::Node {
+public:
+  SerialBridge() : Node("serial_bridge") {
+    // 打开串口
+    serial_.setPort("/dev/ttyUSB0");
+    serial_.setBaudrate(115200);
+    serial_.open();
+
+    // 订阅速度指令
+    cmd_vel_sub_ = this->create_subscription&lt;geometry_msgs::msg::Twist&gt;(
+      "/cmd_vel", 10, std::bind(&amp;SerialBridge::cmdVelCallback, this, _1));
+
+    // 定时读取串口
+    timer_ = this->create_wall_timer(
+      std::chrono::milliseconds(10), std::bind(&amp;SerialBridge::readSerial, this));
+  }
+
+private:
+  void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg) {
+    // 打包成自定义帧，通过串口发送
+    uint8_t frame[16];
+    frame[0] = 0xAA; frame[1] = 0x55;
+    frame[2] = 0x01; // 消息ID：速度指令
+    frame[3] = 8;    // 数据长度
+    memcpy(&amp;frame[4], &amp;msg->linear.x, 4);
+    memcpy(&amp;frame[8], &amp;msg->angular.z, 4);
+    frame[12] = calcChecksum(frame, 12);
+    frame[13] = 0x0A;
+    serial_.write(frame, 14);
+  }
+
+  void readSerial() {
+    // 读取串口数据，解析里程计帧
+    // ... 帧同步、校验、解析 ...
+    // 发布odom消息
+  }
+
+  serial::Serial serial_;
+  rclcpp::Subscription&lt;geometry_msgs::msg::Twist&gt;::SharedPtr cmd_vel_sub_;
+  rclcpp::TimerBase::SharedPtr timer_;
+};</code></pre>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>串口打开后，建议先发一个空帧测试MCU是否在线。我习惯在驱动初始化时发一个0xAA 0x55 0x00 0x00 0x00 0x0A的“心跳探测帧”，MCU收到后回复一个确认帧。这样一上电就知道通信链路是否正常。</p>
+</div>
+
+<h3>6.4 MCU端接收与DMA收发</h3>
+
+<p>MCU端，我强烈建议用DMA接收。为什么？因为串口中断接收在高波特率下容易丢数据。115200波特率，每字节约87微秒，如果中断处理不及时，数据就丢了。</p>
+
+<p>用DMA的话，数据直接由硬件搬运到内存缓冲区，CPU几乎不参与。等一帧数据收完了，再触发一次中断处理即可。</p>
+
+<p>以STM32为例，配置思路：</p>
+
+<pre><code>// 初始化UART+DMA接收
+void uart_dma_init(void) {
+  // 配置UART: 115200, 8N1
+  // 配置DMA: 循环模式, 接收缓冲区256字节
+  // 使能UART空闲中断 (IDLE interrupt)
+}
+
+// 空闲中断回调
+void HAL_UART_IdleCallback(UART_HandleTypeDef *huart) {
+  if (huart->Instance == USART1) {
+    // 计算本次接收到的数据长度
+    uint16_t len = DMA_RX_BUF_SIZE - __HAL_DMA_GET_COUNTER(huart->hdmarx);
+    // 处理接收到的数据帧
+    process_frame(rx_buffer, len);
+    // 重新启动DMA接收
+    HAL_UART_Receive_DMA(huart, rx_buffer, DMA_RX_BUF_SIZE);
+  }
+}</code></pre>
+
+<p>为什么用空闲中断？因为串口数据是一帧一帧发的，两帧之间会有短暂的“空闲时间”。利用这个空闲中断，可以精确知道一帧数据什么时候结束。这比用固定长度接收灵活多了。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>DMA接收缓冲区要足够大，至少是最大帧长的2倍。我曾经设了64字节的缓冲区，结果一帧数据超过64字节就溢出了，查了三天才找到原因。嗯，血的教训。</p>
+</div>
+
+<h3>6.5 数据校验与丢包处理</h3>
+
+<p>串口通信在工业现场很容易受干扰。电机启停、电磁干扰，都可能导致数据出错。所以校验必不可少。</p>
+
+<p>我常用的校验方式有两种：</p>
+
+<ul>
+  <li><strong>异或校验（XOR）：</strong>简单快速，MCU计算几乎不耗时。适合对实时性要求高的场景。</li>
+  <li><strong>CRC8：</strong>比XOR可靠，但计算量稍大。我一般在里程计反馈这种关键数据上用CRC8。</li>
+</ul>
+
+<p>丢包处理策略：</p>
+
+<ul>
+  <li><strong>超时重发：</strong>ROS2端发送速度指令后，如果50ms内没收到MCU的确认帧，就重发一次。</li>
+  <li><strong>帧序号：</strong>在帧头后面加一个1字节的帧序号，MCU收到重复序号就丢弃。防止MCU重复执行同一条指令。</li>
+  <li><strong>看门狗：</strong>MCU端设一个500ms的看门狗定时器。如果超过500ms没收到ROS2的任何帧，就紧急停车。防止ROS2崩溃后AGV失控。</li>
+</ul>
+
+<p>我曾经遇到过一个问题：AGV在仓库里跑得好好的，突然撞墙了。查日志发现，ROS2端发了停车指令，但MCU没收到。从那以后，我就在MCU端加了看门狗，只要通信断了就自动停车。安全第一。</p>
+
+<h3>6.6 心跳机制</h3>
+
+<p>心跳机制，说白了就是“你还活着吗？”的定期问候。ROS2端每隔100ms发一个心跳帧（ID=0x00），MCU收到后回复一个心跳响应。</p>
+
+<p>心跳帧格式：</p>
+<pre><code>| 0xAA | 0x55 | 0x00 | 0x01 | 0x00 | 0x0A |
+| 帧头  | 帧头  | ID=0 | 长度1 | 数据0 | 帧尾  |</code></pre>
+
+<p>MCU端的心跳响应：</p>
+<pre><code>| 0xAA | 0x55 | 0x00 | 0x01 | 状态字节 | 0x0A |
+| 帧头  | 帧头  | ID=0 | 长度1 | 0x01=正常 | 帧尾  |</code></pre>
+
+<p>状态字节可以携带MCU的健康信息，比如：</p>
+<ul>
+  <li>0x01：一切正常</li>
+  <li>0x02：电机过流</li>
+  <li>0x03：编码器故障</li>
+  <li>0x04：电池电量低</li>
+</ul>
+
+<p>ROS2端如果连续3次没收到心跳响应，就认为通信断了，触发紧急停车流程。这个机制在AGV长时间运行时特别重要。我记得有一次测试，AGV跑了8小时后突然不动了，查日志发现是MCU看门狗复位了，但ROS2端没收到任何通知。加了心跳机制后，这种问题就能第一时间发现。</p>
+
+<h3>6.7 整体架构图</h3>
+
+<p>下面这张图展示了ROS2与MCU通信的完整流程：</p>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" style="background-color: #f0f8ff; border: 1px solid #b0c4de; border-radius: 8px; margin: 20px 0;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4682b4"/>
+    </marker>
+    <marker id="arrowhead2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#cd5c5c"/>
+    </marker>
+  </defs>
+
+  <!-- 背景分区 -->
+  <rect x="10" y="10" width="380" height="480" rx="10" fill="#e6f3ff" stroke="#4682b4" stroke-width="2"/>
+  <text x="200" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="#4682b4">ROS2 端 (Linux)</text>
+
+  <rect x="410" y="10" width="380" height="480" rx="10" fill="#fff0e6" stroke="#cd5c5c" stroke-width="2"/>
+  <text x="600" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="#cd5c5c">MCU 端 (STM32)</text>
+
+  <!-- ROS2 内部节点 -->
+  <rect x="50" y="70" width="140" height="50" rx="8" fill="#4682b4" opacity="0.8"/>
+  <text x="120" y="100" text-anchor="middle" font-size="14" fill="white">导航规划节点</text>
+
+  <rect x="220" y="70" width="140" height="50" rx="8" fill="#4682b4" opacity="0.8"/>
+  <text x="290" y="100" text-anchor="middle" font-size="14" fill="white">串口桥接节点</text>
+
+  <!-- MCU 内部模块 -->
+  <rect x="450" y="70" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="520" y="100" text-anchor="middle" font-size="14" fill="white">串口DMA接收</text>
+
+  <rect x="620" y="70" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="690" y="100" text-anchor="middle" font-size="14" fill="white">协议解析器</text>
+
+  <rect x="450" y="160" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="520" y="190" text-anchor="middle" font-size="14" fill="white">电机控制模块</text>
+
+  <rect x="620" y="160" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="690" y="190" text-anchor="middle" font-size="14" fill="white">编码器采集模块</text>
+
+  <rect x="450" y="250" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="520" y="280" text-anchor="middle" font-size="14" fill="white">心跳检测模块</text>
+
+  <rect x="620" y="250" width="140" height="50" rx="8" fill="#cd5c5c" opacity="0.8"/>
+  <text x="690" y="280" text-anchor="middle" font-size="14" fill="white">看门狗定时器</text>
+
+  <!-- 数据流箭头 -->
+  <!-- /cmd_vel 话题 -->
+  <line x1="190" y1="95" x2="220" y2="95" stroke="#4682b4" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="205" y="85" text-anchor="middle" font-size="10" fill="#4682b4">/cmd_vel</text>
+
+  <!-- 串口物理链路 -->
+  <line x1="360" y1="95" x2="450" y2="95" stroke="#333" stroke-width="3" stroke-dasharray="8,4"/>
+  <text x="405" y="85" text-anchor="middle" font-size="11" fill="#333">串口 (115200)</text>
+
+  <!-- MCU内部数据流 -->
+  <line x1="590" y1="95" x2="620" y2="95" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="690" y1="120" x2="690" y2="160" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="590" y1="120" x2="590" y2="160" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+
+  <!-- 编码器反馈 -->
+  <line x1="690" y1="210" x2="690" y2="250" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="690" y1="250" x2="620" y2="250" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="620" y1="275" x2="590" y2="275" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+
+  <!-- 看门狗反馈 -->
+  <line x1="690" y1="300" x2="690" y2="350" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="590" y1="300" x2="590" y2="350" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+
+  <!-- 串口反馈 -->
+  <line x1="590" y1="350" x2="450" y2="350" stroke="#cd5c5c" stroke-width="2" marker-end="url(#arrowhead2)"/>
+  <line x1="450" y1="350" x2="360" y2="350" stroke="#333" stroke-width="3" stroke-dasharray="8,4"/>
+  <text x="405" y="340" text-anchor="middle" font-size="11" fill="#333">里程计/心跳反馈</text>
+
+  <!-- ROS2 接收 -->
+  <line x1="360" y1="350" x2="290" y2="350" stroke="#4682b4" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="290" y1="350" x2="290" y2="120" stroke="#4682b4" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 图例 -->
+  <rect x="50" y="400" width="700" height="80" rx="5" fill="#fafafa" stroke="#ddd"/>
+  <text x="70" y="425" font-size="12" font-weight="bold" fill="#333">图例：</text>
+  <line x1="70" y1="445" x2="120" y2="445" stroke="#4682b4" stroke-width="2"/>
+  <text x="130" y="450" font-size="11" fill="#333">ROS2内部通信 (DDS)</text>
+  <line x1="300" y1="445" x2="350" y2="445" stroke="#333" stroke-width="3" stroke-dasharray="8,4"/>
+  <text x="360" y="450" font-size="11" fill="#333">串口物理链路</text>
+  <line x1="500" y1="445" x2="550" y2="445" stroke="#cd5c5c" stroke-width="2"/>
+  <text x="560" y="450" font-size="11" fill="#333">MCU内部数据流</text>
+  <text x="70" y="470" font-size="10" fill="#888">注：心跳帧每100ms双向发送一次，看门狗超时500ms触发紧急停车</text>
+</svg>
+
+<h3>6.8 调试与测试</h3>
+
+<p>通信调试，我建议分三步走：</p>
+
+<ol>
+  <li><strong>裸串口测试：</strong>用串口助手直接发十六进制数据，看MCU能不能正确响应。这一步排除硬件问题。</li>
+  <li><strong>单帧测试：</strong>ROS2端手动发一帧速度指令，看MCU电机是否转动。同时看MCU返回的里程计数据是否正确。</li>
+  <li><strong>压力测试：</strong>让ROS2以最高频率（比如100Hz）连续发指令，跑一两个小时，看有没有丢包或死机。</li>
+</ol>
+
+<p>我常用的测试工具：</p>
+<ul>
+  <li>Linux端：<code>screen /dev/ttyUSB0 115200</code> 或 <code>minicom</code></li>
+  <li>Windows端：SSCOM、Putty</li>
+  <li>ROS2端：<code>ros2 topic pub /cmd_vel geometry_msgs/Twist "{linear: {x: 0.5}}"</code></li>
+</ul>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在调试时发现，MCU收到的数据总是少一个字节。查了半天，发现是串口线接触不良。嗯，从那以后我调试前都会先检查物理连接。另外，串口波特率一定要两边一致，115200就是115200，别搞成115200和1152000这种低级错误。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。ROS2与MCU的通信，说白了就是设计一个可靠的串口协议，然后两边都按规矩办事。协议设计好了，后面的导航、控制才能跑得稳。下一章我们会聊到更具体的电机控制实现，到时候再细说。</p>
+
+<div class="footer-nav">
+            <a href="05Stm32LowLevelDriver.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07KinematicsAndOdometer.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

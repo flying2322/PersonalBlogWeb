@@ -1,0 +1,481 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>20 安全与可靠性</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="active">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>20 安全与可靠性：看门狗（IWDG/WWDG）配置、数据校验（CRC）、异常处理与系统恢复</h2>
+
+<p>做AGV控制器，最怕什么？</p>
+<p>我最怕车跑到一半，控制器死机了。AGV在仓库里高速穿梭，一旦失控，撞货架、撞人，后果不堪设想。所以，安全与可靠性，是AGV控制器的生命线。</p>
+<p>这一章，我们就来聊聊怎么给系统上“保险”。说白了，就是三件事：用看门狗防止程序跑飞，用CRC校验数据有没有被篡改，以及设计一套异常处理机制让系统能自己“活过来”。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>嵌入式系统不可靠是常态，我们要做的不是避免故障，而是让故障发生时，系统能安全地恢复。</p>
+</div>
+
+<h3>20.1 看门狗：系统的“最后一道防线”</h3>
+
+<p>看门狗（Watchdog）是什么？你可以把它想象成一个脾气暴躁的保安。你每隔一段时间必须去“打卡”（喂狗），告诉它“我还活着”。如果你没按时打卡，它就认为你出事了，直接按复位键重启系统。</p>
+<p>STM32里有两个看门狗：独立看门狗（IWDG）和窗口看门狗（WWDG）。我个人习惯，在AGV主控制器上，两个都用。</p>
+
+<h4>20.1.1 独立看门狗（IWDG）—— 防死机利器</h4>
+
+<p>IWDG由独立的40kHz内部低速时钟驱动。即使主时钟挂了，它照样工作。这特性太重要了。你想想看，如果主时钟都停了，系统肯定已经崩溃了，这时候只有IWDG能救你。</p>
+<p>配置IWDG很简单，就三步：</p>
+<ol>
+  <li><strong>取消写保护：</strong> 操作IWDG的键寄存器（KR），写入0x5555解锁。</li>
+  <li><strong>设置分频和重装载值：</strong> 决定喂狗的时间窗口。</li>
+  <li><strong>启动看门狗：</strong> 写入0xCCCC启动。</li>
+</ol>
+
+<p>来看个实际代码：</p>
+<pre><code>// IWDG配置函数
+void IWDG_Config(uint8_t prescaler, uint16_t reload) {
+    // 1. 解锁IWDG
+    IWDG-&gt;KR = 0x5555;
+    
+    // 2. 设置预分频器
+    // prescaler: 0-6，对应4/8/16/32/64/128/256分频
+    IWDG-&gt;PR = prescaler;
+    
+    // 3. 设置重装载值（12位，最大0xFFF）
+    IWDG-&gt;RLR = reload;
+    
+    // 4. 等待寄存器更新完成
+    while (IWDG-&gt;SR &amp; 0x01);
+    
+    // 5. 启动看门狗
+    IWDG-&gt;KR = 0xCCCC;
+}
+
+// 喂狗函数
+void IWDG_Feed(void) {
+    IWDG-&gt;KR = 0xAAAA;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈：</strong>喂狗时间别设太短。我曾经在一个项目里设了100ms，结果主循环里一个耗时操作稍微超了点，系统就反复重启。后来我改成500ms，留足余量。AGV控制器的控制周期一般是10-50ms，所以设个200-500ms比较合理。</p>
+</div>
+
+<h4>20.1.2 窗口看门狗（WWDG）—— 防程序跑偏</h4>
+
+<p>WWDG比IWDG更“聪明”。它不光要求你按时喂狗，还要求你在一个特定的时间窗口内喂狗。喂早了不行，喂晚了也不行。</p>
+<p>为什么需要这个？因为程序跑飞后，有可能碰巧执行到了喂狗代码。如果只是IWDG，它可能刚好在复位前喂了狗，系统就永远无法恢复。但WWDG的窗口机制，让这种巧合几乎不可能发生。</p>
+
+<p>配置WWDG稍微复杂一点：</p>
+<pre><code>// WWDG配置函数
+void WWDG_Config(uint8_t counter, uint8_t window) {
+    // 1. 使能WWDG时钟
+    RCC-&gt;APB1ENR |= RCC_APB1ENR_WWDGEN;
+    
+    // 2. 设置窗口值（WWDG-&gt;CFR的低7位）
+    // 喂狗必须在计数器值 &lt; 窗口值 且 &gt; 0x3F 时进行
+    WWDG-&gt;CFR = (window &amp; 0x7F) &lt;&lt; 7;
+    
+    // 3. 设置分频（WWDG-&gt;CFR的bit8-9）
+    // 00: 1分频, 01: 2分频, 10: 4分频, 11: 8分频
+    WWDG-&gt;CFR |= 0x00;  // 1分频
+    
+    // 4. 设置计数器初始值（WWDG-&gt;CR的低7位）
+    WWDG-&gt;CR = counter &amp; 0x7F;
+    
+    // 5. 使能WWDG（WWDG-&gt;CR的bit7）
+    WWDG-&gt;CR |= 0x80;
+}
+
+// WWDG喂狗
+void WWDG_Feed(void) {
+    // 必须在窗口内喂狗
+    // 读取当前计数器值
+    uint8_t cnt = WWDG-&gt;CR &amp; 0x7F;
+    // 如果计数器值小于窗口值，可以喂狗
+    if (cnt &lt; (WWDG-&gt;CFR &gt;&gt; 7)) {
+        WWDG-&gt;CR = (cnt &amp; 0x7F) | 0x80;
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>WWDG的计数器是递减的。从0x7F开始往下减，减到0x3F时触发复位。窗口值必须大于0x3F。我一般设窗口值为0x60，计数器初始值0x7F，这样喂狗窗口是0x60到0x40之间。</p>
+</div>
+
+<h3>20.2 数据校验：CRC—— 揪出“隐形错误”</h3>
+
+<p>AGV控制器里，数据在内存、外设、通信链路之间频繁传输。电磁干扰、硬件老化，都可能导致数据位翻转。一个bit错了，可能让电机转错方向，或者让路径规划算出离谱的轨迹。</p>
+<p>CRC（循环冗余校验）就是用来检测这种错误的。它把数据当做一个多项式，通过除法运算生成一个校验码。接收方用同样的方法计算，如果结果不一致，说明数据被篡改了。</p>
+
+<p>STM32内置了CRC计算单元，硬件算起来飞快。我一般在两个地方用：</p>
+<ul>
+  <li><strong>固件校验：</strong> 启动时计算Flash中固件的CRC，和预存的CRC比较，确保固件没被破坏。</li>
+  <li><strong>通信数据包：</strong> 每个CAN或串口数据包末尾加4字节CRC，接收方校验。</li>
+</ul>
+
+<p>硬件CRC配置代码：</p>
+<pre><code>// 使能CRC时钟
+RCC-&gt;AHB1ENR |= RCC_AHB1ENR_CRCEN;
+
+// 计算32位数据的CRC
+uint32_t CRC_Calc(uint32_t data) {
+    CRC-&gt;DR = data;  // 写入数据寄存器
+    return CRC-&gt;DR;   // 读取结果
+}
+
+// 计算一块内存的CRC
+uint32_t CRC_CalcBlock(uint32_t *buf, uint32_t len) {
+    // 复位CRC计算器
+    CRC-&gt;CR = CRC_CR_RESET;
+    
+    for (uint32_t i = 0; i &lt; len; i++) {
+        CRC-&gt;DR = buf[i];
+    }
+    
+    return CRC-&gt;DR;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在AGV的CAN通信里，只用了简单的累加和校验。结果有一次现场干扰特别大，累加和居然碰巧对了，但数据已经错了。车直接撞上了货架。从那以后，所有关键通信我都改用CRC32。多花4字节，换来的是安心。</p>
+</div>
+
+<h3>20.3 异常处理与系统恢复—— 让系统“自己救自己”</h3>
+
+<p>看门狗和CRC都是“被动防御”。真正的高手，还要设计“主动恢复”机制。当系统检测到异常时，不是傻等看门狗复位，而是尝试自己恢复。</p>
+
+<p>我设计AGV控制器时，会建立一个三级异常处理体系：</p>
+
+<table>
+  <tr>
+    <th>级别</th>
+    <th>异常类型</th>
+    <th>处理方式</th>
+  </tr>
+  <tr>
+    <td>一级</td>
+    <td>轻微异常（如通信超时一次）</td>
+    <td>记录日志，重试，不中断当前任务</td>
+  </tr>
+  <tr>
+    <td>二级</td>
+    <td>中等异常（如传感器数据CRC错误）</td>
+    <td>丢弃错误数据，使用上一帧有效数据，报警</td>
+  </tr>
+  <tr>
+    <td>三级</td>
+    <td>严重异常（如电机驱动器故障）</td>
+    <td>紧急停车，保存关键状态，触发看门狗复位</td>
+  </tr>
+</table>
+
+<p>具体实现上，我习惯用状态机来管理：</p>
+<pre><code>typedef enum {
+    SYS_NORMAL,       // 正常
+    SYS_WARNING,      // 警告（一级异常）
+    SYS_ERROR,        // 错误（二级异常）
+    SYS_FAULT,        // 故障（三级异常）
+    SYS_RECOVERY      // 恢复中
+} SystemState;
+
+SystemState g_sysState = SYS_NORMAL;
+
+void System_ExceptionHandler(ExceptionType type) {
+    switch(type) {
+        case EXCEP_COMM_TIMEOUT:
+            if (g_sysState == SYS_NORMAL) {
+                g_sysState = SYS_WARNING;
+                Log_Write("通信超时，重试中...");
+                Comm_Retry();
+            }
+            break;
+            
+        case EXCEP_CRC_ERROR:
+            g_sysState = SYS_ERROR;
+            Log_Write("CRC错误，使用旧数据");
+            Sensor_UseLastValidData();
+            break;
+            
+        case EXCEP_MOTOR_FAULT:
+            g_sysState = SYS_FAULT;
+            Log_Write("电机故障，紧急停车");
+            Motor_EmergencyStop();
+            // 保存关键状态到备份寄存器
+            RTC-&gt;BKPDR0 = g_agvState;
+            // 触发软件复位
+            NVIC_SystemReset();
+            break;
+            
+        default:
+            break;
+    }
+}
+
+// 系统恢复函数（在main循环中调用）
+void System_RecoveryCheck(void) {
+    if (g_sysState == SYS_WARNING) {
+        // 检查警告是否消除
+        if (Comm_IsHealthy()) {
+            g_sysState = SYS_NORMAL;
+            Log_Write("系统恢复正常");
+        }
+    }
+    
+    if (g_sysState == SYS_FAULT) {
+        // 从备份寄存器恢复状态
+        g_agvState = RTC-&gt;BKPDR0;
+        // 执行恢复流程
+        AGV_RecoveryProcedure();
+        g_sysState = SYS_RECOVERY;
+    }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>异常处理里千万别做复杂操作。比如在HardFault_Handler里调用printf，那只会让情况更糟。我一般只在异常处理里做三件事：保存现场、设置标志位、触发复位。其他事情等系统重启后再做。</p>
+</div>
+
+<h3>20.4 知识体系总览</h3>
+
+<p>说了这么多，我们来梳理一下。安全与可靠性，不是靠某一个功能实现的，而是一套组合拳。下面这张图，是我自己总结的AGV控制器安全体系：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV控制器安全与可靠性体系</text>
+  
+  <!-- 三个主模块 -->
+  <!-- 看门狗模块 -->
+  <rect x="50" y="80" width="220" height="360" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="160" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="#2e7d32">看门狗（Watchdog）</text>
+  <line x1="70" y1="130" x2="250" y2="130" stroke="#4caf50" stroke-width="1"/>
+  
+  <text x="70" y="160" font-size="14" fill="#333">IWDG（独立看门狗）</text>
+  <text x="80" y="185" font-size="12" fill="#666">• 独立时钟，主时钟挂了也能用</text>
+  <text x="80" y="205" font-size="12" fill="#666">• 防死机，定时喂狗</text>
+  <text x="80" y="225" font-size="12" fill="#666">• 超时直接复位</text>
+  
+  <text x="70" y="260" font-size="14" fill="#333">WWDG（窗口看门狗）</text>
+  <text x="80" y="285" font-size="12" fill="#666">• 窗口内喂狗</text>
+  <text x="80" y="305" font-size="12" fill="#666">• 防程序跑偏</text>
+  <text x="80" y="325" font-size="12" fill="#666">• 比IWDG更严格</text>
+  
+  <text x="70" y="360" font-size="14" fill="#333">配置要点</text>
+  <text x="80" y="385" font-size="12" fill="#666">• 喂狗时间留余量</text>
+  <text x="80" y="405" font-size="12" fill="#666">• 窗口值设合理</text>
+  <text x="80" y="425" font-size="12" fill="#666">• 主循环中喂狗</text>
+  
+  <!-- 数据校验模块 -->
+  <rect x="290" y="80" width="220" height="360" rx="10" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="#e65100">数据校验（CRC）</text>
+  <line x1="310" y1="130" x2="490" y2="130" stroke="#ff9800" stroke-width="1"/>
+  
+  <text x="310" y="160" font-size="14" fill="#333">硬件CRC单元</text>
+  <text x="320" y="185" font-size="12" fill="#666">• 内置硬件计算</text>
+  <text x="320" y="205" font-size="12" fill="#666">• 速度快，不占CPU</text>
+  <text x="320" y="225" font-size="12" fill="#666">• 支持CRC32</text>
+  
+  <text x="310" y="260" font-size="14" fill="#333">应用场景</text>
+  <text x="320" y="285" font-size="12" fill="#666">• 固件完整性校验</text>
+  <text x="320" y="305" font-size="12" fill="#666">• 通信数据包校验</text>
+  <text x="320" y="325" font-size="12" fill="#666">• 传感器数据校验</text>
+  
+  <text x="310" y="360" font-size="14" fill="#333">注意事项</text>
+  <text x="320" y="385" font-size="12" fill="#666">• 别用累加和替代CRC</text>
+  <text x="320" y="405" font-size="12" fill="#666">• 关键通信用CRC32</text>
+  <text x="320" y="425" font-size="12" fill="#666">• 启动时校验固件</text>
+  
+  <!-- 异常处理模块 -->
+  <rect x="530" y="80" width="220" height="360" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="640" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="#1565c0">异常处理与恢复</text>
+  <line x1="550" y1="130" x2="730" y2="130" stroke="#2196f3" stroke-width="1"/>
+  
+  <text x="550" y="160" font-size="14" fill="#333">三级异常体系</text>
+  <text x="560" y="185" font-size="12" fill="#666">• 一级：警告，重试</text>
+  <text x="560" y="205" font-size="12" fill="#666">• 二级：错误，用旧数据</text>
+  <text x="560" y="225" font-size="12" fill="#666">• 三级：故障，紧急复位</text>
+  
+  <text x="550" y="260" font-size="14" fill="#333">恢复机制</text>
+  <text x="560" y="285" font-size="12" fill="#666">• 状态机管理</text>
+  <text x="560" y="305" font-size="12" fill="#666">• 关键状态保存</text>
+  <text x="560" y="325" font-size="12" fill="#666">• 自动恢复流程</text>
+  
+  <text x="550" y="360" font-size="14" fill="#333">设计原则</text>
+  <text x="560" y="385" font-size="12" fill="#666">• 异常处理要轻量</text>
+  <text x="560" y="405" font-size="12" fill="#666">• 别在中断里做复杂操作</text>
+  <text x="560" y="425" font-size="12" fill="#666">• 日志记录要完整</text>
+  
+  <!-- 底部连接线 -->
+  <line x1="160" y1="440" x2="160" y2="470" stroke="#4caf50" stroke-width="2"/>
+  <line x1="400" y1="440" x2="400" y2="470" stroke="#ff9800" stroke-width="2"/>
+  <line x1="640" y1="440" x2="640" y2="470" stroke="#2196f3" stroke-width="2"/>
+  
+  <line x1="160" y1="470" x2="640" y2="470" stroke="#333" stroke-width="2"/>
+  
+  <text x="400" y="490" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">三者协同工作，构建完整安全体系</text>
+</svg>
+
+<p>嗯，这张图把三个模块的关系说清楚了。看门狗负责“保底”，CRC负责“查错”，异常处理负责“自救”。三者缺一不可。</p>
+
+<div class="highlight">
+  <p><strong>最后说一句：</strong>安全设计不是功能，而是习惯。我每次写代码，都会问自己：如果这里出错了，系统会怎样？如果答不上来，说明设计还不够安全。AGV控制器是跑在路上的，容不得半点马虎。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="19LowPowerManagement.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="21MotionControlTask.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

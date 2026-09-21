@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 动态环境中的重规划策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="active">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 动态环境中的重规划策略</h2>
+
+<p>各位做AGV的朋友，大家好。今天我们来聊一个很实际的问题——<strong>动态环境中的重规划</strong>。</p>
+
+<p>说实话，静态地图下的路径规划，现在开源方案一大堆，跑个A*谁都会。但真正让AGV“翻车”的，往往是环境变了，机器人还在按老路走。我见过太多项目，仿真跑得飞起，一上产线就撞人——说白了，就是重规划没做好。</p>
+
+<p>这一讲，我们就聚焦两个核心问题：<strong>局部代价地图怎么更新？全局路径什么时候该重新搜？</strong></p>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block; background:#f0f8ff; border-radius:12px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  <!-- 中心主题 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">动态重规划策略</text>
+  
+  <!-- 左分支：局部代价地图 -->
+  <line x1="300" y1="45" x2="150" y2="120" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="60" y="110" width="180" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="150" y="136" text-anchor="middle" fill="white" font-size="15" font-weight="bold">局部代价地图更新</text>
+  
+  <line x1="150" y1="150" x2="100" y2="210" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="20" y="210" width="160" height="35" rx="6" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="100" y="233" text-anchor="middle" fill="#c0392b" font-size="13">传感器数据融合</text>
+  
+  <line x1="150" y1="150" x2="200" y2="210" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="120" y="210" width="160" height="35" rx="6" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="200" y="233" text-anchor="middle" fill="#c0392b" font-size="13">膨胀层动态调整</text>
+  
+  <line x1="150" y1="150" x2="150" y2="270" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="60" y="270" width="180" height="35" rx="6" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="150" y="293" text-anchor="middle" fill="#c0392b" font-size="13">代价衰减与遗忘机制</text>
+
+  <!-- 右分支：全局重规划触发 -->
+  <line x1="500" y1="45" x2="650" y2="120" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="560" y="110" width="180" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="1.5"/>
+  <text x="650" y="136" text-anchor="middle" fill="white" font-size="15" font-weight="bold">全局路径重新搜索</text>
+  
+  <line x1="650" y1="150" x2="600" y2="210" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="520" y="210" width="160" height="35" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="600" y="233" text-anchor="middle" fill="#1e8449" font-size="13">路径阻塞检测</text>
+  
+  <line x1="650" y1="150" x2="700" y2="210" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="620" y="210" width="160" height="35" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="700" y="233" text-anchor="middle" fill="#1e8449" font-size="13">代价阈值触发</text>
+  
+  <line x1="650" y1="150" x2="650" y2="270" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <rect x="560" y="270" width="180" height="35" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="650" y="293" text-anchor="middle" fill="#1e8449" font-size="13">定时重规划策略</text>
+</svg>
+
+<h3>一、局部代价地图：动态环境的“实时感知”</h3>
+
+<p>先说说局部代价地图。我个人习惯把它比作AGV的“近程雷达”——它只管机器人周围几米到十几米的范围，但更新频率很高，通常10Hz甚至更高。</p>
+
+<h4>1.1 传感器数据怎么“喂”进地图？</h4>
+
+<p>激光雷达、深度相机、超声波……这些传感器每帧都会吐出一堆点云或障碍物信息。关键是怎么把这些数据高效地融合到代价地图里。</p>
+
+<p>我常用的做法是<strong>分层更新</strong>：</p>
+<ul>
+  <li><strong>障碍物层（Obstacle Layer）</strong>：直接写入传感器检测到的障碍物，标记为不可通行（cost=254）。</li>
+  <li><strong>膨胀层（Inflation Layer）</strong>：根据机器人尺寸，对障碍物进行膨胀，生成梯度代价。</li>
+  <li><strong>静态层（Static Layer）</strong>：加载事先建好的地图，作为背景。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>局部地图的更新要“快进快出”。传感器数据进来后，只更新机器人当前位置周围的一个滑动窗口，不要全图刷新。</p>
+</div>
+
+<p>嗯，这里有个坑。我曾经在一个项目里，直接用全局地图的更新方式去处理局部地图，结果每帧都要遍历整个200x200的栅格图，CPU直接飙到80%。后来改成滑动窗口，只更新机器人周围5米半径的区域，CPU占用降到了15%。</p>
+
+<h4>1.2 膨胀层的动态调整</h4>
+
+<p>膨胀半径不是一成不变的。你想想看，AGV空载和满载时，转弯半径能一样吗？</p>
+
+<p>我建议的做法是：</p>
+<ul>
+  <li>根据当前车速动态调整膨胀半径。车速越快，膨胀半径越大——给刹车留出余量。</li>
+  <li>根据负载重量调整。重载时，机器人惯性大，膨胀层要更“厚”一些。</li>
+</ul>
+
+<pre><code>// 伪代码：动态膨胀半径计算
+float compute_inflation_radius(float speed, float load_ratio) {
+    float base_radius = 0.3;  // 基础半径 0.3m
+    float speed_factor = speed * 0.1;  // 速度每增加1m/s，半径增加0.1m
+    float load_factor = load_ratio * 0.15;  // 满载时额外增加0.15m
+    return base_radius + speed_factor + load_factor;
+}</code></pre>
+
+<h4>1.3 代价衰减与遗忘机制</h4>
+
+<p>动态环境里，障碍物会移动，也会消失。比如一个人从AGV前面走过去了，如果代价地图还记着他，机器人就会傻傻地停在那里等。</p>
+
+<p>我常用的策略是<strong>时间衰减</strong>：</p>
+<ul>
+  <li>每个栅格记录最后一次被观测到的时间戳。</li>
+  <li>如果超过一定时间（比如5秒）没有被观测到，代价开始衰减。</li>
+  <li>衰减到0后，恢复为自由空间。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>衰减速度不要线性，用指数衰减更符合直觉。我一般用 cost = cost * exp(-Δt / τ)，τ取3秒左右。</p>
+</div>
+
+<h3>二、全局路径重新搜索：什么时候该“推倒重来”？</h3>
+
+<p>局部代价地图更新得再快，如果全局路径本身已经不可行了，那也是白搭。所以我们需要一套<strong>触发条件</strong>，来决定什么时候重新搜索全局路径。</p>
+
+<h4>2.1 路径阻塞检测</h4>
+
+<p>这是最直接的触发条件。当机器人沿着全局路径走，发现前方一段路径被障碍物完全堵死，而且局部规划器尝试绕行失败时，就该触发全局重规划了。</p>
+
+<p>怎么判断“堵死”？我个人的经验是：</p>
+<ul>
+  <li>检查全局路径上，距离机器人前方2-5米范围内的所有路径点。</li>
+  <li>如果连续N个点（比如5个）在局部代价地图中的代价都超过阈值（比如200），就认为路径被阻塞。</li>
+  <li>同时，局部规划器尝试绕行超过一定时间（比如3秒）仍未成功，触发重规划。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>不要一检测到障碍物就重规划。有时候只是临时遮挡，比如有人从机器人面前经过。我建议加一个“确认延迟”——障碍持续存在超过1秒再触发。</p>
+</div>
+
+<h4>2.2 代价阈值触发</h4>
+
+<p>有时候路径没有被完全堵死，但代价变得很高。比如原本规划的路线经过一个狭窄通道，现在通道两边都堆了货物，虽然还能过，但风险很大。</p>
+
+<p>这种情况下，我建议设置一个<strong>累计代价阈值</strong>：</p>
+<ul>
+  <li>计算全局路径上所有路径点的平均代价。</li>
+  <li>如果平均代价超过某个阈值（比如100），触发重规划。</li>
+  <li>或者，如果路径上任意一个点的代价超过254（不可通行），立即触发。</li>
+</ul>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0; background:#fff;">
+  <tr style="background:#3498db; color:white;">
+    <th>触发条件</th>
+    <th>阈值建议</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>连续阻塞点数</td>
+    <td>≥5个点（分辨率0.05m时）</td>
+    <td>静态障碍物突然出现</td>
+  </tr>
+  <tr>
+    <td>路径平均代价</td>
+    <td>≥100（0-255范围）</td>
+    <td>环境逐渐变拥挤</td>
+  </tr>
+  <tr>
+    <td>单点最大代价</td>
+    <td>≥254</td>
+    <td>路径被完全阻断</td>
+  </tr>
+  <tr>
+    <td>局部绕行超时</td>
+    <td>≥3秒</td>
+    <td>局部规划器陷入死胡同</td>
+  </tr>
+</table>
+
+<h4>2.3 定时重规划策略</h4>
+
+<p>还有一种情况——环境变化很缓慢，但一直在变。比如仓库里货物被慢慢搬走，通道逐渐变宽。这种情况下，代价阈值可能永远不会触发，但路径其实已经不是最优的了。</p>
+
+<p>我的做法是加一个<strong>定时器</strong>：</p>
+<ul>
+  <li>每隔一定时间（比如30秒），强制触发一次全局重规划。</li>
+  <li>但如果当前路径代价很低（比如平均代价<30），可以跳过这次重规划，节省算力。</li>
+  <li>重规划后，如果新路径比旧路径代价降低超过10%，就切换过去。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>重规划不是越频繁越好。每次重规划都要消耗算力，而且可能导致机器人走走停停。我见过有人把重规划频率设成1Hz，结果机器人像抽风一样来回变道——这就是过度重规划。</p>
+</div>
+
+<h3>三、实战中的“避坑指南”</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>坑1：重规划时忘记清空局部代价地图。</strong> 我曾经有一次，全局路径重规划后，局部代价地图里还残留着旧障碍物信息，导致新路径刚生成就被局部规划器否决了。解决方案：重规划时，把局部代价地图中动态障碍物层清空，重新从传感器获取数据。</li>
+  <li><strong>坑2：重规划频率过高导致路径抖动。</strong> 后来我加了一个“冷却时间”——每次重规划后，至少等2秒才能再次触发。这样既保证了响应速度，又避免了频繁切换。</li>
+  <li><strong>坑3：代价地图更新和路径规划用同一个线程。</strong> 这会导致地图更新时路径规划被阻塞，反之亦然。我建议把代价地图更新放在一个独立线程，优先级设高一些。</li>
+</ul>
+
+<p>好了，关于动态环境中的重规划策略，今天就聊到这里。核心就两句话：<strong>局部地图要快，全局重规划要稳</strong>。把握好这个平衡，你的AGV才能在复杂环境中跑得又稳又安全。</p>
+
+<hr style="border:1px dashed #bdc3c7; margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="22LocalizationTech.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24PathPlanningEval.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

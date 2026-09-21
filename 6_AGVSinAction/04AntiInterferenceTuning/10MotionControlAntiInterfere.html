@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 运动控制抗干扰</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="active">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 运动控制抗干扰：PID控制器抗积分饱和与微分先行，前馈补偿与扰动观测器设计，电机电流环与速度环参数整定</h2>
+
+<p>各位工程师朋友，咱们今天聊点硬核的。运动控制抗干扰，说白了就是让AGV在乱七八糟的现场环境里，还能稳稳当当跑直线、转直角。</p>
+
+<p>我见过太多项目，AGV在实验室跑得跟教科书一样完美，一到客户现场就抽风。为什么？干扰来了。地面油污、轮胎打滑、负载变化、通信延迟……这些才是真实世界。</p>
+
+<p>这一章，咱们就聚焦三个核心问题：<strong>PID怎么调才不飘？扰动来了怎么扛？电流环和速度环怎么配合？</strong></p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>运动控制抗干扰不是靠一个算法包打天下，而是靠「PID调优 + 前馈补偿 + 扰动观测」三件套组合出拳。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block; background:#f0f8ff; border-radius:12px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  <!-- 中心标题 -->
+  <rect x="250" y="20" width="300" height="50" rx="25" fill="#1a5276" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">运动控制抗干扰三件套</text>
+  
+  <!-- 三个核心模块 -->
+  <rect x="50" y="120" width="200" height="80" rx="10" fill="#d4efdf" stroke="#27ae60" stroke-width="2"/>
+  <text x="150" y="155" text-anchor="middle" fill="#1e8449" font-size="15" font-weight="bold">PID控制器优化</text>
+  <text x="150" y="180" text-anchor="middle" fill="#2c3e50" font-size="12">抗积分饱和 + 微分先行</text>
+  
+  <rect x="300" y="120" width="200" height="80" rx="10" fill="#d6eaf8" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="155" text-anchor="middle" fill="#1a5276" font-size="15" font-weight="bold">前馈补偿</text>
+  <text x="400" y="180" text-anchor="middle" fill="#2c3e50" font-size="12">速度前馈 + 加速度前馈</text>
+  
+  <rect x="550" y="120" width="200" height="80" rx="10" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+  <text x="650" y="155" text-anchor="middle" fill="#a04000" font-size="15" font-weight="bold">扰动观测器</text>
+  <text x="650" y="180" text-anchor="middle" fill="#2c3e50" font-size="12">DOB + 扩张状态观测器</text>
+  
+  <!-- 箭头连接 -->
+  <line x1="150" y1="200" x2="150" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="200" x2="400" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="200" x2="650" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底部应用层 -->
+  <rect x="100" y="280" width="600" height="60" rx="10" fill="#e8daef" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" fill="#6c3483" font-size="16" font-weight="bold">电机电流环 + 速度环参数整定</text>
+  <text x="400" y="330" text-anchor="middle" fill="#2c3e50" font-size="12">最终目标：AGV平稳运行，抗干扰能力强</text>
+  
+  <!-- 连接线 -->
+  <line x1="150" y1="200" x2="400" y2="200" stroke="#95a5a6" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="400" y1="200" x2="650" y2="200" stroke="#95a5a6" stroke-width="1.5" stroke-dasharray="5,5"/>
+</svg>
+
+<h3>10.1 PID控制器抗积分饱和</h3>
+
+<p>积分饱和，这词听着专业，其实说白了就是：<strong>误差一直存在，积分项一直累加，累到天昏地暗。</strong>等误差终于反转了，积分项还傻乎乎地往反方向使劲，系统就 overshoot 了。</p>
+
+<p>我在一个仓储AGV项目里遇到过这问题。AGV从A点去B点，中间要经过一段长直道。直道上有轻微坡度，PID的积分项一直在累加。等AGV到了B点要停车，好家伙，积分项还在往上顶，车子直接冲过了头，撞上了货架。</p>
+
+<p>怎么解决？两种常用方法：</p>
+
+<ul>
+  <li><strong>积分限幅法：</strong>给积分项设个上限。我习惯设成输出限幅的80%。比如PWM最大1000，积分项最大就800。</li>
+  <li><strong>积分分离法：</strong>误差大的时候，干脆关掉积分。等误差小了再打开。阈值一般设在目标值的5%~10%。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>积分分离法效果更好，但要注意切换时的平滑过渡。我一般加个软切换，用sigmoid函数做权重，避免积分突然切入切出造成抖动。</p>
+</div>
+
+<pre><code>// 抗积分饱和 - 积分分离法示例
+float pid_integral_anti_windup(float error, float integral, float threshold) {
+    if (fabs(error) &lt; threshold) {
+        // 误差小，正常积分
+        integral += error * dt;
+    } else {
+        // 误差大，积分保持不动
+        // 或者缓慢衰减
+        integral *= 0.95f;
+    }
+    // 再加个限幅，双重保险
+    if (integral &gt; INTEGRAL_MAX) integral = INTEGRAL_MAX;
+    if (integral &lt; -INTEGRAL_MAX) integral = -INTEGRAL_MAX;
+    return integral;
+}</code></pre>
+
+<h3>10.2 微分先行</h3>
+
+<p>微分项有个毛病：<strong>对噪声特别敏感。</strong>你想想看，AGV的编码器信号稍微抖一下，微分项就炸了。输出会剧烈跳动，电机嗡嗡响。</p>
+
+<p>微分先行的思路很简单：<strong>不对误差求导，而是对测量值求导。</strong>这样设定值突变的时候，微分项不会跟着跳，只有实际值变化才起作用。</p>
+
+<p>我曾经调试一台AGV，速度环微分增益稍微给大一点，电机就啸叫。后来改成微分先行，同样的增益，安静得像只猫。</p>
+
+<div class="highlight">
+  <p><strong>关键区别：</strong></p>
+  <ul>
+    <li>传统微分：D = Kd * d(error)/dt</li>
+    <li>微分先行：D = Kd * d(measurement)/dt</li>
+  </ul>
+  <p>效果：设定值突变时，传统微分会产生尖峰脉冲；微分先行则平滑过渡。</p>
+</div>
+
+<h3>10.3 前馈补偿设计</h3>
+
+<p>PID是事后诸葛亮——有了误差才调整。前馈补偿是事前诸葛亮——提前知道要干啥，先给个预判。</p>
+
+<p>AGV运动控制里，最常用的前馈有两种：</p>
+
+<ul>
+  <li><strong>速度前馈：</strong>知道目标速度，直接给一个对应的控制量。比如电机要跑1000rpm，先给60%的PWM，剩下的让PID去微调。</li>
+  <li><strong>加速度前馈：</strong>知道要加速，提前给一个额外的力矩。这对克服惯性特别有用。</li>
+</ul>
+
+<p>我习惯的做法是：<strong>先做前馈标定。</strong>让AGV空载跑一遍，记录不同速度下需要的PWM值。拟合出一条曲线。以后直接查表或者用公式算。</p>
+
+<pre><code>// 速度前馈查表示例
+float speed_feedforward(float target_speed) {
+    // 标定数据：速度(rpm) -> PWM(%)
+    static float calib_table[][2] = {
+        {0,    0},
+        {500,  30},
+        {1000, 55},
+        {1500, 78},
+        {2000, 100}
+    };
+    // 线性插值
+    for (int i = 0; i &lt; 4; i++) {
+        if (target_speed &gt;= calib_table[i][0] &amp;&amp; target_speed &lt;= calib_table[i+1][0]) {
+            float ratio = (target_speed - calib_table[i][0]) / 
+                         (calib_table[i+1][0] - calib_table[i][0]);
+            return calib_table[i][1] + ratio * (calib_table[i+1][1] - calib_table[i][1]);
+        }
+    }
+    return 0;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>前馈补偿不是万能的。它依赖模型精度。如果AGV负载变化很大（比如空载和满载差一倍），前馈系数需要在线调整。我一般加个自适应因子，根据实际电流反馈修正前馈量。</p>
+</div>
+
+<h3>10.4 扰动观测器设计</h3>
+
+<p>前馈补偿搞不定的，就是那些<strong>未知的、突发的扰动</strong>。比如AGV压到一块石头，或者轮胎打滑。</p>
+
+<p>扰动观测器（DOB）的思路：<strong>把扰动当成一个状态量，用观测器把它估计出来，然后补偿掉。</strong></p>
+
+<p>我常用的两种：</p>
+
+<ul>
+  <li><strong>经典DOB：</strong>基于名义模型，用低通滤波器分离扰动。实现简单，但依赖模型精度。</li>
+  <li><strong>扩张状态观测器（ESO）：</strong>把扰动扩张成一个新状态，用状态观测器估计。鲁棒性更好，但参数整定麻烦一点。</li>
+</ul>
+
+<p>记得有一次，AGV在仓库里跑，地面有一小滩油。没有DOB的时候，车子直接打滑偏了30度。加上DOB之后，观测器在10ms内就估计出了扰动，补偿力矩加上去，车子只偏了3度就拉回来了。</p>
+
+<div class="tip">
+  <p><strong>参数整定小技巧：</strong>DOB的带宽是关键。带宽太高，会把噪声当成扰动；带宽太低，扰动来了来不及补偿。我一般从电机电流环带宽的1/5开始调，慢慢往上加，直到看到扰动抑制效果满意为止。</p>
+</div>
+
+<h3>10.5 电流环与速度环参数整定</h3>
+
+<p>好了，前面说的抗积分饱和、微分先行、前馈补偿、扰动观测器，最终都要落实到<strong>电流环和速度环的参数上</strong>。</p>
+
+<p>我的整定顺序是：<strong>先电流环，后速度环。</strong>电流环是内环，速度环是外环。内环不稳，外环怎么调都没用。</p>
+
+<table>
+  <tr>
+    <th>环节</th>
+    <th>带宽范围</th>
+    <th>整定目标</th>
+    <th>常用方法</th>
+  </tr>
+  <tr>
+    <td>电流环</td>
+    <td>500Hz ~ 2kHz</td>
+    <td>快速响应，无超调</td>
+    <td>PI控制器，带宽法整定</td>
+  </tr>
+  <tr>
+    <td>速度环</td>
+    <td>20Hz ~ 200Hz</td>
+    <td>平稳跟踪，抗扰动</td>
+    <td>PI+前馈，对称最优法</td>
+  </tr>
+</table>
+
+<p><strong>电流环整定步骤：</strong></p>
+<ol>
+  <li>先给一个小的比例增益，比如Kp=0.1</li>
+  <li>给一个阶跃电流指令，看响应</li>
+  <li>慢慢增大Kp，直到出现轻微振荡，然后退回80%</li>
+  <li>加积分项，消除稳态误差。Ki一般取Kp的1/10到1/5</li>
+</ol>
+
+<p><strong>速度环整定步骤：</strong></p>
+<ol>
+  <li>电流环整定好之后，把速度环比例增益设小，比如Kp=1</li>
+  <li>给一个阶跃速度指令，看响应</li>
+  <li>增大Kp，直到速度出现超调，然后退回一点</li>
+  <li>加积分项，注意配合抗积分饱和</li>
+  <li>最后加前馈补偿，减少PID的负担</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>我的个人习惯：</strong>速度环的积分时间常数，我一般设成电流环闭环时间常数的5~10倍。这样内外环不会打架。你想想看，内环都响应完了，外环才开始积分，系统自然就稳了。</p>
+</div>
+
+<p>嗯，这一章内容不少。抗积分饱和、微分先行、前馈补偿、扰动观测器、电流环速度环整定——这些技术单独拿出来都不难，但组合在一起，就能让AGV在恶劣环境下依然跑得稳。</p>
+
+<p>我曾经在一个项目里，客户说「你们AGV跑得跟老司机一样稳」。其实哪有什么魔法，就是把这些细节一个一个抠到位了。</p>
+
+<div class="footer-nav">
+            <a href="09PathPlanningAntiInterfere.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11CommunicationAntiInterfere.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

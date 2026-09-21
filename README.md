@@ -65,6 +65,7 @@ This blog’s where I’ll share bits of all that—tech takeaways from projects
   - **3. Scheduling System Design**
   - **4. Intelligent Warehouse insights**
   - **5. Operations Research Textbooks**
+  - **6. [AGVS 实战课程](/6_AGVSinAction/index.html ':ignore')** (20 HTML courses)
 
 
 
@@ -104,6 +105,7 @@ Personal pages and bookmarks. **Full catalog → [§3 ALL NOTES INDEX](#3-all-no
 
 | Link | Description |
 |---|---|
+| [AGVS 实战课程](/6_AGVSinAction/index.html ':ignore') | 20 门 AGV 系统化课程（独立 HTML，浏览器直接打开） |
 | [Index to ME](./9_Others_Notes_Unsorted/liwenpeng.md) | Social & platform links |
 | [Bookmarks — Edge](./9_Others_Notes_Unsorted/Bookmarks.md) | Favorites, OR textbooks, tools |
 | [Bookmarks — Chrome](./9_Others_Notes_Unsorted/Boomarks_chrome.md) | Chrome bookmarks |
@@ -158,6 +160,32 @@ Java / C++ / Python 语言、并发、数据库与工程实践
 - [计算机网络 - 目录](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%20-%20%E7%9B%AE%E5%BD%95.md) — 计算机网络
 - [计算机网络](./5_Network/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C.md) — 计算机网络.md
 
+## 6 AGVS 实战
+
+AGV 系统化实战课程（独立 HTML 页，不走 Docsify Markdown 渲染；Nginx 静态托管即可）。
+
+- [课程总目录](/6_AGVSinAction/index.html ':ignore') — 20 门课入口总览
+- [01 多车协同调度](/6_AGVSinAction/01MultiAgvCooperativeDispatch/index.html ':ignore') — AGV多车协同调度系统搭建
+- [02 导航从零落地](/6_AGVSinAction/02NavigationFromScratch/index.html ':ignore') — AGV导航系统从零到落地实战
+- [03 传感器融合](/6_AGVSinAction/03SensorFusion/index.html ':ignore') — AGV导航系统传感器融合方案
+- [04 抗干扰调优](/6_AGVSinAction/04AntiInterferenceTuning/index.html ':ignore') — AGV导航系统抗干扰调优技巧
+- [05 建图与定位](/6_AGVSinAction/05MappingAndLocalization/index.html ':ignore') — AGV导航系统：地图构建与定位
+- [06 RTOS 移植](/6_AGVSinAction/06RtosPorting/index.html ':ignore') — AGV控制器实时操作系统移植实战
+- [07 控制器全流程](/6_AGVSinAction/07ControllerFullProcess/index.html ':ignore') — AGV控制器开发全流程实战
+- [08 控制器架构](/6_AGVSinAction/08ControllerArchitecture/index.html ':ignore') — AGV控制器架构与模块设计
+- [09 硬件选型与接口](/6_AGVSinAction/09HardwareSelectionInterface/index.html ':ignore') — AGV控制器硬件选型与接口设计实战
+- [10 激光 SLAM](/6_AGVSinAction/10LaserSlamNavigation/index.html ':ignore') — AGV激光SLAM导航技术实战
+- [11 磁条 vs 惯性](/6_AGVSinAction/11MagneticVsInertialNav/index.html ':ignore') — AGV磁条导航与惯性导航对比
+- [12 调度与 MES](/6_AGVSinAction/12DispatchMesIntegration/index.html ':ignore') — AGV调度系统与MES对接实战
+- [13 交通管制优化](/6_AGVSinAction/13TrafficControlOptimization/index.html ':ignore') — AGV调度系统交通管制与优化
+- [14 任务分配策略](/6_AGVSinAction/14TaskAllocationStrategy/index.html ':ignore') — AGV调度系统任务分配策略实战
+- [15 核心调度算法](/6_AGVSinAction/15CoreDispatchAlgorithms/index.html ':ignore') — AGV调度系统核心算法精讲
+- [16 死锁检测解除](/6_AGVSinAction/16DeadlockDetectionRelease/index.html ':ignore') — AGV调度系统死锁检测与解除
+- [17 路径规划避障](/6_AGVSinAction/17PathPlanningObstacleAvoidance/index.html ':ignore') — AGV路径规划与动态避障实战
+- [18 仓储路径规划](/6_AGVSinAction/18WarehousePathPlanning/index.html ':ignore') — AGV路径规划在仓储场景中的应用
+- [19 A\* 算法](/6_AGVSinAction/19AStarAlgorithm/index.html ':ignore') — AGV路径规划：A星算法深度解析
+- [20 全局局部融合](/6_AGVSinAction/20GlobalLocalPathFusion/index.html ':ignore') — AGV路径规划：全局与局部融合实战
+
 ## 7 日常
 
 日记、周报、人生清单与生活随笔
@@ -196,6 +224,7 @@ Complete navigation to all **249** markdown notes.
 - [3_DesignPattern](#3-designpattern)
 - [4_OS_Linux_WIN_MAC](#4-os-linux-win-mac)
 - [5_Network](#5-network)
+- [6_AGVSinAction](/6_AGVSinAction/index.html ':ignore')
 - [7_DairyAndLife](#7-dairyandlife)
 - [8_WorkHRCMSIN](#8-workhrcmsin)
 - [9_Others_Notes_Unsorted](#9-others-notes-unsorted)

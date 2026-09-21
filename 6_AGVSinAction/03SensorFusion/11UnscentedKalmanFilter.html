@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 无迹卡尔曼滤波(UKF)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="active">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 无迹卡尔曼滤波(UKF)：无迹变换、Sigma点选取、UKF与EKF对比</h2>
+
+<p>说到非线性滤波，很多工程师第一反应就是EKF。嗯，EKF确实经典，但说实话，我在实际项目中踩过它不少坑。尤其是当系统非线性特别强的时候，EKF那个一阶泰勒展开，说白了就是「硬凑线性」。你想想看，把一个弯曲的曲面硬掰成平面，误差能不大吗？</p>
+
+<p>后来我开始用UKF，效果确实好不少。今天我就把UKF的核心思路、Sigma点怎么选、以及它和EKF到底差在哪，一次性讲清楚。</p>
+
+<h3>11.1 无迹变换：UKF的灵魂</h3>
+
+<p>UKF和EKF最大的区别，就在于处理非线性的方式。</p>
+
+<p>EKF的做法是：把非线性函数做泰勒展开，只保留一阶项。说白了就是「近似函数」。</p>
+
+<p>UKF的做法是：我不去近似函数，我去近似概率分布。怎么近似？用一组确定的采样点——也就是Sigma点——去逼近真实分布。</p>
+
+<p>我个人觉得，UKF的思路更优雅。你想想看，既然非线性变换后分布很难算，那我干脆选几个有代表性的点，把它们传过去，再统计结果不就行了？</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>对任意非线性函数 y = f(x)，用一组加权采样点（Sigma点）近似 x 的分布，将这些点通过 f 映射后，加权统计得到 y 的均值和协方差。</p>
+</div>
+
+<p>我在做AGV的航迹推算时，遇到过IMU的加速度计数据非线性特别强的情况。用EKF，状态估计经常发散。换成UKF后，同样的传感器，同样的运动模型，估计精度直接提升了一个量级。</p>
+
+<h3>11.2 Sigma点怎么选？</h3>
+
+<p>Sigma点的选取，是UKF里最需要手感的环节。我刚开始用的时候也犯过糊涂，后来总结出一套经验。</p>
+
+<p>标准UKF选取 2n+1 个Sigma点（n是状态维度）：</p>
+
+<pre><code>// 假设状态维度 n = 3，状态向量 x，协方差矩阵 P
+// 参数 λ = α²(n + κ) - n，α 控制点的散布范围
+
+// 第0个点：均值点
+χ₀ = x̄
+
+// 第1到n个点：沿主成分方向的正向偏移
+χᵢ = x̄ + √((n + λ)P)ᵢ    i = 1, ..., n
+
+// 第n+1到2n个点：沿主成分方向的负向偏移
+χᵢ = x̄ - √((n + λ)P)ᵢ₋ₙ    i = n+1, ..., 2n
+</code></pre>
+
+<p>这里有个关键参数 α，我一般取 0.001 到 1 之间。α 越小，Sigma点越靠近均值，对强非线性系统效果越好。但也不能太小，否则数值不稳定。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>对于AGV的位姿估计，状态维度通常是7维（位置3+姿态4），我习惯取 α=0.1，κ=0，β=2（高斯分布最优值）。这套参数在大多数场景下表现都不错。</p>
+</div>
+
+<p>每个Sigma点还有对应的权重：</p>
+
+<pre><code>// 均值权重
+W₀ᵐ = λ / (n + λ)
+Wᵢᵐ = 1 / (2(n + λ))    i = 1, ..., 2n
+
+// 协方差权重
+W₀ᶜ = λ / (n + λ) + (1 - α² + β)
+Wᵢᶜ = 1 / (2(n + λ))    i = 1, ..., 2n
+</code></pre>
+
+<p>嗯，这里要注意，均值和协方差的第0个点权重不一样。我刚开始写代码时没注意这个细节，结果协方差矩阵总是不正定，折腾了两天才发现是权重搞混了。</p>
+
+<h3>11.3 UKF的完整流程</h3>
+
+<p>UKF的流程其实和KF很像，只是多了Sigma点生成和加权统计的步骤。我画了一张图，帮你理清整体逻辑：</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="520" fill="#f8f9fa" rx="8"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">UKF 核心流程</text>
+  
+  <!-- 初始状态 -->
+  <rect x="260" y="55" width="200" height="45" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="82" text-anchor="middle" font-size="14" fill="white" font-weight="bold">初始状态 x₀, P₀</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="100" x2="360" y2="125" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 生成Sigma点 -->
+  <rect x="230" y="125" width="260" height="45" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="360" y="152" text-anchor="middle" font-size="14" fill="white" font-weight="bold">生成 2n+1 个 Sigma 点</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="170" x2="360" y2="195" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 时间更新 -->
+  <rect x="230" y="195" width="260" height="55" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="360" y="218" text-anchor="middle" font-size="14" fill="white" font-weight="bold">时间更新（预测）</text>
+  <text x="360" y="238" text-anchor="middle" font-size="12" fill="white">Sigma点通过状态方程 f(·) 传播</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="250" x2="360" y2="275" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 加权统计 -->
+  <rect x="230" y="275" width="260" height="45" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="360" y="302" text-anchor="middle" font-size="14" fill="white" font-weight="bold">加权统计：x̄⁻, P⁻</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="320" x2="360" y2="345" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 生成新Sigma点 -->
+  <rect x="210" y="345" width="300" height="45" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="360" y="372" text-anchor="middle" font-size="14" fill="white" font-weight="bold">重新生成 Sigma 点（或复用）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="390" x2="360" y2="415" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 量测更新 -->
+  <rect x="230" y="415" width="260" height="55" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="360" y="438" text-anchor="middle" font-size="14" fill="white" font-weight="bold">量测更新（校正）</text>
+  <text x="360" y="458" text-anchor="middle" font-size="12" fill="white">通过观测方程 h(·) 映射，计算增益</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="470" x2="360" y2="495" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="260" y="495" width="200" height="25" rx="8" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="360" y="512" text-anchor="middle" font-size="13" fill="white" font-weight="bold">输出 x̂ₖ, Pₖ</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>你看，UKF的流程里，最关键的就是两次Sigma点生成和两次加权统计。第一次在时间更新前，第二次在量测更新前。有些实现里会复用第一次的Sigma点，但我建议你每次都重新生成，虽然多一点点计算量，但数值稳定性好很多。</p>
+
+<h3>11.4 UKF vs EKF：到底差在哪？</h3>
+
+<p>这个问题我经常被问到。直接上对比表：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#2c3e50; color:white;">
+    <th style="width:20%;">对比维度</th>
+    <th style="width:40%;">EKF</th>
+    <th style="width:40%;">UKF</th>
+  </tr>
+  <tr>
+    <td><strong>非线性处理方式</strong></td>
+    <td>泰勒展开，一阶线性化</td>
+    <td>无迹变换，采样点传播</td>
+  </tr>
+  <tr>
+    <td><strong>精度</strong></td>
+    <td>一阶精度，强非线性时误差大</td>
+    <td>二阶精度（高斯分布下），对强非线性更鲁棒</td>
+  </tr>
+  <tr>
+    <td><strong>计算复杂度</strong></td>
+    <td>O(n³)，需要计算雅可比矩阵</td>
+    <td>O(n³)，但不需要求导</td>
+  </tr>
+  <tr>
+    <td><strong>实现难度</strong></td>
+    <td>需要推导雅可比矩阵，容易出错</td>
+    <td>无需推导雅可比，直接使用原函数</td>
+  </tr>
+  <tr>
+    <td><strong>数值稳定性</strong></td>
+    <td>线性化误差可能导致发散</td>
+    <td>无线性化误差，稳定性更好</td>
+  </tr>
+  <tr>
+    <td><strong>适用场景</strong></td>
+    <td>弱非线性、实时性要求极高</td>
+    <td>强非线性、对精度要求高</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中，用EKF做AGV的航向估计。航向角变化剧烈时，EKF的雅可比矩阵计算误差累积，导致滤波器直接发散。换成UKF后，同样的数据，一次跑通。所以如果你的系统非线性强，别犹豫，直接上UKF。</p>
+</div>
+
+<p>不过话说回来，UKF也不是万能的。它的计算量比EKF大一些，主要是Sigma点传播那一步。如果你的系统状态维度很高（比如超过20维），UKF的计算负担会明显增加。这时候可以考虑用CKF（容积卡尔曼滤波）或者粒子滤波。</p>
+
+<h3>11.5 什么时候用UKF？</h3>
+
+<p>我个人的经验是：</p>
+
+<ul>
+  <li><strong>系统非线性强</strong>：比如包含三角函数、四元数旋转、指数函数等，果断用UKF</li>
+  <li><strong>状态维度适中</strong>：n &lt; 20 时，UKF性价比最高</li>
+  <li><strong>不想推导雅可比</strong>：有些模型太复杂，求导不现实，UKF直接上原函数</li>
+  <li><strong>对精度要求高</strong>：比如AGV的厘米级定位，UKF比EKF靠谱</li>
+</ul>
+
+<p>嗯，最后说一句。UKF的代码实现其实比EKF更简洁，因为你不用写那些烦人的雅可比矩阵推导。我建议你从简单的2D定位问题开始练手，跑通一次之后，你就会爱上这种「无脑传点」的感觉。</p>
+
+<div class="highlight">
+  <p><strong>一句话总结：</strong>EKF是「近似函数」，UKF是「近似分布」。UKF用一组确定的点，换来了更高的精度和更好的稳定性。代价？多算几次函数而已，值！</p>
+</div>
+
+<div class="footer-nav">
+            <a href="10ExtendedKalmanFilter.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12ParticleFilter.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

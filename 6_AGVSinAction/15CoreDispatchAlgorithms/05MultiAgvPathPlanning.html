@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 多AGV路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="active">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 多AGV路径规划：冲突类型与解决策略</h2>
+
+<p>各位同学好，我是老张。今天咱们聊聊多AGV路径规划里最头疼的问题——冲突。说实话，单台AGV跑起来很简单，但一旦多台车同时作业，冲突就不可避免了。我最早做AGV调度系统时，就吃过这个亏，当时觉得路径规划算法写得挺完美，结果一上线，几台车在交叉口堵成一锅粥。</p>
+
+<p>嗯，今天的内容，就是把我这些年踩过的坑、总结的经验，掰开揉碎了讲给你听。</p>
+
+<h3>冲突的三种基本类型</h3>
+
+<p>先说说冲突的分类。我个人习惯把冲突分成三类：节点冲突、相向冲突、追赶冲突。你想想看，AGV在工厂里跑，跟汽车在路上跑其实很像，只不过AGV更死板——它必须沿着预设路径走，不能随便变道。</p>
+
+<h4>1. 节点冲突</h4>
+
+<p>节点冲突是最常见的。两辆AGV同时要经过同一个路口，或者要占用同一个工位。说白了，就是资源竞争。</p>
+
+<div class="highlight">
+  <p><strong>典型场景：</strong>AGV-A要从(1,2)去(5,2)，AGV-B要从(3,4)去(3,0)。两条路径在交叉点(3,2)相遇。如果时间窗口重叠，就撞上了。</p>
+</div>
+
+<p>我在项目中遇到过这种情况：一个仓库有8台AGV同时作业，交叉路口就那么三四个。高峰期时，节点冲突能占到总冲突的60%以上。怎么解决？后面会细讲。</p>
+
+<h4>2. 相向冲突</h4>
+
+<p>相向冲突，就是两辆车在同一条直线上，面对面行驶。这在双向通行的路径上特别容易发生。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>相向冲突是最危险的。节点冲突最多是剐蹭，相向冲突搞不好就是正面碰撞。我曾经见过一台AGV直接把另一台的货叉撞弯了，维修费花了小两万。</p>
+</div>
+
+<p>为什么会这样？因为AGV的传感器通常装在前后两端，但侧向感知能力有限。两辆车面对面高速接近时，留给系统反应的时间很短。</p>
+
+<h4>3. 追赶冲突</h4>
+
+<p>追赶冲突，说白了就是追尾。前车慢，后车快，后车就怼上去了。</p>
+
+<p>这种情况在环形路径或者长直道上很常见。比如AGV-A载重货，速度只有0.5m/s，AGV-B空载，速度1.5m/s。如果路径规划没考虑速度差异，B很快就会追上A。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>冲突类型</th>
+      <th>发生条件</th>
+      <th>危险程度</th>
+      <th>典型场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>节点冲突</td>
+      <td>路径交叉/汇合</td>
+      <td>中</td>
+      <td>路口、工位入口</td>
+    </tr>
+    <tr>
+      <td>相向冲突</td>
+      <td>同一直线、方向相反</td>
+      <td>高</td>
+      <td>双向通道、窄巷道</td>
+    </tr>
+    <tr>
+      <td>追赶冲突</td>
+      <td>同一直线、方向相同、速度不同</td>
+      <td>低</td>
+      <td>长直道、环形路径</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>冲突解决三大策略</h3>
+
+<p>冲突检测出来了，怎么解决？我总结了三种策略：等待、绕行、重规划。这三种策略各有适用场景，也各有优缺点。</p>
+
+<h4>策略一：等待</h4>
+
+<p>等待是最简单粗暴的方法。检测到冲突后，让其中一辆AGV停下来，等另一辆通过后再走。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>等待策略适合解决节点冲突和追赶冲突。对于相向冲突，等待往往不是好选择——两辆车面对面停着，谁先走？这需要额外的协商机制。</p>
+</div>
+
+<p>等待策略的优点是实现简单，计算量小。缺点是会降低系统效率。你想想看，如果一台AGV在路口等10秒，后面可能堵一串车。</p>
+
+<pre><code>// 等待策略伪代码
+function resolveConflict(agvA, agvB, conflictPoint):
+    // 计算两车到达冲突点的时间
+    timeA = calculateArrivalTime(agvA, conflictPoint)
+    timeB = calculateArrivalTime(agvB, conflictPoint)
+    
+    // 让后到的车等待
+    if timeA &lt; timeB:
+        agvB.addWaitPoint(conflictPoint, timeA - timeB + safetyMargin)
+    else:
+        agvA.addWaitPoint(conflictPoint, timeB - timeA + safetyMargin)
+</code></pre>
+
+<h4>策略二：绕行</h4>
+
+<p>绕行就是让AGV走另一条路，避开冲突区域。这需要系统有备用路径。</p>
+
+<p>我建议在路径规划阶段就为每个任务生成2-3条备选路径。主路径有冲突时，直接切换到备选路径。这样做的好处是响应快，不需要重新规划。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>绕行策略依赖路径拓扑的冗余度。如果仓库里只有一条主干道，绕行就无从谈起。所以，好的AGV调度系统，在设计阶段就要考虑路径的冗余性。</p>
+</div>
+
+<p>绕行策略的缺点是什么？路径变长了，能耗和耗时都会增加。而且，如果多台AGV同时绕行，可能把冲突转移到其他区域。</p>
+
+<h4>策略三：重规划</h4>
+
+<p>重规划是最彻底的解决方案。检测到冲突后，重新为AGV规划一条全新的路径。</p>
+
+<p>重规划通常使用A*算法或者Dijkstra算法，但需要把当前其他AGV的占用信息作为约束条件。说白了，就是在地图上标记出哪些路段已经被占用了，新路径不能走这些路段。</p>
+
+<pre><code>// 重规划策略核心逻辑
+function replanPath(agv, occupiedEdges):
+    // 构建带约束的路径图
+    graph = buildGraphWithConstraints(occupiedEdges)
+    
+    // 使用A*算法搜索路径
+    newPath = aStarSearch(
+        graph, 
+        agv.currentPosition, 
+        agv.targetPosition,
+        heuristic = manhattanDistance
+    )
+    
+    if newPath is not None:
+        agv.setPath(newPath)
+    else:
+        // 无路可走时，回退到等待策略
+        agv.waitAtCurrentPosition()
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>重规划的计算开销比较大。如果系统里有几十台AGV，每秒钟都要重规划，CPU可能扛不住。我曾经在一个项目里遇到过这个问题，后来加了缓存机制，把最近规划过的路径存起来，重复利用。</p>
+</div>
+
+<h3>三种策略的对比与选择</h3>
+
+<p>说了这么多，到底该用哪种策略？我个人的经验是：没有银弹，得看场景。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>策略</th>
+      <th>适用冲突类型</th>
+      <th>计算开销</th>
+      <th>系统效率影响</th>
+      <th>实现复杂度</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>等待</td>
+      <td>节点冲突、追赶冲突</td>
+      <td>低</td>
+      <td>中</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>绕行</td>
+      <td>所有类型（需备选路径）</td>
+      <td>低</td>
+      <td>低-中</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>重规划</td>
+      <td>所有类型</td>
+      <td>高</td>
+      <td>低（路径最优）</td>
+      <td>高</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我建议这样组合使用：</p>
+<ul>
+  <li><strong>轻度冲突</strong>（比如只有1-2台AGV可能冲突）：用等待策略，简单高效</li>
+  <li><strong>中度冲突</strong>（3-5台AGV在同一个区域）：用绕行策略，避免长时间等待</li>
+  <li><strong>重度冲突</strong>（多台AGV形成死锁）：用重规划，彻底解决问题</li>
+</ul>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我梳理的多AGV路径规划冲突处理的知识体系。你可以把它当作一个思维导图来看。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心标题 -->
+  <rect x="250" y="20" width="300" height="50" fill="#4a90d9" rx="25"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="20" font-weight="bold">多AGV路径规划冲突处理</text>
+  
+  <!-- 冲突类型分支 -->
+  <line x1="400" y1="70" x2="400" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="110" x2="130" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="110" x2="400" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="110" x2="670" y2="110" stroke="#4a90d9" stroke-width="2"/>
+  
+  <!-- 冲突类型标题 -->
+  <rect x="280" y="110" width="240" height="40" fill="#e6f3ff" rx="8" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="136" text-anchor="middle" fill="#2c3e50" font-size="16" font-weight="bold">冲突类型</text>
+  
+  <!-- 三种冲突 -->
+  <line x1="130" y1="130" x2="130" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="170" width="200" height="60" fill="#fff3e0" rx="8" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="130" y="196" text-anchor="middle" fill="#e65100" font-size="14" font-weight="bold">节点冲突</text>
+  <text x="130" y="216" text-anchor="middle" fill="#666" font-size="12">路径交叉/汇合点</text>
+  
+  <line x1="400" y1="150" x2="400" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="300" y="170" width="200" height="60" fill="#fce4ec" rx="8" stroke="#e91e63" stroke-width="1.5"/>
+  <text x="400" y="196" text-anchor="middle" fill="#c62828" font-size="14" font-weight="bold">相向冲突</text>
+  <text x="400" y="216" text-anchor="middle" fill="#666" font-size="12">面对面行驶</text>
+  
+  <line x1="670" y1="130" x2="670" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="570" y="170" width="200" height="60" fill="#e8f5e9" rx="8" stroke="#4caf50" stroke-width="1.5"/>
+  <text x="670" y="196" text-anchor="middle" fill="#2e7d32" font-size="14" font-weight="bold">追赶冲突</text>
+  <text x="670" y="216" text-anchor="middle" fill="#666" font-size="12">同向速度差异</text>
+  
+  <!-- 解决策略分支 -->
+  <line x1="400" y1="230" x2="400" y2="270" stroke="#4a90d9" stroke-width="2"/>
+  <rect x="280" y="270" width="240" height="40" fill="#e6f3ff" rx="8" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="296" text-anchor="middle" fill="#2c3e50" font-size="16" font-weight="bold">解决策略</text>
+  
+  <!-- 三种策略 -->
+  <line x1="130" y1="290" x2="130" y2="330" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="330" width="200" height="80" fill="#fff8e1" rx="8" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="130" y="356" text-anchor="middle" fill="#f57f17" font-size="14" font-weight="bold">等待策略</text>
+  <text x="130" y="376" text-anchor="middle" fill="#666" font-size="12">简单高效</text>
+  <text x="130" y="396" text-anchor="middle" fill="#666" font-size="12">适合轻度冲突</text>
+  
+  <line x1="400" y1="310" x2="400" y2="330" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="300" y="330" width="200" height="80" fill="#e3f2fd" rx="8" stroke="#2196f3" stroke-width="1.5"/>
+  <text x="400" y="356" text-anchor="middle" fill="#1565c0" font-size="14" font-weight="bold">绕行策略</text>
+  <text x="400" y="376" text-anchor="middle" fill="#666" font-size="12">需备选路径</text>
+  <text x="400" y="396" text-anchor="middle" fill="#666" font-size="12">适合中度冲突</text>
+  
+  <line x1="670" y1="290" x2="670" y2="330" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="570" y="330" width="200" height="80" fill="#f3e5f5" rx="8" stroke="#9c27b0" stroke-width="1.5"/>
+  <text x="670" y="356" text-anchor="middle" fill="#6a1b9a" font-size="14" font-weight="bold">重规划策略</text>
+  <text x="670" y="376" text-anchor="middle" fill="#666" font-size="12">计算开销大</text>
+  <text x="670" y="396" text-anchor="middle" fill="#666" font-size="12">适合重度冲突</text>
+  
+  <!-- 底部总结 -->
+  <line x1="400" y1="410" x2="400" y2="440" stroke="#4a90d9" stroke-width="2"/>
+  <rect x="200" y="440" width="400" height="40" fill="#4a90d9" rx="20"/>
+  <text x="400" y="466" text-anchor="middle" fill="white" font-size="14">组合使用：轻度等待 → 中度绕行 → 重度重规划</text>
+</svg>
+
+<p>这张图把冲突类型和解决策略的关系梳理得很清楚。你可以看到，每种冲突类型都有对应的解决策略，但实际应用中往往是组合使用。</p>
+
+<h3>避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>我曾经</strong>在一个项目里只用了等待策略，结果高峰期AGV排长队，效率惨不忍睹。后来加了绕行策略，效率提升了30%。</li>
+  <li><strong>我曾经</strong>在重规划时没考虑计算开销，导致系统卡死。后来加了超时机制，如果重规划超过50ms，就回退到等待策略。</li>
+  <li><strong>我曾经</strong>忽略了相向冲突的检测，结果两辆AGV在窄巷子里面对面停住了，谁也过不去。后来加了相向冲突的专门检测逻辑，提前让一辆车倒车让行。</li>
+</ul>
+
+<p>嗯，今天就讲到这里。冲突处理是AGV调度系统的核心难点，没有之一。你把这些基础打牢了，后面学死锁检测、交通管制这些高级话题时，就会轻松很多。</p>
+
+<div class="footer-nav">
+            <a href="04AStarAlgorithm.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06TrafficControlStrategy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

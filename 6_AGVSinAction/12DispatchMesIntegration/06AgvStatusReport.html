@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 AGV状态上报</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="active">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 AGV状态上报：心跳机制、位置上报、电量上报、任务状态变更上报、异常报警上报</h2>
+
+<p>AGV调度系统跟MES对接，最核心的一件事是什么？</p>
+<p>我个人觉得，不是任务下发的有多快，而是<strong>状态上报</strong>。</p>
+<p>你想想看，MES那边眼巴巴等着知道AGV现在在哪儿、活儿干完了没有、还有没有电。如果状态上报不及时，MES就会以为AGV还在干活，实际上它早就趴窝了。我在项目里见过太多次这种乌龙了。</p>
+<p>今天咱们就把AGV状态上报的五个核心维度掰开揉碎讲清楚。</p>
+
+<h3>6.1 心跳机制：证明我还活着</h3>
+
+<p>心跳机制，说白了就是AGV每隔几秒跟调度系统说一声「我还活着」。</p>
+<p>为什么需要这个？因为AGV和调度系统之间的网络随时可能断掉。如果没有心跳，调度系统根本不知道AGV是死是活。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong></p>
+  <ul>
+    <li>心跳频率：一般3~5秒一次，太频繁浪费带宽，太慢影响实时性</li>
+    <li>心跳内容：AGV编号、当前时间戳、运行模式（自动/手动/离线）</li>
+    <li>超时判定：连续3次未收到心跳，调度系统判定AGV离线</li>
+  </ul>
+</div>
+
+<p>我习惯在心跳包里加一个<strong>序列号</strong>。比如第1次心跳序列号是1，第2次是2。这样调度系统能发现有没有丢包。如果收到序列号5和7，中间缺了6，说明网络有抖动。</p>
+
+<pre><code>// 心跳报文示例（JSON格式）
+{
+  "msgType": "HEARTBEAT",
+  "agvId": "AGV-001",
+  "timestamp": 1712345678000,
+  "sequence": 128,
+  "mode": "AUTO",
+  "batteryLevel": 85
+}</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经遇到过一个项目，AGV的心跳频率设成了1秒1次。结果100台AGV同时上线，调度系统直接被打挂了。后来改成3秒一次，配合消息队列缓冲，问题就解决了。</p>
+</div>
+
+<h3>6.2 位置上报：AGV到底在哪儿</h3>
+
+<p>位置上报比心跳复杂得多。MES要知道AGV当前在哪个站点、哪条路径上，甚至精确到厘米级。</p>
+
+<p>位置上报通常分两种：</p>
+<ul>
+  <li><strong>站点级上报</strong>：AGV到达某个站点时上报，精度到站点编号</li>
+  <li><strong>连续位置上报</strong>：AGV在行驶过程中持续上报坐标，精度到厘米</li>
+</ul>
+
+<p>我个人建议，<strong>站点级上报用于MES</strong>，连续位置上报用于调度系统内部。为什么？因为MES不需要知道AGV在路径上的每一厘米，它只需要知道「AGV到了A站」或者「AGV正在去B站的路上」。</p>
+
+<pre><code>// 位置上报报文示例
+{
+  "msgType": "POSITION_REPORT",
+  "agvId": "AGV-001",
+  "positionType": "STATION",  // STATION 或 COORDINATE
+  "stationId": "ST-05",
+  "x": 125.3,
+  "y": 78.6,
+  "angle": 90.0,
+  "speed": 0.5,
+  "timestamp": 1712345679000
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong></p>
+  <p>位置上报的频率不能太高。我见过有人把连续位置上报设成100毫秒一次，结果AGV的工控机CPU直接跑满。一般500毫秒到1秒一次就够了。</p>
+</div>
+
+<h3>6.3 电量上报：别让AGV半路趴窝</h3>
+
+<p>电量上报看似简单，其实坑很多。</p>
+
+<p>MES需要根据电量做决策：</p>
+<ul>
+  <li>电量低于20%：强制返回充电站</li>
+  <li>电量低于30%：不再分配长距离任务</li>
+  <li>电量低于50%：优先分配近距离任务</li>
+</ul>
+
+<p>我在项目中遇到过一个问题：AGV上报的电量是百分比，但不同AGV的电池容量不一样。有的AGV电池是200Ah，有的是300Ah。MES只看百分比，结果200Ah的AGV显示50%电量，实际只能跑2小时；300Ah的AGV显示50%，能跑3小时。</p>
+
+<p>所以我建议，<strong>电量上报同时包含百分比和剩余续航时间</strong>。</p>
+
+<pre><code>// 电量上报报文示例
+{
+  "msgType": "BATTERY_REPORT",
+  "agvId": "AGV-001",
+  "batteryLevel": 65,        // 百分比
+  "remainingMinutes": 120,   // 剩余续航时间（分钟）
+  "isCharging": false,       // 是否正在充电
+  "voltage": 48.5,           // 当前电压
+  "current": 12.3            // 当前电流
+}</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong></p>
+  <p>电量上报不要只在电量变化时才上报。我习惯每30秒上报一次，哪怕电量没变。这样调度系统能持续监控电池健康状态。如果连续几次上报电量都没变，说明电池传感器可能坏了。</p>
+</div>
+
+<h3>6.4 任务状态变更上报：MES最关心的</h3>
+
+<p>任务状态变更，是MES最敏感的上报类型。MES下发一个任务，AGV执行过程中，状态每变一次，MES都要知道。</p>
+
+<p>任务状态变更的典型流程：</p>
+<ol>
+  <li><strong>任务已接收</strong>：AGV确认收到任务</li>
+  <li><strong>任务已开始</strong>：AGV开始执行任务</li>
+  <li><strong>到达取货点</strong>：AGV到达取货站点</li>
+  <li><strong>取货完成</strong>：AGV完成取货</li>
+  <li><strong>到达放货点</strong>：AGV到达放货站点</li>
+  <li><strong>放货完成</strong>：AGV完成放货，任务结束</li>
+</ol>
+
+<p>嗯，这里要注意：<strong>每个状态变更都必须上报，不能跳状态</strong>。我曾经遇到一个供应商，他们AGV从「任务已开始」直接跳到「放货完成」，跳过了中间四个状态。MES那边直接报错，因为MES的逻辑是必须按顺序接收状态。</p>
+
+<pre><code>// 任务状态变更报文示例
+{
+  "msgType": "TASK_STATUS_CHANGE",
+  "agvId": "AGV-001",
+  "taskId": "TASK-20240315-001",
+  "fromStatus": "ARRIVED_PICKUP",
+  "toStatus": "PICKUP_COMPLETED",
+  "timestamp": 1712345680000,
+  "stationId": "ST-05",
+  "errorCode": null
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点：</strong></p>
+  <p>任务状态变更必须包含<strong>时间戳</strong>和<strong>站点ID</strong>。MES需要根据这些信息计算每个环节的耗时，做效率分析。</p>
+</div>
+
+<h3>6.5 异常报警上报：出事了赶紧说</h3>
+
+<p>异常报警上报，是AGV状态上报里优先级最高的。一旦AGV出问题，必须立刻通知MES。</p>
+
+<p>常见的异常类型：</p>
+<table>
+  <tr>
+    <th>异常类型</th>
+    <th>严重级别</th>
+    <th>处理方式</th>
+  </tr>
+  <tr>
+    <td>碰撞传感器触发</td>
+    <td>紧急</td>
+    <td>AGV立即停止，通知维护人员</td>
+  </tr>
+  <tr>
+    <td>导航丢失</td>
+    <td>严重</td>
+    <td>AGV原地等待，调度系统重新下发路径</td>
+  </tr>
+  <tr>
+    <td>电机过温</td>
+    <td>警告</td>
+    <td>AGV降速运行，完成当前任务后返回维修区</td>
+  </tr>
+  <tr>
+    <td>通信超时</td>
+    <td>警告</td>
+    <td>AGV尝试重连，重连失败则停车</td>
+  </tr>
+  <tr>
+    <td>电量过低</td>
+    <td>警告</td>
+    <td>AGV强制返回充电站</td>
+  </tr>
+</table>
+
+<p>我习惯在异常上报里加一个<strong>恢复建议</strong>字段。比如「导航丢失」的恢复建议是「请检查地面二维码是否被遮挡」。这样MES操作员看到报警，能立刻知道该怎么做，不用翻手册。</p>
+
+<pre><code>// 异常报警报文示例
+{
+  "msgType": "ALARM_REPORT",
+  "agvId": "AGV-001",
+  "alarmCode": "E-1005",
+  "alarmLevel": "CRITICAL",
+  "description": "导航丢失，无法定位当前位置",
+  "suggestion": "请检查地面二维码是否被遮挡或损坏",
+  "timestamp": 1712345685000,
+  "position": {
+    "x": 125.3,
+    "y": 78.6
+  }
+}</code></pre>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong></p>
+  <p>异常报警上报不能有延迟。我见过有些系统把报警和心跳混在一起，心跳3秒一次，报警也3秒一次。结果AGV撞了东西，3秒后才上报，黄花菜都凉了。报警应该<strong>立即上报</strong>，走独立的、高优先级的通道。</p>
+</div>
+
+<h3>6.6 五种状态上报的关系图</h3>
+
+<p>下面这张图展示了五种状态上报在AGV调度系统中的流转关系：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV状态上报体系架构</text>
+  
+  <!-- AGV主体 -->
+  <rect x="50" y="80" width="180" height="360" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="140" y="120" text-anchor="middle" font-size="18" font-weight="bold" fill="white">AGV车载系统</text>
+  
+  <!-- 五个状态模块 -->
+  <rect x="70" y="150" width="140" height="40" rx="5" fill="#2980b9"/>
+  <text x="140" y="175" text-anchor="middle" font-size="14" fill="white">心跳机制</text>
+  
+  <rect x="70" y="210" width="140" height="40" rx="5" fill="#2980b9"/>
+  <text x="140" y="235" text-anchor="middle" font-size="14" fill="white">位置上报</text>
+  
+  <rect x="70" y="270" width="140" height="40" rx="5" fill="#2980b9"/>
+  <text x="140" y="295" text-anchor="middle" font-size="14" fill="white">电量上报</text>
+  
+  <rect x="70" y="330" width="140" height="40" rx="5" fill="#2980b9"/>
+  <text x="140" y="355" text-anchor="middle" font-size="14" fill="white">任务状态变更</text>
+  
+  <rect x="70" y="390" width="140" height="40" rx="5" fill="#e74c3c"/>
+  <text x="140" y="415" text-anchor="middle" font-size="14" fill="white">异常报警上报</text>
+  
+  <!-- 箭头线 -->
+  <line x1="230" y1="170" x2="310" y2="170" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="230" y1="230" x2="310" y2="230" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="230" y1="290" x2="310" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="230" y1="350" x2="310" y2="350" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="230" y1="410" x2="310" y2="410" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowRed)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+  
+  <!-- 调度系统 -->
+  <rect x="320" y="80" width="200" height="360" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="420" y="120" text-anchor="middle" font-size="18" font-weight="bold" fill="white">AGV调度系统</text>
+  
+  <!-- 调度系统内部模块 -->
+  <rect x="340" y="150" width="160" height="35" rx="5" fill="#27ae60"/>
+  <text x="420" y="173" text-anchor="middle" font-size="13" fill="white">心跳监控模块</text>
+  
+  <rect x="340" y="200" width="160" height="35" rx="5" fill="#27ae60"/>
+  <text x="420" y="223" text-anchor="middle" font-size="13" fill="white">位置管理模块</text>
+  
+  <rect x="340" y="250" width="160" height="35" rx="5" fill="#27ae60"/>
+  <text x="420" y="273" text-anchor="middle" font-size="13" fill="white">电量管理模块</text>
+  
+  <rect x="340" y="300" width="160" height="35" rx="5" fill="#27ae60"/>
+  <text x="420" y="323" text-anchor="middle" font-size="13" fill="white">任务状态机</text>
+  
+  <rect x="340" y="350" width="160" height="35" rx="5" fill="#e67e22"/>
+  <text x="420" y="373" text-anchor="middle" font-size="13" fill="white">报警处理模块</text>
+  
+  <!-- 调度系统到MES的箭头 -->
+  <line x1="520" y1="170" x2="600" y2="170" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="230" x2="600" y2="230" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="290" x2="600" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="350" x2="600" y2="350" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="520" y1="410" x2="600" y2="410" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowRed)"/>
+  
+  <!-- MES系统 -->
+  <rect x="610" y="80" width="160" height="360" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="690" y="120" text-anchor="middle" font-size="18" font-weight="bold" fill="white">MES系统</text>
+  
+  <rect x="625" y="150" width="130" height="35" rx="5" fill="#8e44ad"/>
+  <text x="690" y="173" text-anchor="middle" font-size="13" fill="white">设备监控</text>
+  
+  <rect x="625" y="200" width="130" height="35" rx="5" fill="#8e44ad"/>
+  <text x="690" y="223" text-anchor="middle" font-size="13" fill="white">位置跟踪</text>
+  
+  <rect x="625" y="250" width="130" height="35" rx="5" fill="#8e44ad"/>
+  <text x="690" y="273" text-anchor="middle" font-size="13" fill="white">电量预警</text>
+  
+  <rect x="625" y="300" width="130" height="35" rx="5" fill="#8e44ad"/>
+  <text x="690" y="323" text-anchor="middle" font-size="13" fill="white">工单跟踪</text>
+  
+  <rect x="625" y="350" width="130" height="35" rx="5" fill="#c0392b"/>
+  <text x="690" y="373" text-anchor="middle" font-size="13" fill="white">报警看板</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="480" text-anchor="middle" font-size="12" fill="#7f8c8d">红色箭头表示异常报警走独立高优先级通道</text>
+</svg>
+
+<p>从这张图可以看出来，AGV的五种状态上报，经过调度系统处理后，最终都要同步给MES。其中异常报警走的是独立通道，优先级最高。</p>
+
+<p>好了，AGV状态上报这块儿就讲这么多。核心就一句话：<strong>状态上报是AGV和MES之间的「语言」，语言不通，啥都干不了</strong>。把心跳、位置、电量、任务状态、异常报警这五件事做好，AGV调度系统跟MES的对接就成功了一大半。</p>
+
+        <div class="footer-nav">
+            <a href="05MesTaskDispatch.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07TaskDispatchStrategy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

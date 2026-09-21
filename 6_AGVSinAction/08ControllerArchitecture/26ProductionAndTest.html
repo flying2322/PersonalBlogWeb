@@ -1,0 +1,484 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 AGV控制器生产与测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="active">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 AGV控制器生产流程概览</h2>
+
+<p>做AGV控制器这么多年，我最大的感触就是：<strong>设计得再好，生产环节掉链子也是白搭</strong>。今天咱们聊聊控制器从图纸变成实物的全过程——SMT贴片、ICT测试、FCT测试、老化测试，这四个环节一个都不能少。</p>
+
+<p>先看一张整体流程图，心里有个谱：</p>
+
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;margin:20px auto;display:block;background:#f8f9fa;border-radius:12px;padding:10px;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c7a7b"/>
+    </marker>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e6fffb;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#b2f5ea;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fff5f5;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#fed7d7;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0fff4;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#c6f6d5;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fefcbf;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#f6e05e;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 四个主节点 -->
+  <rect x="30" y="60" width="150" height="80" rx="12" fill="url(#grad1)" stroke="#38b2ac" stroke-width="2.5"/>
+  <text x="105" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#234e52">SMT贴片</text>
+  <text x="105" y="118" text-anchor="middle" font-size="12" fill="#285e61">PCB焊接组装</text>
+  
+  <rect x="230" y="60" width="150" height="80" rx="12" fill="url(#grad2)" stroke="#e53e3e" stroke-width="2.5"/>
+  <text x="305" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#742a2a">ICT测试</text>
+  <text x="305" y="118" text-anchor="middle" font-size="12" fill="#9b2c2c">电路板级测试</text>
+  
+  <rect x="430" y="60" width="150" height="80" rx="12" fill="url(#grad3)" stroke="#38a169" stroke-width="2.5"/>
+  <text x="505" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#22543d">FCT测试</text>
+  <text x="505" y="118" text-anchor="middle" font-size="12" fill="#276749">功能全面验证</text>
+  
+  <rect x="630" y="60" width="150" height="80" rx="12" fill="url(#grad4)" stroke="#d69e2e" stroke-width="2.5"/>
+  <text x="705" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#744210">老化测试</text>
+  <text x="705" y="118" text-anchor="middle" font-size="12" fill="#975a16">可靠性验证</text>
+  
+  <!-- 箭头 -->
+  <line x1="180" y1="100" x2="225" y2="100" stroke="#2c7a7b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="100" x2="425" y2="100" stroke="#2c7a7b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <line x1="580" y1="100" x2="625" y2="100" stroke="#2c7a7b" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="200" text-anchor="middle" font-size="14" fill="#4a5568">AGV控制器生产测试流程</text>
+  
+  <!-- 关键指标 -->
+  <rect x="100" y="220" width="600" height="70" rx="8" fill="#edf2f7" stroke="#a0aec0" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <text x="400" y="248" text-anchor="middle" font-size="13" fill="#2d3748">关键指标：直通率 ≥ 98% | 测试覆盖率 ≥ 95% | 老化时间 ≥ 48小时</text>
+  <text x="400" y="272" text-anchor="middle" font-size="12" fill="#718096">每个环节都有返修通道，不合格品绝不流入下一站</text>
+</svg>
+
+<p>说白了，这四步就是从「焊好」到「测通」再到「跑稳」的过程。我见过不少团队跳过ICT直接做FCT，结果出了问题排查半天，最后发现是虚焊——白白浪费了时间。</p>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+<h2>二、SMT贴片流程</h2>
+
+<h3>2.1 贴片前的准备</h3>
+
+<p>SMT贴片，就是把元器件焊到PCB上。听起来简单，但细节决定成败。</p>
+
+<p>我个人习惯在贴片前做三件事：</p>
+
+<ul>
+  <li><strong>钢网检查</strong>——钢网开口尺寸对不对？厚度是否合适？AGV控制器上有不少大电流MOS管，焊盘尺寸和普通信号焊盘不一样，钢网开错了就是批量事故。</li>
+  <li><strong>物料核对</strong>——电容耐压值、电阻精度、IC批次，一个都不能错。我曾经遇到过一批0402电容贴错，整板电源纹波超标，排查了三天。</li>
+  <li><strong>炉温曲线验证</strong>——无铅焊接的炉温曲线，峰值温度235-245℃，升温斜率1-3℃/秒。这个参数每家板厂略有差异，但必须实测验证。</li>
+</ul>
+
+<div class="highlight" style="background:#f0fff4;border-left:4px solid #38a169;padding:15px;margin:15px 0;border-radius:6px;">
+  <strong>✅ 贴片关键参数表</strong>
+  <table style="width:100%;border-collapse:collapse;margin-top:10px;">
+    <tr style="background:#c6f6d5;">
+      <th style="padding:8px;border:1px solid #9ae6b4;">参数项</th>
+      <th style="padding:8px;border:1px solid #9ae6b4;">要求值</th>
+      <th style="padding:8px;border:1px solid #9ae6b4;">检测方法</th>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #e2e8f0;">锡膏厚度</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">0.12-0.15mm</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">SPI检测</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #e2e8f0;">贴片精度</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">±0.05mm</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">AOI光学检测</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #e2e8f0;">回流焊峰值温度</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">235-245℃</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">炉温测试仪</td>
+    </tr>
+    <tr>
+      <td style="padding:8px;border:1px solid #e2e8f0;">焊接空洞率</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">≤25%</td>
+      <td style="padding:8px;border:1px solid #e2e8f0;">X-Ray抽检</td>
+    </tr>
+  </table>
+</div>
+
+<h3>2.2 贴片流程详解</h3>
+
+<p>标准的SMT流程分这几步：</p>
+
+<ol>
+  <li><strong>锡膏印刷</strong>——用钢网把锡膏印到PCB焊盘上。这里要注意，AGV控制器上的BGA芯片对锡膏量很敏感，多了会短路，少了会虚焊。</li>
+  <li><strong>贴片机贴装</strong>——高速机贴小元件，泛用机贴大元件和异形件。我建议把MCU、DDR这些关键芯片放在最后贴，减少静电损伤风险。</li>
+  <li><strong>回流焊接</strong>——经过预热、恒温、回流、冷却四个温区。嗯，这里要注意，冷却速率太快会导致焊点裂纹，尤其是陶瓷电容。</li>
+  <li><strong>AOI光学检测</strong>——自动检测焊点质量，比如少锡、连锡、立碑等缺陷。</li>
+</ol>
+
+<div class="tip" style="background:#ebf8ff;border-left:4px solid #3182ce;padding:15px;margin:15px 0;border-radius:6px;">
+  <strong>💡 我的经验</strong>
+  <p>AGV控制器上有个容易忽略的地方——<strong>连接器焊盘</strong>。像JST、Molex这类接插件，焊盘间距小，而且经常要承受插拔力。我建议在贴片后增加一道<strong>X-Ray抽检</strong>，重点关注BGA和连接器焊点。别问我为什么，吃过亏的人都知道。</p>
+</div>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+<h2>三、ICT测试</h2>
+
+<h3>3.1 什么是ICT</h3>
+
+<p>ICT，全称In-Circuit Test，在线测试。说白了，就是给板子通电之前，先测一遍每个元器件对不对。</p>
+
+<p>ICT测试的核心原理是<strong>飞针测试</strong>或<strong>针床测试</strong>。通过探针接触PCB上的测试点，测量电阻、电容、电感、二极管、三极管等元件的参数，以及检查是否有短路、开路。</p>
+
+<h3>3.2 ICT测试项目</h3>
+
+<p>我个人习惯把ICT测试分成三类：</p>
+
+<ul>
+  <li><strong>开路/短路测试</strong>——检查网络之间有没有不该连的地方，或者该连的地方没连上。这是最基本的，也是最重要的。</li>
+  <li><strong>元件值测试</strong>——电阻阻值、电容容值、电感感值，是否在规格范围内。比如AGV控制器上的电源滤波电容，容值偏差超过20%就可能引起纹波超标。</li>
+  <li><strong>二极管/三极管方向测试</strong>——极性元件装反了，上电就炸。ICT可以测出PN结的正向压降，判断方向是否正确。</li>
+</ul>
+
+<div class="warning" style="background:#fff5f5;border-left:4px solid #e53e3e;padding:15px;margin:15px 0;border-radius:6px;">
+  <strong>⚠️ 避坑指南</strong>
+  <p>我曾经遇到过一个案例：ICT测试全部通过，但整机一上电就烧保险丝。查了半天，发现是PCB上有个过孔设计得太靠近螺丝孔，安装时螺丝压到了过孔，造成短路。ICT测不到这个，因为测试时没装螺丝。</p>
+  <p>所以ICT不是万能的，它只能测<strong>静态</strong>的电气特性。动态问题、装配问题，还得靠后面的FCT和老化来发现。</p>
+</div>
+
+<h3>3.3 ICT测试覆盖率</h3>
+
+<p>ICT的测试覆盖率，一般要求达到<strong>90%以上</strong>。但AGV控制器这种复杂板卡，我建议做到95%以上。</p>
+
+<p>怎么提高覆盖率？</p>
+<ul>
+  <li>设计阶段就预留测试点，每个网络至少一个测试点</li>
+  <li>关键信号（电源、时钟、复位）必须可测</li>
+  <li>BGA芯片的焊点，通过外围测试点间接验证</li>
+</ul>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+<h2>四、FCT测试</h2>
+
+<h3>4.1 FCT测试内容</h3>
+
+<p>FCT，Functional Circuit Test，功能测试。ICT测的是「元件对不对」，FCT测的是「功能好不好」。</p>
+
+<p>AGV控制器的FCT测试，我一般分这几个模块：</p>
+
+<table style="width:100%;border-collapse:collapse;margin:15px 0;">
+  <tr style="background:#e2e8f0;">
+    <th style="padding:10px;border:1px solid #cbd5e0;">测试模块</th>
+    <th style="padding:10px;border:1px solid #cbd5e0;">测试项目</th>
+    <th style="padding:10px;border:1px solid #cbd5e0;">判定标准</th>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">电源模块</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">各电压输出、纹波、上电时序</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">±5%以内，纹波<50mV</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">MCU模块</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">时钟频率、复位、JTAG通信</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">频率偏差<1%</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">通信模块</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">CAN、RS485、以太网、WiFi</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">收发正常，误码率<1e-6</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">驱动接口</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">PWM输出、编码器输入、IO口</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">电平、频率、占空比符合规格</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">传感器接口</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">IMU、激光雷达、超声波</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">数据读取正常</td>
+  </tr>
+</table>
+
+<h3>4.2 FCT测试流程</h3>
+
+<p>FCT测试通常需要<strong>测试工装</strong>。工装里有个「金板」——就是一块确认没问题的标准板。每次测试前，先用金板校准测试系统。</p>
+
+<p>测试流程大致如下：</p>
+
+<ol>
+  <li>上电自检——板子自己跑一遍初始化，检查各模块是否正常</li>
+  <li>电压测量——用ADC采集各电源轨的电压值</li>
+  <li>通信环回——CAN口发数据自己收，以太网Ping测试</li>
+  <li>IO测试——逐个控制IO口输出，再读取回检</li>
+  <li>PWM测试——输出指定频率和占空比的PWM，用示波器验证</li>
+</ol>
+
+<div class="highlight" style="background:#fefcbf;border-left:4px solid #d69e2e;padding:15px;margin:15px 0;border-radius:6px;">
+  <strong>🔧 实用技巧</strong>
+  <p>FCT测试脚本我建议用Python写，配合pySerial和pyVISA库，可以很方便地控制仪器和读取数据。下面是一个简单的CAN通信测试代码片段：</p>
+  <pre style="background:#1a202c;color:#e2e8f0;padding:12px;border-radius:6px;overflow-x:auto;"><code>import can
+import time
+
+# 初始化CAN接口
+bus = can.interface.Bus(channel='can0', bustype='socketcan')
+
+# 发送测试帧
+msg = can.Message(arbitration_id=0x123, data=[0x11, 0x22, 0x33, 0x44], is_extended_id=False)
+bus.send(msg)
+
+# 接收回环帧
+response = bus.recv(timeout=1.0)
+if response and response.data == [0x11, 0x22, 0x33, 0x44]:
+    print("CAN通信测试通过")
+else:
+    print("CAN通信测试失败")</code></pre>
+</div>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+<h2>五、老化测试</h2>
+
+<h3>5.1 为什么要做老化</h3>
+
+<p>老化测试，说白了就是让板子「跑起来」，看看它能不能扛得住。很多问题在常温下测不出来，但一跑高温、一跑长时间，就原形毕露了。</p>
+
+<p>我见过最典型的例子：有一批控制器，FCT全部通过，但客户用了三天就死机。查到最后，是DDR内存颗粒的时序余量不够，温度一高就出错。这种问题，只有老化才能发现。</p>
+
+<h3>5.2 老化测试方案</h3>
+
+<p>AGV控制器的老化测试，我建议分三步走：</p>
+
+<ul>
+  <li><strong>高温老化</strong>——60℃环境下连续运行48小时。模拟夏天仓库、车间的高温环境。</li>
+  <li><strong>温度循环</strong>——-20℃到70℃循环10次，每次2小时。检查焊点和芯片的耐温应力。</li>
+  <li><strong>振动测试</strong>——模拟AGV行驶过程中的振动。频率10-500Hz，加速度2g，每个方向2小时。</li>
+</ul>
+
+<div class="warning" style="background:#fff5f5;border-left:4px solid #e53e3e;padding:15px;margin:15px 0;border-radius:6px;">
+  <strong>⚠️ 重要提醒</strong>
+  <p>老化测试不是「烤机」那么简单。我建议在老化过程中<strong>实时监控</strong>以下参数：</p>
+  <ul>
+    <li>核心温度（MCU内部温度传感器）</li>
+    <li>电源电流（是否有异常增大）</li>
+    <li>通信状态（CAN总线是否有丢帧）</li>
+    <li>看门狗复位次数（复位次数多了说明有问题）</li>
+  </ul>
+  <p>这些数据记录下来，形成每块板子的「老化曲线」。以后出了问题，翻出老化数据一看，就知道是不是早期隐患。</p>
+</div>
+
+<h3>5.3 老化通过标准</h3>
+
+<p>我个人习惯的判定标准：</p>
+
+<table style="width:100%;border-collapse:collapse;margin:15px 0;">
+  <tr style="background:#e2e8f0;">
+    <th style="padding:10px;border:1px solid #cbd5e0;">项目</th>
+    <th style="padding:10px;border:1px solid #cbd5e0;">合格标准</th>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">高温老化</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">48小时无死机、无复位、无通信中断</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">温度循环</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">10次循环后功能正常，无焊点开裂</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">振动测试</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">测试后无松动、无电气性能下降</td>
+  </tr>
+  <tr>
+    <td style="padding:10px;border:1px solid #e2e8f0;">整体判定</td>
+    <td style="padding:10px;border:1px solid #e2e8f0;">三项全部通过，方可出货</td>
+  </tr>
+</table>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+<h2>六、总结与建议</h2>
+
+<p>AGV控制器的生产测试，说白了就是一道「质量防火墙」。SMT贴片保证焊好，ICT保证元件对，FCT保证功能全，老化保证用得久。四道关卡，缺一不可。</p>
+
+<p>最后给几个实用建议：</p>
+
+<ul>
+  <li><strong>测试数据要存档</strong>——每块板子的ICT、FCT、老化数据，保存至少2年。出了问题可以追溯。</li>
+  <li><strong>定期校准测试设备</strong>——ICT针床、FCT工装、老化箱，半年校准一次。设备不准，测了等于没测。</li>
+  <li><strong>建立不良品分析机制</strong>——每块不良品都要分析根因，是设计问题还是工艺问题？然后反馈改进。</li>
+</ul>
+
+<p>嗯，今天就聊到这儿。AGV控制器看着简单，但真正做好生产测试，需要的是细心和耐心。希望这些经验对你有帮助。</p>
+
+<hr style="border:1px dashed #e2e8f0;margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="25EmcReliability.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27BomCostControl.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

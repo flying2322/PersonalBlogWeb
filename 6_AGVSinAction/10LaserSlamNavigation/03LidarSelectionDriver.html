@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 激光雷达选型与驱动</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="active">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 激光雷达选型与驱动：单线/多线激光雷达原理、主流品牌对比、ROS驱动配置、点云数据可视化</h2>
+
+<p>做AGV导航，选对激光雷达，项目就成功了一半。这话一点不夸张。</p>
+<p>我见过太多团队，算法调得再好，雷达选错了，最后定位精度就是上不去。说白了，激光雷达就是AGV的「眼睛」。眼睛不好使，脑子再聪明也白搭。</p>
+<p>这一章，咱们就聊聊怎么选雷达、怎么配驱动、怎么看点云。全是实战干货。</p>
+
+<h3>3.1 单线 vs 多线：原理与适用场景</h3>
+
+<p>先搞清楚一个基本问题：单线和多线，到底差在哪？</p>
+
+<p><strong>单线激光雷达</strong>，顾名思义，只发射一束激光。它旋转一圈，扫出一个二维平面。你想想看，它只能知道某个角度有没有障碍物，距离是多少。高度信息？没有。</p>
+<p>我最早做仓储AGV时，用的就是单线雷达。室内环境，地面平坦，天花板也规整，单线完全够用。说白了，它就是个「平面扫描仪」。</p>
+
+<p><strong>多线激光雷达</strong>，同时发射多束激光（16线、32线、64线甚至128线）。每一束激光对应一个垂直角度，扫出来就是三维点云。它能告诉你：前方2米处有个箱子，箱子高度0.5米。</p>
+<p>为什么室外AGV或者复杂环境要用多线？因为地面可能有坑，头顶可能有树枝，单线雷达根本看不见。我在一个港口AGV项目里吃过这个亏——单线雷达没扫到地面的减速带，结果车颠了一下，定位直接飘了。</p>
+
+<div class="highlight">
+  <p><strong>核心结论：</strong></p>
+  <ul>
+    <li>室内平地、结构化环境 → 单线就够了，性价比高</li>
+    <li>室外、非结构化、有坡道或悬空障碍物 → 必须上多线</li>
+  </ul>
+</div>
+
+<h3>3.2 主流品牌对比：我踩过的坑和推荐</h3>
+
+<p>市面上的激光雷达品牌很多。我按自己的经验，分几个梯队聊聊。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>品牌</th>
+      <th>类型</th>
+      <th>典型型号</th>
+      <th>测距</th>
+      <th>精度</th>
+      <th>价格区间</th>
+      <th>我的评价</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>SICK</td>
+      <td>单线</td>
+      <td>LMS1xx / TiM系列</td>
+      <td>20-50m</td>
+      <td>±30mm</td>
+      <td>￥5000-20000</td>
+      <td>工业级稳定，但贵</td>
+    </tr>
+    <tr>
+      <td>Hokuyo</td>
+      <td>单线</td>
+      <td>UST-10LX / URG系列</td>
+      <td>10-30m</td>
+      <td>±40mm</td>
+      <td>￥3000-8000</td>
+      <td>轻量级，适合室内</td>
+    </tr>
+    <tr>
+      <td>Velodyne</td>
+      <td>多线</td>
+      <td>VLP-16 / HDL-32E</td>
+      <td>100m</td>
+      <td>±30mm</td>
+      <td>￥20000-80000</td>
+      <td>老牌劲旅，点云质量好</td>
+    </tr>
+    <tr>
+      <td>RoboSense</td>
+      <td>多线</td>
+      <td>RS-LiDAR-16 / 32</td>
+      <td>150m</td>
+      <td>±20mm</td>
+      <td>￥10000-30000</td>
+      <td>国产性价比之选</td>
+    </tr>
+    <tr>
+      <td>思岚科技</td>
+      <td>单线</td>
+      <td>RPLIDAR A2 / A3</td>
+      <td>12-25m</td>
+      <td>±50mm</td>
+      <td>￥1000-3000</td>
+      <td>入门首选，便宜够用</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯是：<strong>量产项目用SICK或Hokuyo</strong>，稳定第一。原型验证阶段，用思岚的RPLIDAR快速跑通流程。多线的话，预算充足上Velodyne，想控制成本就看看RoboSense。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中选了某款低价多线雷达，标称30米测距，实际在强光下只能测15米。后来换成了Velodyne VLP-16，问题才解决。所以，<strong>别只看参数表，一定要实测</strong>。</p>
+</div>
+
+<h3>3.3 ROS驱动配置：从零开始连上雷达</h3>
+
+<p>雷达买回来了，怎么让它和ROS通信？</p>
+<p>嗯，这里要注意：不同品牌的驱动包不一样，但套路是通用的。</p>
+
+<h4>3.3.1 安装驱动</h4>
+<p>以思岚RPLIDAR为例，驱动在ROS官方仓库里就有：</p>
+
+<pre><code>sudo apt install ros-noetic-rplidar-ros</code></pre>
+
+<p>如果是SICK的雷达，用这个：</p>
+
+<pre><code>sudo apt install ros-noetic-sick-tim</code></pre>
+
+<p>Velodyne的驱动稍微复杂点，需要从源码编译：</p>
+
+<pre><code>cd ~/catkin_ws/src
+git clone https://github.com/ros-drivers/velodyne.git
+cd ..
+catkin_make</code></pre>
+
+<h4>3.3.2 配置launch文件</h4>
+<p>驱动装好后，需要写一个launch文件来启动雷达节点。我一般这样写：</p>
+
+<pre><code>&lt;launch&gt;
+  &lt;node name="rplidar_node" pkg="rplidar_ros" type="rplidarNode" output="screen"&gt;
+    &lt;param name="serial_port" value="/dev/ttyUSB0"/&gt;
+    &lt;param name="serial_baudrate" value="115200"/&gt;
+    &lt;param name="frame_id" value="laser_frame"/&gt;
+    &lt;param name="angle_compensate" value="true"/&gt;
+    &lt;param name="scan_mode" value="Standard"/&gt;
+  &lt;/node&gt;
+&lt;/launch&gt;</code></pre>
+
+<p>这里有几个参数要特别留意：</p>
+<ul>
+  <li><strong>serial_port</strong>：雷达插在哪个USB口？可以用 <code>ls /dev/ttyUSB*</code> 查看</li>
+  <li><strong>frame_id</strong>：这个很重要，后续的TF变换全靠它。我习惯统一命名为 <code>laser_frame</code></li>
+  <li><strong>angle_compensate</strong>：建议开启，能矫正雷达安装角度偏差</li>
+</ul>
+
+<div class="warning">
+  <p><strong>权限问题：</strong>很多新手会卡在这一步。雷达插上后，如果没有读取权限，ROS节点会报错。解决办法：</p>
+  <pre><code>sudo chmod 666 /dev/ttyUSB0</code></pre>
+  <p>或者一劳永逸，把用户加到dialout组：</p>
+  <pre><code>sudo usermod -a -G dialout $USER</code></pre>
+</div>
+
+<h4>3.3.3 启动并验证</h4>
+<p>运行launch文件：</p>
+
+<pre><code>roslaunch rplidar_ros rplidar.launch</code></pre>
+
+<p>然后新开一个终端，看看话题有没有数据：</p>
+
+<pre><code>rostopic echo /scan</code></pre>
+
+<p>如果看到一堆距离数据在刷屏，恭喜你，驱动搞定了。</p>
+
+<h3>3.4 点云数据可视化：用RViz看你的雷达</h3>
+
+<p>数据有了，怎么看？用RViz。</p>
+<p>启动RViz：</p>
+
+<pre><code>rviz</code></pre>
+
+<p>在RViz里，你需要做这几步：</p>
+<ol>
+  <li>左侧面板点击「Add」→ 选择「By topic」→ 找到 <code>/scan</code> 话题 → 添加「LaserScan」显示</li>
+  <li>在「Global Options」里，把 <code>Fixed Frame</code> 设置成 <code>laser_frame</code>（和你launch文件里定义的一致）</li>
+  <li>调整视角，你就能看到雷达扫描出来的点云了</li>
+</ol>
+
+<p>如果是多线雷达，话题一般是 <code>/velodyne_points</code>，添加「PointCloud2」显示即可。</p>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>在RViz里，可以给点云设置颜色。比如按距离着色，近处红色、远处蓝色。这样一眼就能看出障碍物的远近分布。设置方法：在LaserScan显示属性里，找到「Color Transformer」→ 选择「AxisColor」或「Intensity」。</p>
+</div>
+
+<h3>3.5 知识体系总览</h3>
+
+<p>下面这张图，把本章的核心逻辑串起来了。你可以把它当作选型和配置的「路线图」：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">激光雷达选型与驱动知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">激光雷达选型与驱动</text>
+  
+  <!-- 分支1：原理 -->
+  <line x1="400" y1="120" x2="200" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="100" y="170" width="200" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="200" y="195" text-anchor="middle" font-size="14" fill="white">工作原理</text>
+  
+  <line x1="200" y1="210" x2="120" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="40" y="250" width="160" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="120" y="272" text-anchor="middle" font-size="12" fill="#c0392b">单线：二维平面扫描</text>
+  
+  <line x1="200" y1="210" x2="280" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="200" y="250" width="160" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="280" y="272" text-anchor="middle" font-size="12" fill="#c0392b">多线：三维点云</text>
+  
+  <!-- 分支2：品牌 -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="300" y="170" width="200" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="1.5"/>
+  <text x="400" y="195" text-anchor="middle" font-size="14" fill="white">主流品牌对比</text>
+  
+  <line x1="400" y1="210" x2="320" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="240" y="250" width="160" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="320" y="272" text-anchor="middle" font-size="12" fill="#1e8449">SICK / Hokuyo</text>
+  
+  <line x1="400" y1="210" x2="480" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="400" y="250" width="160" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="480" y="272" text-anchor="middle" font-size="12" fill="#1e8449">Velodyne / RoboSense</text>
+  
+  <!-- 分支3：驱动 -->
+  <line x1="400" y1="120" x2="600" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="500" y="170" width="200" height="40" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5"/>
+  <text x="600" y="195" text-anchor="middle" font-size="14" fill="white">ROS驱动配置</text>
+  
+  <line x1="600" y1="210" x2="520" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="440" y="250" width="160" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="520" y="272" text-anchor="middle" font-size="12" fill="#6c3483">安装驱动包</text>
+  
+  <line x1="600" y1="210" x2="680" y2="260" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="600" y="250" width="160" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="680" y="272" text-anchor="middle" font-size="12" fill="#6c3483">配置launch文件</text>
+  
+  <!-- 分支4：可视化 -->
+  <line x1="400" y1="120" x2="400" y2="320" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="300" y="310" width="200" height="40" rx="8" fill="#f39c12" stroke="#d68910" stroke-width="1.5"/>
+  <text x="400" y="335" text-anchor="middle" font-size="14" fill="white">点云数据可视化</text>
+  
+  <line x1="400" y1="350" x2="300" y2="400" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="220" y="390" width="160" height="35" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="300" y="412" text-anchor="middle" font-size="12" fill="#d68910">RViz配置</text>
+  
+  <line x1="400" y1="350" x2="500" y2="400" stroke="#7f8c8d" stroke-width="1.5"/>
+  <rect x="420" y="390" width="160" height="35" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="500" y="412" text-anchor="middle" font-size="12" fill="#d68910">话题订阅与显示</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="450" width="400" height="35" rx="8" fill="#2c3e50" opacity="0.8"/>
+  <text x="400" y="473" text-anchor="middle" font-size="13" fill="white">选型 → 驱动 → 可视化，三步搞定激光雷达接入</text>
+</svg>
+
+<p>这张图把本章内容分成了四个模块：工作原理、品牌对比、驱动配置、可视化。你顺着这个流程走，基本不会出大问题。</p>
+
+<div class="footer-nav">
+            <a href="02RosEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04CoordinateTransform.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

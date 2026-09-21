@@ -1,0 +1,384 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 任务调度与优先级管理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02TrafficControlBasics.html" class="">2 交通管制基础</a></li>
+<li><a href="03PathPlanningAlgo.html" class="">3 路径规划算法</a></li>
+<li><a href="04DeadlockDetectRelease.html" class="">4 死锁检测与解除</a></li>
+<li><a href="05TrafficControlStrategy.html" class="">5 交通管制策略</a></li>
+<li><a href="06MultiAgvCoopDispatch.html" class="">6 多AGV协同调度</a></li>
+<li><a href="07TrafficSystemArch.html" class="">7 交通管制系统架构</a></li>
+<li><a href="08CommProtocolData.html" class="">8 通信协议与数据交互</a></li>
+<li><a href="09MapModelingPerception.html" class="">9 地图建模与环境感知</a></li>
+<li><a href="10TaskPriorityManage.html" class="active">10 任务调度与优先级管理</a></li>
+<li><a href="11PathConflictPredict.html" class="">11 路径冲突预测与预防</a></li>
+<li><a href="12TrafficSimPlatform.html" class="">12 交通管制仿真平台搭建</a></li>
+<li><a href="13LocalizationNav.html" class="">13 AGV定位与导航技术</a></li>
+<li><a href="14SafetyMechanism.html" class="">14 交通管制中的安全机制</a></li>
+<li><a href="15PerformanceOptimize.html" class="">15 交通管制性能优化</a></li>
+<li><a href="16DynamicObstacleAvoid.html" class="">16 动态障碍物避让</a></li>
+<li><a href="17TrafficRuleLibrary.html" class="">17 交通管制规则库设计</a></li>
+<li><a href="18MultiZoneTraffic.html" class="">18 多区域交通管制</a></li>
+<li><a href="19TestAndValidation.html" class="">19 交通管制系统测试与验证</a></li>
+<li><a href="20ChargingAndTraffic.html" class="">20 AGV充电调度与交通管制</a></li>
+<li><a href="21MlInTrafficControl.html" class="">21 交通管制中的机器学习应用</a></li>
+<li><a href="22SystemInterface.html" class="">22 交通管制系统接口设计</a></li>
+<li><a href="23LogAndMonitor.html" class="">23 交通管制日志与监控</a></li>
+<li><a href="24DeployAndOps.html" class="">24 交通管制系统部署与运维</a></li>
+<li><a href="25SecurityPermission.html" class="">25 交通管制系统安全与权限管理</a></li>
+<li><a href="26StandardCompliance.html" class="">26 交通管制系统标准化与合规</a></li>
+<li><a href="27TrafficCaseAnalysis.html" class="">27 交通管制系统案例分析</a></li>
+<li><a href="28FrontierTech.html" class="">28 交通管制系统前沿技术</a></li>
+<li><a href="29TrafficProjectPractice.html" class="">29 交通管制系统项目实战</a></li>
+<li><a href="30FutureOutlook.html" class="">30 交通管制系统未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 任务调度与优先级管理：任务优先级定义与动态调整、任务调度算法（FIFO、EDF、SJF）、紧急任务抢占机制</h2>
+
+<p>各位同行，今天我们来聊聊AGV调度系统里最核心、也最让人头疼的一块——任务调度与优先级管理。</p>
+
+<p>说实话，我入行那会儿，觉得调度不就是“谁先来谁先走”嘛。直到有一次在汽车总装车间，一台运载发动机的AGV被一台运空料架的AGV堵在路口，整条产线停了15分钟。厂长当时就站在我旁边，那脸色……嗯，从那以后，我再也不敢小看任务调度了。</p>
+
+<p>任务调度说白了，就是决定“哪台车、什么时候、去干什么活”。但现实远比理论复杂：有的任务十万火急，有的任务可以等一等；有的车快没电了，有的车正好顺路。怎么把这些因素揉到一起，就是我们要解决的问题。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>没有完美的调度算法，只有最适合现场工况的调度策略。我的经验是——先保证系统不死锁，再追求效率。</p>
+</div>
+
+<h3>10.1 任务优先级定义与动态调整</h3>
+
+<p>优先级这东西，你想想看，它其实是个“相对值”。同样一个任务，在A车间是最高优先级，到了B车间可能就是个普通任务。所以，怎么定义优先级，得看现场的业务逻辑。</p>
+
+<p>我个人习惯把优先级分为三级：</p>
+
+<ul>
+  <li><strong>紧急优先级（Critical）：</strong>产线急停恢复、消防通道清理、设备故障抢修。这类任务一旦触发，必须立即执行。</li>
+  <li><strong>高优先级（High）：</strong>产线物料配送、在制品转运、空托盘回收。这些任务直接影响生产节拍。</li>
+  <li><strong>普通优先级（Normal）：</strong>仓库补货、废料回收、充电任务。可以排队等待，但也不能无限期拖延。</li>
+</ul>
+
+<p>但问题来了——静态优先级够用吗？我在一个3C电子厂的项目里就吃过亏。当时所有任务都按静态优先级跑，结果一台AGV连续执行高优先级任务，电量掉到15%以下，最后趴窝在通道中间。从那以后，我强制要求所有调度系统必须支持<strong>动态优先级调整</strong>。</p>
+
+<p>动态调整的典型场景：</p>
+
+<ol>
+  <li><strong>电量阈值触发：</strong>当AGV电量低于20%时，自动将“返回充电站”的任务优先级提升至紧急。</li>
+  <li><strong>任务等待超时：</strong>一个普通任务等待超过30分钟，自动提升一级优先级。</li>
+  <li><strong>产线节拍关联：</strong>如果下游工位即将断料，对应配送任务的优先级自动提升。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>动态调整不要做得太“灵敏”。我曾经设过一个规则——等待超过5分钟就提优先级，结果整个系统都在疯狂提权，调度器直接懵了。建议阈值设得宽松些，比如10-15分钟起步。</p>
+</div>
+
+<h3>10.2 任务调度算法：FIFO、EDF、SJF</h3>
+
+<p>算法这东西，教科书上讲得头头是道，但实际落地时你会发现——没有银弹。我分别说说这三种算法在AGV场景下的真实表现。</p>
+
+<h4>10.2.1 FIFO（先进先出）</h4>
+
+<p>FIFO是最简单的，也是我最早用的。谁先下单，谁先执行。好处是公平，坏处是……太公平了。</p>
+
+<p>举个例子：一个紧急任务排在队列末尾，前面有20个普通任务。按FIFO，它得等前面20个任务全部完成。这在产线上是致命的。所以FIFO只适合以下场景：</p>
+
+<ul>
+  <li>所有任务优先级相同（比如纯仓储搬运）</li>
+  <li>任务执行时间差异很小（比如都是短途运输）</li>
+  <li>系统负载较低（AGV数量远少于任务数）</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>FIFO在AGV调度中最大的问题是——容易导致“饿死”现象。一个长任务堵在前面，后面的短任务永远等不到执行机会。我曾经在一个仓库项目里用FIFO，结果一台AGV被分配了一个绕厂一周的长任务，其他短任务等了40分钟……从那以后，我再也不敢在混合任务场景下用纯FIFO了。</p>
+</div>
+
+<h4>10.2.2 EDF（最早截止时间优先）</h4>
+
+<p>EDF是我个人比较偏爱的算法，尤其适合有明确时间窗口的产线配送场景。它的逻辑很简单：谁的截止时间最近，谁先执行。</p>
+
+<p>EDF的代码实现其实不复杂：</p>
+
+<pre><code>// 伪代码：EDF调度器核心逻辑
+function edf_schedule(task_list):
+    // 按截止时间升序排序
+    sorted_tasks = sort(task_list, by: deadline)
+    // 取出最早截止的任务
+    next_task = sorted_tasks[0]
+    // 检查是否能在截止时间前完成
+    if current_time + next_task.exec_time &lt;= next_task.deadline:
+        return next_task
+    else:
+        // 无法按时完成，触发异常处理
+        handle_deadline_miss(next_task)
+        return null</code></pre>
+
+<p>但EDF有个坑——<strong>过载时系统会崩溃</strong>。当任务量超过系统处理能力时，EDF会连续错过截止时间，而且越错越多。我见过一个极端案例：系统同时收到50个任务，EDF调度器疯狂切换任务上下文，结果一个都没按时完成。</p>
+
+<p>我的建议是：EDF一定要配合<strong>过载保护机制</strong>。比如当系统负载超过80%时，自动拒绝新任务，或者降级处理部分非关键任务。</p>
+
+<h4>10.2.3 SJF（最短作业优先）</h4>
+
+<p>SJF追求的是“最小化平均等待时间”。说白了，就是让短任务先跑，长任务往后排。</p>
+
+<p>这个算法在AGV场景下有个天然优势——<strong>减少路口拥堵</strong>。短任务通常意味着路径短，占用路口时间少。让短任务先走，能有效降低系统死锁概率。</p>
+
+<p>但SJF也有致命缺陷：<strong>长任务会被饿死</strong>。如果一个系统里不断有短任务插入，长任务可能永远得不到执行。我在一个电商仓库项目里就遇到过：AGV需要从A区跑到Z区取货，结果每次刚要出发，就被一堆“从A到B”的短任务插队，最后那个长任务等了2个多小时。</p>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>实际项目中，我很少单独使用某一种算法。更常见的做法是——<strong>混合调度</strong>。比如：用FIFO作为基础队列，用EDF处理有时限的任务，用SJF处理短任务。然后通过优先级机制，让紧急任务可以插队。</p>
+</div>
+
+<h3>10.3 紧急任务抢占机制</h3>
+
+<p>这是调度系统里最刺激的部分。紧急任务一来，正在执行的任务要不要停？停了之后怎么恢复？</p>
+
+<p>我先说结论：<strong>抢占机制必须有，但不能滥用</strong>。</p>
+
+<p>抢占分为两种：</p>
+
+<ul>
+  <li><strong>任务级抢占：</strong>当前任务执行到某个检查点，暂停，让紧急任务先跑。等紧急任务完成后，再恢复原任务。</li>
+  <li><strong>路径级抢占：</strong>AGV正在行驶途中，收到紧急任务，立即改变路径去执行新任务。原来的任务被挂起。</li>
+</ul>
+
+<p>路径级抢占风险很高。我记得有一次，一台AGV正在执行“从A到B”的任务，突然收到紧急任务“去C点取货”。系统直接让AGV原地掉头，结果和后方来车撞了个正着。从那以后，我规定：<strong>路径级抢占只能在AGV静止或低速（&lt;0.5m/s）时触发</strong>。</p>
+
+<p>抢占机制的实现要点：</p>
+
+<ol>
+  <li><strong>任务状态保存：</strong>被抢占的任务必须保存当前执行进度（比如已经走了多少米、还剩几个站点）。</li>
+  <li><strong>资源释放：</strong>被抢占任务占用的路口、工位等资源必须立即释放，否则紧急任务可能被堵住。</li>
+  <li><strong>恢复策略：</strong>紧急任务完成后，被抢占的任务是重新执行还是继续执行？我建议“继续执行”，但需要重新计算路径（因为环境可能变了）。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里允许无限抢占，结果出现了“任务A抢占B，B抢占C，C又抢占A”的死循环。后来我加了一个规则——<strong>每个任务最多被抢占3次</strong>，超过次数后不再响应抢占请求。这个规则虽然粗暴，但有效。</p>
+</div>
+
+<h3>10.4 知识体系总览</h3>
+
+<p>下面这张图是我自己总结的任务调度知识体系，你可以把它当作一个快速索引：</p>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" style="max-width:800px; margin:20px auto; display:block;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#4A90D9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357ABD;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" rx="10" fill="#F0F8FF" stroke="#B0D4F1" stroke-width="2"/>
+
+  <!-- 标题 -->
+  <rect x="250" y="15" width="300" height="40" rx="20" fill="url(#headerGrad)"/>
+  <text x="400" y="42" text-anchor="middle" fill="white" font-size="18" font-weight="bold">AGV任务调度知识体系</text>
+
+  <!-- 三个核心模块 -->
+  <!-- 模块1：优先级定义 -->
+  <rect x="50" y="80" width="200" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="150" y="110" text-anchor="middle" fill="#2C5F8A" font-size="15" font-weight="bold">优先级定义</text>
+
+  <rect x="50" y="140" width="200" height="100" rx="6" fill="white" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="60" y="165" fill="#333" font-size="13">• 紧急优先级</text>
+  <text x="60" y="185" fill="#333" font-size="13">• 高优先级</text>
+  <text x="60" y="205" fill="#333" font-size="13">• 普通优先级</text>
+  <text x="60" y="225" fill="#888" font-size="11">（三级分类法）</text>
+
+  <!-- 模块2：调度算法 -->
+  <rect x="300" y="80" width="200" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="400" y="110" text-anchor="middle" fill="#2C5F8A" font-size="15" font-weight="bold">调度算法</text>
+
+  <rect x="300" y="140" width="200" height="130" rx="6" fill="white" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="310" y="165" fill="#333" font-size="13">• FIFO（先进先出）</text>
+  <text x="310" y="185" fill="#333" font-size="13">• EDF（最早截止时间）</text>
+  <text x="310" y="205" fill="#333" font-size="13">• SJF（最短作业优先）</text>
+  <text x="310" y="225" fill="#888" font-size="11">（混合调度更实用）</text>
+
+  <!-- 模块3：抢占机制 -->
+  <rect x="550" y="80" width="200" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="650" y="110" text-anchor="middle" fill="#2C5F8A" font-size="15" font-weight="bold">抢占机制</text>
+
+  <rect x="550" y="140" width="200" height="130" rx="6" fill="white" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="560" y="165" fill="#333" font-size="13">• 任务级抢占</text>
+  <text x="560" y="185" fill="#333" font-size="13">• 路径级抢占</text>
+  <text x="560" y="205" fill="#333" font-size="13">• 状态保存与恢复</text>
+  <text x="560" y="225" fill="#888" font-size="11">（最多抢占3次）</text>
+
+  <!-- 连接箭头 -->
+  <line x1="250" y1="105" x2="300" y2="105" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="500" y1="105" x2="550" y2="105" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 动态调整 -->
+  <rect x="50" y="280" width="700" height="50" rx="8" fill="#FFF3E0" stroke="#FFB74D" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" fill="#E65100" font-size="15" font-weight="bold">动态优先级调整（电量阈值、等待超时、产线节拍）</text>
+
+  <!-- 向下箭头 -->
+  <line x1="400" y1="250" x2="400" y2="280" stroke="#FFB74D" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 底部总结 -->
+  <rect x="150" y="360" width="500" height="50" rx="25" fill="#4A90D9" opacity="0.9"/>
+  <text x="400" y="390" text-anchor="middle" fill="white" font-size="15">核心原则：先保不死锁，再追求效率</text>
+
+  <!-- 底部箭头 -->
+  <line x1="400" y1="330" x2="400" y2="360" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 小标签 -->
+  <rect x="100" y="430" width="120" height="30" rx="5" fill="#E8F4FD" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="160" y="450" text-anchor="middle" fill="#2C5F8A" font-size="12">避免饿死</text>
+
+  <rect x="340" y="430" width="120" height="30" rx="5" fill="#E8F4FD" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="400" y="450" text-anchor="middle" fill="#2C5F8A" font-size="12">过载保护</text>
+
+  <rect x="580" y="430" width="120" height="30" rx="5" fill="#E8F4FD" stroke="#B0D4F1" stroke-width="1"/>
+  <text x="640" y="450" text-anchor="middle" fill="#2C5F8A" font-size="12">死锁预防</text>
+</svg>
+
+<p>这张图把今天讲的内容串起来了。你看，优先级定义是基础，调度算法是核心，抢占机制是应急手段，而动态调整则是把它们粘在一起的胶水。少了任何一个环节，系统都可能出问题。</p>
+
+<p>最后说一句：调度系统没有“最好”，只有“最合适”。我见过用FIFO跑得飞快的仓库，也见过用EDF频繁死锁的产线。关键还是看你的业务场景——<strong>理解现场，比理解算法更重要</strong>。</p>
+
+<div class="highlight">
+  <p><strong>本章小结：</strong></p>
+  <ul>
+    <li>优先级分三级：紧急、高、普通，支持动态调整</li>
+    <li>FIFO简单公平，但容易饿死；EDF适合有时限任务，但过载会崩溃；SJF减少拥堵，但长任务可能被饿死</li>
+    <li>抢占机制要有限制，建议每个任务最多被抢占3次</li>
+    <li>混合调度 + 动态调整，是工程实践中最稳妥的方案</li>
+  </ul>
+</div>
+
+<div class="footer-nav">
+            <a href="09MapModelingPerception.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11PathConflictPredict.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

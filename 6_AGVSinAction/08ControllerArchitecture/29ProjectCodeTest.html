@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 AGV控制器项目实战（二）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="active">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 AGV控制器项目实战（二）：编码实现、单元测试、集成测试、系统联调</h2>
+
+<p>好，咱们接着上一章聊。上一章我们把架构搭好了，模块接口也定下来了。这一章，就是真正动手写代码的时候了。</p>
+
+<p>说实话，每次到这一步，我都挺兴奋的。架构设计就像画图纸，而编码实现就是把图纸变成真家伙。但我也得提醒你——写代码只是开始，真正的考验在后面：单元测试、集成测试、系统联调。这三关过不去，代码写得再漂亮也是白搭。</p>
+
+<h3>一、编码实现：从接口到实现</h3>
+
+<p>我个人习惯，编码实现分三步走：</p>
+
+<ol>
+<li><strong>先写头文件</strong>——把上一章定义的接口用C/C++代码固定下来</li>
+<li><strong>再写桩代码</strong>——每个函数先返回一个假值，让编译能通过</li>
+<li><strong>最后填逻辑</strong>——一个一个函数去实现，边写边测</li>
+</ol>
+
+<p>举个例子，我们AGV控制器的核心模块——<strong>运动控制模块</strong>，它的头文件大概长这样：</p>
+
+<pre><code>// motion_controller.h
+#ifndef MOTION_CONTROLLER_H
+#define MOTION_CONTROLLER_H
+
+#include &lt;stdint.h&gt;
+
+typedef enum {
+    MOTION_STOP = 0,
+    MOTION_FORWARD,
+    MOTION_BACKWARD,
+    MOTION_TURN_LEFT,
+    MOTION_TURN_RIGHT
+} MotionState_t;
+
+typedef struct {
+    float linear_velocity;   // m/s
+    float angular_velocity;  // rad/s
+    MotionState_t state;
+} MotionCmd_t;
+
+int Motion_Init(void);
+int Motion_SetCmd(MotionCmd_t *cmd);
+int Motion_GetStatus(MotionCmd_t *status);
+int Motion_EmergencyStop(void);
+
+#endif
+</code></pre>
+
+<p>嗯，这里要注意：<strong>接口参数尽量用结构体指针</strong>。为什么？因为AGV控制器里数据交互频繁，用指针传递效率高，而且方便扩展。我在项目中遇到过，一开始用单个参数传，后来要加字段，改得那叫一个痛苦。</p>
+
+<h3>二、单元测试：把每个零件单独拧出来测</h3>
+
+<p>单元测试，说白了就是验证每个函数对不对。我见过太多人跳过这一步，结果集成的时候bug一堆，查都查不过来。</p>
+
+<p>我个人推荐用<strong>CUnit</strong>或者<strong>Unity</strong>这种轻量级测试框架。咱们AGV控制器是嵌入式系统，资源有限，测试框架不能太臃肿。</p>
+
+<p>来看一个运动控制模块的单元测试例子：</p>
+
+<pre><code>// test_motion_controller.c
+#include "unity.h"
+#include "motion_controller.h"
+
+void setUp(void) {
+    Motion_Init();
+}
+
+void tearDown(void) {
+    // 清理资源
+}
+
+void test_Motion_Init_Should_Return_OK(void) {
+    TEST_ASSERT_EQUAL_INT(0, Motion_Init());
+}
+
+void test_Motion_SetCmd_Forward_Should_Work(void) {
+    MotionCmd_t cmd = {0.5, 0.0, MOTION_FORWARD};
+    int ret = Motion_SetCmd(&amp;cmd);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+    
+    MotionCmd_t status;
+    Motion_GetStatus(&amp;status);
+    TEST_ASSERT_EQUAL_FLOAT(0.5, status.linear_velocity);
+    TEST_ASSERT_EQUAL(MOTION_FORWARD, status.state);
+}
+
+void test_Motion_EmergencyStop_Should_Stop_Immediately(void) {
+    MotionCmd_t cmd = {1.0, 0.0, MOTION_FORWARD};
+    Motion_SetCmd(&amp;cmd);
+    
+    Motion_EmergencyStop();
+    
+    MotionCmd_t status;
+    Motion_GetStatus(&amp;status);
+    TEST_ASSERT_EQUAL_FLOAT(0.0, status.linear_velocity);
+    TEST_ASSERT_EQUAL(MOTION_STOP, status.state);
+}
+</code></pre>
+
+<p>你想想看，如果每个函数都这样测一遍，集成的时候心里是不是踏实多了？</p>
+
+<div class="tip">
+<strong>我的小技巧：</strong>单元测试要覆盖正常路径、边界路径和异常路径。比如速度值传负数会怎样？传个NULL指针会怎样？这些都要测到。
+</div>
+
+<h3>三、集成测试：把零件组装起来</h3>
+
+<p>单元测试过了，不代表模块之间能配合好。集成测试就是干这个的。</p>
+
+<p>AGV控制器的集成测试，我一般分两层：</p>
+
+<ul>
+<li><strong>模块间集成</strong>：比如运动控制模块和传感器模块能不能协同工作</li>
+<li><strong>子系统集成</strong>：比如导航子系统和底盘子系统能不能配合</li>
+</ul>
+
+<p>我曾经在一个项目里，单元测试全过了，但一集成就出问题。查了两天才发现，是<strong>两个模块对同一个数据结构的字节对齐理解不一致</strong>。从那以后，我集成测试时一定会检查结构体大小：</p>
+
+<pre><code>// 集成测试：检查数据结构一致性
+void test_DataStructure_Consistency(void) {
+    // 确保发送端和接收端结构体大小一致
+    TEST_ASSERT_EQUAL_INT(sizeof(MotionCmd_t), 12);
+    // 检查关键字段偏移
+    TEST_ASSERT_EQUAL_INT(offsetof(MotionCmd_t, linear_velocity), 0);
+    TEST_ASSERT_EQUAL_INT(offsetof(MotionCmd_t, angular_velocity), 4);
+    TEST_ASSERT_EQUAL_INT(offsetof(MotionCmd_t, state), 8);
+}
+</code></pre>
+
+<div class="warning">
+<strong>注意：</strong>集成测试环境要尽量接近真实硬件。如果条件不允许，至少要用硬件在环（HIL）仿真。我在一个项目中偷懒用了纯软件仿真，结果到现场才发现电机响应延迟比仿真大了一倍。
+</div>
+
+<h3>四、系统联调：让整个AGV跑起来</h3>
+
+<p>系统联调，是项目实战中最刺激也最折磨人的阶段。所有模块都装到AGV上，在真实场景里跑。</p>
+
+<p>我一般按这个顺序来：</p>
+
+<ol>
+<li><strong>空载调试</strong>——AGV不载货，跑基本路径</li>
+<li><strong>负载调试</strong>——加上额定负载，看控制参数要不要调</li>
+<li><strong>极限测试</strong>——最大速度、最大转弯、急停</li>
+<li><strong>长时间跑</strong>——连续跑8小时以上，看稳定性</li>
+</ol>
+
+<p>这里有个坑，我踩过好几次：<strong>系统联调时一定要有日志记录</strong>。别光靠眼睛看，AGV跑起来你根本来不及反应。把关键数据都打出来，出问题了回头分析。</p>
+
+<p>下面这张图，是我做系统联调时常用的流程：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV系统联调流程</text>
+  
+  <!-- 步骤1：单元测试 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">单元测试通过</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2：集成测试 -->
+  <rect x="300" y="150" width="200" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="180" text-anchor="middle" font-size="16" fill="white" font-weight="bold">集成测试通过</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="200" x2="400" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤3：空载调试 -->
+  <rect x="300" y="230" width="200" height="50" rx="10" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="260" text-anchor="middle" font-size="16" fill="white" font-weight="bold">空载调试</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="280" x2="400" y2="310" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤4：负载调试 -->
+  <rect x="300" y="310" width="200" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="340" text-anchor="middle" font-size="16" fill="white" font-weight="bold">负载调试</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="360" x2="400" y2="390" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤5：极限测试 -->
+  <rect x="300" y="390" width="200" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="420" text-anchor="middle" font-size="16" fill="white" font-weight="bold">极限测试</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="440" x2="400" y2="460" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤6：长时间跑 -->
+  <rect x="300" y="460" width="200" height="30" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="480" text-anchor="middle" font-size="14" fill="white" font-weight="bold">长时间稳定性测试</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 右侧说明 -->
+  <rect x="550" y="70" width="220" height="420" rx="10" fill="#fff3cd" stroke="#ffc107" stroke-width="1"/>
+  <text x="660" y="100" text-anchor="middle" font-size="14" font-weight="bold" fill="#856404">关键检查点</text>
+  <text x="570" y="130" font-size="12" fill="#856404">• 每个模块功能正确</text>
+  <text x="570" y="160" font-size="12" fill="#856404">• 接口数据一致</text>
+  <text x="570" y="200" font-size="12" fill="#856404">• 模块间通信正常</text>
+  <text x="570" y="240" font-size="12" fill="#856404">• 空载路径跟踪精度</text>
+  <text x="570" y="280" font-size="12" fill="#856404">• 负载下PID参数调整</text>
+  <text x="570" y="320" font-size="12" fill="#856404">• 急停距离</text>
+  <text x="570" y="360" font-size="12" fill="#856404">• 最大转弯半径</text>
+  <text x="570" y="400" font-size="12" fill="#856404">• 连续运行无故障</text>
+  <text x="570" y="440" font-size="12" fill="#856404">• 内存无泄漏</text>
+  <text x="570" y="470" font-size="12" fill="#856404">• 温度正常</text>
+</svg>
+
+<h3>五、实战中的避坑指南</h3>
+
+<p>做AGV控制器项目，有些坑是绕不开的。我把自己踩过的坑整理了一下：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#3498db; color:white;">
+    <th>阶段</th>
+    <th>常见问题</th>
+    <th>我的建议</th>
+  </tr>
+  <tr>
+    <td>编码实现</td>
+    <td>接口定义频繁修改</td>
+    <td>先定接口再写实现，接口评审要拉上所有相关模块的人</td>
+  </tr>
+  <tr>
+    <td>单元测试</td>
+    <td>测试覆盖率低</td>
+    <td>用gcov等工具看覆盖率，低于80%不放过</td>
+  </tr>
+  <tr>
+    <td>集成测试</td>
+    <td>模块间时序问题</td>
+    <td>加日志时间戳，分析时序关系</td>
+  </tr>
+  <tr>
+    <td>系统联调</td>
+    <td>现场环境与测试环境不一致</td>
+    <td>尽早把AGV放到真实场地跑，别等全部开发完</td>
+  </tr>
+</table>
+
+<div class="highlight">
+<p><strong>核心总结：</strong>编码实现要稳，单元测试要全，集成测试要细，系统联调要狠。每一步都扎实了，AGV才能跑得稳、跑得久。</p>
+</div>
+
+<p>好了，这一章的内容就到这儿。记住，代码写出来只是第一步，让代码在各种场景下都能稳定运行，才是真本事。</p>
+
+<div class="footer-nav">
+            <a href="28ProjectReqDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30ProjectDeployDelivery.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

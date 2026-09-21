@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 AGV调度系统实战（二）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="active">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 地图构建与路径规划模块实现</h2>
+
+<p>好，咱们今天来聊聊AGV调度系统里最核心的两个模块——地图构建和路径规划。说实话，这两个东西是调度系统的地基。地基不稳，上面再花哨的算法都是空中楼阁。</p>
+
+<p>我在做第一个AGV项目时，就吃过地图建模的亏。当时图省事，直接用二维网格，结果车跑起来各种撞墙。后来才明白，地图构建不是简单的画格子，你得考虑AGV的物理尺寸、转弯半径、还有各种障碍物的实际形状。</p>
+
+<h3>地图构建：从物理世界到数字模型</h3>
+
+<p>地图构建，说白了就是把仓库、车间这些真实环境，变成计算机能理解的数据结构。我个人习惯用拓扑地图+栅格地图的混合方案。</p>
+
+<p><strong>拓扑地图</strong>：用节点和边表示路径网络。节点是AGV可以停靠或转向的点，边是AGV可以行驶的路径。这种地图计算快，适合全局路径规划。</p>
+
+<p><strong>栅格地图</strong>：把环境划分成小格子，每个格子标记为可通行或不可通行。这种地图精度高，适合局部避障。</p>
+
+<p>我一般这样设计地图数据结构：</p>
+
+<pre><code>// 拓扑地图节点
+struct MapNode {
+    int id;           // 节点ID
+    double x, y;      // 物理坐标
+    double theta;     // 朝向角（可选）
+    int type;         // 0:普通点, 1:充电站, 2:装卸站
+};
+
+// 拓扑地图边
+struct MapEdge {
+    int fromNode;     // 起点ID
+    int toNode;       // 终点ID
+    double length;    // 实际距离
+    double maxSpeed;  // 限速
+    bool isBidirectional; // 是否双向
+};
+
+// 栅格地图
+class GridMap {
+    int width, height;       // 栅格数量
+    double resolution;       // 每个格子代表的物理尺寸（米）
+    vector&lt;vector&lt;int&gt;&gt; grid; // 0:空闲, 1:障碍物, 2:未知
+};</code></pre>
+
+<p>嗯，这里要注意一点：栅格地图的分辨率不能太高也不能太低。太高了计算量爆炸，太低了AGV过不去窄通道。我一般取0.1米到0.2米，刚好能匹配AGV的尺寸。</p>
+
+<h3>路径规划：A*算法的工程化改造</h3>
+
+<p>路径规划算法很多，但工程上用得最多的还是A*。为什么？因为它稳定、可控、好调参。</p>
+
+<p>不过，教科书上的A*直接拿来用，十有八九会出问题。我在项目中遇到过几个坑：</p>
+
+<ul>
+<li><strong>路径不平滑</strong>：A*出来的路径全是直角拐弯，AGV根本走不了</li>
+<li><strong>计算太慢</strong>：地图一大，搜索空间爆炸</li>
+<li><strong>动态障碍物</strong>：其他AGV或人突然出现，路径就废了</li>
+</ul>
+
+<p>针对这些问题，我做了几个改造：</p>
+
+<h4>1. 启发函数优化</h4>
+
+<p>标准A*用曼哈顿距离或欧氏距离。但实际AGV有运动约束，不能斜着走。我改用<strong>考虑转向代价的启发函数</strong>：</p>
+
+<pre><code>double heuristic(int fromX, int fromY, int toX, int toY, int currentDir) {
+    double dx = abs(fromX - toX);
+    double dy = abs(fromY - toY);
+    
+    // 基础距离
+    double baseDist = dx + dy;
+    
+    // 转向代价：如果当前方向与目标方向不一致，增加代价
+    int targetDir = getDirection(fromX, fromY, toX, toY);
+    double turnCost = (currentDir == targetDir) ? 0 : TURN_PENALTY;
+    
+    return baseDist + turnCost;
+}</code></pre>
+
+<p>你想想看，如果不加转向代价，AGV会频繁变向，实际跑起来比乌龟还慢。</p>
+
+<h4>2. 分层规划策略</h4>
+
+<p>地图一大，A*就慢。我的做法是分层：</p>
+
+<ol>
+<li><strong>全局层</strong>：在拓扑地图上用A*，找到节点序列</li>
+<li><strong>局部层</strong>：在两个节点之间，用栅格地图做精细路径</li>
+</ol>
+
+<p>这样全局规划毫秒级完成，局部规划也能实时响应。</p>
+
+<h4>3. 动态重规划</h4>
+
+<p>AGV跑着跑着，前面突然出现障碍物怎么办？不能停下来等死。我设计了一个<strong>局部重规划触发器</strong>：</p>
+
+<ul>
+<li>当AGV前方3米内出现新障碍物</li>
+<li>当AGV偏离原路径超过0.5米</li>
+<li>当路径被其他AGV占用超过5秒</li>
+</ul>
+
+<p>触发后，只重新规划当前节点到目标节点的局部路径，不重新跑全局。</p>
+
+<div class="highlight">
+<p><strong>核心要点</strong>：路径规划不是一次性的，而是持续迭代的过程。AGV每走一步，都要检查路径是否还可用。</p>
+</div>
+
+<h3>代码实战：A*路径规划模块</h3>
+
+<p>下面是我实际项目里用的A*核心代码，去掉了业务细节，保留了骨架：</p>
+
+<pre><code>class AStarPlanner {
+private:
+    GridMap* map;
+    vector&lt;Node&gt; openList;
+    vector&lt;Node&gt; closedList;
+    
+    struct Node {
+        int x, y;
+        double g, h, f;
+        Node* parent;
+        int direction; // 0:上, 1:右, 2:下, 3:左
+    };
+    
+public:
+    vector&lt;Point&gt; plan(int startX, int startY, int endX, int endY) {
+        // 1. 初始化起点
+        Node* start = new Node{startX, startY, 0, 0, 0, nullptr, 0};
+        start-&gt;h = heuristic(startX, startY, endX, endY, 0);
+        start-&gt;f = start-&gt;g + start-&gt;h;
+        openList.push_back(*start);
+        
+        // 2. 主循环
+        while (!openList.empty()) {
+            // 取f值最小的节点
+            Node current = getLowestF();
+            
+            // 到达终点？
+            if (current.x == endX &amp;&amp; current.y == endY) {
+                return reconstructPath(&amp;current);
+            }
+            
+            // 移到closed列表
+            openList.erase(remove(openList.begin(), openList.end(), current));
+            closedList.push_back(current);
+            
+            // 3. 扩展邻居
+            vector&lt;Point&gt; neighbors = getNeighbors(current.x, current.y);
+            for (auto&amp; n : neighbors) {
+                if (isInClosedList(n.x, n.y)) continue;
+                if (!map-&gt;isPassable(n.x, n.y)) continue;
+                
+                double newG = current.g + distance(current.x, current.y, n.x, n.y);
+                double newH = heuristic(n.x, n.y, endX, endY, current.direction);
+                double newF = newG + newH;
+                
+                // 更新或添加节点
+                updateOrAddNode(n.x, n.y, newG, newH, newF, &amp;current);
+            }
+        }
+        
+        return {}; // 无路径
+    }
+};</code></pre>
+
+<div class="tip">
+<p><strong>避坑指南</strong>：我曾经在openList用vector存储，每次取最小f值时遍历整个列表。地图一大，性能直接崩了。后来改成优先队列（priority_queue），速度提升了10倍。记住：数据结构选型很重要。</p>
+</div>
+
+<h3>地图与路径的联动</h3>
+
+<p>地图构建和路径规划不是孤立的。它们之间有个<strong>接口层</strong>，负责：</p>
+
+<ul>
+<li>把拓扑路径转换成栅格路径</li>
+<li>把栅格路径平滑成AGV可执行的轨迹</li>
+<li>实时更新地图中的动态障碍物</li>
+</ul>
+
+<p>我一般用<strong>三次样条插值</strong>做路径平滑。A*出来的折线路径，经过样条插值后，变成AGV能顺畅跟随的曲线。</p>
+
+<p>下面这张图展示了整个模块的协作关系：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 地图构建模块 -->
+  <rect x="50" y="50" width="200" height="120" fill="#e6f3ff" stroke="#4a90d9" stroke-width="2" rx="8"/>
+  <text x="150" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">地图构建模块</text>
+  <text x="150" y="110" text-anchor="middle" font-size="12" fill="#555">拓扑地图</text>
+  <text x="150" y="130" text-anchor="middle" font-size="12" fill="#555">栅格地图</text>
+  <text x="150" y="150" text-anchor="middle" font-size="12" fill="#555">障碍物管理</text>
+  
+  <!-- 路径规划模块 -->
+  <rect x="550" y="50" width="200" height="120" fill="#e6ffe6" stroke="#27ae60" stroke-width="2" rx="8"/>
+  <text x="650" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">路径规划模块</text>
+  <text x="650" y="110" text-anchor="middle" font-size="12" fill="#555">全局A*规划</text>
+  <text x="650" y="130" text-anchor="middle" font-size="12" fill="#555">局部重规划</text>
+  <text x="650" y="150" text-anchor="middle" font-size="12" fill="#555">路径平滑</text>
+  
+  <!-- 接口层 -->
+  <rect x="250" y="180" width="300" height="80" fill="#fff3e0" stroke="#e67e22" stroke-width="2" rx="8"/>
+  <text x="400" y="210" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">接口层</text>
+  <text x="400" y="235" text-anchor="middle" font-size="12" fill="#555">拓扑→栅格转换 | 路径平滑 | 动态更新</text>
+  
+  <!-- 箭头：地图→接口层 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4a90d9"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60"/>
+    </marker>
+  </defs>
+  
+  <line x1="250" y1="110" x2="250" y2="180" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  <line x1="550" y1="110" x2="550" y2="180" stroke="#27ae60" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 调度执行模块 -->
+  <rect x="250" y="300" width="300" height="70" fill="#fce4ec" stroke="#e74c3c" stroke-width="2" rx="8"/>
+  <text x="400" y="330" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">调度执行模块</text>
+  <text x="400" y="352" text-anchor="middle" font-size="12" fill="#555">任务分配 | 交通管制 | 状态监控</text>
+  
+  <line x1="400" y1="260" x2="400" y2="300" stroke="#e67e22" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 图例 -->
+  <rect x="50" y="340" width="15" height="15" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1"/>
+  <text x="70" y="353" font-size="12" fill="#555">输入模块</text>
+  <rect x="150" y="340" width="15" height="15" fill="#e6ffe6" stroke="#27ae60" stroke-width="1"/>
+  <text x="170" y="353" font-size="12" fill="#555">核心算法</text>
+  <rect x="260" y="340" width="15" height="15" fill="#fff3e0" stroke="#e67e22" stroke-width="1"/>
+  <text x="280" y="353" font-size="12" fill="#555">桥梁层</text>
+  <rect x="370" y="340" width="15" height="15" fill="#fce4ec" stroke="#e74c3c" stroke-width="1"/>
+  <text x="390" y="353" font-size="12" fill="#555">输出模块</text>
+</svg>
+
+<p>从图上能看出来，地图构建是基础，路径规划是核心，接口层是粘合剂。三者缺一不可。</p>
+
+<div class="warning">
+<p><strong>注意事项</strong>：地图数据一定要做版本管理。我见过一个项目，地图被误改了，AGV直接往墙上撞。后来我们给地图加了时间戳和变更日志，每次加载都校验完整性。</p>
+</div>
+
+<h3>性能优化：让AGV跑得更快</h3>
+
+<p>路径规划的性能直接影响AGV的响应速度。我总结了几条优化经验：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e6f3ff;">
+    <th>优化手段</th>
+    <th>效果</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>JPS（跳点搜索）</td>
+    <td>减少搜索节点数，速度提升5-10倍</td>
+    <td>栅格地图，障碍物稀疏</td>
+  </tr>
+  <tr>
+    <td>分层规划</td>
+    <td>全局+局部，响应时间&lt;10ms</td>
+    <td>大规模地图（1000x1000以上）</td>
+  </tr>
+  <tr>
+    <td>路径缓存</td>
+    <td>相同起终点直接复用，节省80%计算</td>
+    <td>固定路线场景（如仓库）</td>
+  </tr>
+  <tr>
+    <td>增量式A*</td>
+    <td>只更新变化部分，避免全量重算</td>
+    <td>动态障碍物频繁出现</td>
+  </tr>
+</table>
+
+<p>我个人最推荐JPS。它本质上是对A*的加速，在栅格地图上效果特别明显。说白了，就是跳过那些「一眼就能看出没希望」的格子，直接跳到关键节点。</p>
+
+<p>嗯，今天就先聊到这儿。地图构建和路径规划这两个模块，看似基础，但里面的门道真不少。下次咱们接着讲任务调度和交通管制，那才是真正考验系统能力的地方。</p>
+
+<div class="footer-nav">
+            <a href="22DispatchPracticePart1.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24DispatchPracticePart3.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

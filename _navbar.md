@@ -1,3 +1,7 @@
+- 0 SITE
+  - [**AGVS 课程**](/6_AGVSinAction/index.html)
+  - [**Notes Home**](/#/README)
+
 - 1 EDO
   - [**01 👀limestart**](https://limestart.cn/)
   - [**02 🪽ggtrans**](https://translate.google.com/)

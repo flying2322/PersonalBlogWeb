@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>20 EMC与可靠性设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="active">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>20 EMC与可靠性设计：PCB布局要点、去耦电容选择、屏蔽与接地、ESD防护</h2>
+
+<p>做AGV控制器，最怕什么？</p>
+<p>不是算法写不出来，是板子跑起来之后，电机一启动，通信就断。或者现场工人一碰外壳，控制器直接死机。这些我都遇到过，而且不止一次。</p>
+<p>EMC和可靠性设计，说白了就是让你的板子在各种恶劣环境下还能稳定工作。AGV这种产品，电机、电池、无线通信全挤在一起，干扰源多，敏感电路也多。不做EMC设计，产品就是定时炸弹。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>EMC设计不是后期补救，必须从PCB布局阶段就开始考虑。后期加屏蔽、加磁环，效果差，成本高。</p>
+</div>
+
+<h3>20.1 PCB布局要点：从源头控制干扰</h3>
+
+<p>我个人习惯，画PCB之前先做分区。AGV控制器一般包含这几个功能块：</p>
+<ul>
+  <li><strong>电源区：</strong>电池输入、DC-DC、LDO</li>
+  <li><strong>功率区：</strong>电机驱动、MOSFET、大电流回路</li>
+  <li><strong>数字区：</strong>MCU、通信芯片、CAN收发器</li>
+  <li><strong>模拟区：</strong>电流采样、电压检测、传感器接口</li>
+</ul>
+
+<p>布局时，这些区域要物理隔离。我在项目中遇到过，把DC-DC的电感放在MCU正下方，结果MCU的ADC采样值一直跳。后来把电感挪到板边，问题就解决了。</p>
+
+<p><strong>具体要点：</strong></p>
+<ol>
+  <li><strong>大电流回路要短：</strong>电机驱动的大电流路径，回路面积越小越好。走线宽，过孔多，减少寄生电感。</li>
+  <li><strong>数字信号远离功率区：</strong>CAN、RS485这些差分信号，走线要远离MOSFET的栅极驱动信号。至少保持3倍线宽的距离。</li>
+  <li><strong>晶振紧贴MCU：</strong>晶振的走线越短越好，周围包地，底下不走其他信号线。我见过有人把晶振放在板子角落，结果时钟抖动大，通信老出错。</li>
+  <li><strong>模拟信号单独走：</strong>电流采样的差分线，要等长、平行走，远离数字信号。最好在模拟区域单独铺地。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>布局阶段先放关键器件——MCU、电机驱动芯片、电源芯片。然后以它们为中心，向外扩展。这样能保证核心路径最短。</p>
+</div>
+
+<h3>20.2 去耦电容选择：别小看这几分钱的元件</h3>
+
+<p>去耦电容，很多人觉得随便放几个就行。其实不然。电容选不对，布局不合理，电源噪声会直接耦合到信号上。</p>
+
+<p><strong>为什么需要去耦电容？</strong></p>
+<p>芯片在切换状态时，瞬间电流需求很大。如果电源路径有寄生电感，电压就会跌落。去耦电容就是给芯片提供一个本地能量池，快速响应电流变化。</p>
+
+<p><strong>选型原则：</strong></p>
+<table>
+  <thead>
+    <tr>
+      <th>电容类型</th>
+      <th>容量范围</th>
+      <th>用途</th>
+      <th>布局位置</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>陶瓷电容（MLCC）</td>
+      <td>0.1μF ~ 10μF</td>
+      <td>高频去耦</td>
+      <td>紧贴芯片电源引脚</td>
+    </tr>
+    <tr>
+      <td>钽电容</td>
+      <td>10μF ~ 100μF</td>
+      <td>低频储能</td>
+      <td>靠近电源入口</td>
+    </tr>
+    <tr>
+      <td>铝电解电容</td>
+      <td>100μF以上</td>
+      <td>大电流滤波</td>
+      <td>电源输入端</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>布局要点：</strong></p>
+<ul>
+  <li>每个IC的电源引脚，至少放一个0.1μF陶瓷电容。距离引脚不超过3mm。</li>
+  <li>大电容（10μF以上）放在板子电源入口，或者每个功能模块的电源入口。</li>
+  <li>电容的接地过孔要靠近电容的GND引脚。我见过有人把过孔放得很远，结果电容的寄生电感变大，高频去耦效果大打折扣。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>陶瓷电容有直流偏压特性。比如10μF的电容，加上5V电压后，实际容量可能只剩4μF。选型时要留余量，或者用更高耐压的电容。</p>
+</div>
+
+<h3>20.3 屏蔽与接地：AGV的“金钟罩”</h3>
+
+<p>AGV控制器里，电机驱动是最大的干扰源。MOSFET开关时，会产生高频噪声，通过空间辐射和传导耦合到其他电路。</p>
+
+<p><strong>屏蔽怎么做？</strong></p>
+<ul>
+  <li><strong>金属外壳接地：</strong>控制器外壳如果是金属的，一定要可靠接地。接地阻抗越低越好，最好小于0.1Ω。</li>
+  <li><strong>局部屏蔽罩：</strong>如果MCU或无线模块离功率区很近，可以在它们上面加一个屏蔽罩。屏蔽罩要焊接到地平面，不能悬空。</li>
+  <li><strong>线缆屏蔽：</strong>电机线、编码器线，用屏蔽电缆。屏蔽层在控制器端单点接地，不要两端都接，避免形成地环路。</li>
+</ul>
+
+<p><strong>接地策略：</strong></p>
+<p>接地是EMC设计里最容易被忽视的环节。我见过一个项目，所有地都连在一起，结果电机一启动，CAN通信就丢包。后来改成单点接地，问题解决。</p>
+
+<ol>
+  <li><strong>单点接地：</strong>功率地、数字地、模拟地，在电源入口处汇合。中间用0Ω电阻或磁珠隔离。</li>
+  <li><strong>地平面完整：</strong>多层板的话，至少有一层是完整的地平面。不要在地平面上开槽，否则回流路径会被切断。</li>
+  <li><strong>过孔要足够：</strong>地平面的过孔，间距不要超过λ/20。对于100MHz的噪声，过孔间距最好小于15mm。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里，为了省成本，把功率地和数字地直接连在一起。结果EMC测试时，辐射超标了10dB。后来加了磁珠隔离，才勉强通过。从那以后，我再也不敢省这个步骤。</p>
+</div>
+
+<h3>20.4 ESD防护：现场工人的“暴力”操作</h3>
+
+<p>AGV在工厂里跑，工人可能直接用手触摸控制器接口。静电放电（ESD）是常见问题。轻则复位，重则烧芯片。</p>
+
+<p><strong>ESD防护设计：</strong></p>
+<ul>
+  <li><strong>接口加TVS管：</strong>所有对外接口（CAN、RS485、I/O、电源输入），都要加TVS管。TVS管的响应时间要小于1ns，钳位电压要低于芯片的耐压值。</li>
+  <li><strong>串联电阻：</strong>在信号线上串联22Ω~100Ω电阻，可以限制ESD电流。电阻要靠近接口端放置。</li>
+  <li><strong>PCB放电间隙：</strong>在板边和接口处，留出放电间隙。铜皮到板边的距离至少1mm，避免ESD直接打到内部走线。</li>
+  <li><strong>外壳接地：</strong>金属外壳要直接接地，让ESD电流直接泄放到大地，不经过PCB。</li>
+</ul>
+
+<p><strong>布局注意事项：</strong></p>
+<ul>
+  <li>TVS管要尽量靠近接口连接器。走线越短，ESD保护效果越好。</li>
+  <li>TVS管的接地过孔要粗，至少两个过孔并联，降低接地阻抗。</li>
+  <li>不要在TVS管和接口之间走其他敏感信号线。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>ESD测试时，如果发现某个接口容易死机，先检查TVS管的接地是否可靠。很多时候，问题就出在接地过孔太少或者太细。</p>
+</div>
+
+<h3>20.5 知识体系总览</h3>
+
+<p>下面这张图，把EMC与可靠性设计的核心逻辑串起来了。你可以把它当作设计检查清单。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2C3E50">EMC与可靠性设计核心逻辑</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#4A90D9" stroke="#2C3E50" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV控制器EMC设计</text>
+  
+  <!-- 四个分支 -->
+  <!-- PCB布局 -->
+  <rect x="50" y="180" width="180" height="50" rx="8" fill="#5DADE2" stroke="#2C3E50" stroke-width="1.5"/>
+  <text x="140" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">PCB布局要点</text>
+  
+  <!-- 去耦电容 -->
+  <rect x="310" y="180" width="180" height="50" rx="8" fill="#58D68D" stroke="#2C3E50" stroke-width="1.5"/>
+  <text x="400" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">去耦电容选择</text>
+  
+  <!-- 屏蔽与接地 -->
+  <rect x="570" y="180" width="180" height="50" rx="8" fill="#F5B041" stroke="#2C3E50" stroke-width="1.5"/>
+  <text x="660" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">屏蔽与接地</text>
+  
+  <!-- ESD防护 -->
+  <rect x="310" y="380" width="180" height="50" rx="8" fill="#E74C3C" stroke="#2C3E50" stroke-width="1.5"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" fill="white" font-weight="bold">ESD防护</text>
+  
+  <!-- 连线 -->
+  <line x1="400" y1="120" x2="140" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="120" x2="660" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="400" y1="230" x2="400" y2="380" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 子项 -->
+  <text x="140" y="260" text-anchor="middle" font-size="12" fill="#2C3E50">分区布局</text>
+  <text x="140" y="280" text-anchor="middle" font-size="12" fill="#2C3E50">大电流回路短</text>
+  <text x="140" y="300" text-anchor="middle" font-size="12" fill="#2C3E50">数字/模拟隔离</text>
+  
+  <text x="400" y="260" text-anchor="middle" font-size="12" fill="#2C3E50">MLCC + 钽电容</text>
+  <text x="400" y="280" text-anchor="middle" font-size="12" fill="#2C3E50">紧贴电源引脚</text>
+  <text x="400" y="300" text-anchor="middle" font-size="12" fill="#2C3E50">注意直流偏压</text>
+  
+  <text x="660" y="260" text-anchor="middle" font-size="12" fill="#2C3E50">金属外壳接地</text>
+  <text x="660" y="280" text-anchor="middle" font-size="12" fill="#2C3E50">单点接地策略</text>
+  <text x="660" y="300" text-anchor="middle" font-size="12" fill="#2C3E50">完整地平面</text>
+  
+  <text x="400" y="450" text-anchor="middle" font-size="12" fill="#2C3E50">接口加TVS管</text>
+  <text x="400" y="470" text-anchor="middle" font-size="12" fill="#2C3E50">串联限流电阻</text>
+  <text x="400" y="490" text-anchor="middle" font-size="12" fill="#2C3E50">PCB放电间隙</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="540" text-anchor="middle" font-size="11" fill="#7F8C8D">设计原则：从源头控制干扰，后期补救成本高、效果差</text>
+</svg>
+
+<p>EMC设计没有捷径。你花在布局、电容、接地上的每一分钟，都会在测试和现场应用中回报给你。别等到出了问题再回头改，那时候成本就高了。</p>
+
+<div class="footer-nav">
+            <a href="19LogAndDebug.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="21ManufacturingSupport.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

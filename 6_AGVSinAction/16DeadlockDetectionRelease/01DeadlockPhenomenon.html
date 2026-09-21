@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 死锁现象初探</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="active">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 死锁现象初探：什么是AGV死锁？</h2>
+
+<p>大家好，我是老张。在AGV调度这行摸爬滚打了十几年，今天咱们来聊聊一个让所有项目经理都头疼的问题——<strong>死锁</strong>。</p>
+
+<p>死锁这东西，说白了就是一群AGV在某个区域互相堵住，谁也动不了。你想想看，一个车间里几十台AGV跑来跑去，突然全都卡住了，产线停摆，老板急得跳脚。嗯，我当年第一次遇到这情况时，还以为是程序bug，查了三天三夜才发现是死锁。</p>
+
+<h3>1.1 死锁的直观理解</h3>
+
+<p>先别急着看公式和定义。咱们用个生活化的例子来理解。</p>
+
+<p>假设你开车到了一个十字路口。你从东往西走，我从南往北走。你到了路口中间，我也到了路口中间。你挡着我，我挡着你。谁都想先走，但谁都不让。结果就是——<strong>大家都动不了</strong>。</p>
+
+<p>这就是死锁。AGV死锁本质上是一样的：<br>
+多台AGV在共享资源（比如路径交叉点、工位、充电站）上互相等待，形成循环依赖，导致系统整体瘫痪。</p>
+
+<div class="highlight">
+  <p><strong>死锁的四个必要条件（Coffman条件）：</strong></p>
+  <ol>
+    <li><strong>互斥</strong>：资源一次只能被一台AGV占用</li>
+    <li><strong>持有并等待</strong>：AGV占着资源不放，同时等待其他资源</li>
+    <li><strong>不可剥夺</strong>：资源不能被强制拿走</li>
+    <li><strong>循环等待</strong>：形成闭环等待链</li>
+  </ol>
+  <p>这四个条件缺一不可。只要打破任意一个，死锁就能解除。</p>
+</div>
+
+<h3>1.2 一个简单的十字路口死锁案例</h3>
+
+<p>咱们来看一个最经典的场景。我画了个示意图，你一看就明白。</p>
+
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="600" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 十字路口道路 -->
+  <rect x="200" y="0" width="200" height="400" fill="#e0e0e0" stroke="#333" stroke-width="2"/>
+  <rect x="0" y="150" width="600" height="100" fill="#e0e0e0" stroke="#333" stroke-width="2"/>
+  
+  <!-- 道路标线 -->
+  <line x1="300" y1="0" x2="300" y2="150" stroke="#ffcc00" stroke-width="2" stroke-dasharray="8,4"/>
+  <line x1="300" y1="250" x2="300" y2="400" stroke="#ffcc00" stroke-width="2" stroke-dasharray="8,4"/>
+  <line x1="200" y1="200" x2="400" y2="200" stroke="#ffcc00" stroke-width="2" stroke-dasharray="8,4"/>
+  
+  <!-- 路口中心区域 -->
+  <rect x="200" y="150" width="200" height="100" fill="#ffe0e0" stroke="#ff4444" stroke-width="3" rx="5"/>
+  <text x="300" y="205" text-anchor="middle" font-size="16" fill="#cc0000" font-weight="bold">冲突区</text>
+  
+  <!-- AGV A - 从东向西 -->
+  <rect x="420" y="160" width="50" height="30" fill="#4a90d9" rx="5" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="445" y="180" text-anchor="middle" font-size="14" fill="white" font-weight="bold">A</text>
+  <text x="445" y="145" text-anchor="middle" font-size="12" fill="#333">东→西</text>
+  <!-- 箭头 -->
+  <polygon points="420,175 410,170 410,180" fill="#4a90d9"/>
+  
+  <!-- AGV B - 从南向北 -->
+  <rect x="270" y="260" width="30" height="50" fill="#e67e22" rx="5" stroke="#c0601a" stroke-width="2"/>
+  <text x="285" y="290" text-anchor="middle" font-size="14" fill="white" font-weight="bold">B</text>
+  <text x="315" y="290" text-anchor="middle" font-size="12" fill="#333">南→北</text>
+  <!-- 箭头 -->
+  <polygon points="285,260 280,250 290,250" fill="#e67e22"/>
+  
+  <!-- AGV C - 从西向东 -->
+  <rect x="130" y="210" width="50" height="30" fill="#27ae60" rx="5" stroke="#1a7a42" stroke-width="2"/>
+  <text x="155" y="230" text-anchor="middle" font-size="14" fill="white" font-weight="bold">C</text>
+  <text x="155" y="255" text-anchor="middle" font-size="12" fill="#333">西→东</text>
+  <!-- 箭头 -->
+  <polygon points="180,225 190,220 190,230" fill="#27ae60"/>
+  
+  <!-- AGV D - 从北向南 -->
+  <rect x="300" y="90" width="30" height="50" fill="#8e44ad" rx="5" stroke="#6c3483" stroke-width="2"/>
+  <text x="315" y="120" text-anchor="middle" font-size="14" fill="white" font-weight="bold">D</text>
+  <text x="345" y="120" text-anchor="middle" font-size="12" fill="#333">北→南</text>
+  <!-- 箭头 -->
+  <polygon points="315,140 310,130 320,130" fill="#8e44ad"/>
+  
+  <!-- 等待标记 -->
+  <text x="445" y="210" text-anchor="middle" font-size="11" fill="#cc0000">等待C让行</text>
+  <text x="315" y="320" text-anchor="middle" font-size="11" fill="#cc0000">等待A让行</text>
+  <text x="155" y="270" text-anchor="middle" font-size="11" fill="#cc0000">等待D让行</text>
+  <text x="315" y="80" text-anchor="middle" font-size="11" fill="#cc0000">等待B让行</text>
+  
+  <!-- 循环等待箭头 -->
+  <path d="M445,195 Q500,200 500,290 Q500,320 315,320" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <path d="M315,310 Q250,310 200,290 Q155,270 155,270" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <path d="M155,240 Q100,230 100,150 Q100,120 315,120" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <path d="M315,100 Q350,100 400,100 Q445,100 445,160" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="4,3"/>
+  
+  <!-- 图例 -->
+  <rect x="10" y="340" width="580" height="50" fill="white" stroke="#ccc" rx="5"/>
+  <text x="20" y="365" font-size="12" fill="#333">图例：</text>
+  <rect x="60" y="352" width="15" height="15" fill="#ff4444" rx="2"/>
+  <text x="80" y="365" font-size="11" fill="#333">死锁循环</text>
+  <rect x="160" y="352" width="15" height="15" fill="#ffe0e0" stroke="#ff4444" rx="2"/>
+  <text x="180" y="365" font-size="11" fill="#333">冲突区域</text>
+  <text x="300" y="365" font-size="11" fill="#888">| 四台AGV互相等待，形成闭环</text>
+</svg>
+
+<p>你看这张图。四台AGV（A、B、C、D）同时到达十字路口。每台车都想穿过路口，但每台车都被另一台车挡住了去路。</p>
+
+<ul>
+  <li><strong>AGV A</strong>（蓝色）从东往西走，被C挡住了</li>
+  <li><strong>AGV B</strong>（橙色）从南往北走，被A挡住了</li>
+  <li><strong>AGV C</strong>（绿色）从西往东走，被D挡住了</li>
+  <li><strong>AGV D</strong>（紫色）从北往南走，被B挡住了</li>
+</ul>
+
+<p>这就形成了一个完美的循环等待链：A→C→D→B→A。谁也别想走。</p>
+
+<div class="tip">
+  <p><strong>💡 个人经验：</strong>我在项目里见过最离谱的死锁，是12台AGV在一个环形走廊里堵成一圈。当时监控画面看起来就像个「AGV贪吃蛇」。后来我们花了整整两天才手动解开。从那以后，我设计系统时第一件事就是考虑死锁预防。</p>
+</div>
+
+<h3>1.3 死锁的代价</h3>
+
+<p>死锁不是小事。我给大家算笔账：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background-color:#e8f4fd;">
+    <th>影响维度</th>
+    <th>具体表现</th>
+    <th>典型损失</th>
+  </tr>
+  <tr>
+    <td>生产效率</td>
+    <td>产线停摆，物料无法配送</td>
+    <td>每小时损失数万到数十万</td>
+  </tr>
+  <tr>
+    <td>设备寿命</td>
+    <td>AGV电机长时间堵转，电池过放</td>
+    <td>缩短设备寿命30%以上</td>
+  </tr>
+  <tr>
+    <td>系统可靠性</td>
+    <td>调度系统崩溃，需要人工干预</td>
+    <td>恢复时间从几分钟到几小时</td>
+  </tr>
+  <tr>
+    <td>安全风险</td>
+    <td>人工介入时可能发生碰撞</td>
+    <td>设备损坏或人员受伤</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>⚠️ 避坑指南：</strong>我曾经在一个项目中，客户为了省钱，只部署了10台AGV，觉得死锁概率低。结果投产第三天就发生了死锁，整个仓库瘫痪了4小时。后来我们紧急加装了死锁检测模块，才算稳住。所以我的建议是：<strong>不管AGV数量多少，死锁检测必须从一开始就设计进去</strong>。别等出了事再补，那代价太大了。</p>
+</div>
+
+<h3>1.4 死锁检测的基本思路</h3>
+
+<p>那么，怎么知道系统里有没有死锁呢？</p>
+
+<p>说白了就两步：</p>
+
+<ol>
+  <li><strong>建图</strong>：把AGV和资源的关系画成一张图。AGV是节点，等待关系是边。</li>
+  <li><strong>找环</strong>：在这张图里找循环。有环，就有死锁。</li>
+</ol>
+
+<p>我习惯用<strong>资源分配图（RAG）</strong>来做这件事。每个资源（路口、工位、路段）和每个AGV都作为一个节点。如果AGV占用了资源，画一条从AGV到资源的边；如果AGV在等待资源，画一条从资源到AGV的边。</p>
+
+<p>然后，用深度优先搜索（DFS）或者拓扑排序来找环。找到环，就找到了死锁。</p>
+
+<pre><code>// 伪代码：死锁检测核心逻辑
+function detectDeadlock(agvList, resourceList):
+    // 1. 构建资源分配图
+    graph = buildRAG(agvList, resourceList)
+    
+    // 2. 对每个节点做DFS找环
+    for each node in graph.nodes:
+        if node not visited:
+            if dfsFindCycle(node, graph):
+                return true  // 发现死锁
+    
+    return false  // 无死锁
+
+function dfsFindCycle(node, graph):
+    mark node as visiting
+    for each neighbor in graph.getNeighbors(node):
+        if neighbor is visiting:
+            return true  // 找到环
+        if neighbor not visited:
+            if dfsFindCycle(neighbor, graph):
+                return true
+    mark node as visited
+    return false
+</code></pre>
+
+<p>这段代码看着简单，但实际项目中要考虑的东西多得多。比如：</p>
+<ul>
+  <li>AGV的路径是动态变化的，图要实时更新</li>
+  <li>多个路口可能形成嵌套死锁</li>
+  <li>检测频率太高会影响性能，太低又可能漏检</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong></p>
+  <ul>
+    <li>死锁的本质是<strong>循环等待</strong></li>
+    <li>十字路口是最简单的死锁场景</li>
+    <li>死锁检测的核心是<strong>找环</strong></li>
+    <li>预防胜于治疗，设计阶段就要考虑</li>
+  </ul>
+</div>
+
+<p>好了，这一章就聊到这儿。死锁这个概念，说白了就是「你等我、我等他、他等你」的恶性循环。下一章咱们会深入讲讲怎么用代码实现死锁检测，以及我在实际项目中踩过的那些坑。</p>
+
+<hr style="border:1px solid #ddd; margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02FourNecessaryConditions.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

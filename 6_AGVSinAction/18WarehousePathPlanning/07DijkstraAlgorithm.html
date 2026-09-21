@@ -1,0 +1,331 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 Dijkstra算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="active">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 Dijkstra算法：原理、伪代码、在仓储地图上的应用实例</h2>
+
+<p>各位工程师朋友，今天我们来聊聊Dijkstra算法。</p>
+<p>说实话，这个算法在AGV路径规划里，就像螺丝刀在工具箱里一样——基础，但离不开。我最早接触它是在大学的数据结构课上，当时觉得就是个找最短路径的数学游戏。直到后来做仓储项目，才发现这玩意儿是真能解决实际问题的。</p>
+
+<h3>7.1 算法原理：说白了就是“贪心”</h3>
+
+<p>Dijkstra算法的核心思想，我总结成一句话：<strong>每次找离起点最近的那个点，然后看看能不能通过它让别的点更近</strong>。</p>
+<p>你想想看，这像不像我们平时找路？从A点到B点，你肯定先看看周围哪条路最近，走过去，再继续看。嗯，就是这么个逻辑。</p>
+
+<div class="highlight">
+  <p><strong>核心三要素：</strong></p>
+  <ul>
+    <li><strong>起点</strong>：AGV的当前位置</li>
+    <li><strong>距离表</strong>：记录每个节点到起点的最短距离</li>
+    <li><strong>访问标记</strong>：哪些节点已经确定了最短路径</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过一个问题：如果地图上有负权重的边（比如某些通道特别快），Dijkstra就会失效。所以记住，<strong>这个算法只适用于非负权重的图</strong>。仓储场景里，路径长度、时间成本都是正数，所以刚好能用。</p>
+
+<h3>7.2 伪代码：看着复杂，其实就几步</h3>
+
+<p>我个人习惯把伪代码写在白板上，边写边想。下面这个版本是我在项目里常用的，去掉了花哨的优化，保留了最核心的逻辑。</p>
+
+<pre><code>function Dijkstra(Graph, source):
+    // 初始化
+    dist[source] = 0
+    for each vertex v in Graph:
+        if v != source:
+            dist[v] = INFINITY
+        visited[v] = false
+    
+    // 主循环
+    while 还有未访问的节点:
+        u = 未访问节点中dist最小的那个
+        visited[u] = true
+        
+        for each 邻居v of u:
+            if not visited[v]:
+                newDist = dist[u] + weight(u, v)
+                if newDist < dist[v]:
+                    dist[v] = newDist
+                    prev[v] = u  // 记录路径
+    
+    return dist, prev</code></pre>
+
+<p>你看，核心就两个操作：<strong>找最小</strong>和<strong>更新邻居</strong>。我刚开始写的时候，总把更新邻居的循环写错，后来养成了习惯——每次更新完都检查一遍prev数组，确保路径是连续的。</p>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>在实际代码里，找最小节点可以用优先队列（最小堆）来优化。这样时间复杂度能从O(V²)降到O((V+E)logV)。V是节点数，E是边数。仓储地图通常节点不多（几百个），但如果你做的是大型仓库，这个优化就很有必要了。</p>
+</div>
+
+<h3>7.3 仓储地图上的应用实例</h3>
+
+<p>好，理论说完了，咱们来点实际的。假设我们有一个小型仓库，地图简化成网格，每个格子是一个节点。</p>
+
+<p><strong>场景描述：</strong></p>
+<ul>
+  <li>AGV从充电站（起点）出发，要去货架A（终点）取货</li>
+  <li>地图上有障碍物（货架、柱子）</li>
+  <li>每条通道的权重是长度（米）</li>
+</ul>
+
+<p>下面这张图是我用SVG画的，展示了Dijkstra算法在仓储地图上的工作过程。</p>
+
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景网格 -->
+  <rect x="50" y="50" width="500" height="300" fill="#f0f8ff" stroke="#333" stroke-width="2"/>
+  
+  <!-- 网格线 -->
+  <line x1="150" y1="50" x2="150" y2="350" stroke="#ccc" stroke-width="1"/>
+  <line x1="250" y1="50" x2="250" y2="350" stroke="#ccc" stroke-width="1"/>
+  <line x1="350" y1="50" x2="350" y2="350" stroke="#ccc" stroke-width="1"/>
+  <line x1="450" y1="50" x2="450" y2="350" stroke="#ccc" stroke-width="1"/>
+  
+  <line x1="50" y1="150" x2="550" y2="150" stroke="#ccc" stroke-width="1"/>
+  <line x1="50" y1="250" x2="550" y2="250" stroke="#ccc" stroke-width="1"/>
+  
+  <!-- 障碍物（货架） -->
+  <rect x="260" y="60" width="80" height="80" fill="#ffd700" stroke="#b8860b" stroke-width="2" rx="5"/>
+  <text x="300" y="105" text-anchor="middle" font-size="12" fill="#333">货架区</text>
+  
+  <rect x="360" y="160" width="80" height="80" fill="#ffd700" stroke="#b8860b" stroke-width="2" rx="5"/>
+  <text x="400" y="205" text-anchor="middle" font-size="12" fill="#333">货架区</text>
+  
+  <!-- 起点（充电站） -->
+  <circle cx="100" cy="100" r="15" fill="#32cd32" stroke="#228b22" stroke-width="2"/>
+  <text x="100" y="105" text-anchor="middle" font-size="10" fill="white">起点</text>
+  
+  <!-- 终点（货架A） -->
+  <circle cx="500" cy="300" r="15" fill="#ff6347" stroke="#dc143c" stroke-width="2"/>
+  <text x="500" y="305" text-anchor="middle" font-size="10" fill="white">终点</text>
+  
+  <!-- 路径节点 -->
+  <circle cx="100" cy="200" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="200" cy="200" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="300" cy="200" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="400" cy="200" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="500" cy="200" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  
+  <circle cx="100" cy="300" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="200" cy="300" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="300" cy="300" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  <circle cx="400" cy="300" r="8" fill="#87ceeb" stroke="#4682b4" stroke-width="1.5"/>
+  
+  <!-- 最短路径（绿色粗线） -->
+  <line x1="100" y1="100" x2="100" y2="200" stroke="#228b22" stroke-width="4"/>
+  <line x1="100" y1="200" x2="200" y2="200" stroke="#228b22" stroke-width="4"/>
+  <line x1="200" y1="200" x2="300" y2="200" stroke="#228b22" stroke-width="4"/>
+  <line x1="300" y1="200" x2="400" y2="200" stroke="#228b22" stroke-width="4"/>
+  <line x1="400" y1="200" x2="500" y2="200" stroke="#228b22" stroke-width="4"/>
+  <line x1="500" y1="200" x2="500" y2="300" stroke="#228b22" stroke-width="4"/>
+  
+  <!-- 路径标注 -->
+  <text x="150" y="190" font-size="10" fill="#228b22">10m</text>
+  <text x="250" y="190" font-size="10" fill="#228b22">10m</text>
+  <text x="350" y="190" font-size="10" fill="#228b22">10m</text>
+  <text x="450" y="190" font-size="10" fill="#228b22">10m</text>
+  <text x="505" y="250" font-size="10" fill="#228b22">10m</text>
+  
+  <!-- 图例 -->
+  <rect x="50" y="360" width="500" height="30" fill="#f5f5f5" stroke="#ddd" stroke-width="1" rx="3"/>
+  <circle cx="80" cy="375" r="6" fill="#32cd32"/>
+  <text x="95" y="379" font-size="10" fill="#333">起点</text>
+  <circle cx="160" cy="375" r="6" fill="#ff6347"/>
+  <text x="175" y="379" font-size="10" fill="#333">终点</text>
+  <rect x="240" y="369" width="15" height="12" fill="#ffd700"/>
+  <text x="262" y="379" font-size="10" fill="#333">障碍物</text>
+  <line x1="340" y1="375" x2="370" y2="375" stroke="#228b22" stroke-width="3"/>
+  <text x="378" y="379" font-size="10" fill="#333">最短路径</text>
+</svg>
+
+<p>这张图里，绿色粗线就是Dijkstra算法算出来的最短路径。你可能会问：为什么绕开了货架区？因为货架区是障碍物，算法在初始化时就把这些节点标记为不可达了。</p>
+
+<p><strong>具体计算过程：</strong></p>
+<ol>
+  <li>起点(100,100)距离为0，其他节点为∞</li>
+  <li>从起点出发，更新邻居：向下到(100,200)距离10m，向右到(200,100)距离10m</li>
+  <li>选最小的(100,200)，继续更新它的邻居</li>
+  <li>重复这个过程，直到终点被访问</li>
+  <li>最终得到路径：起点→(100,200)→(200,200)→(300,200)→(400,200)→(500,200)→终点</li>
+</ol>
+
+<div class="warning">
+  <p><strong>注意：</strong>我曾经在一个项目里吃过亏——地图上有个窄通道，宽度刚好够AGV通过，但Dijkstra算法只考虑了距离，没考虑通道宽度。结果AGV卡在那里了。所以，<strong>权重不能只设距离，还得考虑通行难度</strong>。比如窄通道的权重设大一点，或者干脆设成障碍物。</p>
+</div>
+
+<h3>7.4 实际项目中的避坑指南</h3>
+
+<p>做仓储AGV路径规划，Dijkstra算法虽然基础，但坑不少。我踩过的几个，分享给你：</p>
+
+<ul>
+  <li><strong>地图更新不及时</strong>：仓库里货架位置会变，如果地图不更新，算法算出来的路径就是错的。我建议每次任务开始前，都重新加载一次地图。</li>
+  <li><strong>多AGV冲突</strong>：Dijkstra只算单台AGV的路径。多台AGV同时运行时，得加交通管制。我一般用时间窗法，给每段路分配时间片。</li>
+  <li><strong>动态障碍物</strong>：比如有人突然走到通道上。这时候Dijkstra得重新算。我习惯在算法外面包一层监控，检测到障碍物就触发重规划。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你刚开始做AGV路径规划，先用Dijkstra把基础功能跑通。别一上来就上A*、RRT那些高级算法。基础打牢了，后面优化起来才顺手。我在第一个项目里就是太心急，结果debug花了两周。</p>
+</div>
+
+<p>好了，Dijkstra算法在仓储地图上的应用就讲到这里。记住，<strong>算法是死的，场景是活的</strong>。多想想你的仓库里有什么特殊情况，然后去调整算法参数。这才是工程师该干的事。</p>
+
+<div class="footer-nav">
+            <a href="06EnvironmentModeling.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08AStarAlgorithm.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

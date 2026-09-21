@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 激光雷达数据处理与建图基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="active">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 激光雷达数据处理与建图基础</h2>
+
+<p>各位同学，欢迎来到第八讲。这一讲我们聊聊激光雷达的数据处理，还有建图的基础。说实话，这部分内容在AGV导航里属于「地基」——地基打不牢，后面定位、规划全得翻车。我自己刚入行那会儿，就吃过点云没处理好、建图建出一堆鬼影的亏，今天咱们把这些坑一个个填上。</p>
+
+<h3>8.1 激光雷达点云数据格式</h3>
+
+<p>先说说点云长什么样。激光雷达扫出来的数据，本质上是一堆三维坐标点，每个点包含(x, y, z)坐标，有的还带强度值(intensity)或时间戳。常见的格式有这么几种：</p>
+
+<ul>
+<li><strong>PCD格式</strong>：Point Cloud Library的标配，带文件头，可读性好</li>
+<li><strong>PLY格式</strong>：多边形文件格式，支持颜色和法向量</li>
+<li><strong>ROS的sensor_msgs/LaserScan</strong>：2D激光常用，存的是距离和角度</li>
+<li><strong>ROS的sensor_msgs/PointCloud2</strong>：3D激光常用，结构灵活</li>
+</ul>
+
+<p>我个人习惯在ROS里直接用PointCloud2格式，因为它能直接跟PCL库对接，省去格式转换的麻烦。不过要注意，不同激光雷达的坐标系定义可能不一样——有的x轴朝前，有的y轴朝前，这个搞错了，建图直接歪掉。</p>
+
+<div class="highlight">
+<p><strong>重要提醒</strong>：拿到新雷达，第一件事就是打印一帧点云，肉眼确认坐标系方向。别问我怎么知道的——我曾经在项目里因为这个原因，排查了整整两天。</p>
+</div>
+
+<h3>8.2 点云滤波：直通、体素、统计</h3>
+
+<p>原始点云数据量很大，而且包含大量噪声。你想想看，一个16线激光雷达每秒能产生30万个点，全扔给建图算法，CPU直接冒烟。所以滤波是必须的。</p>
+
+<h4>8.2.1 直通滤波</h4>
+
+<p>直通滤波说白了就是「切一刀」。比如你的AGV只在2米高的空间内运行，那把z > 2.0的点全砍掉。代码很简单：</p>
+
+<pre><code>pcl::PassThrough&lt;pcl::PointXYZ&gt; pass;
+pass.setInputCloud(cloud);
+pass.setFilterFieldName("z");
+pass.setFilterLimits(0.0, 2.0);
+pass.filter(*cloud_filtered);
+</code></pre>
+
+<p>我在项目中遇到过一个问题：直通滤波的边界值设得太死，导致地面反射点被误删，建图时地面那一层全是空洞。后来我习惯留个0.1米的余量。</p>
+
+<h4>8.2.2 体素滤波</h4>
+
+<p>体素滤波是降采样的利器。它把空间划分成一个个小立方体（体素），每个体素里只保留一个重心点。说白了就是用分辨率换效率。</p>
+
+<pre><code>pcl::VoxelGrid&lt;pcl::PointXYZ&gt; voxel;
+voxel.setInputCloud(cloud);
+voxel.setLeafSize(0.05f, 0.05f, 0.05f); // 5cm体素
+voxel.filter(*cloud_filtered);
+</code></pre>
+
+<p>体素大小怎么选？我一般这样定：</p>
+
+<table>
+<tr><th>场景</th><th>体素大小</th><th>说明</th></tr>
+<tr><td>室内走廊</td><td>0.03-0.05m</td><td>细节保留多</td></tr>
+<tr><td>仓库货架</td><td>0.05-0.10m</td><td>平衡精度与速度</td></tr>
+<tr><td>室外大场景</td><td>0.10-0.20m</td><td>主要看轮廓</td></tr>
+</table>
+
+<div class="tip">
+<p><strong>小技巧</strong>：体素滤波会丢失边缘信息。如果你要做精确的建图，建议先体素降采样，再单独保留边缘点。</p>
+</div>
+
+<h4>8.2.3 统计滤波</h4>
+
+<p>统计滤波用来剔除离群点。它的原理很简单：计算每个点与邻近k个点的平均距离，如果这个距离超过阈值（均值+倍数×标准差），就判定为噪声。</p>
+
+<pre><code>pcl::StatisticalOutlierRemoval&lt;pcl::PointXYZ&gt; sor;
+sor.setInputCloud(cloud);
+sor.setMeanK(50);          // 邻近点数量
+sor.setStddevMulThresh(1.0); // 标准差倍数
+sor.filter(*cloud_filtered);
+</code></pre>
+
+<p>嗯，这里要注意：标准差倍数设得太小，会把正常点也干掉；设得太大，噪声又滤不干净。我一般从1.0开始调，看效果再微调。</p>
+
+<h3>8.3 激光雷达畸变校正</h3>
+
+<p>激光雷达在运动过程中扫描，会产生畸变。为什么？因为雷达转一圈需要时间（比如100ms），这期间机器人可能已经移动了0.5米。结果就是：同一个物体，在扫描起始和结束时的位置不一样，建图时出现重影。</p>
+
+<p>畸变校正的核心思路：利用里程计或IMU数据，把每个激光点投影到同一个时间戳下。具体步骤：</p>
+
+<ol>
+<li>获取每个激光点的时间戳（相对扫描起始）</li>
+<li>根据里程计插值，得到每个时刻的机器人位姿</li>
+<li>把每个点从雷达坐标系变换到世界坐标系</li>
+<li>再统一投影到扫描结束时刻的坐标系</li>
+</ol>
+
+<p>代码实现大致长这样：</p>
+
+<pre><code>// 伪代码示意
+for (int i = 0; i &lt; scan_points.size(); i++) {
+    double t = scan_points[i].time;  // 相对时间
+    Pose pose = interpolateOdom(t);  // 里程计插值
+    Point p_world = transform(scan_points[i], pose);
+    scan_corrected.push_back(p_world);
+}
+</code></pre>
+
+<div class="warning">
+<p><strong>避坑指南</strong>：我曾经在畸变校正时直接用线性插值，结果在急转弯场景下建图全糊了。后来改用IMU辅助的匀速模型插值，效果才稳定。记住：里程计频率不够时，IMU是救命稻草。</p>
+</div>
+
+<h3>8.4 Gmapping算法原理与参数调优</h3>
+
+<p>Gmapping是2D激光SLAM的经典算法，基于粒子滤波。它的核心思想：用一堆粒子来估计机器人的位姿和地图，每个粒子代表一个可能的轨迹。</p>
+
+<h4>8.4.1 算法流程</h4>
+
+<p>Gmapping的流程可以概括为四步：</p>
+
+<ol>
+<li><strong>提议分布</strong>：利用激光观测更新粒子的权重，让粒子集中在高概率区域</li>
+<li><strong>权重计算</strong>：根据观测模型计算每个粒子的重要性权重</li>
+<li><strong>重采样</strong>：剔除权重低的粒子，复制权重高的粒子</li>
+<li><strong>地图更新</strong>：用每个粒子的轨迹更新栅格地图</li>
+</ol>
+
+<p>这里有个关键点：Gmapping的提议分布结合了里程计和激光数据，比纯里程计更准。说白了，就是让激光「拽着」粒子往正确方向走。</p>
+
+<h4>8.4.2 参数调优</h4>
+
+<p>Gmapping的参数很多，但真正需要调的也就这几个：</p>
+
+<table>
+<tr><th>参数</th><th>默认值</th><th>调优建议</th></tr>
+<tr><td>particles</td><td>30</td><td>场景越大、噪声越大，粒子数越多（50-100）</td></tr>
+<tr><td>delta</td><td>0.05</td><td>地图分辨率，一般0.05m够用，精细场景用0.025m</td></tr>
+<tr><td>linearUpdate</td><td>1.0</td><td>机器人移动多少米更新一次地图，建议0.5-1.0</td></tr>
+<tr><td>angularUpdate</td><td>0.5</td><td>机器人旋转多少弧度更新一次，建议0.3-0.5</td></tr>
+<tr><td>srr</td><td>0.01</td><td>里程计平移噪声，根据实际里程计精度调</td></tr>
+<tr><td>srt</td><td>0.02</td><td>里程计旋转噪声，一般比srr大一点</td></tr>
+</table>
+
+<div class="highlight">
+<p><strong>实战经验</strong>：我调Gmapping时有个习惯——先调粒子数。粒子太少，建图容易发散；粒子太多，CPU扛不住。一般从30开始，如果建图出现「鬼影」就加到50，还不行就检查畸变校正和里程计。</p>
+</div>
+
+<p>还有一个容易被忽略的参数：<code>minimumScore</code>。它控制激光匹配的最低分数，低于这个值就丢弃观测。我建议设成50-100，能有效过滤掉遮挡严重时的错误匹配。</p>
+
+<h3>8.5 本章知识体系</h3>
+
+<p>下面这张图把本章的核心逻辑串起来了：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="780" height="380" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">激光雷达数据处理与建图知识体系</text>
+  
+  <!-- 原始点云 -->
+  <rect x="300" y="70" width="200" height="50" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="8"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="#2c3e50">原始激光点云</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#3498db" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 滤波模块 -->
+  <rect x="50" y="150" width="200" height="50" fill="#fff3cd" stroke="#f0ad4e" stroke-width="2" rx="8"/>
+  <text x="150" y="180" text-anchor="middle" font-size="14" fill="#2c3e50">直通滤波</text>
+  
+  <rect x="300" y="150" width="200" height="50" fill="#fff3cd" stroke="#f0ad4e" stroke-width="2" rx="8"/>
+  <text x="400" y="180" text-anchor="middle" font-size="14" fill="#2c3e50">体素滤波</text>
+  
+  <rect x="550" y="150" width="200" height="50" fill="#fff3cd" stroke="#f0ad4e" stroke-width="2" rx="8"/>
+  <text x="650" y="180" text-anchor="middle" font-size="14" fill="#2c3e50">统计滤波</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="200" x2="150" y2="230" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="200" x2="400" y2="230" stroke="#3498db" stroke-width="2"/>
+  <line x1="650" y1="200" x2="650" y2="230" stroke="#3498db" stroke-width="2"/>
+  
+  <!-- 畸变校正 -->
+  <rect x="250" y="230" width="300" height="50" fill="#d4edda" stroke="#28a745" stroke-width="2" rx="8"/>
+  <text x="400" y="260" text-anchor="middle" font-size="16" fill="#2c3e50">激光雷达畸变校正</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="280" x2="400" y2="310" stroke="#3498db" stroke-width="2"/>
+  
+  <!-- Gmapping -->
+  <rect x="200" y="310" width="400" height="50" fill="#f8d7da" stroke="#e74c3c" stroke-width="2" rx="8"/>
+  <text x="400" y="340" text-anchor="middle" font-size="16" fill="#2c3e50">Gmapping建图（粒子滤波）</text>
+  
+  <!-- 箭头标记 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+  </defs>
+  
+  <!-- 说明文字 -->
+  <text x="400" y="380" text-anchor="middle" font-size="12" fill="#7f8c8d">数据流方向：原始点云 → 滤波 → 畸变校正 → 建图</text>
+</svg>
+
+<p>这张图很直观：原始点云进来，先过三道滤波关，再做畸变校正，最后喂给Gmapping建图。每一步都影响最终地图质量，缺一不可。</p>
+
+<div class="tip">
+<p><strong>个人建议</strong>：刚开始学的时候，别急着调Gmapping参数。先把滤波和畸变校正做好——我见过太多人花一周调粒子数，结果发现是畸变校正没开。地基稳了，上层才能盖得高。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="07KinematicsAndOdometer.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09CartographerMapping.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

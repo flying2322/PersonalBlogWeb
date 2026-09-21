@@ -1,0 +1,368 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 课程导论</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="active">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 课程导论：AGV行业现状、全局与局部路径规划的区别、融合的必要性、课程目标与学习路径</h2>
+
+<p>大家好，欢迎来到《AGV路径规划：全局与局部融合实战课程》。我是你们这门课的主讲人，一个在移动机器人领域摸爬滚打了十几年的老工程师。</p>
+
+<p>说实话，每次带新人或者做技术分享，我总喜欢先从“为什么”讲起。你想想看，如果连方向都没搞明白，学再多的算法也是白搭。所以今天这第一讲，咱们不急着写代码，先聊聊AGV这个行业到底怎么样了，全局规划和局部规划到底有啥区别，为什么非得把它们揉在一起，以及你学完这门课能收获什么。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>全局规划是“战略”，局部规划是“战术”。没有战略的战术是瞎忙，没有战术的战略是空谈。两者必须融合，AGV才能真正跑起来。</p>
+</div>
+
+<h3>一、AGV行业现状：从“能用”到“好用”的跨越</h3>
+
+<p>AGV（自动导引车）这个行业，我算是看着它长大的。早些年，AGV就是个“轨道上的搬运工”，靠磁条、二维码走固定路线。那时候的项目，说白了就是“铺路”，路铺好了，车就能跑。</p>
+
+<p>但现在不一样了。电商仓储、柔性制造、港口码头……场景越来越复杂。客户不再满足于“车能走”，而是要求“车会走”。什么意思？就是AGV得自己判断路况、躲避障碍、动态调整路线。我去年参与的一个汽车零部件工厂项目，现场有几十台AGV同时跑，还有人工叉车、穿梭车混行。那种场景下，如果还用老一套的固定路径规划，分分钟撞车、死锁。</p>
+
+<p>所以，行业现状可以总结为三点：</p>
+
+<ul>
+  <li><strong>场景复杂化：</strong>从单一通道到多车混行、人机协作。</li>
+  <li><strong>效率要求高：</strong>不再是“能运就行”，而是“怎么运最快、最省电”。</li>
+  <li><strong>智能化升级：</strong>从“按图索骥”到“自主决策”。</li>
+</ul>
+
+<p>嗯，这里要注意，智能化不是万能药。我见过不少团队，一上来就上深度学习、强化学习，结果现场跑起来还不如传统算法稳定。所以，咱们这门课讲的是“实战”，不是“炫技”。</p>
+
+<h3>二、全局路径规划 vs 局部路径规划：一个管“远”，一个管“近”</h3>
+
+<p>很多初学者容易把这两个概念搞混。我简单打个比方：</p>
+
+<p><strong>全局路径规划</strong>，就像你出门前用手机地图规划路线。从A点到B点，走哪条路、经过哪些路口、大概多远，这些都是事先算好的。它依赖的是<strong>静态地图</strong>，也就是已知的环境信息。</p>
+
+<p><strong>局部路径规划</strong>，则像你开车时遇到前方修路，临时绕行。它依赖的是<strong>传感器实时数据</strong>，比如激光雷达、摄像头。它要处理的是动态障碍物、突发情况。</p>
+
+<p>两者的核心区别，我整理了一张表：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>维度</th>
+      <th>全局路径规划</th>
+      <th>局部路径规划</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>输入</td>
+      <td>静态地图（先验信息）</td>
+      <td>传感器数据（实时信息）</td>
+    </tr>
+    <tr>
+      <td>目标</td>
+      <td>找到一条从起点到终点的最优路径</td>
+      <td>安全、平滑地跟随全局路径，避开障碍</td>
+    </tr>
+    <tr>
+      <td>算法代表</td>
+      <td>A*、Dijkstra、RRT</td>
+      <td>DWA、TEB、MPC</td>
+    </tr>
+    <tr>
+      <td>计算频率</td>
+      <td>低（几秒甚至几分钟一次）</td>
+      <td>高（10Hz~50Hz）</td>
+    </tr>
+    <tr>
+      <td>输出</td>
+      <td>一系列路径点（离散的）</td>
+      <td>速度指令（线速度、角速度）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯把全局规划叫做“慢思考”，局部规划叫做“快反应”。两者缺一不可。</p>
+
+<h3>三、为什么要融合？——我踩过的坑告诉你</h3>
+
+<p>这个问题，我用一个真实案例来回答。</p>
+
+<p>几年前我做的一个仓储项目，AGV用的是纯全局规划。地图建好了，路径算好了，车跑得也挺顺。但有一天，仓库里临时堆了一排货架，正好挡在AGV的必经之路上。结果呢？AGV到了那个位置，发现过不去，直接原地报错，停在那不动了。因为它的全局路径是固定的，没有局部规划去“绕一下”。</p>
+
+<p>后来我换了个方案，只做局部规划，不依赖全局路径。结果更糟。AGV在空旷区域还好，一到狭窄通道就“迷路”，因为它没有全局视野，不知道通道尽头是死路还是出口。</p>
+
+<p>所以，<strong>融合的必要性</strong>就体现在这里：</p>
+
+<ul>
+  <li><strong>全局规划提供方向：</strong>避免局部规划陷入“局部最优”，比如走进死胡同。</li>
+  <li><strong>局部规划提供灵活性：</strong>应对动态障碍、临时路障，让AGV不死板。</li>
+  <li><strong>两者互补：</strong>全局规划负责“大方向”，局部规划负责“微调”。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中，把全局路径的更新频率设得太高（每秒一次），结果AGV频繁重新规划路径，导致行驶轨迹来回摆动，效率反而下降了。后来我改成“只在遇到障碍或偏离路径太远时才重规划”，问题就解决了。所以，融合不是简单的“1+1”，而是要考虑时机和频率。</p>
+</div>
+
+<h3>四、课程目标与学习路径</h3>
+
+<p>这门课的目标很明确：<strong>让你能独立设计一套AGV路径规划系统，从全局到局部，从仿真到实车。</strong></p>
+
+<p>具体来说，学完这门课，你应该能做到：</p>
+
+<ol>
+  <li>理解并实现至少两种全局规划算法（A*、RRT*）。</li>
+  <li>理解并实现至少两种局部规划算法（DWA、TEB）。</li>
+  <li>掌握全局与局部规划的融合策略，包括路径重规划、代价地图更新。</li>
+  <li>能在ROS（机器人操作系统）中搭建完整的路径规划模块。</li>
+  <li>具备调试和优化实际AGV路径规划问题的能力。</li>
+</ol>
+
+<p>学习路径上，我建议你按这个顺序来：</p>
+
+<ul>
+  <li><strong>第一阶段（第1-5章）：</strong>打好基础。理解坐标系、地图表示、运动模型。别急着跑算法，先把“车”和“路”搞清楚。</li>
+  <li><strong>第二阶段（第6-15章）：</strong>全局规划。从最简单的Dijkstra开始，再到A*、RRT。我会带着你一行一行写代码。</li>
+  <li><strong>第三阶段（第16-25章）：</strong>局部规划。重点讲DWA和TEB，以及如何与传感器数据结合。</li>
+  <li><strong>第四阶段（第26-30章）：</strong>融合实战。我们会做一个完整的项目，从建图到路径规划，再到实车测试。</li>
+</ul>
+
+<p>下面这张图，是我自己画的课程知识体系框架，你可以先有个整体印象：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV路径规划课程知识体系</text>
+  
+  <!-- 顶层：课程目标 -->
+  <rect x="250" y="60" width="300" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">课程目标：独立设计AGV路径规划系统</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：三大模块 -->
+  <rect x="50" y="140" width="200" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">全局路径规划</text>
+  
+  <rect x="300" y="140" width="200" height="50" rx="10" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">局部路径规划</text>
+  
+  <rect x="550" y="140" width="200" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="650" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">融合策略</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="190" x2="150" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="650" y1="190" x2="650" y2="220" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第三层：具体内容 -->
+  <rect x="30" y="220" width="240" height="120" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="150" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">核心算法</text>
+  <text x="150" y="265" text-anchor="middle" font-size="12" fill="#34495e">• Dijkstra / A*</text>
+  <text x="150" y="285" text-anchor="middle" font-size="12" fill="#34495e">• RRT / RRT*</text>
+  <text x="150" y="305" text-anchor="middle" font-size="12" fill="#34495e">• 代价地图构建</text>
+  <text x="150" y="325" text-anchor="middle" font-size="12" fill="#34495e">• 路径平滑处理</text>
+  
+  <rect x="280" y="220" width="240" height="120" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">核心算法</text>
+  <text x="400" y="265" text-anchor="middle" font-size="12" fill="#34495e">• DWA (动态窗口法)</text>
+  <text x="400" y="285" text-anchor="middle" font-size="12" fill="#34495e">• TEB (时间弹性带)</text>
+  <text x="400" y="305" text-anchor="middle" font-size="12" fill="#34495e">• MPC (模型预测控制)</text>
+  <text x="400" y="325" text-anchor="middle" font-size="12" fill="#34495e">• 传感器融合</text>
+  
+  <rect x="530" y="220" width="240" height="120" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="650" y="245" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">关键问题</text>
+  <text x="650" y="265" text-anchor="middle" font-size="12" fill="#34495e">• 路径重规划时机</text>
+  <text x="650" y="285" text-anchor="middle" font-size="12" fill="#34495e">• 代价地图更新</text>
+  <text x="650" y="305" text-anchor="middle" font-size="12" fill="#34495e">• 多车协同避障</text>
+  <text x="650" y="325" text-anchor="middle" font-size="12" fill="#34495e">• 异常处理机制</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="340" x2="150" y2="370" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="650" y1="340" x2="650" y2="370" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第四层：实践平台 -->
+  <rect x="150" y="370" width="500" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="400" text-anchor="middle" font-size="14" fill="white" font-weight="bold">实践平台：ROS + Gazebo仿真 + 实车验证</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="420" x2="400" y2="450" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第五层：输出 -->
+  <rect x="250" y="450" width="300" height="40" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="475" text-anchor="middle" font-size="14" fill="white" font-weight="bold">输出：可部署的AGV路径规划模块</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>好了，这就是咱们第一讲的全部内容。从行业现状到技术区别，再到融合的必要性和课程规划，我希望你心里已经有了一个清晰的蓝图。记住，路径规划不是孤立的算法堆砌，而是一个系统工程。接下来的29章，我会带着你一步步把它落地。</p>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>这门课的所有代码和示例，我都会在ROS Noetic环境下测试。如果你用的是其他版本，可能会遇到兼容性问题。建议你提前安装好ROS环境，具体教程我会在下一章给出。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02KinematicsBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

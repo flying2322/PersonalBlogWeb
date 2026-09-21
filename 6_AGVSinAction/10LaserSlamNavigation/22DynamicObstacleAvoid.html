@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 动态障碍物避障</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="active">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 动态障碍物避障：costmap层更新、VFH+算法、社会力模型、动态窗口避障</h2>
+
+<p>动态障碍物避障，说白了就是让AGV在跑起来的时候，能躲开突然窜出来的东西。比如仓库里突然有个人推着车经过，或者另一台AGV从拐角冒出来。我刚开始做这个方向时，总觉得避障不就是“检测到障碍物就绕开”嘛，后来发现远没那么简单——怎么绕？绕多远？绕的时候速度怎么变？这些都是坑。</p>
+
+<p>这一章，我打算把四种主流的动态避障方法串起来讲。它们分别是：costmap层更新、VFH+算法、社会力模型、动态窗口避障（DWA）。每种方法都有它的脾气，咱们一个个来看。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>动态避障不是单一算法能搞定的。实际项目中，往往是多种策略组合使用。比如用costmap做环境感知，用DWA做局部路径规划，再用社会力模型处理密集人群场景。</p>
+</div>
+
+<h3>22.1 costmap层更新：让地图“活”起来</h3>
+
+<p>静态地图是死的，但AGV跑的环境是活的。costmap层的核心思想，就是把传感器实时检测到的障碍物信息，动态地“刷”到地图上。</p>
+
+<p>我习惯把costmap分成两层：<strong>静态层</strong>和<strong>动态层</strong>。静态层来自建图时的先验信息，比如墙壁、柱子。动态层则来自激光雷达、深度相机等传感器的实时数据。</p>
+
+<p>更新逻辑其实不复杂：</p>
+
+<ul>
+  <li>传感器扫描到障碍物点，映射到costmap坐标系</li>
+  <li>对应栅格的cost值增加（比如从0变成100）</li>
+  <li>如果障碍物移走了，cost值随时间衰减</li>
+</ul>
+
+<p>这里有个坑——<strong>衰减速度</strong>怎么设？设快了，障碍物刚走地图就清空，万一它又回来呢？设慢了，障碍物走了半天地图还显示有东西，AGV会傻傻地绕远路。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>衰减时间常数设为2~3秒比较稳妥。对于移动速度较慢的障碍物（比如行人），可以适当延长到5秒。我在一个仓储项目里试过，这个参数能让AGV既不会频繁急刹，也不会撞到突然停住的人。</p>
+</div>
+
+<p>另外，costmap更新还有个<strong>膨胀层</strong>的概念。说白了就是把障碍物“胖一圈”，给AGV留出安全距离。膨胀半径一般设为AGV半径的1.2倍。嗯，这个值不是拍脑袋定的，我吃过亏——设太小了容易刮蹭，设太大了AGV钻不过窄通道。</p>
+
+<h3>22.2 VFH+算法：用向量场找路</h3>
+
+<p>VFH+（Vector Field Histogram）是一种基于极坐标直方图的避障方法。它的思路很直观：把机器人周围的障碍物分布，投影到一个360度的直方图上，然后找“空隙”钻过去。</p>
+
+<p>具体步骤是这样的：</p>
+
+<ol>
+  <li>以AGV为中心，建立极坐标网格</li>
+  <li>每个网格根据costmap的障碍物密度，计算一个“障碍物强度值”</li>
+  <li>生成极坐标直方图，横轴是角度，纵轴是障碍物强度</li>
+  <li>设定一个阈值，低于阈值的角度区域就是“可通行区域”</li>
+  <li>从可通行区域中选一个最接近目标方向的角度，作为前进方向</li>
+</ol>
+
+<p>VFH+相比原始VFH的改进，在于它考虑了机器人的<strong>运动学约束</strong>。比如AGV不能原地掉头，那它就不会选一个需要急转弯的方向。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>VFH+在狭窄通道里容易“抖动”。因为左右两边障碍物强度接近，直方图会在两个方向之间来回跳。我遇到过这种情况，AGV在走廊里像喝醉了酒一样左右摇摆。解决办法是加一个“方向保持”的惯性项——如果上次选了左转，这次只要左转方向还在可通行范围内，就优先选左转。</p>
+</div>
+
+<p>VFH+的优点是计算量小，适合嵌入式平台。缺点是对动态障碍物的响应不够平滑——障碍物突然出现时，直方图会剧烈变化，导致AGV急刹或猛拐。</p>
+
+<h3>22.3 社会力模型：模拟人群行为</h3>
+
+<p>社会力模型（Social Force Model）最早是研究行人运动的。它把每个移动物体（包括AGV和行人）都看作受“力”作用的粒子。这些力包括：</p>
+
+<ul>
+  <li><strong>驱动力：</strong>朝向目标点的吸引力</li>
+  <li><strong>排斥力：</strong>来自障碍物和其他移动物体的排斥</li>
+  <li><strong>摩擦力：</strong>避免碰撞的切向力</li>
+</ul>
+
+<p>我为什么要把这个模型放进AGV避障里？因为它在<strong>人机共融</strong>场景下特别好用。比如AGV在商场里送餐，周围全是行人。用传统方法，AGV要么停下来等，要么绕个大圈。但社会力模型能让AGV像人一样“挤”过去——稍微减速、侧身、从人群缝隙中穿过。</p>
+
+<p>实际实现时，我一般这样配置参数：</p>
+
+<table>
+  <tr>
+    <th>参数</th>
+    <th>含义</th>
+    <th>推荐值</th>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>排斥力强度</td>
+    <td>2.0 ~ 5.0</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>排斥力作用范围</td>
+    <td>0.3 ~ 0.8 m</td>
+  </tr>
+  <tr>
+    <td>v_des</td>
+    <td>期望速度</td>
+    <td>0.5 ~ 1.0 m/s</td>
+  </tr>
+  <tr>
+    <td>tau</td>
+    <td>松弛时间</td>
+    <td>0.5 s</td>
+  </tr>
+</table>
+
+<p>松弛时间tau很有意思——它决定了AGV从当前速度切换到期望速度的快慢。tau越小，AGV加减速越猛。我一般设0.5秒，既不会让AGV显得太肉，也不会让乘客觉得晕车。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>社会力模型有个经典问题——<strong>震荡</strong>。当两个AGV迎面相遇时，它们会互相让路，然后同时让到同一侧，又同时让回另一侧，反复震荡。我曾经被这个问题折磨了两周。解决方案是加一个随机扰动，或者引入“右侧通行”的交通规则。</p>
+</div>
+
+<h3>22.4 动态窗口避障（DWA）：速度空间的博弈</h3>
+
+<p>动态窗口避障（Dynamic Window Approach）是我个人最喜欢的方法。它的思路很优雅：在速度空间（线速度v、角速度w）里采样，然后评估每组速度的“好坏”，选最优的那组执行。</p>
+
+<p>DWA的流程可以概括为三步：</p>
+
+<ol>
+  <li><strong>生成动态窗口：</strong>根据当前速度和加速度限制，计算下一时刻可达的速度范围</li>
+  <li><strong>采样：</strong>在动态窗口内均匀采样多组(v, w)</li>
+  <li><strong>评估：</strong>对每组速度模拟一段轨迹，用代价函数打分</li>
+</ol>
+
+<p>代价函数通常包含三个项：</p>
+
+<ul>
+  <li><strong>朝向代价：</strong>轨迹终点与目标点的角度偏差</li>
+  <li><strong>障碍物代价：</strong>轨迹与最近障碍物的距离</li>
+  <li><strong>速度代价：</strong>鼓励高速行驶，提高效率</li>
+</ul>
+
+<p>这三个项的权重怎么配？我一般用<strong>0.5 : 0.3 : 0.2</strong>。为什么？因为安全第一。障碍物代价的权重不能太低，否则AGV会贴着障碍物走，看着都吓人。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>DWA的采样密度直接影响性能。采样太稀疏，可能漏掉最优路径；采样太密，计算量爆炸。我通常采样20组线速度 × 20组角速度 = 400组，在嵌入式平台上能跑到20Hz以上。</p>
+</div>
+
+<p>DWA的另一个优点是<strong>天然支持动态避障</strong>。因为每次规划都基于最新的costmap，障碍物移动了，下一帧的轨迹自然就变了。不需要额外的“跟踪”逻辑。</p>
+
+<p>但DWA也有短板——它是个<strong>局部规划器</strong>，没有全局视野。如果前方是个死胡同，DWA会一直尝试钻进去，直到撞墙。所以实际项目中，DWA必须配合全局路径规划使用。全局规划负责“指路”，DWA负责“躲坑”。</p>
+
+<h3>22.5 四种方法的对比与选型</h3>
+
+<p>说了这么多，到底该用哪种？我整理了一个对比表：</p>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>计算量</th>
+    <th>动态响应</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>costmap层更新</td>
+    <td>低</td>
+    <td>中</td>
+    <td>所有场景（基础层）</td>
+  </tr>
+  <tr>
+    <td>VFH+</td>
+    <td>低</td>
+    <td>快</td>
+    <td>开阔环境、走廊</td>
+  </tr>
+  <tr>
+    <td>社会力模型</td>
+    <td>中</td>
+    <td>平滑</td>
+    <td>人机共融、密集人群</td>
+  </tr>
+  <tr>
+    <td>DWA</td>
+    <td>中高</td>
+    <td>快</td>
+    <td>通用场景（推荐）</td>
+  </tr>
+</table>
+
+<p>我个人建议的搭配方案是：<strong>costmap + DWA</strong>作为基础组合，覆盖90%的场景。如果遇到密集人群，再叠加社会力模型。VFH+可以作为轻量级备选，在算力受限的平台上使用。</p>
+
+<p>最后说一句——没有银弹。每种方法都有它的脾气，关键是你得理解它为什么这样设计，然后在实际项目中不断调参、试错。我当年在第一个AGV项目里，光调DWA的权重就花了两周。但调通了之后，那种成就感，嗯，值得。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2C3E50">动态障碍物避障方法体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#4A90D9" stroke="#2C3E50" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态避障</text>
+  
+  <!-- 四个分支 -->
+  <!-- costmap -->
+  <rect x="50" y="180" width="160" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="130" y="210" text-anchor="middle" font-size="14" fill="#2C3E50" font-weight="bold">costmap层更新</text>
+  
+  <!-- VFH+ -->
+  <rect x="240" y="180" width="160" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="320" y="210" text-anchor="middle" font-size="14" fill="#2C3E50" font-weight="bold">VFH+算法</text>
+  
+  <!-- 社会力模型 -->
+  <rect x="430" y="180" width="160" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="510" y="210" text-anchor="middle" font-size="14" fill="#2C3E50" font-weight="bold">社会力模型</text>
+  
+  <!-- DWA -->
+  <rect x="620" y="180" width="160" height="50" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="700" y="210" text-anchor="middle" font-size="14" fill="#2C3E50" font-weight="bold">动态窗口避障</text>
+  
+  <!-- 连线 -->
+  <line x1="350" y1="120" x2="130" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="380" y1="120" x2="320" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="420" y1="120" x2="510" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="450" y1="120" x2="700" y2="180" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 子特性 -->
+  <!-- costmap子项 -->
+  <rect x="30" y="270" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="130" y="295" text-anchor="middle" font-size="12" fill="#2C3E50">静态层 + 动态层</text>
+  
+  <rect x="30" y="320" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="130" y="345" text-anchor="middle" font-size="12" fill="#2C3E50">衰减时间常数 2~5s</text>
+  
+  <line x1="130" y1="230" x2="130" y2="270" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="130" y1="310" x2="130" y2="320" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- VFH+子项 -->
+  <rect x="220" y="270" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="320" y="295" text-anchor="middle" font-size="12" fill="#2C3E50">极坐标直方图</text>
+  
+  <rect x="220" y="320" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="320" y="345" text-anchor="middle" font-size="12" fill="#2C3E50">运动学约束</text>
+  
+  <line x1="320" y1="230" x2="320" y2="270" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="320" y1="310" x2="320" y2="320" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- 社会力子项 -->
+  <rect x="410" y="270" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="510" y="295" text-anchor="middle" font-size="12" fill="#2C3E50">驱动力 + 排斥力</text>
+  
+  <rect x="410" y="320" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="510" y="345" text-anchor="middle" font-size="12" fill="#2C3E50">人机共融场景</text>
+  
+  <line x1="510" y1="230" x2="510" y2="270" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="510" y1="310" x2="510" y2="320" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- DWA子项 -->
+  <rect x="600" y="270" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="700" y="295" text-anchor="middle" font-size="12" fill="#2C3E50">速度空间采样</text>
+  
+  <rect x="600" y="320" width="200" height="40" rx="5" fill="#FFF3E0" stroke="#FF9800" stroke-width="1"/>
+  <text x="700" y="345" text-anchor="middle" font-size="12" fill="#2C3E50">代价函数评估</text>
+  
+  <line x1="700" y1="230" x2="700" y2="270" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <line x1="700" y1="310" x2="700" y2="320" stroke="#FF9800" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  
+  <!-- 底部推荐 -->
+  <rect x="200" y="400" width="400" height="60" rx="10" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
+  <text x="400" y="425" text-anchor="middle" font-size="14" fill="#2C3E50" font-weight="bold">推荐组合方案</text>
+  <text x="400" y="448" text-anchor="middle" font-size="13" fill="#2C3E50">costmap + DWA（基础）+ 社会力模型（密集人群）</text>
+  
+  <line x1="400" y1="360" x2="400" y2="400" stroke="#4CAF50" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+</svg>
+
+        <div class="footer-nav">
+            <a href="21NavStackPractice.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23MultiAgvCoopNav.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

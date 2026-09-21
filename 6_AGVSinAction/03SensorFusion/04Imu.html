@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 惯性测量单元(IMU)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="active">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 惯性测量单元(IMU)——加速度计与陀螺仪原理、标定与零偏补偿</h2>
+
+<p>各位同学，今天我们聊聊IMU。说实话，IMU在AGV导航里是个又爱又恨的角色。爱它，是因为它不依赖外部信号，能给你高频的角速度和加速度数据；恨它，是因为它漂移起来，能把你的位姿估计带到沟里去。我最早做AGV项目时，就被IMU的零偏坑过——车子明明停着，积分出来的速度却显示在“漂移”。从那以后，我养成了一个习惯：拿到IMU的第一件事，就是做标定和零偏补偿。</p>
+
+<h3>4.1 加速度计与陀螺仪的工作原理</h3>
+
+<p>先说说它们是怎么工作的。你想想看，加速度计本质上就是个“弹簧-质量块”系统。当AGV加速时，质量块会因惯性产生位移，这个位移被电容或压阻效应检测到，换算成加速度值。陀螺仪呢？它用的是科里奥利效应——一个振动的质量块在旋转时会产生垂直于振动方向的力，测出这个力就能算出角速度。</p>
+
+<p>嗯，这里要注意：加速度计测的是“比力”，不是纯重力加速度。什么意思？就是它测的是物体受到的合力加速度，包括重力。所以当AGV静止时，加速度计读数是9.8 m/s²，而不是0。我见过不少新手直接拿这个值做积分，结果位置飞了。</p>
+
+<div class="highlight">
+  <strong>核心公式：</strong>
+  <pre><code>加速度计输出 = 真实加速度 + 重力加速度 + 零偏 + 噪声
+陀螺仪输出 = 真实角速度 + 零偏 + 噪声</code></pre>
+  <p>记住这个公式，后面所有补偿都围绕它展开。</p>
+</div>
+
+<h3>4.2 IMU标定——为什么必须做？</h3>
+
+<p>IMU出厂时虽然做过标定，但运输、焊接、温度变化都会让参数偏移。我个人习惯，每块IMU板子到手后，先做一次六位置标定。说白了，就是让IMU的每个轴分别朝上、朝下、朝左、朝右、朝前、朝后，记录静止时的加速度计读数。</p>
+
+<p>为什么要六个位置？因为每个位置下，重力在三个轴上的投影是已知的。比如Z轴朝上时，理论上加速度计输出应该是[0, 0, 9.8]。实际读数和理论值之间的差异，就是标定要补偿的——包括零偏、比例因子和轴间对准误差。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong> 六位置标定最好用水平台面，确保每个方向都严格垂直。我曾经用了个不太平的桌面，结果标定出来的零偏误差大了0.5 mg，导致后续导航精度下降。后来我改用精密转台，问题就解决了。
+</div>
+
+<h3>4.3 零偏补偿——最关键的环节</h3>
+
+<p>零偏，就是IMU在静止时输出的非零值。加速度计零偏的单位是mg（毫g），陀螺仪零偏的单位是°/h（度每小时）或°/s。一个好的MEMS IMU，加速度计零偏在±10 mg以内，陀螺仪零偏在±1 °/s以内。但实际项目中，温度变化会让零偏漂移，所以需要实时补偿。</p>
+
+<p>我常用的零偏补偿方法有两种：</p>
+
+<ol>
+  <li><strong>静态初始对准：</strong> AGV启动后静止5-10秒，取这段时间IMU输出的平均值作为零偏。这是最简单的方法，但只适用于启动后温度稳定的场景。</li>
+  <li><strong>温度补偿模型：</strong> 建立零偏与温度的拟合曲线。我一般用二次多项式：<code>Bias(T) = a*T² + b*T + c</code>。标定时让IMU从-20°C升温到80°C，记录每个温度点的零偏，然后拟合出a、b、c三个系数。</li>
+</ol>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在零偏补偿时犯过一个低级错误——直接用静态初始对准的值去补偿动态数据。结果AGV一启动，温度变化导致零偏漂移，补偿效果反而更差。后来我改用温度补偿模型，并在每次停车时更新零偏，才解决了这个问题。
+</div>
+
+<h3>4.4 实战：IMU标定与零偏补偿代码</h3>
+
+<p>下面是我在项目中用的一段Python代码，用于六位置标定和零偏计算。代码不长，但很实用。</p>
+
+<pre><code>import numpy as np
+
+# 六位置标定数据（加速度计输出，单位：m/s²）
+# 每个位置取100个样本的平均值
+positions = {
+    'z_up':   [0.02, 0.01, 9.82],
+    'z_down': [0.01, -0.02, -9.78],
+    'x_up':   [9.81, 0.01, 0.02],
+    'x_down': [-9.79, -0.01, 0.01],
+    'y_up':   [0.01, 9.80, 0.02],
+    'y_down': [-0.01, -9.78, 0.01]
+}
+
+# 理论值（重力加速度取9.81 m/s²）
+g = 9.81
+theoretical = {
+    'z_up':   [0, 0, g],
+    'z_down': [0, 0, -g],
+    'x_up':   [g, 0, 0],
+    'x_down': [-g, 0, 0],
+    'y_up':   [0, g, 0],
+    'y_down': [0, -g, 0]
+}
+
+# 计算零偏（取所有位置的平均偏差）
+bias = np.zeros(3)
+count = 0
+for key in positions:
+    measured = np.array(positions[key])
+    theory = np.array(theoretical[key])
+    bias += measured - theory
+    count += 1
+bias /= count
+
+print(f"加速度计零偏: {bias} m/s²")
+# 输出示例: [0.01, -0.005, 0.02]</code></pre>
+
+<p>这段代码的核心思想很简单：每个位置下，实际输出减去理论值，得到的就是该位置的偏差。把所有位置的偏差平均，就得到了零偏。当然，这只是最基础的标定。实际项目中，还需要用最小二乘法同时求解零偏、比例因子和轴间误差。</p>
+
+<h3>4.5 知识体系总览</h3>
+
+<p>为了让你更直观地理解IMU标定与补偿的完整流程，我画了一张图。这张图涵盖了从原始数据到最终补偿输出的所有环节。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">IMU标定与零偏补偿知识体系</text>
+  
+  <!-- 第一层：原始数据 -->
+  <rect x="50" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">原始IMU数据</text>
+  
+  <rect x="300" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">温度传感器数据</text>
+  
+  <rect x="550" y="70" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="650" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">六位置标定数据</text>
+  
+  <!-- 箭头 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <line x1="150" y1="130" x2="150" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="130" x2="400" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="130" x2="650" y2="180" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：标定与建模 -->
+  <rect x="50" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="150" y="215" text-anchor="middle" font-size="14" fill="white" font-weight="bold">零偏计算</text>
+  
+  <rect x="300" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="215" text-anchor="middle" font-size="14" fill="white" font-weight="bold">温度补偿模型拟合</text>
+  
+  <rect x="550" y="180" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="650" y="215" text-anchor="middle" font-size="14" fill="white" font-weight="bold">比例因子与轴间误差</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="240" x2="150" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="240" x2="400" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="240" x2="650" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：补偿 -->
+  <rect x="150" y="290" width="500" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="400" y="325" text-anchor="middle" font-size="16" fill="white" font-weight="bold">实时零偏补偿</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="350" x2="400" y2="400" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：输出 -->
+  <rect x="200" y="400" width="400" height="60" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="400" y="435" text-anchor="middle" font-size="16" fill="white" font-weight="bold">补偿后的IMU数据（用于导航）</text>
+  
+  <!-- 连接线 -->
+  <line x1="250" y1="240" x2="250" y2="290" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="550" y1="240" x2="550" y2="290" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- 说明文字 -->
+  <text x="400" y="485" text-anchor="middle" font-size="12" fill="#7f8c8d">图：IMU标定与零偏补偿的完整流程</text>
+</svg>
+
+<p>从这张图你可以看到，整个流程分为四步：原始数据采集、标定与建模、实时补偿、输出使用。每一步都环环相扣，缺一不可。我个人习惯在AGV每次启动时，先做一次静态初始对准，然后结合温度补偿模型进行实时修正。这样既能保证启动时的快速性，又能应对温度变化带来的漂移。</p>
+
+<h3>4.6 总结与建议</h3>
+
+<p>IMU标定和零偏补偿，说白了就是“把误差找出来，然后减掉”。但实际做起来，细节很多。我最后给你三个建议：</p>
+
+<ul>
+  <li><strong>标定环境要稳定：</strong> 温度、振动、电磁干扰都会影响标定结果。最好在无风、恒温、无振动的环境下进行。</li>
+  <li><strong>零偏补偿要动态：</strong> 不要只做一次静态补偿。AGV运行过程中，温度变化会导致零偏漂移，所以需要实时更新补偿值。</li>
+  <li><strong>数据记录要完整：</strong> 标定过程中，记录每个位置的原始数据、温度、时间戳。这样后期分析问题时，有据可查。</li>
+</ul>
+
+<p>嗯，关于IMU的内容就讲到这里。下一节我们会聊到轮式里程计，看看它是如何与IMU配合，实现更稳定的导航定位。</p>
+
+<div class="footer-nav">
+            <a href="03OdometerModel.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05Lidar.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

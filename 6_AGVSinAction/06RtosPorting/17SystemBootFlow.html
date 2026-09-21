@@ -1,0 +1,451 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 系统启动流程</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="active">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 系统启动流程：从复位到main函数、硬件初始化顺序、RTOS启动与多任务创建</h2>
+
+<p>说实话，很多做嵌入式开发的朋友，写了几年代码，对系统启动流程还是一知半解。我刚开始做AGV控制器那会儿，也踩过不少坑。有一次，板子死活跑不起来，查了三天，最后发现是启动文件里中断向量表配置错了。嗯，从那以后，我养成了一个习惯——每次移植RTOS，第一件事就是把启动流程从头到尾捋一遍。</p>
+
+<p>今天这一章，咱们就聊聊AGV控制器从复位到多任务运行的完整过程。说白了，就是芯片上电后，到底干了哪些事，才让我们的应用代码跑起来的。</p>
+
+<h3>17.1 复位后的第一行代码</h3>
+
+<p>芯片上电复位后，CPU会去固定地址取第一条指令。对于Cortex-M系列内核，这个地址是0x00000000，存放的是栈顶指针；0x00000004存放的是复位中断向量，指向复位处理函数。</p>
+
+<p>我见过不少新手，以为main函数是程序的起点。其实不是。在main之前，系统已经干了一大堆活。你想想看，如果连堆栈都没初始化好，C语言代码怎么运行？</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>复位后，CPU首先执行的是启动文件（startup_xxx.s）中的复位处理函数，而不是main函数。</p>
+</div>
+
+<p>启动文件里主要干了这几件事：</p>
+
+<ul>
+  <li>设置堆栈指针（SP）</li>
+  <li>初始化中断向量表</li>
+  <li>调用SystemInit函数进行时钟配置</li>
+  <li>初始化BSS段（清零）和DATA段（从Flash拷贝到RAM）</li>
+  <li>调用C库的初始化函数</li>
+  <li>最后跳转到main函数</li>
+</ul>
+
+<p>我个人习惯，在SystemInit里把系统时钟、PLL、外设总线时钟都配好。这样进入main后，所有外设都能直接用了。</p>
+
+<h3>17.2 硬件初始化顺序</h3>
+
+<p>硬件初始化顺序，这个很有讲究。顺序搞反了，轻则功能异常，重则直接死机。我在AGV项目里总结了一套顺序，分享给你：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>初始化阶段</th>
+      <th>具体内容</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>第1步</td>
+      <td>时钟系统</td>
+      <td>配置系统时钟、PLL、外设时钟使能</td>
+    </tr>
+    <tr>
+      <td>第2步</td>
+      <td>GPIO基础</td>
+      <td>关键引脚初始化（如调试串口）</td>
+    </tr>
+    <tr>
+      <td>第3步</td>
+      <td>中断控制器</td>
+      <td>NVIC配置，中断优先级分组</td>
+    </tr>
+    <tr>
+      <td>第4步</td>
+      <td>定时器</td>
+      <td>系统滴答定时器（SysTick）</td>
+    </tr>
+    <tr>
+      <td>第5步</td>
+      <td>通信外设</td>
+      <td>UART、CAN、SPI、I2C等</td>
+    </tr>
+    <tr>
+      <td>第6步</td>
+      <td>存储外设</td>
+      <td>Flash、SRAM、外部存储器</td>
+    </tr>
+    <tr>
+      <td>第7步</td>
+      <td>电机驱动相关</td>
+      <td>PWM、编码器接口、电机控制逻辑</td>
+    </tr>
+    <tr>
+      <td>第8步</td>
+      <td>传感器</td>
+      <td>激光雷达、IMU、超声波等</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="warning">
+  <p><strong>注意：</strong>千万不要在时钟还没稳定之前就去操作外设寄存器。我曾经遇到过，在PLL锁定前就去配置UART，结果波特率完全不对，调试信息全是乱码。</p>
+</div>
+
+<h3>17.3 RTOS启动流程</h3>
+
+<p>硬件初始化完成后，就该RTOS登场了。以FreeRTOS为例，启动流程大概是这样的：</p>
+
+<pre><code>int main(void)
+{
+    /* 1. 硬件初始化 */
+    SystemInit();           // 时钟配置
+    BoardInit();            // 板级初始化
+    PeriphInit();           // 外设初始化
+    
+    /* 2. RTOS内核初始化 */
+    prvInitializeTaskLists();   // 初始化任务链表
+    prvInitializeTCB();         // 初始化任务控制块
+    
+    /* 3. 创建启动任务 */
+    xTaskCreate(AppTaskStart, "Start", 512, NULL, 1, NULL);
+    
+    /* 4. 启动调度器 */
+    vTaskStartScheduler();
+    
+    /* 正常情况下不会执行到这里 */
+    while(1);
+}
+</code></pre>
+
+<p>这里有个关键点：<code>vTaskStartScheduler</code>一旦调用，就不会返回了。它会做以下几件事：</p>
+
+<ul>
+  <li>创建空闲任务（Idle Task）</li>
+  <li>初始化系统滴答定时器</li>
+  <li>设置PendSV和SVC中断</li>
+  <li>启动第一个任务</li>
+</ul>
+
+<p>嗯，这里要注意。启动调度器之前，一定要确保SysTick已经配置好了。否则RTOS没法进行时间片轮转，任务调度就乱套了。</p>
+
+<h3>17.4 多任务创建的艺术</h3>
+
+<p>多任务创建，说白了就是怎么把AGV控制器的各个功能模块，合理地分配到不同的任务里。我一般遵循几个原则：</p>
+
+<ol>
+  <li><strong>实时性要求高的放高优先级</strong>——比如电机控制、急停处理</li>
+  <li><strong>周期性的任务用定时器触发</strong>——比如传感器数据采集</li>
+  <li><strong>非关键任务放低优先级</strong>——比如日志记录、状态显示</li>
+</ol>
+
+<p>下面是一个典型的AGV控制器任务划分：</p>
+
+<pre><code>/* 任务优先级定义 */
+#define PRIO_MOTOR_CTRL     5   // 电机控制（最高）
+#define PRIO_SAFETY         4   // 安全监控
+#define PRIO_SENSOR         3   // 传感器采集
+#define PRIO_NAVIGATION     2   // 导航算法
+#define PRIO_COMM           1   // 通信任务
+#define PRIO_LOGGING        0   // 日志（最低）
+
+/* 创建任务 */
+xTaskCreate(MotorControlTask, "Motor", 256, NULL, PRIO_MOTOR_CTRL, NULL);
+xTaskCreate(SafetyMonitorTask, "Safety", 128, NULL, PRIO_SAFETY, NULL);
+xTaskCreate(SensorTask, "Sensor", 256, NULL, PRIO_SENSOR, NULL);
+xTaskCreate(NavigationTask, "Nav", 512, NULL, PRIO_NAVIGATION, NULL);
+xTaskCreate(CommTask, "Comm", 256, NULL, PRIO_COMM, NULL);
+xTaskCreate(LoggingTask, "Log", 128, NULL, PRIO_LOGGING, NULL);
+</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈：</strong>任务栈大小别抠得太死。我刚开始做AGV时，为了省内存，把每个任务的栈都压到最小。结果跑着跑着就栈溢出，系统随机死机。后来我学乖了，每个任务至少留30%的余量。</p>
+</div>
+
+<h3>17.5 启动流程的SVG全景图</h3>
+
+<p>为了让你更直观地理解整个启动流程，我画了一张图：</p>
+
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV控制器系统启动流程</text>
+  
+  <!-- 阶段1：复位 -->
+  <rect x="300" y="60" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">芯片复位</text>
+  
+  <!-- 箭头1 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 阶段2：启动文件 -->
+  <rect x="280" y="140" width="240" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" font-size="16" fill="white" font-weight="bold">启动文件(startup_xxx.s)</text>
+  
+  <!-- 子步骤 -->
+  <text x="400" y="195" text-anchor="middle" font-size="12" fill="#7f8c8d">设置SP → 初始化向量表 → SystemInit → 拷贝数据段 → 跳转main</text>
+  
+  <!-- 箭头2 -->
+  <line x1="400" y1="210" x2="400" y2="240" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 阶段3：硬件初始化 -->
+  <rect x="280" y="240" width="240" height="50" rx="10" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="400" y="270" text-anchor="middle" font-size="16" fill="white" font-weight="bold">硬件初始化</text>
+  
+  <!-- 子步骤 -->
+  <text x="400" y="295" text-anchor="middle" font-size="12" fill="#7f8c8d">时钟 → GPIO → NVIC → 定时器 → 通信外设 → 存储 → 电机 → 传感器</text>
+  
+  <!-- 箭头3 -->
+  <line x1="400" y1="310" x2="400" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 阶段4：RTOS初始化 -->
+  <rect x="280" y="340" width="240" height="50" rx="10" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="400" y="370" text-anchor="middle" font-size="16" fill="white" font-weight="bold">RTOS内核初始化</text>
+  
+  <text x="400" y="395" text-anchor="middle" font-size="12" fill="#7f8c8d">初始化任务链表 → 初始化TCB → 创建启动任务</text>
+  
+  <!-- 箭头4 -->
+  <line x1="400" y1="410" x2="400" y2="440" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 阶段5：启动调度器 -->
+  <rect x="280" y="440" width="240" height="50" rx="10" fill="#f39c12" stroke="#d68910" stroke-width="2"/>
+  <text x="400" y="470" text-anchor="middle" font-size="16" fill="white" font-weight="bold">vTaskStartScheduler()</text>
+  
+  <text x="400" y="495" text-anchor="middle" font-size="12" fill="#7f8c8d">创建空闲任务 → 配置SysTick → 设置PendSV/SVC → 启动第一个任务</text>
+  
+  <!-- 箭头5 -->
+  <line x1="400" y1="510" x2="400" y2="540" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 阶段6：多任务运行 -->
+  <rect x="280" y="540" width="240" height="50" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="570" text-anchor="middle" font-size="16" fill="white" font-weight="bold">多任务并发运行</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 右侧说明框 -->
+  <rect x="560" y="60" width="220" height="530" rx="10" fill="#fff9e6" stroke="#f1c40f" stroke-width="2"/>
+  <text x="670" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">关键说明</text>
+  
+  <text x="580" y="120" font-size="12" fill="#2c3e50">1. 复位后CPU从0x0000</text>
+  <text x="585" y="140" font-size="12" fill="#2c3e50">   0000取栈指针</text>
+  
+  <text x="580" y="170" font-size="12" fill="#2c3e50">2. 启动文件是汇编写的</text>
+  <text x="585" y="190" font-size="12" fill="#2c3e50">   不要随意修改</text>
+  
+  <text x="580" y="220" font-size="12" fill="#2c3e50">3. 硬件初始化顺序</text>
+  <text x="585" y="240" font-size="12" fill="#2c3e50">   搞反了会出问题</text>
+  
+  <text x="580" y="270" font-size="12" fill="#2c3e50">4. RTOS启动后不再</text>
+  <text x="585" y="290" font-size="12" fill="#2c3e50">   返回main函数</text>
+  
+  <text x="580" y="320" font-size="12" fill="#2c3e50">5. 任务栈大小要留</text>
+  <text x="585" y="340" font-size="12" fill="#2c3e50">   足够余量</text>
+  
+  <text x="580" y="370" font-size="12" fill="#2c3e50">6. 高优先级任务</text>
+  <text x="585" y="390" font-size="12" fill="#2c3e50">   不要阻塞太久</text>
+  
+  <text x="580" y="420" font-size="12" fill="#2c3e50">7. 空闲任务不能</text>
+  <text x="585" y="440" font-size="12" fill="#2c3e50">   被阻塞或挂起</text>
+  
+  <text x="580" y="470" font-size="12" fill="#2c3e50">8. 调试串口尽量</text>
+  <text x="585" y="490" font-size="12" fill="#2c3e50">   在最早阶段初始化</text>
+  
+  <text x="580" y="520" font-size="12" fill="#2c3e50">9. 中断优先级</text>
+  <text x="585" y="540" font-size="12" fill="#2c3e50">   分组要统一</text>
+  
+  <text x="580" y="570" font-size="12" fill="#2c3e50">10. 多任务调试</text>
+  <text x="585" y="590" font-size="12" fill="#2c3e50">    用好断点和Trace</text>
+</svg>
+
+<h3>17.6 避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑，希望能帮你少走弯路：</p>
+
+<div class="warning">
+  <p><strong>坑1：中断优先级分组不一致</strong></p>
+  <p>我曾经在启动文件里设了一组优先级分组，在RTOS配置里又设了另一组。结果中断响应完全乱套，高优先级中断被低优先级中断抢占。后来统一在SystemInit里设置，再也没出过问题。</p>
+</div>
+
+<div class="warning">
+  <p><strong>坑2：SysTick被其他定时器干扰</strong></p>
+  <p>有一次，我为了省一个定时器，把SysTick用作PWM输出。结果RTOS的时间片轮转直接失效，所有任务都卡住了。记住，SysTick是RTOS的心跳，别乱动。</p>
+</div>
+
+<div class="warning">
+  <p><strong>坑3：任务栈溢出检测没开</strong></p>
+  <p>FreeRTOS提供了栈溢出检测功能，但默认是关闭的。我建议你在调试阶段一定要打开。方法很简单，在FreeRTOSConfig.h里设置：</p>
+  <pre><code>#define configCHECK_FOR_STACK_OVERFLOW 2</code></pre>
+  <p>这样一旦栈溢出，系统会调用vApplicationStackOverflowHook，你就能第一时间发现问题。</p>
+</div>
+
+<p>好了，关于系统启动流程，今天就聊这么多。记住一句话：启动流程是系统的根基，根基不稳，上层应用再漂亮也是白搭。希望你在实际项目中，能把这些知识点用起来。</p>
+
+<div class="footer-nav">
+            <a href="16FileSystemPorting.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18DebugPerformance.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

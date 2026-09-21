@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 AGV核心硬件选型</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="active">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 AGV核心硬件选型：主控制器、驱动电机、安全传感器</h2>
+
+<p>各位同学，咱们今天聊点实在的。AGV 能不能跑起来、跑得稳不稳，全看这几个核心硬件选得对不对。我这些年经手的项目，十有八九的坑都出在选型阶段。说白了，硬件选型就是给 AGV 搭骨架，骨架歪了，后面软件调得再好也白搭。</p>
+
+<h3>2.1 主控制器：STM32、PLC、工控机，到底选谁？</h3>
+
+<p>这个问题我几乎每次培训都会被问到。我的回答很简单：<strong>看你的 AGV 要干多重的活</strong>。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>控制器的算力要与任务复杂度匹配。杀鸡不用牛刀，但牛刀也切不了绣花针。</p>
+</div>
+
+<h4>2.1.1 STM32 —— 轻量级任务的性价比之王</h4>
+
+<p>如果你做的是简单的磁导航 AGV，或者只负责点对点运输，STM32 完全够用。我个人习惯用 STM32F4 系列，主频 168MHz，跑个 FreeRTOS 绰绰有余。</p>
+
+<p><strong>适用场景：</strong></p>
+<ul>
+  <li>磁条/色带导航的简易 AGV</li>
+  <li>单一任务、固定路径的搬运</li>
+  <li>成本敏感型项目</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>曾经有个项目，客户非要省成本，用 STM32F103 去跑 SLAM 算法。结果呢？算力不够，地图更新一卡一卡的。后来换了 F407，问题才解决。记住：<strong>STM32 不适合做重计算任务</strong>，比如视觉 SLAM 或路径规划。</p>
+</div>
+
+<h4>2.1.2 PLC —— 工业场景的稳定之选</h4>
+
+<p>PLC 这东西，说白了就是「稳」。我在工厂里见过跑了十年的 PLC，除了灰尘多一点，一点毛病没有。如果你做的是工厂产线 AGV，需要跟 MES、上位机做大量 IO 交互，PLC 是首选。</p>
+
+<p><strong>推荐品牌：</strong></p>
+<ul>
+  <li>西门子 S7-1200/1500：生态好，通讯协议全</li>
+  <li>三菱 FX5U：性价比高，日系设备兼容性好</li>
+  <li>汇川：国产替代，这几年进步很大</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>PLC 的软肋是复杂算法。你想想看，让 PLC 去跑卡尔曼滤波？不是不行，但代码写起来能让你怀疑人生。所以，<strong>PLC 通常只做逻辑控制，算法交给工控机</strong>。</p>
+</div>
+
+<h4>2.1.3 工控机 —— 智能 AGV 的大脑</h4>
+
+<p>现在做 AGV，没个工控机都不好意思叫「智能」。激光 SLAM、视觉导航、多传感器融合，这些都得靠工控机。我建议用 Intel i5 或 i7 级别的，内存至少 8GB，最好带个 GPU。</p>
+
+<p><strong>选型要点：</strong></p>
+<ul>
+  <li>CPU：主频 2.0GHz 以上，4 核起步</li>
+  <li>内存：8GB 起步，16GB 不嫌多</li>
+  <li>存储：128GB SSD，系统盘和数据盘分开</li>
+  <li>接口：至少 4 个 USB、2 个网口、1 个 HDMI</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的建议：</strong>别在工控机上省钱。我曾经贪便宜买了个国产杂牌工控机，结果运行 8 小时后 CPU 降频，AGV 直接原地打转。后来换了研华的，再没出过问题。</p>
+</div>
+
+<h3>2.2 驱动电机与编码器</h3>
+
+<p>电机是 AGV 的腿，编码器是眼睛。腿没力走不动，眼睛看不清会撞墙。</p>
+
+<h4>2.2.1 驱动电机选型</h4>
+
+<p>AGV 常用的电机就三种：直流有刷、直流无刷、伺服电机。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型</th>
+      <th>优点</th>
+      <th>缺点</th>
+      <th>适用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>直流有刷</td>
+      <td>便宜、控制简单</td>
+      <td>寿命短、效率低</td>
+      <td>低成本、轻载 AGV</td>
+    </tr>
+    <tr>
+      <td>直流无刷</td>
+      <td>效率高、寿命长</td>
+      <td>控制复杂、成本中等</td>
+      <td>大多数 AGV 首选</td>
+    </tr>
+    <tr>
+      <td>伺服电机</td>
+      <td>精度高、响应快</td>
+      <td>贵、需要驱动器</td>
+      <td>高精度定位 AGV</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯，<strong>80% 的项目用直流无刷电机</strong>。为什么？性价比最高。配上霍尔传感器，速度控制精度能做到 ±1%，够用了。</p>
+
+<h4>2.2.2 编码器选型</h4>
+
+<p>编码器这东西，看着不起眼，但坑最多。我遇到过最离谱的一次，编码器线序接反了，AGV 倒着跑了一整天，愣是没人发现。</p>
+
+<p><strong>编码器类型：</strong></p>
+<ul>
+  <li>增量式编码器：便宜，但断电丢位置</li>
+  <li>绝对式编码器：贵，但位置不丢失</li>
+  <li>磁编码器：抗震动，适合恶劣环境</li>
+  <li>光电编码器：精度高，但怕灰尘</li>
+</ul>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在粉尘车间用过光电编码器，结果三天两头报错。后来换成磁编码器，再也没出过问题。记住：<strong>环境决定选型</strong>，别只看参数。</p>
+</div>
+
+<h3>2.3 电池与充电管理</h3>
+
+<p>电池是 AGV 的命根子。没电了，再牛的算法也是白搭。</p>
+
+<h4>2.3.1 电池类型选择</h4>
+
+<p>现在 AGV 主流用磷酸铁锂电池。为什么？安全、寿命长、充放电倍率高。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>电池类型</th>
+      <th>能量密度</th>
+      <th>循环寿命</th>
+      <th>安全性</th>
+      <th>成本</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>铅酸电池</td>
+      <td>低</td>
+      <td>300-500次</td>
+      <td>高</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>三元锂电池</td>
+      <td>高</td>
+      <td>500-800次</td>
+      <td>中</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>磷酸铁锂电池</td>
+      <td>中</td>
+      <td>2000次+</td>
+      <td>高</td>
+      <td>中高</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>我的建议：</strong>别用铅酸电池了，太重。AGV 本身就不轻，再加个铅酸电池，电机负载大，续航还短。磷酸铁锂虽然贵点，但综合成本更低。</p>
+
+<h4>2.3.2 充电管理策略</h4>
+
+<p>充电管理不是简单的「没电了就充」。我见过太多项目，电池提前报废，就是因为充电策略太粗暴。</p>
+
+<p><strong>关键点：</strong></p>
+<ul>
+  <li>恒流恒压充电：这是基本要求</li>
+  <li>温度保护：充电时电池温度超过 45°C 要降流</li>
+  <li>均衡管理：电芯之间电压差不能超过 50mV</li>
+  <li>充电方式：接触式充电 vs 无线充电</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>无线充电虽然方便，但效率低（约 85%），而且对位精度要求高。我做过一个项目，无线充电线圈对不准，充了 8 小时只充进去 30%。后来还是换回了接触式充电。</p>
+</div>
+
+<h3>2.4 安全传感器：激光雷达、超声波、碰撞条</h3>
+
+<p>安全是 AGV 的底线。没有安全，一切都是零。</p>
+
+<h4>2.4.1 激光雷达</h4>
+
+<p>激光雷达是 AGV 的「眼睛」。现在主流用 2D 激光雷达，比如思岚 RPLIDAR 系列、西克 LMS 系列。</p>
+
+<p><strong>选型参数：</strong></p>
+<ul>
+  <li>扫描范围：270° 或 360°</li>
+  <li>测距距离：10m-50m</li>
+  <li>角分辨率：0.1°-1°</li>
+  <li>扫描频率：10Hz-50Hz</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>别只看测距距离。角分辨率更重要。角分辨率 0.1° 的雷达，能看清 10m 外的一个小障碍物；角分辨率 1° 的，可能就漏掉了。我吃过这个亏，后来选型时角分辨率低于 0.5° 的一律不考虑。</p>
+</div>
+
+<h4>2.4.2 超声波传感器</h4>
+
+<p>超声波是激光雷达的「补丁」。激光雷达怕什么？玻璃、镜面、黑色物体。这些场景下，超声波反而更可靠。</p>
+
+<p><strong>安装建议：</strong></p>
+<ul>
+  <li>车头两侧各装 2 个</li>
+  <li>车尾装 2 个</li>
+  <li>探测距离：0.2m-3m</li>
+  <li>安装角度：向下倾斜 15°</li>
+</ul>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>超声波传感器之间会互相干扰。我曾经一次装了 8 个超声波，结果它们互相「吵架」，数据全乱套。后来加了时分复用，才解决问题。</p>
+</div>
+
+<h4>2.4.3 碰撞条</h4>
+
+<p>碰撞条是最后一道防线。激光雷达和超声波都失效了，碰撞条就是「救命稻草」。</p>
+
+<p><strong>技术要求：</strong></p>
+<ul>
+  <li>触发力：小于 50N</li>
+  <li>响应时间：小于 10ms</li>
+  <li>防护等级：IP65 以上</li>
+  <li>安装位置：车头、车尾、两侧</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>碰撞条不是让你去撞的！它是最后的安全保障。我见过有些项目，把碰撞条当普通传感器用，结果频繁触发，AGV 动不动就急停。记住：<strong>碰撞条触发，说明前面的安全层已经失效了</strong>。</p>
+</div>
+
+<h3>2.5 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的 AGV 核心硬件选型框架。你把它记在心里，选型时就不会乱。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV 核心硬件选型框架</text>
+  
+  <!-- 主控制器 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">主控制器</text>
+  
+  <!-- 驱动电机 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">驱动电机与编码器</text>
+  
+  <!-- 电池 -->
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">电池与充电管理</text>
+  
+  <!-- 安全传感器 -->
+  <rect x="300" y="160" width="200" height="50" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="190" text-anchor="middle" font-size="16" fill="white" font-weight="bold">安全传感器</text>
+  
+  <!-- 子项 -->
+  <!-- STM32 -->
+  <rect x="50" y="150" width="90" height="40" rx="5" fill="#85c1e9" stroke="#3498db" stroke-width="1"/>
+  <text x="95" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">STM32</text>
+  
+  <!-- PLC -->
+  <rect x="155" y="150" width="90" height="40" rx="5" fill="#85c1e9" stroke="#3498db" stroke-width="1"/>
+  <text x="200" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">PLC</text>
+  
+  <!-- 工控机 -->
+  <rect x="50" y="210" width="90" height="40" rx="5" fill="#85c1e9" stroke="#3498db" stroke-width="1"/>
+  <text x="95" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">工控机</text>
+  
+  <!-- 直流有刷 -->
+  <rect x="300" y="150" width="90" height="40" rx="5" fill="#f1948a" stroke="#e74c3c" stroke-width="1"/>
+  <text x="345" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">直流有刷</text>
+  
+  <!-- 直流无刷 -->
+  <rect x="405" y="150" width="90" height="40" rx="5" fill="#f1948a" stroke="#e74c3c" stroke-width="1"/>
+  <text x="450" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">直流无刷</text>
+  
+  <!-- 伺服电机 -->
+  <rect x="300" y="210" width="90" height="40" rx="5" fill="#f1948a" stroke="#e74c3c" stroke-width="1"/>
+  <text x="345" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">伺服电机</text>
+  
+  <!-- 编码器 -->
+  <rect x="405" y="210" width="90" height="40" rx="5" fill="#f1948a" stroke="#e74c3c" stroke-width="1"/>
+  <text x="450" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">编码器</text>
+  
+  <!-- 铅酸 -->
+  <rect x="550" y="150" width="90" height="40" rx="5" fill="#82e0aa" stroke="#2ecc71" stroke-width="1"/>
+  <text x="595" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">铅酸</text>
+  
+  <!-- 三元锂 -->
+  <rect x="655" y="150" width="90" height="40" rx="5" fill="#82e0aa" stroke="#2ecc71" stroke-width="1"/>
+  <text x="700" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">三元锂</text>
+  
+  <!-- 磷酸铁锂 -->
+  <rect x="550" y="210" width="90" height="40" rx="5" fill="#82e0aa" stroke="#2ecc71" stroke-width="1"/>
+  <text x="595" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">磷酸铁锂</text>
+  
+  <!-- 充电管理 -->
+  <rect x="655" y="210" width="90" height="40" rx="5" fill="#82e0aa" stroke="#2ecc71" stroke-width="1"/>
+  <text x="700" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">充电管理</text>
+  
+  <!-- 激光雷达 -->
+  <rect x="300" y="240" width="90" height="40" rx="5" fill="#f9e79f" stroke="#f39c12" stroke-width="1"/>
+  <text x="345" y="265" text-anchor="middle" font-size="13" fill="#2c3e50">激光雷达</text>
+  
+  <!-- 超声波 -->
+  <rect x="405" y="240" width="90" height="40" rx="5" fill="#f9e79f" stroke="#f39c12" stroke-width="1"/>
+  <text x="450" y="265" text-anchor="middle" font-size="13" fill="#2c3e50">超声波</text>
+  
+  <!-- 碰撞条 -->
+  <rect x="300" y="300" width="90" height="40" rx="5" fill="#f9e79f" stroke="#f39c12" stroke-width="1"/>
+  <text x="345" y="325" text-anchor="middle" font-size="13" fill="#2c3e50">碰撞条</text>
+  
+  <!-- 连线 -->
+  <line x1="150" y1="120" x2="95" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="150" y1="120" x2="200" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="150" y1="120" x2="95" y2="210" stroke="#3498db" stroke-width="2"/>
+  
+  <line x1="400" y1="120" x2="345" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="120" x2="450" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="120" x2="345" y2="210" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="120" x2="450" y2="210" stroke="#e74c3c" stroke-width="2"/>
+  
+  <line x1="650" y1="120" x2="595" y2="150" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="650" y1="120" x2="700" y2="150" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="650" y1="120" x2="595" y2="210" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="650" y1="120" x2="700" y2="210" stroke="#2ecc71" stroke-width="2"/>
+  
+  <line x1="400" y1="210" x2="345" y2="240" stroke="#f39c12" stroke-width="2"/>
+  <line x1="400" y1="210" x2="450" y2="240" stroke="#f39c12" stroke-width="2"/>
+  <line x1="345" y1="280" x2="345" y2="300" stroke="#f39c12" stroke-width="2"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="380" text-anchor="middle" font-size="14" fill="#7f8c8d">选型核心：任务复杂度 → 控制器 → 执行器 → 能源 → 安全</text>
+  
+  <!-- 经验总结 -->
+  <rect x="100" y="400" width="600" height="80" rx="8" fill="#eaf2f8" stroke="#3498db" stroke-width="1" stroke-dasharray="5,5"/>
+  <text x="400" y="425" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">经验总结</text>
+  <text x="400" y="450" text-anchor="middle" font-size="13" fill="#34495e">1. 控制器选型看算力需求，别盲目追求高性能</text>
+  <text x="400" y="470" text-anchor="middle" font-size="13" fill="#34495e">2. 电机和编码器要匹配，精度不够就加传感器融合</text>
+</svg>
+
+<p>这张图把 AGV 核心硬件分成了四大块。你选型的时候，按这个框架走，基本不会漏项。记住：<strong>硬件选型没有最好的，只有最合适的</strong>。</p>
+
+<div class="footer-nav">
+            <a href="01AgvSystemOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03SoftwareArchitecture.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

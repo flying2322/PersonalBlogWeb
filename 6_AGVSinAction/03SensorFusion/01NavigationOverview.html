@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV导航概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="active">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV导航概述：AGV定义、导航技术分类、传感器融合的必要性</h2>
+
+<h3>1.1 什么是AGV？先聊聊我的理解</h3>
+
+<p>AGV，全称Automated Guided Vehicle，自动导引运输车。</p>
+
+<p>说白了，就是一辆能自己认路、自己跑的小车。不用人开，不用人推，它自己就知道该往哪走。</p>
+
+<p>我入行那会儿，AGV还叫「自动导引小车」。那时候技术简单，地上铺条磁条，车就沿着磁条跑。现在不一样了，激光、视觉、IMU、轮式编码器全堆上去，AGV已经变成了一个移动机器人平台。</p>
+
+<p>我个人习惯把AGV分成三类：</p>
+
+<ul>
+  <li><strong>仓储AGV</strong>：在仓库里搬货，路线固定，环境相对可控</li>
+  <li><strong>产线AGV</strong>：在工厂里配送物料，需要和产线设备对接</li>
+  <li><strong>重载AGV</strong>：港口、机场、大型工厂，拉几十吨的货物</li>
+</ul>
+
+<p>不管哪一类，核心问题都一样：<strong>我在哪？我要去哪？我怎么去？</strong></p>
+
+<h3>1.2 导航技术分类——我踩过的坑</h3>
+
+<p>AGV的导航技术，这些年我基本都摸过一遍。咱们按技术路线来分：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>导航方式</th>
+      <th>原理</th>
+      <th>典型应用</th>
+      <th>我的评价</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>磁导航</td>
+      <td>磁条/磁钉引导</td>
+      <td>早期产线AGV</td>
+      <td>便宜，但改路线要重新铺磁条，麻烦</td>
+    </tr>
+    <tr>
+      <td>二维码导航</td>
+      <td>地面贴二维码，相机识别</td>
+      <td>仓储AGV（如Kiva）</td>
+      <td>精度高，但二维码脏了就容易丢</td>
+    </tr>
+    <tr>
+      <td>激光导航</td>
+      <td>激光雷达扫描环境，匹配地图</td>
+      <td>目前主流方案</td>
+      <td>灵活，但反射板方案成本高</td>
+    </tr>
+    <tr>
+      <td>视觉导航</td>
+      <td>摄像头提取特征点，视觉SLAM</td>
+      <td>新兴方案</td>
+      <td>信息丰富，但光照影响大</td>
+    </tr>
+    <tr>
+      <td>惯性导航</td>
+      <td>IMU积分推算位置</td>
+      <td>辅助定位</td>
+      <td>短时精度还行，长时漂移严重</td>
+    </tr>
+    <tr>
+      <td>GPS导航</td>
+      <td>卫星定位</td>
+      <td>室外AGV</td>
+      <td>室内用不了，精度不够</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>你可能会问：这么多技术，哪个最好？</p>
+
+<p>嗯，这个问题我当年也问过。答案是：<strong>没有最好的，只有最合适的。</strong></p>
+
+<p>举个例子。我曾经在一个项目里只用激光雷达做导航，结果仓库里堆满了货架，激光雷达扫到的全是货架腿，匹配出来的位置误差能到十几厘米。后来加了轮式编码器做航迹推算，情况好了一些，但遇到地面打滑又崩了。</p>
+
+<p>最后怎么解决的？加了IMU，做了传感器融合。这才稳下来。</p>
+
+<h3>1.3 为什么需要传感器融合？</h3>
+
+<p>说白了，单个传感器都有「短板」。</p>
+
+<ul>
+  <li><strong>激光雷达</strong>：精度高，但怕玻璃、怕雨雾、怕空旷环境</li>
+  <li><strong>摄像头</strong>：信息丰富，但怕暗、怕逆光、怕纹理重复</li>
+  <li><strong>IMU</strong>：不怕环境变化，但漂移严重，几分钟就偏了</li>
+  <li><strong>轮式编码器</strong>：短时准，但打滑、轮胎磨损都会引入误差</li>
+</ul>
+
+<p>你想想看，如果只用一种传感器，一旦它出问题，AGV就「瞎」了。</p>
+
+<p>传感器融合，就是让多个传感器互相补位。激光雷达给全局定位，IMU补高频姿态，编码器做短时推算，视觉提供语义信息。大家各司其职，出了问题还能互相校验。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>传感器融合不是简单的数据叠加，而是利用不同传感器的互补特性，通过概率模型（如卡尔曼滤波、因子图优化）得到最优的状态估计。</p>
+</div>
+
+<p>我在做第一个融合项目时，犯过一个低级错误：直接把激光雷达的位置和IMU的位置取平均。结果两个传感器都有误差，平均之后误差反而更大。</p>
+
+<p>后来才明白，融合的关键是<strong>知道每个传感器什么时候可信，什么时候不可信</strong>。比如AGV急转弯时，IMU的角速度数据很准，但加速度数据受离心力影响很大。这时候就要给加速度数据降低权重。</p>
+
+<h3>1.4 传感器融合的典型架构</h3>
+
+<p>我习惯把融合架构分成三层：</p>
+
+<ol>
+  <li><strong>数据层融合</strong>：原始数据直接融合，比如把激光点云和图像像素对齐。计算量大，但信息损失少。</li>
+  <li><strong>特征层融合</strong>：先提取特征（如角点、边缘、平面），再融合。这是目前的主流做法。</li>
+  <li><strong>决策层融合</strong>：每个传感器独立做决策，最后投票或加权。容错性好，但精度一般。</li>
+</ol>
+
+<p>实际项目中，我推荐用特征层融合。为什么呢？</p>
+
+<p>数据层融合太吃算力，嵌入式平台扛不住。决策层融合又太粗糙，浪费了传感器的信息。特征层融合刚好在中间，精度和效率都能兼顾。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>如果你刚开始做融合，先从松耦合开始。激光雷达做定位，IMU做姿态，编码器做速度。用扩展卡尔曼滤波（EKF）把它们串起来。等跑通了，再上紧耦合的因子图优化。</p>
+</div>
+
+<h3>1.5 避坑指南——我曾经踩过的雷</h3>
+
+<p>做传感器融合这些年，我踩过不少坑。挑几个典型的说说：</p>
+
+<ul>
+  <li><strong>时间同步问题</strong>：激光雷达和IMU的时间戳没对齐，融合出来的位置忽前忽后。后来加了硬件同步信号才解决。</li>
+  <li><strong>坐标系混乱</strong>：IMU的坐标系和激光雷达的坐标系没统一，融合结果直接飞了。现在我做项目第一件事就是标定外参。</li>
+  <li><strong>过度信任模型</strong>：卡尔曼滤波的噪声参数设得太理想，实际传感器噪声比模型大得多。结果滤波器发散，位置估计直接崩了。</li>
+</ul>
+
+<p>嗯，这些坑说起来都是泪。但踩过了，也就记住了。</p>
+
+<h3>1.6 本章知识体系</h3>
+
+<p>下面这张图，是我梳理的本章核心逻辑。你可以把它当作一个「导航地图」：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV导航系统传感器融合知识体系</text>
+  
+  <!-- 中心节点：AGV导航 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="white">AGV导航系统</text>
+  
+  <!-- 三个分支 -->
+  <!-- 分支1：AGV定义 -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="60" y="170" width="180" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="150" y="195" text-anchor="middle" font-size="14" font-weight="bold" fill="white">AGV定义与分类</text>
+  
+  <line x1="150" y1="210" x2="100" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="30" y="260" width="140" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="100" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">仓储AGV</text>
+  
+  <line x1="150" y1="210" x2="200" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="130" y="260" width="140" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="200" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">产线AGV</text>
+  
+  <line x1="150" y1="210" x2="150" y2="310" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="80" y="310" width="140" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="150" y="332" text-anchor="middle" font-size="12" fill="#2c3e50">重载AGV</text>
+  
+  <!-- 分支2：导航技术分类 -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="290" y="170" width="220" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="1.5"/>
+  <text x="400" y="195" text-anchor="middle" font-size="14" font-weight="bold" fill="white">导航技术分类</text>
+  
+  <line x1="350" y1="210" x2="250" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="180" y="260" width="140" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="250" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">磁导航 / 二维码</text>
+  
+  <line x1="400" y1="210" x2="400" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="330" y="260" width="140" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="400" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">激光导航 / 视觉</text>
+  
+  <line x1="450" y1="210" x2="550" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="480" y="260" width="140" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="550" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">惯性 / GPS</text>
+  
+  <!-- 分支3：传感器融合 -->
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="550" y="170" width="200" height="40" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="1.5"/>
+  <text x="650" y="195" text-anchor="middle" font-size="14" font-weight="bold" fill="white">传感器融合必要性</text>
+  
+  <line x1="600" y1="210" x2="550" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="480" y="260" width="140" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="550" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">互补短板</text>
+  
+  <line x1="650" y1="210" x2="650" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="580" y="260" width="140" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="650" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">冗余容错</text>
+  
+  <line x1="700" y1="210" x2="750" y2="260" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="680" y="260" width="140" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="750" y="282" text-anchor="middle" font-size="12" fill="#2c3e50">精度提升</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="380" width="400" height="50" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" font-weight="bold" fill="white">核心：多传感器融合 → 稳定、可靠、高精度定位</text>
+  
+  <!-- 箭头连接 -->
+  <line x1="400" y1="120" x2="400" y2="380" stroke="#f39c12" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 融合架构子节点 -->
+  <rect x="200" y="440" width="120" height="30" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="260" y="460" text-anchor="middle" font-size="11" fill="#2c3e50">数据层融合</text>
+  
+  <rect x="340" y="440" width="120" height="30" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="400" y="460" text-anchor="middle" font-size="11" fill="#2c3e50">特征层融合</text>
+  
+  <rect x="480" y="440" width="120" height="30" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="540" y="460" text-anchor="middle" font-size="11" fill="#2c3e50">决策层融合</text>
+</svg>
+
+<div class="warning">
+  <p><strong>注意：</strong>这张图只是帮你建立整体认知。后面每一章，我都会深入拆解一个技术点。别急，慢慢来。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02CoordinateAndPose.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 数据预处理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="active">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 数据预处理：点云滤波与图像去畸变</h2>
+
+<p>各位同学，大家好。今天我们来聊聊传感器融合里一个特别“脏活累活”的环节——数据预处理。</p>
+
+<p>说实话，很多刚入行的工程师，拿到激光雷达和相机数据就往算法里灌。结果呢？定位飘得妈都不认。我当年也犯过这个错。后来才明白，<strong>数据预处理做不好，后面的一切都是空中楼阁</strong>。</p>
+
+<p>这一章，我带你手把手过一遍：点云怎么滤波、图像怎么去畸变、异常值怎么剔除。全是实战经验，没有废话。</p>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="320" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f9fafb; border-radius:12px;">
+  <rect x="10" y="10" width="780" height="300" fill="none" stroke="#4a90d9" stroke-width="2" rx="10"/>
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">数据预处理核心流程</text>
+  <!-- 激光雷达分支 -->
+  <rect x="50" y="70" width="180" height="50" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="140" y="100" text-anchor="middle" font-size="15" fill="#0d47a1">激光雷达点云</text>
+  <line x1="230" y1="95" x2="310" y2="95" stroke="#1e88e5" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="310" y="70" width="180" height="50" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="14" fill="#e65100">体素滤波 + 统计滤波</text>
+  <line x1="490" y1="95" x2="570" y2="95" stroke="#fb8c00" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="570" y="70" width="180" height="50" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="660" y="100" text-anchor="middle" font-size="14" fill="#1b5e20">干净点云</text>
+  <!-- 相机分支 -->
+  <rect x="50" y="150" width="180" height="50" rx="8" fill="#e3f2fd" stroke="#1e88e5" stroke-width="2"/>
+  <text x="140" y="180" text-anchor="middle" font-size="15" fill="#0d47a1">相机图像</text>
+  <line x1="230" y1="175" x2="310" y2="175" stroke="#1e88e5" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="310" y="150" width="180" height="50" rx="8" fill="#fff3e0" stroke="#fb8c00" stroke-width="2"/>
+  <text x="400" y="180" text-anchor="middle" font-size="14" fill="#e65100">去畸变 + 异常值剔除</text>
+  <line x1="490" y1="175" x2="570" y2="175" stroke="#fb8c00" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="570" y="150" width="180" height="50" rx="8" fill="#e8f5e9" stroke="#43a047" stroke-width="2"/>
+  <text x="660" y="180" text-anchor="middle" font-size="14" fill="#1b5e20">矫正图像</text>
+  <!-- 融合 -->
+  <rect x="250" y="240" width="300" height="45" rx="10" fill="#f3e5f5" stroke="#8e24aa" stroke-width="2"/>
+  <text x="400" y="268" text-anchor="middle" font-size="16" font-weight="bold" fill="#4a148c">传感器融合（时间戳对齐 + 空间同步）</text>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#1e88e5"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>一、点云滤波：别让噪声毁了你的地图</h3>
+
+<p>激光雷达点云，说白了就是一堆三维坐标点。但原始数据里什么妖魔鬼怪都有：飘在空中的灰尘、玻璃上的反射噪点、甚至飞过的蚊子。你想想看，要是把这些都当成障碍物，AGV 还怎么走？</p>
+
+<h4>1. 体素滤波（Voxel Filter）——降采样利器</h4>
+
+<p>体素滤波的核心思想很简单：把空间切成小立方体（体素），每个立方体里只保留一个点。这样既能大幅降低点云数量，又能保留几何结构。</p>
+
+<p><strong>为什么需要它？</strong> 一个 16 线激光雷达，每秒产生 30 万个点。直接处理？算力扛不住。体素滤波可以把点云压缩到原来的 1/10，而形状基本不变。</p>
+
+<div class="highlight">
+  <p><strong>关键参数：体素大小</strong></p>
+  <ul>
+    <li>室内场景：0.05m - 0.1m（5cm 到 10cm）</li>
+    <li>室外场景：0.1m - 0.2m</li>
+    <li>我个人的习惯：先设 0.1m，看效果再微调</li>
+  </ul>
+</div>
+
+<pre><code>// C++ 示例：PCL 体素滤波
+pcl::VoxelGrid&lt;pcl::PointXYZ&gt; voxel_filter;
+voxel_filter.setInputCloud(cloud_in);
+voxel_filter.setLeafSize(0.1f, 0.1f, 0.1f);  // 体素边长 10cm
+voxel_filter.filter(*cloud_out);</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>体素大小别设太小。设 0.02m 的话，点云还是太密，滤波效果不明显。设 0.5m 的话，墙角细节就没了。0.1m 是个不错的起点。</p>
+</div>
+
+<h4>2. 统计滤波（Statistical Outlier Removal）——揪出离群点</h4>
+
+<p>体素滤波只管降采样，不管噪声。统计滤波就是干这个的。</p>
+
+<p>原理其实很直观：对每个点，计算它到 k 个最近邻的平均距离。如果这个距离明显大于全局平均值，那它大概率是个离群点。</p>
+
+<p><strong>我在项目中遇到过</strong>：有一次在仓库里测试，AGV 老是莫名其妙地急停。排查了半天，发现是屋顶通风口吹下来的灰尘，在点云里形成了几个“幽灵点”。统计滤波一上，问题立刻解决。</p>
+
+<pre><code>// PCL 统计滤波
+pcl::StatisticalOutlierRemoval&lt;pcl::PointXYZ&gt; sor;
+sor.setInputCloud(cloud_in);
+sor.setMeanK(50);          // 近邻点数
+sor.setStddevMulThresh(1.0); // 标准差倍数阈值
+sor.filter(*cloud_out);</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>标准差倍数设得越小，剔除得越狠。设 0.5 的话，连正常点都可能被干掉。我一般从 1.0 开始调，效果不满意再改。</p>
+</div>
+
+<h3>二、图像去畸变：让相机看到真实的世界</h3>
+
+<p>相机镜头不是完美的。尤其是广角镜头，画面边缘的直线会变成曲线。这就是畸变。</p>
+
+<p>畸变主要分两种：</p>
+<ul>
+  <li><strong>径向畸变</strong>：画面像鱼眼一样向外凸（桶形）或向内凹（枕形）</li>
+  <li><strong>切向畸变</strong>：镜头和成像平面不平行导致的倾斜</li>
+</ul>
+
+<p>去畸变的本质，就是用一个数学模型把变形的像素“拉”回正确位置。</p>
+
+<h4>畸变模型公式</h4>
+<pre><code>// 径向畸变
+x_corrected = x * (1 + k1*r^2 + k2*r^4 + k3*r^6)
+y_corrected = y * (1 + k1*r^2 + k2*r^4 + k3*r^6)
+
+// 切向畸变
+x_corrected = x + [2*p1*x*y + p2*(r^2 + 2*x^2)]
+y_corrected = y + [p1*(r^2 + 2*y^2) + 2*p2*x*y]</code></pre>
+
+<p>其中 k1、k2、k3 是径向畸变系数，p1、p2 是切向畸变系数。这些参数来自相机标定。</p>
+
+<div class="highlight">
+  <p><strong>实操建议：</strong></p>
+  <ul>
+    <li>用 OpenCV 的 <code>cv::undistort()</code> 一步到位</li>
+    <li>或者用 <code>cv::initUndistortRectifyMap()</code> + <code>cv::remap()</code>，效率更高</li>
+    <li>我建议用 remap 方式，因为可以提前算好映射表，实时处理时只查表，速度飞快</li>
+  </ul>
+</div>
+
+<pre><code>// OpenCV 去畸变示例
+cv::Mat camera_matrix, dist_coeffs;
+// ... 从标定文件读取参数
+
+cv::Mat map1, map2;
+cv::initUndistortRectifyMap(camera_matrix, dist_coeffs, 
+    cv::Mat(), camera_matrix, image.size(), CV_32FC1, map1, map2);
+
+cv::Mat undistorted_img;
+cv::remap(distorted_img, undistorted_img, map1, map2, cv::INTER_LINEAR);</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在标定时用了错误的棋盘格尺寸，结果去畸变后图像边缘扭曲得更厉害了。标定板尺寸一定要量准，差 1mm 都不行。</p>
+</div>
+
+<h3>三、异常值剔除：别让一个坏点毁了全局</h3>
+
+<p>异常值不光是点云里的噪声，还包括：</p>
+<ul>
+  <li>激光雷达的“飞点”（比如打到玻璃边缘，距离突变）</li>
+  <li>相机图像中的坏像素</li>
+  <li>时间戳错乱的数据包</li>
+</ul>
+
+<h4>1. 基于距离的异常值剔除</h4>
+<p>激光雷达有最大/最小测量范围。超出范围的直接扔掉。这个最简单，也最有效。</p>
+
+<pre><code>// 距离范围滤波
+if (point.x &lt; 0.3f || point.x &gt; 50.0f) continue;  // 0.3m 到 50m</code></pre>
+
+<h4>2. 基于邻域密度的剔除</h4>
+<p>如果一个点周围 10cm 内没有其他点，那它很可能是孤立的噪声点。这个逻辑和统计滤波类似，但更轻量。</p>
+
+<h4>3. 时间戳一致性检查</h4>
+<p>多传感器融合时，时间戳必须对齐。如果某个数据包的时间戳比上一帧还早，或者偏差超过 100ms，直接丢弃。</p>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>异常值剔除要放在预处理的第一步。先去掉明显错误的数据，再做滤波和去畸变。顺序搞反了，计算资源就白费了。</p>
+</div>
+
+<h3>四、预处理流程总结</h3>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background:#e3f2fd;">
+    <th>步骤</th>
+    <th>输入</th>
+    <th>操作</th>
+    <th>输出</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>原始点云</td>
+    <td>距离范围滤波 + 时间戳检查</td>
+    <td>干净点云（粗）</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>干净点云（粗）</td>
+    <td>体素滤波（降采样）</td>
+    <td>稀疏点云</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>稀疏点云</td>
+    <td>统计滤波（去离群点）</td>
+    <td>最终点云</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>原始图像</td>
+    <td>去畸变（remap）</td>
+    <td>矫正图像</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>矫正图像</td>
+    <td>坏像素检测 + 插值</td>
+    <td>最终图像</td>
+  </tr>
+</table>
+
+<p>嗯，到这里，数据预处理的核心内容就讲完了。你可能会问：这些操作看起来都不难，为什么还要单独讲一章？</p>
+
+<p>因为在实际项目中，<strong>预处理往往是整个系统里最耗时的环节</strong>。参数调不好，后面定位精度直接掉一个数量级。我见过太多人花几周调 SLAM 算法，结果发现是预处理参数没设对。</p>
+
+<p>所以，我的建议是：<strong>花 30% 的时间在预处理上，一点都不亏</strong>。</p>
+
+<div class="highlight">
+  <p><strong>一句话总结：</strong>体素滤波降采样，统计滤波去噪声，图像去畸变保精度，异常值剔除防翻车。四步走完，数据才算“能用”。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="14SensorCalibration.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16FeatureExtraction.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

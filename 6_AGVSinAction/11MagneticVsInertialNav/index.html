@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV磁条导航与惯性导航对比 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 0.8rem;
+            font-size: 0.95rem;
+            color: #2c5a6b;
+            background: rgba(255, 243, 205, 0.6);
+            display: inline-block;
+            padding: 0.3rem 2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            font-weight: 500;
+            border: 1px solid #f7d44a;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV磁条导航与惯性导航对比</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01NavigationOverview.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">AGV导航技术概述</div>
+            <div class="chapter-desc">AGV定义、发展简史、核心导航技术分类、磁条与惯性定位</div>
+            <div class="card-tags"><span class="tag">基础</span><span class="tag">概念</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02MagneticNavPrinciple.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">磁条导航原理</div>
+            <div class="chapter-desc">磁条物理特性、磁导航传感器、铺设规范、信号采集流程</div>
+            <div class="card-tags"><span class="tag">磁条</span><span class="tag">原理</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03InertialNavPrinciple.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">惯性导航原理</div>
+            <div class="chapter-desc">IMU器件(加速度计/陀螺仪)、解算原理、捷联惯导、误差累积</div>
+            <div class="card-tags"><span class="tag">惯性</span><span class="tag">IMU</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04MagneticNavArchitecture.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">磁条导航系统架构</div>
+            <div class="chapter-desc">路径网络设计、传感器布局、控制器与驱动、硬件选型</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">磁条</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05InertialNavArchitecture.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">惯性导航系统架构</div>
+            <div class="chapter-desc">IMU选型、里程计融合、卡尔曼滤波、嵌入式实现</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">滤波</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06AccuracyCompare.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">定位精度对比</div>
+            <div class="chapter-desc">磁条vs惯性精度分析、关键因素、实测数据对比</div>
+            <div class="card-tags"><span class="tag">精度</span><span class="tag">对比</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07PathFlexibilityCompare.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">路径灵活性对比</div>
+            <div class="chapter-desc">变更成本、规划灵活性、混合场景、柔性制造</div>
+            <div class="card-tags"><span class="tag">灵活性</span><span class="tag">路径</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08EnvAdaptCompare.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">环境适应性对比</div>
+            <div class="chapter-desc">光照/地面/电磁/温湿度/粉尘油污表现</div>
+            <div class="card-tags"><span class="tag">环境</span><span class="tag">鲁棒性</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09CostCompare.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">成本对比分析</div>
+            <div class="chapter-desc">硬件/部署/维护成本、全生命周期模型</div>
+            <div class="card-tags"><span class="tag">成本</span><span class="tag">经济</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10DeployMaintainCompare.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">部署与维护对比</div>
+            <div class="chapter-desc">磁条铺设、惯导标定、日常维护、故障排查</div>
+            <div class="card-tags"><span class="tag">部署</span><span class="tag">维护</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11ReliabilityCompare.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">可靠性对比</div>
+            <div class="chapter-desc">故障模式、冗余设计、系统MTBF对比</div>
+            <div class="card-tags"><span class="tag">可靠性</span><span class="tag">MTBF</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12ExtensibilityCompare.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">扩展性对比</div>
+            <div class="chapter-desc">路径扩展、区域扩展、多车协同、升级路径</div>
+            <div class="card-tags"><span class="tag">扩展</span><span class="tag">协同</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13MagneticNavScenarios.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">磁条导航典型应用</div>
+            <div class="chapter-desc">仓储物流、生产线、洁净室、高频次固定路径</div>
+            <div class="card-tags"><span class="tag">应用</span><span class="tag">磁条</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14InertialNavScenarios.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">惯性导航典型应用</div>
+            <div class="chapter-desc">动态仓储、人机混行、不规则路径、临时调整</div>
+            <div class="card-tags"><span class="tag">应用</span><span class="tag">惯性</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15HybridNavSolution.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">混合导航方案</div>
+            <div class="chapter-desc">磁条+惯性融合、融合定位、切换逻辑、案例</div>
+            <div class="card-tags"><span class="tag">融合</span><span class="tag">混合</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16MagneticNavParams.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">磁条导航关键技术参数</div>
+            <div class="chapter-desc">检测距离、磁条规格、转弯半径、最大速度</div>
+            <div class="card-tags"><span class="tag">参数</span><span class="tag">磁条</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17InertialNavParams.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">惯性导航关键技术参数</div>
+            <div class="chapter-desc">IMU零偏稳定性、角度随机游走、噪声密度、更新频率</div>
+            <div class="card-tags"><span class="tag">参数</span><span class="tag">IMU</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18MagneticNavTuning.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">磁条导航调试与优化</div>
+            <div class="chapter-desc">传感器校准、接头处理、路径平滑、速度匹配</div>
+            <div class="card-tags"><span class="tag">调试</span><span class="tag">优化</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19InertialNavTuning.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">惯性导航调试与优化</div>
+            <div class="chapter-desc">温漂补偿、零速修正、地图构建、运动模型调参</div>
+            <div class="card-tags"><span class="tag">调试</span><span class="tag">惯导</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20MagneticNavIssues.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">磁条导航常见问题与解决</div>
+            <div class="chapter-desc">磁条磨损、传感器污染、路径偏移、交叉干扰</div>
+            <div class="card-tags"><span class="tag">故障</span><span class="tag">磁条</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21InertialNavIssues.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">惯性导航常见问题与解决</div>
+            <div class="chapter-desc">IMU漂移、打滑误差、初始化失败、发散处理</div>
+            <div class="card-tags"><span class="tag">故障</span><span class="tag">惯导</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22MagneticNavSelection.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">磁条导航选型指南</div>
+            <div class="chapter-desc">负载/速度/环境等级、供应商评估</div>
+            <div class="card-tags"><span class="tag">选型</span><span class="tag">磁条</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23InertialNavSelection.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">惯性导航选型指南</div>
+            <div class="chapter-desc">IMU等级、导航计算机、算法授权、集成难度</div>
+            <div class="card-tags"><span class="tag">选型</span><span class="tag">惯导</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24MagneticNavCases.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">磁条导航项目案例</div>
+            <div class="chapter-desc">汽车零部件厂、电商仓库、半导体工厂AGV</div>
+            <div class="card-tags"><span class="tag">案例</span><span class="tag">实战</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25InertialNavCases.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">惯性导航项目案例</div>
+            <div class="chapter-desc">柔性装配线、医院物流、机场行李搬运</div>
+            <div class="card-tags"><span class="tag">案例</span><span class="tag">实战</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26MagneticNavTrends.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">磁条导航技术发展趋势</div>
+            <div class="chapter-desc">磁条材料创新、传感器集成、智能路径、5G融合</div>
+            <div class="card-tags"><span class="tag">趋势</span><span class="tag">未来</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27InertialNavTrends.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">惯性导航技术发展趋势</div>
+            <div class="chapter-desc">MEMS提升、视觉融合、深度学习、芯片级导航</div>
+            <div class="card-tags"><span class="tag">趋势</span><span class="tag">AI</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28NavSelectionFramework.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">导航技术选型决策框架</div>
+            <div class="chapter-desc">需求矩阵、评估维度、成本效益、风险冗余</div>
+            <div class="card-tags"><span class="tag">决策</span><span class="tag">框架</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29NavTestAcceptance.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">AGV导航系统测试与验收</div>
+            <div class="chapter-desc">精度/可靠性/环境测试、验收标准</div>
+            <div class="card-tags"><span class="tag">测试</span><span class="tag">验收</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30CourseSummaryOutlook.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">课程总结与展望</div>
+            <div class="chapter-desc">对比总结、未来趋势、行业展望、学习路径</div>
+            <div class="card-tags"><span class="tag">总结</span><span class="tag">结课</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

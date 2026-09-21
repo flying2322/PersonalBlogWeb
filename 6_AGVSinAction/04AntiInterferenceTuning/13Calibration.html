@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 标定与校准</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="active">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 标定与校准：激光雷达与IMU外参标定方法，编码器刻度系数校准，视觉相机内参标定与畸变校正</h2>
+
+<p>各位同行，今天咱们聊聊标定与校准。说实话，这活儿看着不起眼，但绝对是AGV导航系统的“地基”。地基没打好，后面算法调得再好也是白搭。我见过太多项目，明明传感器选型没问题，控制算法也够先进，结果跑起来就是各种飘——十有八九是标定没做到位。</p>
+
+<p>标定这事儿，说白了就是给传感器“对表”。让它们知道彼此之间的相对位置、姿态，以及自身的内部参数。今天我把三个核心模块拆开讲：激光雷达与IMU的外参标定、编码器刻度系数校准、视觉相机的内参标定与畸变校正。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>标定不是一次性工作。温度变化、机械振动、长期磨损都会导致参数漂移。我建议每3-6个月做一次复检，关键项目甚至要上在线标定。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block; background:#f0f8ff; border-radius:12px; padding:10px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  <!-- 中心标题 -->
+  <rect x="280" y="10" width="240" height="40" rx="20" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="36" text-anchor="middle" fill="white" font-size="16" font-weight="bold">标定与校准三大核心</text>
+  
+  <!-- 分支1：激光雷达+IMU -->
+  <rect x="40" y="80" width="220" height="50" rx="8" fill="#e74c3c" opacity="0.85"/>
+  <text x="150" y="110" text-anchor="middle" fill="white" font-size="14" font-weight="bold">激光雷达与IMU外参标定</text>
+  <line x1="260" y1="105" x2="280" y2="105" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 分支2：编码器 -->
+  <rect x="290" y="80" width="220" height="50" rx="8" fill="#27ae60" opacity="0.85"/>
+  <text x="400" y="110" text-anchor="middle" fill="white" font-size="14" font-weight="bold">编码器刻度系数校准</text>
+  <line x1="400" y1="50" x2="400" y2="80" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 分支3：视觉相机 -->
+  <rect x="540" y="80" width="220" height="50" rx="8" fill="#f39c12" opacity="0.85"/>
+  <text x="650" y="110" text-anchor="middle" fill="white" font-size="14" font-weight="bold">视觉相机内参标定与畸变校正</text>
+  <line x1="520" y1="105" x2="540" y2="105" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 子项：激光雷达+IMU -->
+  <rect x="20" y="160" width="100" height="35" rx="6" fill="#fadbd8"/>
+  <text x="70" y="183" text-anchor="middle" fill="#c0392b" font-size="11">旋转法标定</text>
+  <rect x="130" y="160" width="100" height="35" rx="6" fill="#fadbd8"/>
+  <text x="180" y="183" text-anchor="middle" fill="#c0392b" font-size="11">手眼标定法</text>
+  <rect x="70" y="205" width="110" height="35" rx="6" fill="#fadbd8"/>
+  <text x="125" y="228" text-anchor="middle" fill="#c0392b" font-size="11">自然场景法</text>
+  
+  <!-- 子项：编码器 -->
+  <rect x="290" y="160" width="100" height="35" rx="6" fill="#d5f5e3"/>
+  <text x="340" y="183" text-anchor="middle" fill="#1e8449" font-size="11">直线校准法</text>
+  <rect x="400" y="160" width="100" height="35" rx="6" fill="#d5f5e3"/>
+  <text x="450" y="183" text-anchor="middle" fill="#1e8449" font-size="11">圆形轨迹法</text>
+  <rect x="340" y="205" width="110" height="35" rx="6" fill="#d5f5e3"/>
+  <text x="395" y="228" text-anchor="middle" fill="#1e8449" font-size="11">双编码器互校</text>
+  
+  <!-- 子项：视觉相机 -->
+  <rect x="540" y="160" width="100" height="35" rx="6" fill="#fdebd0"/>
+  <text x="590" y="183" text-anchor="middle" fill="#d35400" font-size="11">棋盘格标定</text>
+  <rect x="650" y="160" width="100" height="35" rx="6" fill="#fdebd0"/>
+  <text x="700" y="183" text-anchor="middle" fill="#d35400" font-size="11">畸变参数求解</text>
+  <rect x="590" y="205" width="110" height="35" rx="6" fill="#fdebd0"/>
+  <text x="645" y="228" text-anchor="middle" fill="#d35400" font-size="11">重投影验证</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="265" width="400" height="35" rx="10" fill="#2c3e50" opacity="0.8"/>
+  <text x="400" y="289" text-anchor="middle" fill="white" font-size="13">目标：统一坐标系 → 消除系统误差 → 提升定位精度</text>
+</svg>
+
+<h3>13.1 激光雷达与IMU外参标定</h3>
+
+<p>激光雷达和IMU是AGV导航的“黄金搭档”。激光雷达给精确的距离信息，IMU提供高频的姿态变化。但问题是——它们俩装在车上的位置和角度不一样。你得知道它们之间的旋转矩阵和平移向量，这就是外参。</p>
+
+<p>我个人习惯用三种方法，按场景选：</p>
+
+<ol>
+  <li><strong>旋转法标定</strong>：把AGV放在转台上，让车体做纯旋转运动。激光雷达观测到的静止点云会形成圆弧，IMU记录角速度。通过拟合圆弧中心和IMU的角速度积分，就能解出外参。这个方法精度高，但需要转台设备。</li>
+  <li><strong>手眼标定法</strong>：借鉴机器人手眼标定的思路。让AGV走一段已知轨迹，同时记录激光雷达的SLAM结果和IMU的积分结果。构建AX=XB方程，用最小二乘法求解。我在项目里常用这个方法，因为不需要额外设备。</li>
+  <li><strong>自然场景法</strong>：在环境里放几个特征明显的标定物（比如反光柱），让AGV从不同角度观测。利用激光雷达和IMU对同一特征点的观测差异来解算外参。这个方法适合现场快速标定。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>旋转法标定出来的外参最准，但操作麻烦。手眼标定法最实用，但要注意轨迹设计——别走直线，要有充分的旋转运动，否则IMU的偏置误差会吃掉外参信息。</p>
+</div>
+
+<p>这里给一段手眼标定的核心代码片段，用的是Eigen库：</p>
+
+<pre><code>// 手眼标定：求解 AX = XB
+// A: 激光雷达的位姿变换 (4x4)
+// B: IMU的位姿变换 (4x4)
+// X: 待求的外参 (4x4)
+
+Eigen::Matrix4d solveHandEye(
+    const std::vector&lt;Eigen::Matrix4d&gt;&amp; A_list,
+    const std::vector&lt;Eigen::Matrix4d&gt;&amp; B_list) {
+    
+    // 构建旋转部分方程
+    std::vector&lt;Eigen::Matrix3d&gt; R_A, R_B;
+    for (size_t i = 0; i &lt; A_list.size(); ++i) {
+        R_A.push_back(A_list[i].block&lt;3,3&gt;(0,0));
+        R_B.push_back(B_list[i].block&lt;3,3&gt;(0,0));
+    }
+    
+    // 使用Tsai方法求解旋转矩阵
+    Eigen::Matrix3d R_X = tsaiRotation(R_A, R_B);
+    
+    // 求解平移部分
+    Eigen::Vector3d t_X = solveTranslation(A_list, B_list, R_X);
+    
+    // 组装外参矩阵
+    Eigen::Matrix4d X = Eigen::Matrix4d::Identity();
+    X.block&lt;3,3&gt;(0,0) = R_X;
+    X.block&lt;3,1&gt;(0,3) = t_X;
+    
+    return X;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>IMU数据一定要做零偏补偿。我曾经在一个项目里忽略了IMU的零偏，结果标定出来的外参误差达到5度，导致融合定位直接发散。后来加了静止段数据做零偏估计，才把问题解决。</p>
+</div>
+
+<h3>13.2 编码器刻度系数校准</h3>
+
+<p>编码器是AGV的“腿”，它告诉你轮子转了多少圈。但问题是——轮子有磨损、有打滑、有安装误差。编码器输出的脉冲数，和实际走过的距离之间，存在一个刻度系数。这个系数不准，里程计就会漂。</p>
+
+<p>校准方法我常用这三种：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>原理</th>
+      <th>精度</th>
+      <th>适用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>直线校准法</td>
+      <td>让AGV走一段已知直线距离，对比编码器脉冲数</td>
+      <td>±0.5%</td>
+      <td>日常维护、快速校准</td>
+    </tr>
+    <tr>
+      <td>圆形轨迹法</td>
+      <td>让AGV绕固定半径转圈，利用几何约束解算</td>
+      <td>±0.2%</td>
+      <td>高精度场景、差速底盘</td>
+    </tr>
+    <tr>
+      <td>双编码器互校</td>
+      <td>左右轮编码器互相约束，解算各自的刻度系数</td>
+      <td>±0.1%</td>
+      <td>双轮差速、需要在线校准</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>直线校准法最简单。你在地上贴一条5米长的胶带，让AGV从起点走到终点。记录编码器脉冲数N，那么刻度系数就是：</p>
+
+<pre><code>// 刻度系数 = 实际距离 / 编码器脉冲数
+// 单位：米/脉冲
+double scale = 5.0 / N;  // 5米距离
+
+// 如果是差速底盘，左右轮要分别校准
+double scale_left = 5.0 / N_left;
+double scale_right = 5.0 / N_right;</code></pre>
+
+<p>嗯，这里要注意——直线校准法看似简单，但有个坑：AGV必须走直线，不能有偏航。我见过有人用手推着AGV走，结果走歪了，校准出来的系数左右轮不一致，反而引入了新的误差。我建议用AGV自己的导航系统控制它走直线，或者用导轨辅助。</p>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>编码器刻度系数会随温度变化。我曾经在冬天校准好的AGV，夏天跑起来里程计误差大了3%。后来发现是轮胎气压随温度变化，导致滚动半径变了。解决方案：在温度变化超过15°C时重新校准，或者加装胎压监测做补偿。</p>
+</div>
+
+<h3>13.3 视觉相机内参标定与畸变校正</h3>
+
+<p>视觉相机是AGV的“眼睛”。但镜头不是完美的——有径向畸变、切向畸变。内参标定就是搞清楚相机的焦距、主点位置和畸变参数。说白了，就是让相机知道“我看到的东西，实际在什么位置”。</p>
+
+<p>我用的标定方法是经典的棋盘格法，流程如下：</p>
+
+<ol>
+  <li><strong>采集图像</strong>：打印一张棋盘格标定板，从不同角度拍20-30张照片。注意：棋盘格要占画面1/3以上，角度要覆盖俯仰、偏航、滚转三个方向。</li>
+  <li><strong>角点检测</strong>：用OpenCV的<code>findChessboardCorners</code>提取棋盘格角点。亚像素精度是关键，用<code>cornerSubPix</code>做细化。</li>
+  <li><strong>求解内参</strong>：用<code>calibrateCamera</code>函数求解内参矩阵和畸变系数。</li>
+  <li><strong>畸变校正</strong>：用<code>undistort</code>或<code>initUndistortRectifyMap</code>生成校正映射表。</li>
+</ol>
+
+<p>代码示例：</p>
+
+<pre><code>// OpenCV 相机标定核心代码
+cv::Mat cameraMatrix, distCoeffs;
+std::vector&lt;cv::Mat&gt; rvecs, tvecs;
+
+// 棋盘格尺寸：内角点数量 (9,6)，方格边长 30mm
+cv::Size patternSize(9, 6);
+float squareSize = 30.0f;  // mm
+
+// 准备世界坐标系中的棋盘格角点
+std::vector&lt;cv::Point3f&gt; objectPoints;
+for (int i = 0; i &lt; patternSize.height; ++i) {
+    for (int j = 0; j &lt; patternSize.width; ++j) {
+        objectPoints.push_back(cv::Point3f(j * squareSize, i * squareSize, 0));
+    }
+}
+
+// 执行标定
+double rms = cv::calibrateCamera(
+    objectPointsList,   // 世界坐标点集
+    imagePointsList,    // 图像坐标点集
+    imageSize,          // 图像尺寸
+    cameraMatrix,       // 输出：内参矩阵
+    distCoeffs,         // 输出：畸变系数
+    rvecs, tvecs,       // 输出：外参
+    cv::CALIB_FIX_ASPECT_RATIO | cv::CALIB_ZERO_TANGENT_DIST
+);
+
+// 检查重投影误差
+std::cout &lt;&lt; "重投影误差: " &lt;&lt; rms &lt;&lt; " 像素" &lt;&lt; std::endl;
+// 一般要求 rms &lt; 0.5 像素才算合格</code></pre>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>标定完成后，我会用<code>undistort</code>校正一张图像，然后手动检查棋盘格的直线是否变直了。如果边缘还有弯曲，说明畸变校正不彻底，需要重新标定。另外，我建议把校正映射表存成文件，运行时直接查表，省去每次校正的计算开销。</p>
+</div>
+
+<p>畸变模型分两种：径向畸变和切向畸变。径向畸变是镜头形状导致的，表现为“桶形”或“枕形”失真。切向畸变是镜头和成像平面不平行导致的。OpenCV默认用5个畸变系数（k1, k2, p1, p2, k3），其中k1、k2、k3是径向系数，p1、p2是切向系数。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>标定板一定要平整！我曾经用一张有点褶皱的打印纸做标定板，结果标定出来的内参误差很大，导致视觉定位偏差超过10厘米。后来换了亚克力板做的标定板，问题才解决。另外，标定板的方格尺寸要精确测量，误差不要超过0.1mm。</p>
+</div>
+
+<p>最后说一句——标定不是终点，是起点。参数标定好了，还要在实际运行中验证。我一般会在AGV跑完一圈后，对比激光雷达、IMU、视觉三个传感器的定位结果，看看偏差是否在容忍范围内。如果偏差持续增大，说明某个传感器的标定参数可能已经漂了，需要重新标定。</p>
+
+<p>好了，这一章的内容就到这里。标定是个细致活，急不得。你想想看，如果连传感器之间的“默契”都没培养好，AGV怎么可能跑得稳？</p>
+
+<div class="footer-nav">
+            <a href="12SoftwareFilterData.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14MapModelingOptimize.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

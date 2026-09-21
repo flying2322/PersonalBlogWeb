@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 多AGV协同调度</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="active">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 多AGV协同调度：交通管制、资源分配、死锁避免、集中式与分布式调度</h2>
+
+<p>多AGV协同调度，说白了就是让一群机器人别打架。</p>
+<p>我刚开始做这个方向时，觉得单台AGV跑得好好的，多几台不就是复制粘贴吗？结果第一次联调，三台车在十字路口堵成一锅粥，调度中心疯狂报错。嗯，从那以后我再也不敢小看协同调度了。</p>
+
+<h3>21.1 交通管制：别让AGV在路口“亲密接触”</h3>
+
+<p>交通管制是多AGV系统最基础的问题。你想想看，工厂里几十台AGV同时跑，路口就那么几个，不管理肯定乱套。</p>
+
+<p>我个人习惯把交通管制分为两级：</p>
+<ul>
+  <li><strong>全局交通管制</strong>：基于地图的拓扑结构，预先规划好哪些路段是单行道，哪些路口需要互斥访问</li>
+  <li><strong>局部交通管制</strong>：实时检测AGV之间的冲突，动态调整通行顺序</li>
+</ul>
+
+<p>我在项目中遇到过最典型的场景：一个T型路口，三台AGV同时到达。如果没有管制，它们会互相等待，形成死锁。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>把路口抽象成“资源”，AGV需要先申请资源才能进入。资源被占用时，其他AGV在路口前等待。</p>
+</div>
+
+<p>实现上，我常用的是<strong>预留表（Reservation Table）</strong>方法。每台AGV在进入路口前，先向调度中心申请一个时间窗口。调度中心检查这个时间窗口是否与其他AGV冲突，如果冲突则拒绝或调整。</p>
+
+<pre><code>// 伪代码：路口资源申请
+bool RequestIntersection(AGV_ID, Intersection_ID, Time_Window) {
+    // 检查该路口在Time_Window内是否已被占用
+    if (ReservationTable[Intersection_ID].IsOccupied(Time_Window)) {
+        return false;  // 冲突，拒绝
+    }
+    // 预留该时间窗口
+    ReservationTable[Intersection_ID].Reserve(AGV_ID, Time_Window);
+    return true;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经把时间窗口设得太小，结果AGV因为加减速误差，实际通过时间超出预留窗口，导致碰撞风险。后来我加了20%的缓冲时间，问题就解决了。</p>
+</div>
+
+<h3>21.2 资源分配：谁先谁后？这是个问题</h3>
+
+<p>资源分配不只是路口，还包括充电桩、装卸站、维修区等。说白了，就是多个AGV竞争有限资源时，怎么决定优先级。</p>
+
+<p>我常用的分配策略有几种：</p>
+
+<table>
+  <tr>
+    <th>策略</th>
+    <th>原理</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>先到先服务（FCFS）</td>
+    <td>谁先申请谁先用</td>
+    <td>资源充足，冲突少</td>
+  </tr>
+  <tr>
+    <td>优先级调度</td>
+    <td>根据任务紧急程度分配</td>
+    <td>有紧急订单的场景</td>
+  </tr>
+  <tr>
+    <td>最短路径优先</td>
+    <td>离资源最近的AGV优先</td>
+    <td>减少空跑距离</td>
+  </tr>
+  <tr>
+    <td>拍卖机制</td>
+    <td>AGV出价竞争资源</td>
+    <td>复杂动态环境</td>
+  </tr>
+</table>
+
+<p>我个人比较喜欢<strong>优先级+最短路径</strong>的组合策略。举个例子：一台AGV正在执行紧急订单，另一台只是回充电桩。即使回充电桩的AGV离路口更近，我也会让紧急订单先过。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>优先级不能一成不变。我见过一个项目，高优先级AGV一直占用资源，低优先级AGV永远等不到，最后电池耗尽停在路中间。所以一定要加超时机制，当低优先级AGV等待超过阈值时，自动提升优先级。</p>
+</div>
+
+<h3>21.3 死锁避免：别让AGV互相“锁死”</h3>
+
+<p>死锁是多AGV系统最头疼的问题。四台AGV在十字路口各占一条路，谁都不让谁，这就是典型的死锁。</p>
+
+<p>死锁发生的四个必要条件：</p>
+<ol>
+  <li><strong>互斥</strong>：资源一次只能被一台AGV占用</li>
+  <li><strong>持有并等待</strong>：AGV占着一个资源，同时等待另一个资源</li>
+  <li><strong>不可剥夺</strong>：资源不能被强制释放</li>
+  <li><strong>循环等待</strong>：AGV之间形成等待环</li>
+</ol>
+
+<p>打破任意一个条件就能避免死锁。我常用的方法有：</p>
+
+<ul>
+  <li><strong>资源排序法</strong>：给所有资源编号，AGV必须按编号顺序申请资源。这样就不会形成循环等待。</li>
+  <li><strong>超时回退法</strong>：AGV等待资源超过一定时间，自动后退让出已占用的资源。</li>
+  <li><strong>死锁检测+恢复</strong>：定期检测是否有死锁，发现后强制让一台AGV退出。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>资源排序法最简单可靠，但需要全局规划。超时回退法灵活，但可能造成AGV反复进退。死锁检测+恢复适合大型系统，但恢复过程可能影响生产效率。</p>
+</div>
+
+<p>我曾经在一个项目中遇到死锁问题，排查了两天才发现：两台AGV在一条窄道上面对面相遇，谁都不肯倒车。后来我加了“窄道会车协议”——谁离出口近谁先走，另一个倒车让路。问题就解决了。</p>
+
+<h3>21.4 集中式调度：一个大脑管所有</h3>
+
+<p>集中式调度，就是有一个中央调度中心，掌握所有AGV的状态和任务信息，统一规划路径和分配资源。</p>
+
+<p><strong>优点很明显：</strong></p>
+<ul>
+  <li>全局最优：能看到全局信息，做出最优决策</li>
+  <li>实现简单：所有逻辑集中在一处，调试方便</li>
+  <li>冲突少：中央调度可以提前规避冲突</li>
+</ul>
+
+<p><strong>缺点也很突出：</strong></p>
+<ul>
+  <li>单点故障：中央挂了，所有AGV都停摆</li>
+  <li>计算压力大：AGV数量多时，调度周期变长</li>
+  <li>通信延迟：AGV和中央之间频繁通信，网络压力大</li>
+</ul>
+
+<p>我做过一个集中式调度系统，管理30台AGV。刚开始还好，后来加到50台，调度周期从100ms变成了500ms，AGV反应明显变慢。嗯，这就是集中式的瓶颈。</p>
+
+<h3>21.5 分布式调度：各自为战，协同合作</h3>
+
+<p>分布式调度没有中央大脑，每台AGV自己决策，通过通信协商解决冲突。</p>
+
+<p><strong>常见实现方式：</strong></p>
+<ul>
+  <li><strong>合同网协议</strong>：任务发布者广播任务，AGV投标，发布者选择最合适的AGV</li>
+  <li><strong>共识算法</strong>：AGV之间通过投票决定谁先通过路口</li>
+  <li><strong>市场机制</strong>：AGV用虚拟货币竞拍资源</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>分布式调度适合AGV数量多、环境变化快的场景。但实现复杂度高，调试困难。我建议先从集中式做起，等系统稳定了再逐步引入分布式元素。</p>
+</div>
+
+<p>我个人习惯用<strong>混合架构</strong>：中央调度负责全局路径规划和资源分配，AGV本地负责局部避障和冲突协商。这样既保证了全局最优，又提高了实时性。</p>
+
+<h3>21.6 知识体系总览</h3>
+
+<p>下面这张图是我自己总结的多AGV协同调度知识体系，你可以对照着梳理思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">多AGV协同调度知识体系</text>
+  
+  <!-- 四大模块 -->
+  <!-- 交通管制 -->
+  <rect x="50" y="70" width="160" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">交通管制</text>
+  
+  <!-- 资源分配 -->
+  <rect x="240" y="70" width="160" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="320" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">资源分配</text>
+  
+  <!-- 死锁避免 -->
+  <rect x="430" y="70" width="160" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="510" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">死锁避免</text>
+  
+  <!-- 调度架构 -->
+  <rect x="620" y="70" width="160" height="50" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="700" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调度架构</text>
+  
+  <!-- 连接线 -->
+  <line x1="130" y1="120" x2="130" y2="160" stroke="#3498db" stroke-width="2"/>
+  <line x1="320" y1="120" x2="320" y2="160" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="510" y1="120" x2="510" y2="160" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="700" y1="120" x2="700" y2="160" stroke="#9b59b6" stroke-width="2"/>
+  
+  <!-- 交通管制子项 -->
+  <rect x="30" y="160" width="200" height="40" rx="5" fill="#d6eaf8"/>
+  <text x="130" y="185" text-anchor="middle" font-size="13" fill="#2c3e50">全局管制：拓扑路径规划</text>
+  
+  <rect x="30" y="210" width="200" height="40" rx="5" fill="#d6eaf8"/>
+  <text x="130" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">局部管制：预留表法</text>
+  
+  <rect x="30" y="260" width="200" height="40" rx="5" fill="#d6eaf8"/>
+  <text x="130" y="285" text-anchor="middle" font-size="13" fill="#2c3e50">时间窗口 + 缓冲</text>
+  
+  <!-- 资源分配子项 -->
+  <rect x="220" y="160" width="200" height="40" rx="5" fill="#fadbd8"/>
+  <text x="320" y="185" text-anchor="middle" font-size="13" fill="#2c3e50">先到先服务（FCFS）</text>
+  
+  <rect x="220" y="210" width="200" height="40" rx="5" fill="#fadbd8"/>
+  <text x="320" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">优先级调度</text>
+  
+  <rect x="220" y="260" width="200" height="40" rx="5" fill="#fadbd8"/>
+  <text x="320" y="285" text-anchor="middle" font-size="13" fill="#2c3e50">最短路径优先</text>
+  
+  <rect x="220" y="310" width="200" height="40" rx="5" fill="#fadbd8"/>
+  <text x="320" y="335" text-anchor="middle" font-size="13" fill="#2c3e50">拍卖机制</text>
+  
+  <!-- 死锁避免子项 -->
+  <rect x="410" y="160" width="200" height="40" rx="5" fill="#d5f5e3"/>
+  <text x="510" y="185" text-anchor="middle" font-size="13" fill="#2c3e50">资源排序法</text>
+  
+  <rect x="410" y="210" width="200" height="40" rx="5" fill="#d5f5e3"/>
+  <text x="510" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">超时回退法</text>
+  
+  <rect x="410" y="260" width="200" height="40" rx="5" fill="#d5f5e3"/>
+  <text x="510" y="285" text-anchor="middle" font-size="13" fill="#2c3e50">死锁检测+恢复</text>
+  
+  <rect x="410" y="310" width="200" height="40" rx="5" fill="#d5f5e3"/>
+  <text x="510" y="335" text-anchor="middle" font-size="13" fill="#2c3e50">窄道会车协议</text>
+  
+  <!-- 调度架构子项 -->
+  <rect x="600" y="160" width="200" height="40" rx="5" fill="#e8daef"/>
+  <text x="700" y="185" text-anchor="middle" font-size="13" fill="#2c3e50">集中式调度</text>
+  
+  <rect x="600" y="210" width="200" height="40" rx="5" fill="#e8daef"/>
+  <text x="700" y="235" text-anchor="middle" font-size="13" fill="#2c3e50">分布式调度</text>
+  
+  <rect x="600" y="260" width="200" height="40" rx="5" fill="#e8daef"/>
+  <text x="700" y="285" text-anchor="middle" font-size="13" fill="#2c3e50">混合架构</text>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="390" width="500" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="400" y="415" text-anchor="middle" font-size="15" fill="white" font-weight="bold">核心目标：避免冲突 → 提高效率 → 保证安全</text>
+  <text x="400" y="438" text-anchor="middle" font-size="13" fill="white">从单机智能到群体智能，协同是关键</text>
+  
+  <!-- 连接线到总结 -->
+  <line x1="130" y1="300" x2="250" y2="390" stroke="#3498db" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="320" y1="350" x2="350" y2="390" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="510" y1="350" x2="450" y2="390" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="700" y1="300" x2="550" y2="390" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="5,5"/>
+</svg>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>多AGV协同调度没有银弹。交通管制是基础，资源分配是核心，死锁避免是保障，调度架构是框架。实际项目中，我建议根据AGV数量、环境复杂度、实时性要求来选择合适的方案。</p>
+  <p>数量少（10台以内）用集中式就够了。数量多（50台以上）必须引入分布式。中间状态用混合架构最稳妥。</p>
+</div>
+
+<p>嗯，这一章的内容就到这里。多AGV协同调度是个实践性很强的领域，光看理论不够，一定要动手调参、跑仿真、看数据。我当年也是踩了无数坑才慢慢摸出门道的。</p>
+
+        <div class="footer-nav">
+            <a href="20PathPlanningPracticePart2.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22LocalizationTech.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

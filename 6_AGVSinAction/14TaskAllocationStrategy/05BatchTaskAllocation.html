@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 多任务批量分配策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="active">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 多任务批量分配策略：匈牙利算法原理、任务-车辆二分图匹配、最小化总行驶距离</h2>
+
+<p>各位同学，今天我们来聊聊多任务批量分配。说实话，这是AGV调度里最让我头疼，也最有成就感的一块。</p>
+
+<p>单任务分配，说白了就是「来一个活，找一辆车」。但现实哪有这么简单？仓库里可能同时冒出几十个搬运任务，几十辆车都在待命。怎么一次性把这些任务都分出去，让总行驶距离最短？这就是我们今天要啃的硬骨头。</p>
+
+<h3>5.1 为什么需要批量分配？</h3>
+
+<p>我刚开始做AGV项目时，犯过一个低级错误。当时系统用的是「先到先服务」策略——来一个任务，找最近的车。结果呢？</p>
+
+<ul>
+  <li>任务A来了，分配给车1，距离10米</li>
+  <li>任务B来了，分配给车2，距离15米</li>
+  <li>任务C来了，分配给车3，距离20米</li>
+</ul>
+
+<p>看起来每个任务都挺合理。但后来我算了一笔账：如果让车1去任务C（20米），车2去任务A（10米），车3去任务B（15米），总距离反而更短！</p>
+
+<div class="highlight">
+  <p><strong>核心问题：</strong>局部最优 ≠ 全局最优。批量分配就是要找到全局最优解。</p>
+</div>
+
+<p>你想想看，一个仓库里几十辆车同时跑，每辆车多跑1米，总距离就多几十米。一天下来，电池消耗、轮胎磨损、任务延迟……全是成本。</p>
+
+<h3>5.2 匈牙利算法：解决分配问题的经典方法</h3>
+
+<p>匈牙利算法，名字听着挺唬人。其实它就是个「找最优配对」的数学方法。1955年由匈牙利数学家库恩提出，专门解决指派问题。</p>
+
+<p>我当年在课本上第一次看到它时，觉得这玩意儿太抽象了。直到有一次在项目里，面对30个任务和30辆车，手动算了一下午没算出来……嗯，从那以后我老老实实把算法写进了代码。</p>
+
+<h4>5.2.1 算法核心思想</h4>
+
+<p>说白了，匈牙利算法就干一件事：<strong>在代价矩阵里，找到一组「行和列都不重复」的元素，让它们的和最小</strong>。</p>
+
+<p>举个例子。假设我们有3个任务（T1, T2, T3）和3辆车（V1, V2, V3）。每辆车到每个任务的距离如下：</p>
+
+<table>
+  <tr>
+    <th></th>
+    <th>T1</th>
+    <th>T2</th>
+    <th>T3</th>
+  </tr>
+  <tr>
+    <td>V1</td>
+    <td>10</td>
+    <td>15</td>
+    <td>20</td>
+  </tr>
+  <tr>
+    <td>V2</td>
+    <td>12</td>
+    <td>8</td>
+    <td>25</td>
+  </tr>
+  <tr>
+    <td>V3</td>
+    <td>18</td>
+    <td>22</td>
+    <td>5</td>
+  </tr>
+</table>
+
+<p>匈牙利算法会找出一种分配方式，比如：V1→T1（10），V2→T2（8），V3→T3（5），总距离=23。这是不是最优？我们后面验证。</p>
+
+<h4>5.2.2 算法步骤（简化版）</h4>
+
+<p>我不打算把数学证明全讲一遍，那太枯燥了。咱们直接看实操步骤：</p>
+
+<ol>
+  <li><strong>行归约</strong>：每行减去该行最小值</li>
+  <li><strong>列归约</strong>：每列减去该列最小值</li>
+  <li><strong>试分配</strong>：用最少的线覆盖所有0元素</li>
+  <li><strong>调整矩阵</strong>：如果线数小于任务数，继续调整</li>
+  <li><strong>得到最优解</strong></li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>实际编码时，别自己手写匈牙利算法。用现成的库（比如Python的scipy.optimize.linear_sum_assignment），稳定又高效。我曾经手写过一次，调试了三天才发现一个边界条件没处理好……</p>
+</div>
+
+<h3>5.3 任务-车辆二分图匹配</h3>
+
+<p>匈牙利算法背后，其实是一个二分图模型。左边是任务节点，右边是车辆节点，边上的权重就是行驶距离。</p>
+
+<p>为什么要用二分图？因为任务和车辆是两类不同的东西，它们之间没有内部连接。任务之间不会互相抢路（至少在分配阶段不考虑），车辆之间也不会互相干扰。这种结构天然适合二分图。</p>
+
+<p>我画了一张图，帮你理解这个结构：</p>
+
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 左侧：任务节点 -->
+  <circle cx="100" cy="60" r="25" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="100" y="65" text-anchor="middle" fill="white" font-size="14">T1</text>
+  
+  <circle cx="100" cy="150" r="25" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="100" y="155" text-anchor="middle" fill="white" font-size="14">T2</text>
+  
+  <circle cx="100" cy="240" r="25" fill="#4CAF50" stroke="#333" stroke-width="2"/>
+  <text x="100" y="245" text-anchor="middle" fill="white" font-size="14">T3</text>
+
+  <!-- 右侧：车辆节点 -->
+  <circle cx="500" cy="60" r="25" fill="#2196F3" stroke="#333" stroke-width="2"/>
+  <text x="500" y="65" text-anchor="middle" fill="white" font-size="14">V1</text>
+  
+  <circle cx="500" cy="150" r="25" fill="#2196F3" stroke="#333" stroke-width="2"/>
+  <text x="500" y="155" text-anchor="middle" fill="white" font-size="14">V2</text>
+  
+  <circle cx="500" cy="240" r="25" fill="#2196F3" stroke="#333" stroke-width="2"/>
+  <text x="500" y="245" text-anchor="middle" fill="white" font-size="14">V3</text>
+
+  <!-- 连线：所有可能的匹配 -->
+  <line x1="125" y1="60" x2="475" y2="60" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="60" x2="475" y2="150" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="60" x2="475" y2="240" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  
+  <line x1="125" y1="150" x2="475" y2="60" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="150" x2="475" y2="150" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="150" x2="475" y2="240" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  
+  <line x1="125" y1="240" x2="475" y2="60" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="240" x2="475" y2="150" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="125" y1="240" x2="475" y2="240" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5"/>
+
+  <!-- 最优匹配（粗线高亮） -->
+  <line x1="125" y1="60" x2="475" y2="60" stroke="#FF5722" stroke-width="4"/>
+  <line x1="125" y1="150" x2="475" y2="150" stroke="#FF5722" stroke-width="4"/>
+  <line x1="125" y1="240" x2="475" y2="240" stroke="#FF5722" stroke-width="4"/>
+
+  <!-- 图例 -->
+  <text x="300" y="290" text-anchor="middle" fill="#999" font-size="12">虚线：所有可能匹配 | 实线：最优匹配</text>
+</svg>
+
+<p>这张图里，虚线表示所有可能的任务-车辆配对。实线是匈牙利算法找到的最优匹配——每个任务只配一辆车，每辆车只做一个任务。</p>
+
+<h3>5.4 最小化总行驶距离</h3>
+
+<p>好了，理论讲完了。咱们看看实际怎么用。</p>
+
+<h4>5.4.1 代价矩阵的构建</h4>
+
+<p>在真实系统里，距离不是简单的直线距离。我一般会考虑三个因素：</p>
+
+<ul>
+  <li><strong>曼哈顿距离</strong>：仓库里AGV走的是网格路径，不是直线</li>
+  <li><strong>交通拥堵系数</strong>：某些路段高峰期要加权</li>
+  <li><strong>车辆当前电量</strong>：电量低的车辆，尽量分配近的任务</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>千万别只用欧氏距离！我在一个项目里吃过亏，AGV按直线距离分配，结果车被货架挡住了，绕了一大圈。后来改成曼哈顿距离，问题才解决。</p>
+</div>
+
+<h4>5.4.2 代码实现示例</h4>
+
+<p>下面是一个简化版的Python实现。实际项目中，你还需要处理任务数量不等于车辆数量的情况（比如任务多于车，或者车多于任务）。</p>
+
+<pre><code>import numpy as np
+from scipy.optimize import linear_sum_assignment
+
+# 构建代价矩阵：行=车辆，列=任务
+# 这里用曼哈顿距离作为示例
+cost_matrix = np.array([
+    [10, 15, 20],   # V1到各任务的距离
+    [12, 8, 25],    # V2到各任务的距离
+    [18, 22, 5]     # V3到各任务的距离
+])
+
+# 匈牙利算法求解
+row_ind, col_ind = linear_sum_assignment(cost_matrix)
+
+# 输出结果
+print("最优分配方案：")
+for i, j in zip(row_ind, col_ind):
+    print(f"车辆V{i+1} → 任务T{j+1}，距离={cost_matrix[i][j]}")
+
+total_distance = cost_matrix[row_ind, col_ind].sum()
+print(f"总行驶距离：{total_distance}")</code></pre>
+
+<p>运行结果：</p>
+
+<pre><code>最优分配方案：
+车辆V1 → 任务T1，距离=10
+车辆V2 → 任务T2，距离=8
+车辆V3 → 任务T3，距离=5
+总行驶距离：23</code></pre>
+
+<p>你看，总距离23，比随便分配要短得多。</p>
+
+<h3>5.5 实际项目中的避坑指南</h3>
+
+<p>讲几个我踩过的坑，希望对你有帮助。</p>
+
+<div class="tip">
+  <p><strong>坑1：任务数量不等于车辆数量</strong></p>
+  <p>我曾经遇到一个场景：15个任务，但只有12辆车空闲。匈牙利算法要求矩阵是方阵。怎么办？我的做法是添加3个「虚拟车辆」，它们到所有任务的距离设为一个很大的数（比如9999）。这样算法会自动把最难的任务分配给虚拟车——实际上就是不分配，留给下一批。</p>
+</div>
+
+<div class="tip">
+  <p><strong>坑2：动态更新代价矩阵</strong></p>
+  <p>任务分配不是一次性的。新任务会不断进来，车辆的状态也在变化。我建议每5-10秒重新运行一次匈牙利算法，而不是等所有任务都攒够了再算。这样既能保证全局最优，又能快速响应变化。</p>
+</div>
+
+<div class="warning">
+  <p><strong>坑3：别忽略约束条件</strong></p>
+  <p>匈牙利算法默认每个任务只能分配给一辆车，每辆车只能做一个任务。但实际中，一辆车可以连续做多个任务。这时候你需要把问题拆解成「任务序列」而不是「单任务」。我一般会用两阶段法：先用匈牙利算法做初始分配，再用局部搜索优化任务顺序。</p>
+</div>
+
+<h3>5.6 小结</h3>
+
+<p>多任务批量分配，核心就三件事：</p>
+
+<ul>
+  <li><strong>建模</strong>：把问题抽象成二分图匹配</li>
+  <li><strong>求解</strong>：用匈牙利算法找到全局最优</li>
+  <li><strong>落地</strong>：处理好实际工程中的各种约束</li>
+</ul>
+
+<p>我个人觉得，匈牙利算法是AGV调度里性价比最高的算法之一。它不复杂，但效果立竿见影。你想想看，同样的硬件，换一套分配策略，吞吐量可能提升20%以上。这笔账，怎么算都划算。</p>
+
+<p>好了，这一章就到这里。下一章我们聊聊动态任务分配——当任务实时到达时，怎么让算法既快又准。</p>
+
+<div class="footer-nav">
+            <a href="04SingleTaskAllocation.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06TimeWindowAllocation.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

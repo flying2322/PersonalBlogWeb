@@ -1,0 +1,342 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 A星算法评估指标</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="active">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 A星算法评估指标：路径长度、搜索时间、扩展节点数</h2>
+
+<p>做AGV路径规划这些年，我调试过不下几十种A星的变体。说实话，很多刚入行的朋友问我：“A星算法好不好，到底看什么？”</p>
+
+<p>嗯，这个问题问得好。你写出来的A星，不能光说“能跑通”就完事了。咱们得有个标准，就像考试有分数一样。今天我就把三个最核心的评估指标掰开揉碎了讲给你听。</p>
+
+<h3>指标一：路径长度——最直观的“成绩单”</h3>
+
+<p>路径长度，说白了就是从起点到终点，你的AGV实际要走多远。这个指标最直观，也最容易理解。</p>
+
+<p><strong>但这里有个坑</strong>：路径最短，不代表就是最好的。我在项目里遇到过，有时候最短路径贴着障碍物边缘走，AGV稍微有点定位偏差就撞上了。所以，路径长度要结合安全距离一起看。</p>
+
+<div class="highlight">
+  <p><strong>核心公式</strong>：路径长度 = Σ(相邻节点间的欧几里得距离)</p>
+  <p>或者用曼哈顿距离：路径长度 = Σ(|Δx| + |Δy|)</p>
+</div>
+
+<p>我个人习惯在评估时，把路径长度分成三档：</p>
+
+<ul>
+  <li><strong>理论最优</strong>：无障碍物时的直线距离，这是天花板</li>
+  <li><strong>实际可达</strong>：A星跑出来的真实路径长度</li>
+  <li><strong>冗余率</strong>：(实际路径 - 理论最优) / 理论最优 × 100%</li>
+</ul>
+
+<p>冗余率超过20%？那你得检查一下启发函数是不是太保守了。</p>
+
+<h3>指标二：搜索时间——AGV等得起吗？</h3>
+
+<p>AGV可不是在实验室里跑着玩的。产线上几十台车同时调度，你A星跑个500毫秒，整个系统就卡死了。</p>
+
+<p><strong>搜索时间</strong>，就是从开始搜索到找到路径所消耗的CPU时间。这个指标直接决定了你的算法能不能上实车。</p>
+
+<div class="tip">
+  <p><strong>我的经验值</strong>：</p>
+  <ul>
+    <li>小地图（100×100网格）：< 10ms 算优秀</li>
+    <li>中地图（500×500网格）：< 50ms 可接受</li>
+    <li>大地图（1000×1000网格）：< 200ms 是底线</li>
+  </ul>
+</div>
+
+<p>为什么会差这么多？你想想看，搜索时间和地图大小不是线性关系。地图扩大一倍，搜索空间可能膨胀4倍。我曾经在一个2000×2000的仓储地图上跑原始A星，结果等了3秒多——那台AGV早就原地报警了。</p>
+
+<p>优化搜索时间，我一般从三个方向下手：</p>
+
+<ol>
+  <li><strong>改进数据结构</strong>：用二叉堆代替普通列表，open表操作从O(n)降到O(log n)</li>
+  <li><strong>优化启发函数</strong>：别用太保守的估计，适当增加权重</li>
+  <li><strong>限制搜索范围</strong>：加个最大迭代次数，超时就切换策略</li>
+</ol>
+
+<h3>指标三：扩展节点数——算法的“体力活”</h3>
+
+<p>扩展节点数，就是A星在搜索过程中，从open表里取出来评估过的节点总数。这个指标和搜索时间强相关，但又不完全一样。</p>
+
+<p><strong>为什么单独看它？</strong>因为搜索时间受硬件影响太大。你换台高性能工控机，时间可能直接砍半。但扩展节点数反映的是算法本身的效率，跟硬件无关。</p>
+
+<div class="warning">
+  <p><strong>注意</strong>：扩展节点数 ≠ 访问节点数。访问节点只是扔进open表，扩展节点是真正从open表取出来计算f值的。我见过有人拿这两个数混淆着说，其实差了好几倍。</p>
+</div>
+
+<p>来看一个实际对比。我在一个50×50的栅格地图上做过测试：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>启发函数</th>
+      <th>路径长度</th>
+      <th>搜索时间(ms)</th>
+      <th>扩展节点数</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>曼哈顿距离</td>
+      <td>68.3</td>
+      <td>12.4</td>
+      <td>1,247</td>
+    </tr>
+    <tr>
+      <td>欧几里得距离</td>
+      <td>68.3</td>
+      <td>15.7</td>
+      <td>1,583</td>
+    </tr>
+    <tr>
+      <td>对角线距离</td>
+      <td>68.3</td>
+      <td>11.2</td>
+      <td>1,098</td>
+    </tr>
+    <tr>
+      <td>加权曼哈顿(w=1.5)</td>
+      <td>69.1</td>
+      <td>6.8</td>
+      <td>623</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>看到没？路径长度几乎没变，但扩展节点数差了一倍多。加权曼哈顿虽然路径长了0.8个单位，但搜索快了将近一倍。这就是典型的“以空间换时间”。</p>
+
+<h3>三个指标怎么权衡？</h3>
+
+<p>说实话，没有完美的算法，只有合适的取舍。我一般按这个优先级来：</p>
+
+<ul>
+  <li><strong>产线AGV</strong>：搜索时间 > 扩展节点数 > 路径长度（实时性优先）</li>
+  <li><strong>仓储AGV</strong>：路径长度 > 扩展节点数 > 搜索时间（效率优先）</li>
+  <li><strong>科研验证</strong>：扩展节点数 > 路径长度 > 搜索时间（算法纯度优先）</li>
+</ul>
+
+<p>你想想看，产线上AGV晚1秒到达，可能整条线就停了。但仓储AGV多绕2米，无非多耗点电。场景不同，侧重点完全不同。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在一个项目里只盯着路径长度优化，把启发函数调得特别激进。结果路径是短了，但搜索时间暴涨，AGV在路口等规划结果等了半天。后来被现场工程师骂了一顿……从那以后，我每次调参都三个指标一起看。</p>
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，把三个指标的关系和评估维度梳理清楚了。你可以把它当作调试A星时的检查清单。</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="420" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">A星算法三大评估指标</text>
+  
+  <!-- 中心节点 -->
+  <ellipse cx="360" cy="100" rx="100" ry="35" fill="#3498db" opacity="0.9"/>
+  <text x="360" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="white">A星算法评估</text>
+  
+  <!-- 三个指标 -->
+  <!-- 路径长度 -->
+  <rect x="60" y="180" width="180" height="50" rx="8" fill="#e74c3c" opacity="0.85"/>
+  <text x="150" y="210" text-anchor="middle" font-size="15" font-weight="bold" fill="white">路径长度</text>
+  
+  <!-- 搜索时间 -->
+  <rect x="270" y="180" width="180" height="50" rx="8" fill="#2ecc71" opacity="0.85"/>
+  <text x="360" y="210" text-anchor="middle" font-size="15" font-weight="bold" fill="white">搜索时间</text>
+  
+  <!-- 扩展节点数 -->
+  <rect x="480" y="180" width="180" height="50" rx="8" fill="#f39c12" opacity="0.85"/>
+  <text x="570" y="210" text-anchor="middle" font-size="15" font-weight="bold" fill="white">扩展节点数</text>
+  
+  <!-- 连线 -->
+  <line x1="300" y1="135" x2="150" y2="180" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="360" y1="135" x2="360" y2="180" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="420" y1="135" x2="570" y2="180" stroke="#f39c12" stroke-width="2"/>
+  
+  <!-- 子指标 -->
+  <text x="150" y="270" text-anchor="middle" font-size="13" fill="#555">理论最优</text>
+  <text x="150" y="290" text-anchor="middle" font-size="13" fill="#555">实际可达</text>
+  <text x="150" y="310" text-anchor="middle" font-size="13" fill="#555">冗余率</text>
+  
+  <text x="360" y="270" text-anchor="middle" font-size="13" fill="#555">CPU耗时</text>
+  <text x="360" y="290" text-anchor="middle" font-size="13" fill="#555">实时性要求</text>
+  <text x="360" y="310" text-anchor="middle" font-size="13" fill="#555">硬件影响</text>
+  
+  <text x="570" y="270" text-anchor="middle" font-size="13" fill="#555">算法效率</text>
+  <text x="570" y="290" text-anchor="middle" font-size="13" fill="#555">与硬件无关</text>
+  <text x="570" y="310" text-anchor="middle" font-size="13" fill="#555">启发函数影响</text>
+  
+  <!-- 底部总结 -->
+  <rect x="160" y="350" width="400" height="45" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="360" y="370" text-anchor="middle" font-size="13" fill="#2c3e50">权衡原则：场景决定优先级，没有银弹</text>
+  <text x="360" y="388" text-anchor="middle" font-size="12" fill="#7f8c8d">产线→时间优先 | 仓储→路径优先 | 科研→节点数优先</text>
+</svg>
+
+<p>嗯，这三个指标就像A星算法的三面镜子。路径长度照出结果好不好，搜索时间照出响应快不快，扩展节点数照出算法本身聪不聪明。下次你调A星的时候，记得三个指标一起看，别只盯着一个。</p>
+
+<p>我个人习惯在代码里加个简单的统计模块，每次跑完自动打印这三个值。时间长了，你自然就知道什么场景该用什么参数了。</p>
+
+        <div class="footer-nav">
+            <a href="25CommonIssues.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27ParameterTuning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

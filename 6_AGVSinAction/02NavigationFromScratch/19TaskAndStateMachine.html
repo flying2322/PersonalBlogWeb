@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 AGV任务管理与状态机</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="active">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 AGV任务管理与状态机：任务生命周期与调度核心</h2>
+
+<p>各位同学，今天我们来聊聊AGV系统里最“灵魂”的部分——任务管理与状态机。说白了，就是AGV怎么知道自己该干什么，以及怎么干。</p>
+
+<p>我刚开始做AGV那会儿，觉得这玩意儿不就是“接到指令，跑过去，放下”嘛。结果第一次联调，三台车在仓库里“打架”，任务乱抢，充电桩排队排到死机。嗯，从那以后，我再也不敢小看任务管理了。</p>
+
+<h3>任务生命周期：从生到死的完整旅程</h3>
+
+<p>一个AGV任务，就像一个人从出生到死亡。我习惯把它拆成五个阶段：<strong>创建、分配、执行、完成、取消</strong>。每个阶段都有明确的职责。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>任务生命周期管理，本质上是“谁负责、何时做、怎么做”的闭环控制。</p>
+</div>
+
+<h4>1. 创建（Created）</h4>
+<p>任务被系统生成，但还没指派给任何AGV。比如WMS下发了一个“从A点取货送到B点”的指令。这时候任务处于“待分配”状态。</p>
+<ul>
+  <li><strong>触发方式：</strong>手动下发、定时任务、事件触发（如传感器检测到缺料）</li>
+  <li><strong>关键字段：</strong>任务ID、起点、终点、优先级、创建时间、超时时间</li>
+</ul>
+
+<h4>2. 分配（Assigned）</h4>
+<p>系统根据某种策略，把任务绑定到一台具体的AGV上。我见过最蠢的做法是“随机分配”，结果车跑一半没电了。</p>
+<ul>
+  <li><strong>分配策略：</strong>最近距离优先、空闲优先、电量优先、负载均衡</li>
+  <li><strong>避坑：</strong>我曾经遇到过分配后AGV突然离线，任务卡死。后来加了“分配确认超时”机制，10秒内没确认就重新分配。</li>
+</ul>
+
+<h4>3. 执行（Executing）</h4>
+<p>AGV开始导航、取货、放货。这个阶段状态机最复杂，后面细讲。</p>
+
+<h4>4. 完成（Completed）</h4>
+<p>任务成功结束。系统记录日志、释放AGV资源、通知上游系统。</p>
+
+<h4>5. 取消（Cancelled）</h4>
+<p>人为取消或系统异常导致任务终止。注意：取消不等于删除，要保留日志用于复盘。</p>
+
+<pre><code>// 任务状态枚举示例（C#风格）
+public enum TaskState
+{
+    Created,    // 已创建
+    Assigned,   // 已分配
+    Executing,  // 执行中
+    Completed,  // 已完成
+    Cancelled   // 已取消
+}</code></pre>
+
+<h3>AGV状态机设计：车在干什么？</h3>
+
+<p>AGV本身也有自己的状态。我把它归纳为四个核心状态：<strong>空闲、导航、充电、异常</strong>。你想想看，一台车不可能同时“在跑”和“在充电”，对吧？</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>状态</th>
+      <th>含义</th>
+      <th>触发条件</th>
+      <th>典型动作</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>空闲（Idle）</td>
+      <td>无任务，等待指令</td>
+      <td>任务完成、系统启动</td>
+      <td>待机、低功耗</td>
+    </tr>
+    <tr>
+      <td>导航（Navigating）</td>
+      <td>正在执行移动任务</td>
+      <td>任务分配、路径规划完成</td>
+      <td>循线、避障、定位</td>
+    </tr>
+    <tr>
+      <td>充电（Charging）</td>
+      <td>正在充电桩充电</td>
+      <td>电量低于阈值、任务空闲</td>
+      <td>对接充电、电量监控</td>
+    </tr>
+    <tr>
+      <td>异常（Error）</td>
+      <td>发生故障或异常</td>
+      <td>传感器故障、碰撞、离线</td>
+      <td>急停、报警、等待人工</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>我建议把“充电”状态单独拎出来，不要和“空闲”混在一起。因为充电时AGV不能接任务，但空闲时可以。很多新手把充电当空闲，结果任务分配过去，车还在充电桩上发呆。</p>
+</div>
+
+<h3>任务优先级调度：谁先谁后？</h3>
+
+<p>仓库里任务有轻重缓急。比如“紧急补料”肯定比“常规巡检”优先级高。我常用的优先级分三级：</p>
+<ul>
+  <li><strong>高优先级：</strong>紧急任务、故障恢复任务</li>
+  <li><strong>中优先级：</strong>常规运输任务</li>
+  <li><strong>低优先级：</strong>巡检、数据采集、空闲充电</li>
+</ul>
+
+<p>调度算法上，我推荐<strong>优先级队列 + 时间戳排序</strong>。同优先级下，先来的先执行。别搞什么“动态优先级”，容易死锁。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>优先级不能滥用。我曾经见过一个项目，所有任务都标“高优先级”，结果调度器直接瘫痪。优先级是稀缺资源，要严格控制。</p>
+</div>
+
+<h3>任务队列管理：排队也是一门艺术</h3>
+
+<p>任务队列，说白了就是“待办事项列表”。但AGV的队列比人的复杂，因为要考虑多车协同、路径冲突、充电需求。</p>
+
+<p>我常用的队列结构是<strong>全局队列 + 局部队列</strong>：</p>
+<ul>
+  <li><strong>全局队列：</strong>所有未分配的任务，按优先级和时间排序</li>
+  <li><strong>局部队列：</strong>每台AGV自己的待执行任务列表（最多3-5个）</li>
+</ul>
+
+<p>为什么要分两层？因为全局队列要统一调度，局部队列让AGV有“预知能力”——提前知道下一个任务，减少空闲等待。</p>
+
+<pre><code>// 任务队列管理伪代码
+class TaskQueueManager
+{
+    Queue&lt;Task&gt; globalQueue;      // 全局队列
+    Dictionary&lt;string, Queue&lt;Task&gt;&gt; localQueues; // 每台AGV的局部队列
+
+    void AssignTask()
+    {
+        var task = globalQueue.Dequeue(); // 取最高优先级任务
+        var agv = SelectBestAgv(task);    // 选择最优AGV
+        localQueues[agv.Id].Enqueue(task); // 加入局部队列
+        agv.ExecuteNext();                // 通知AGV执行
+    }
+}</code></pre>
+
+<h3>核心逻辑流程图</h3>
+
+<p>下面我用一张SVG图，把任务生命周期和AGV状态机串起来。你看完应该就明白了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV任务管理与状态机核心流程</text>
+  
+  <!-- 任务生命周期（左侧） -->
+  <rect x="50" y="80" width="300" height="360" fill="#e8f5e9" rx="10" stroke="#4caf50" stroke-width="2"/>
+  <text x="200" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">任务生命周期</text>
+  
+  <!-- 创建 -->
+  <rect x="80" y="130" width="240" height="40" fill="#c8e6c9" rx="5"/>
+  <text x="200" y="155" text-anchor="middle" font-size="14" fill="#1b5e20">1. 创建（Created）</text>
+  <line x1="200" y1="170" x2="200" y2="190" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 分配 -->
+  <rect x="80" y="190" width="240" height="40" fill="#a5d6a7" rx="5"/>
+  <text x="200" y="215" text-anchor="middle" font-size="14" fill="#1b5e20">2. 分配（Assigned）</text>
+  <line x1="200" y1="230" x2="200" y2="250" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 执行 -->
+  <rect x="80" y="250" width="240" height="40" fill="#81c784" rx="5"/>
+  <text x="200" y="275" text-anchor="middle" font-size="14" fill="#1b5e20">3. 执行（Executing）</text>
+  <line x1="200" y1="290" x2="200" y2="310" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 完成 -->
+  <rect x="80" y="310" width="240" height="40" fill="#66bb6a" rx="5"/>
+  <text x="200" y="335" text-anchor="middle" font-size="14" fill="#1b5e20">4. 完成（Completed）</text>
+  <line x1="200" y1="350" x2="200" y2="370" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 取消 -->
+  <rect x="80" y="370" width="240" height="40" fill="#ef9a9a" rx="5"/>
+  <text x="200" y="395" text-anchor="middle" font-size="14" fill="#b71c1c">5. 取消（Cancelled）</text>
+  
+  <!-- 从执行到取消的虚线 -->
+  <line x1="320" y1="270" x2="380" y2="270" stroke="#e53935" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="350" y="260" text-anchor="middle" font-size="12" fill="#e53935">异常</text>
+  
+  <!-- AGV状态机（右侧） -->
+  <rect x="450" y="80" width="300" height="360" fill="#e3f2fd" rx="10" stroke="#2196f3" stroke-width="2"/>
+  <text x="600" y="110" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">AGV状态机</text>
+  
+  <!-- 空闲 -->
+  <rect x="480" y="130" width="240" height="40" fill="#bbdefb" rx="5"/>
+  <text x="600" y="155" text-anchor="middle" font-size="14" fill="#0d47a1">空闲（Idle）</text>
+  <line x1="600" y1="170" x2="600" y2="190" stroke="#2196f3" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 导航 -->
+  <rect x="480" y="190" width="240" height="40" fill="#90caf9" rx="5"/>
+  <text x="600" y="215" text-anchor="middle" font-size="14" fill="#0d47a1">导航（Navigating）</text>
+  <line x1="600" y1="230" x2="600" y2="250" stroke="#2196f3" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 充电 -->
+  <rect x="480" y="250" width="240" height="40" fill="#64b5f6" rx="5"/>
+  <text x="600" y="275" text-anchor="middle" font-size="14" fill="#0d47a1">充电（Charging）</text>
+  <line x1="600" y1="290" x2="600" y2="310" stroke="#2196f3" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 异常 -->
+  <rect x="480" y="310" width="240" height="40" fill="#ffcc80" rx="5"/>
+  <text x="600" y="335" text-anchor="middle" font-size="14" fill="#e65100">异常（Error）</text>
+  
+  <!-- 从异常回到空闲 -->
+  <line x1="600" y1="350" x2="600" y2="370" stroke="#ff9800" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowOrange)"/>
+  <rect x="520" y="370" width="160" height="30" fill="#fff3e0" rx="5"/>
+  <text x="600" y="390" text-anchor="middle" font-size="12" fill="#e65100">人工恢复 → 空闲</text>
+  
+  <!-- 左右连接线：任务执行 ↔ AGV导航 -->
+  <line x1="320" y1="270" x2="480" y2="210" stroke="#9c27b0" stroke-width="2" stroke-dasharray="8,4"/>
+  <text x="400" y="230" text-anchor="middle" font-size="12" fill="#9c27b0">任务分配触发</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2196f3"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff9800"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>避坑指南与个人经验</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+<ul>
+  <li><strong>任务超时处理：</strong>我曾经没加超时，结果一个任务卡了三天。现在每个任务都有“最大执行时间”，超时自动取消并报警。</li>
+  <li><strong>状态机死锁：</strong>两台AGV互相等待对方让路，状态卡在“导航”不动。解决方案是加一个“死锁检测”定时器，5秒没变化就触发重新规划。</li>
+  <li><strong>充电调度：</strong>别让所有车同时去充电。我习惯用“电量阈值 + 任务空闲窗口”来判断。电量低于20%强制充电，低于50%且无任务时主动充电。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>任务队列里加一个“预估完成时间”字段。调度时不仅看优先级，还看“谁最快能完成”。这样能显著提升整体效率。</p>
+</div>
+
+<p>好了，任务管理和状态机这块，核心就是“任务怎么流转，车怎么响应”。你把这个逻辑理清了，AGV调度系统就稳了一半。剩下的，就是细节和调优了。</p>
+        <div class="footer-nav">
+            <a href="18TrafficAndCooperation.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20AutoChargingDock.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

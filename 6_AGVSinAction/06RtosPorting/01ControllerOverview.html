@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV控制器概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="active">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV控制器概述：系统架构、硬件选型与RTOS选型分析</h2>
+
+<p>各位同学，大家好。我是你们的老朋友，一个在嵌入式底层摸爬滚打了十几年的工程师。今天咱们正式开始《AGV控制器实时操作系统移植实战》的第一课。</p>
+
+<p>说实话，AGV（自动导引车）这东西，现在工厂里太常见了。但要把它的控制器做好，尤其是把里面的实时操作系统（RTOS）跑稳了，还真不是件容易事。我刚开始接触AGV项目时，也踩过不少坑。今天这一讲，咱们就把AGV控制器的底牌先翻一翻——系统架构长什么样？硬件怎么选？RTOS又该怎么挑？</p>
+
+<h3>1.1 AGV系统架构：从“大脑”到“手脚”</h3>
+
+<p>先聊聊AGV的整体架构。你想想看，一台AGV要能自己走路、避障、搬运货物，它得有哪些部分？</p>
+
+<p>我个人习惯把AGV系统分成三层：<strong>决策层、控制层、执行层</strong>。说白了，就是大脑、小脑和手脚。</p>
+
+<ul>
+    <li><strong>决策层</strong>：负责路径规划、任务调度。通常是一块高性能的处理器，比如ARM Cortex-A系列或者x86工控板。它跑的是Linux或者Android，处理复杂的算法。</li>
+    <li><strong>控制层</strong>：这是咱们RTOS的主战场。负责实时性要求高的任务，比如电机控制、传感器数据采集、通信协议处理。一般用Cortex-M系列MCU，跑FreeRTOS或RT-Thread。</li>
+    <li><strong>执行层</strong>：电机驱动器、舵机、电磁刹车这些。它们听控制层的指令，干力气活。</li>
+</ul>
+
+<p>这里有个关键点：<strong>决策层和控制层之间怎么通信？</strong> 我在项目中遇到过，有人直接用串口传大包数据，结果控制层被频繁中断，电机控制周期都乱了。后来我改用共享内存+信号量的方式，才把实时性稳住。</p>
+
+<div class="highlight">
+    <p><strong>核心逻辑：</strong> 实时性要求高的任务（如电机PID控制）必须放在控制层，由RTOS管理。决策层只负责下发路径点，不参与实时闭环。</p>
+</div>
+
+<p>下面这张图，是我画的一个典型AGV控制器架构图，帮你理清关系：</p>
+
+<svg width="720" height="400" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="700" height="380" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+    <text x="360" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">AGV控制器系统架构</text>
+    
+    <!-- 决策层 -->
+    <rect x="50" y="60" width="600" height="80" fill="#e6f7ff" stroke="#1890ff" stroke-width="2" rx="8"/>
+    <text x="350" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#0050b3">决策层（大脑）</text>
+    <text x="350" y="105" text-anchor="middle" font-size="13" fill="#333">ARM Cortex-A / x86 · Linux · 路径规划 · 任务调度</text>
+    <text x="350" y="125" text-anchor="middle" font-size="12" fill="#666">通信接口：Ethernet / CAN / 共享内存</text>
+    
+    <!-- 箭头 -->
+    <line x1="350" y1="140" x2="350" y2="170" stroke="#1890ff" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    
+    <!-- 控制层 -->
+    <rect x="50" y="170" width="600" height="80" fill="#fff7e6" stroke="#fa8c16" stroke-width="2" rx="8"/>
+    <text x="350" y="195" text-anchor="middle" font-size="16" font-weight="bold" fill="#d46b08">控制层（小脑）</text>
+    <text x="350" y="215" text-anchor="middle" font-size="13" fill="#333">ARM Cortex-M / MCU · RTOS · 电机控制 · 传感器采集</text>
+    <text x="350" y="235" text-anchor="middle" font-size="12" fill="#666">实时任务：PID控制(1ms) · 编码器读取(0.5ms) · 避障处理(10ms)</text>
+    
+    <!-- 箭头 -->
+    <line x1="350" y1="250" x2="350" y2="280" stroke="#fa8c16" stroke-width="2" marker-end="url(#arrowOrange)"/>
+    
+    <!-- 执行层 -->
+    <rect x="50" y="280" width="600" height="80" fill="#f6ffed" stroke="#52c41a" stroke-width="2" rx="8"/>
+    <text x="350" y="305" text-anchor="middle" font-size="16" font-weight="bold" fill="#389e0d">执行层（手脚）</text>
+    <text x="350" y="325" text-anchor="middle" font-size="13" fill="#333">电机驱动器 · 舵机 · 电磁刹车 · 传感器</text>
+    <text x="350" y="345" text-anchor="middle" font-size="12" fill="#666">接口：PWM · GPIO · I2C · SPI</text>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#1890ff"/>
+        </marker>
+        <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fa8c16"/>
+        </marker>
+    </defs>
+</svg>
+
+<div class="tip">
+    <p><strong>我的经验：</strong> 控制层和决策层之间，千万别用轮询方式传数据。用消息队列或者共享内存+信号量，能减少90%的实时性抖动。</p>
+</div>
+
+<h3>1.2 控制器硬件选型：别光看主频</h3>
+
+<p>硬件选型这块，水挺深的。很多新手上来就问：“主频越高越好对吧？” 嗯，不全对。</p>
+
+<p>AGV控制器硬件，我一般关注这几个点：</p>
+
+<ul>
+    <li><strong>MCU性能</strong>：不只是主频，还要看是否有硬件乘除法器、FPU（浮点运算单元）。做PID控制时，浮点运算能力直接决定控制周期能跑多快。</li>
+    <li><strong>外设资源</strong>：至少2路CAN（与底盘通信）、4路UART（激光雷达、IMU、调试口）、多路PWM（电机控制）。</li>
+    <li><strong>存储</strong>：Flash至少512KB，RAM至少128KB。如果跑RT-Thread或者uC/OS-III，还要考虑内核占用的资源。</li>
+    <li><strong>功耗与散热</strong>：AGV是移动设备，电池供电。MCU功耗超过1W就得加散热片，这在紧凑的控制器里很麻烦。</li>
+</ul>
+
+<p>我整理了一个常用硬件选型对比表，供你参考：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <tr style="background-color:#e6f7ff;">
+        <th>型号</th>
+        <th>内核</th>
+        <th>主频</th>
+        <th>FPU</th>
+        <th>CAN</th>
+        <th>RAM</th>
+        <th>Flash</th>
+        <th>适用场景</th>
+    </tr>
+    <tr>
+        <td>STM32F407</td>
+        <td>Cortex-M4</td>
+        <td>168MHz</td>
+        <td>单精度</td>
+        <td>2路</td>
+        <td>192KB</td>
+        <td>1MB</td>
+        <td>中小型AGV</td>
+    </tr>
+    <tr>
+        <td>STM32H743</td>
+        <td>Cortex-M7</td>
+        <td>480MHz</td>
+        <td>双精度</td>
+        <td>2路</td>
+        <td>1MB</td>
+        <td>2MB</td>
+        <td>高性能AGV</td>
+    </tr>
+    <tr>
+        <td>GD32F450</td>
+        <td>Cortex-M4</td>
+        <td>200MHz</td>
+        <td>单精度</td>
+        <td>2路</td>
+        <td>256KB</td>
+        <td>1MB</td>
+        <td>国产替代方案</td>
+    </tr>
+    <tr>
+        <td>NXP i.MX RT1050</td>
+        <td>Cortex-M7</td>
+        <td>600MHz</td>
+        <td>双精度</td>
+        <td>2路</td>
+        <td>512KB</td>
+        <td>4MB</td>
+        <td>边缘计算+控制</td>
+    </tr>
+</table>
+
+<div class="warning">
+    <p><strong>避坑指南：</strong> 我曾经选了一款主频很高的MCU，结果发现它的CAN控制器只有1个邮箱。AGV需要同时收发底盘和调度系统的CAN数据，邮箱不够导致丢帧。后来换了个多邮箱的型号才解决。选型时一定要看外设的<strong>深度</strong>，不只是数量。</p>
+</div>
+
+<h3>1.3 实时操作系统选型分析：FreeRTOS、RT-Thread还是uC/OS？</h3>
+
+<p>RTOS选型，说白了就是看你的项目要什么。我这些年用过FreeRTOS、RT-Thread、uC/OS-III，甚至自己写过简易调度器。说说我的感受。</p>
+
+<p><strong>FreeRTOS</strong>：轻量、稳定、生态好。适合资源紧张的MCU。但它的内核功能相对简单，没有设备驱动框架，很多外设驱动得自己写。</p>
+
+<p><strong>RT-Thread</strong>：国产之光，组件丰富。有设备驱动框架、文件系统、网络协议栈。适合功能复杂的AGV控制器。但它的内核比FreeRTOS大一圈，对RAM要求高一些。</p>
+
+<p><strong>uC/OS-III</strong>：商业级，文档规范。可抢占式内核，实时性有保障。但授权费用不低，现在用的人少了。</p>
+
+<p>我个人的建议是：</p>
+<ul>
+    <li>如果MCU资源紧张（比如Flash<256KB），选FreeRTOS。</li>
+    <li>如果项目需要快速开发，有网络、文件系统需求，选RT-Thread。</li>
+    <li>如果产品要过功能安全认证（比如IEC 61508），uC/OS-III有认证版本，但成本高。</li>
+</ul>
+
+<p>下面这个表格，是我根据实际项目经验整理的对比：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <tr style="background-color:#fff7e6;">
+        <th>特性</th>
+        <th>FreeRTOS</th>
+        <th>RT-Thread</th>
+        <th>uC/OS-III</th>
+    </tr>
+    <tr>
+        <td>内核大小（ROM）</td>
+        <td>~6KB</td>
+        <td>~12KB</td>
+        <td>~15KB</td>
+    </tr>
+    <tr>
+        <td>RAM占用</td>
+        <td>~1KB</td>
+        <td>~4KB</td>
+        <td>~3KB</td>
+    </tr>
+    <tr>
+        <td>任务数量</td>
+        <td>无限制</td>
+        <td>无限制</td>
+        <td>无限制</td>
+    </tr>
+    <tr>
+        <td>优先级</td>
+        <td>支持（可配置）</td>
+        <td>支持（256级）</td>
+        <td>支持（256级）</td>
+    </tr>
+    <tr>
+        <td>设备驱动框架</td>
+        <td>无</td>
+        <td>有</td>
+        <td>无</td>
+    </tr>
+    <tr>
+        <td>网络协议栈</td>
+        <td>需移植LwIP</td>
+        <td>内置</td>
+        <td>需移植</td>
+    </tr>
+    <tr>
+        <td>文件系统</td>
+        <td>需移植</td>
+        <td>内置</td>
+        <td>需移植</td>
+    </tr>
+    <tr>
+        <td>授权</td>
+        <td>MIT开源</td>
+        <td>Apache 2.0</td>
+        <td>商业授权</td>
+    </tr>
+</table>
+
+<div class="highlight">
+    <p><strong>我的选择：</strong> 目前我做的AGV项目，大部分用RT-Thread。原因很简单——它的设备驱动框架让我少写了很多底层代码。比如CAN驱动、PWM驱动，直接调用框架接口就行，不用每次从寄存器开始撸。但如果你用的是小Flash的MCU，FreeRTOS还是更稳妥的选择。</p>
+</div>
+
+<p>嗯，这一讲的内容就到这儿。AGV控制器的架构、硬件选型、RTOS选型，这三块是后续所有移植工作的基础。你想想看，如果架构没理清，硬件选错了，RTOS选得不合适，后面移植得再漂亮也是白搭。</p>
+
+<p>下一讲，咱们会深入RTOS移植的具体步骤。到时候我会拿一个实际项目案例，手把手带你走一遍移植流程。今天就先到这里，有问题随时交流。</p>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02RtosKernelBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

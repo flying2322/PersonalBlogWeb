@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 OTA远程升级模块设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="active">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 OTA远程升级模块设计：固件分区设计、升级包校验（CRC/MD5）、断点续传、回滚机制</h2>
+
+<p>OTA远程升级，说白了就是让AGV在跑着的时候，能把固件给换了。这事儿看着简单，做起来坑不少。我最早做AGV那会儿，OTA升级失败导致小车变砖，维修工程师扛着笔记本满车间跑的场景，至今记忆犹新。</p>
+
+<p>今天咱们就聊聊，怎么把OTA升级这个模块设计得靠谱。核心就四个东西：<strong>分区怎么划、校验怎么做、断了怎么续、坏了怎么回</strong>。</p>
+
+<h3>15.1 固件分区设计——别把所有鸡蛋放一个篮子里</h3>
+
+<p>AGV的MCU或者MPU，Flash空间通常有限。但再有限，也得给升级留出余地。我个人习惯的做法是：<strong>至少分三个区</strong>。</p>
+
+<table>
+  <tr>
+    <th>分区名称</th>
+    <th>作用</th>
+    <th>大小建议</th>
+  </tr>
+  <tr>
+    <td>Bootloader区</td>
+    <td>引导加载，负责校验和跳转</td>
+    <td>64KB~128KB</td>
+  </tr>
+  <tr>
+    <td>App主区（A区）</td>
+    <td>当前运行的应用固件</td>
+    <td>根据固件大小定</td>
+  </tr>
+  <tr>
+    <td>App备份区（B区）</td>
+    <td>升级时的备用固件</td>
+    <td>与A区等大</td>
+  </tr>
+  <tr>
+    <td>参数/配置区</td>
+    <td>存放校准数据、网络配置等</td>
+    <td>16KB~32KB</td>
+  </tr>
+  <tr>
+    <td>升级标志区</td>
+    <td>记录升级状态、版本号</td>
+    <td>4KB</td>
+  </tr>
+</table>
+
+<p>你可能会问：为什么非要两个App区？</p>
+
+<p>嗯，这里有个血泪教训。我曾经在一个项目里只留了一个App区，升级写到一半断电了。重启后Bootloader发现App校验失败，直接卡死在引导阶段。那台AGV当时正在仓库里执行任务，硬是让整个产线停了两个小时。</p>
+
+<p>所以我现在坚持用<strong>A/B双区切换</strong>的方案。Bootloader永远只从标记为"有效"的区启动。升级时，把新固件写到备用区，校验通过后再切换启动标志。这样就算升级过程中断电，最多就是备用区数据坏了，主区还能正常跑。</p>
+
+<div class="highlight">
+  <strong>核心原则：</strong>升级过程中，永远不要破坏当前正在运行的程序区。
+</div>
+
+<h3>15.2 升级包校验——CRC还是MD5？</h3>
+
+<p>校验这事儿，说白了就是确保你下载下来的固件，跟服务器上的一模一样。没人想在AGV上跑一个被篡改或者传错的文件。</p>
+
+<p>我常用的校验方式有两种：</p>
+
+<ul>
+  <li><strong>CRC32</strong>：速度快，硬件支持好。适合在MCU上做实时校验。比如每收到一个包，就累加计算CRC，最后跟服务器下发的CRC值比对。</li>
+  <li><strong>MD5</strong>：安全性更高，但计算量稍大。适合在升级包下载完成后，做一次全量校验。</li>
+</ul>
+
+<p>我的建议是：<strong>两者都用</strong>。</p>
+
+<p>具体做法是这样的：</p>
+
+<ol>
+  <li>服务器生成固件包时，同时计算CRC32和MD5值，打包进升级包头部。</li>
+  <li>AGV在接收每个数据包时，用硬件CRC模块做实时校验。一旦发现CRC不对，立刻请求重传这个包。</li>
+  <li>整个固件包下载完成后，再对完整文件做一次MD5校验。确保没有漏掉任何错误。</li>
+</ol>
+
+<p>这里有个小技巧：CRC校验可以用MCU自带的硬件模块，基本不占CPU时间。MD5就得纯软件算了，我一般放在后台低优先级任务里跑，不影响AGV的正常控制。</p>
+
+<div class="tip">
+  <strong>避坑指南：</strong>我曾经遇到过CRC32碰撞的情况——两个不同的数据块算出来一样的CRC值。虽然概率极低，但在关键系统里，我建议加上MD5做双重保险。
+</div>
+
+<h3>15.3 断点续传——别让AGV从头再来</h3>
+
+<p>AGV在车间里跑，Wi-Fi信号时好时坏是常态。一个固件包动不动几MB甚至几十MB，下载到一半断连了，要是从头再来，那体验太糟糕了。</p>
+
+<p>断点续传的核心就一句话：<strong>记录已经下载了哪些数据，下次从断点接着下</strong>。</p>
+
+<p>具体实现上，我习惯把固件包分成固定大小的块（比如每块1KB）。然后维护一个<strong>位图（Bitmap）</strong>，每一位代表一个块是否已经下载成功。</p>
+
+<pre><code>// 断点续传的位图示例
+#define BLOCK_SIZE 1024        // 每块1KB
+#define TOTAL_BLOCKS 4096      // 总共4096块，对应4MB固件
+
+uint8_t bitmap[TOTAL_BLOCKS / 8];  // 位图，每个bit代表一个块
+
+// 检查第n块是否已下载
+bool is_block_downloaded(uint32_t block_index) {
+    return (bitmap[block_index / 8] & (1 << (block_index % 8))) != 0;
+}
+
+// 标记第n块下载成功
+void mark_block_downloaded(uint32_t block_index) {
+    bitmap[block_index / 8] |= (1 << (block_index % 8));
+}
+</code></pre>
+
+<p>每次连接恢复后，AGV把位图发给服务器。服务器就知道哪些块需要重发。这样就算断了十次八次，每次也只补传丢失的块，效率高得多。</p>
+
+<div class="warning">
+  <strong>注意：</strong>位图数据要定期写入Flash保存。我一般每下载完10个块就写一次。不然突然断电，位图丢了，又得从头开始。
+</div>
+
+<h3>15.4 回滚机制——给升级留条后路</h3>
+
+<p>升级失败怎么办？这是每个做OTA的人必须回答的问题。</p>
+
+<p>我的方案是<strong>三级回滚</strong>：</p>
+
+<ul>
+  <li><strong>第一级：启动时校验失败，自动回滚</strong>。Bootloader在启动App前，先校验App区的CRC。如果校验失败，直接跳转到备份区启动。</li>
+  <li><strong>第二级：运行时异常，手动回滚</strong>。新固件跑起来后，如果AGV频繁死机、传感器异常、或者通信中断，维护人员可以通过远程指令强制回滚到旧版本。</li>
+  <li><strong>第三级：升级过程中断电，自动恢复</strong>。这个前面说过了，靠A/B分区机制保证。</li>
+</ul>
+
+<p>回滚的触发条件，我一般这样设计：</p>
+
+<pre><code>// 回滚判断逻辑（伪代码）
+if (bootloader_crc_check(pAppA) == FAIL) {
+    // A区坏了，尝试从B区启动
+    if (bootloader_crc_check(pAppB) == PASS) {
+        switch_to_boot_from(pAppB);
+    } else {
+        // 两个区都坏了，进入恢复模式
+        enter_recovery_mode();
+    }
+}
+
+if (app_runtime_health_check() == ABNORMAL) {
+    // 运行时健康检查失败，标记当前区为无效
+    mark_current_partition_invalid();
+    // 重启后Bootloader会自动切到另一个区
+    system_reset();
+}
+</code></pre>
+
+<p>这里有个细节：回滚之后，要不要自动再尝试升级？我的做法是<strong>不自动重试</strong>。回滚后把升级状态标记为"失败"，然后上报给服务器。由运维人员分析原因后，再决定是否重新下发升级指令。不然AGV反复升级、反复失败，那画面太美我不敢看。</p>
+
+<div class="highlight">
+  <strong>我的经验：</strong>回滚机制不是万能的。如果新固件改了Flash布局或者参数结构，回滚后旧固件可能无法正确读取新格式的数据。所以升级前，一定要做好参数区的版本兼容性设计。
+</div>
+
+<h3>15.5 整体升级流程</h3>
+
+<p>把上面这些串起来，一个完整的OTA升级流程大概是这样的：</p>
+
+<ol>
+  <li>AGV上报当前固件版本号给服务器。</li>
+  <li>服务器判断有新版本，下发升级包信息（大小、CRC、MD5、分块数）。</li>
+  <li>AGV检查备用分区空间是否足够。不够则擦除备用区。</li>
+  <li>AGV逐块下载固件数据，每块用CRC实时校验。下载进度记录在位图中。</li>
+  <li>下载过程中如果断连，重连后从断点继续。</li>
+  <li>全部下载完成后，对完整固件做MD5校验。</li>
+  <li>校验通过，将备用分区标记为"待激活"。</li>
+  <li>AGV重启，Bootloader检测到待激活标志，将启动分区切换到备用区。</li>
+  <li>新固件启动后，做自检和健康检查。如果正常，将旧分区标记为备份区。</li>
+  <li>如果自检异常，触发回滚，切回旧固件。</li>
+</ol>
+
+<p>你看，每一步都有校验，每一步都有兜底。这就是嵌入式系统该有的样子——<strong>宁可慢一点，不能错一次</strong>。</p>
+
+<div class="tip">
+  <strong>最后说一句：</strong>OTA升级模块写好了，能省掉你无数跑现场的时间。我当年要是早点把回滚机制做完善，也不至于大半夜被电话叫起来去仓库救砖。嗯，都是经验啊。
+</div>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2C3E50">OTA远程升级核心流程</text>
+  
+  <!-- 服务器 -->
+  <rect x="50" y="60" width="140" height="50" rx="8" fill="#4A90D9" stroke="#2C3E50" stroke-width="2"/>
+  <text x="120" y="90" text-anchor="middle" font-size="14" fill="white" font-weight="bold">云端服务器</text>
+  
+  <!-- 箭头：服务器 -> 下发升级包 -->
+  <line x1="190" y1="85" x2="260" y2="85" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="225" y="75" text-anchor="middle" font-size="11" fill="#4A90D9">下发升级包</text>
+  
+  <!-- 下载模块 -->
+  <rect x="270" y="60" width="140" height="50" rx="8" fill="#5CB85C" stroke="#2C3E50" stroke-width="2"/>
+  <text x="340" y="80" text-anchor="middle" font-size="13" fill="white" font-weight="bold">分块下载</text>
+  <text x="340" y="98" text-anchor="middle" font-size="11" fill="white">断点续传</text>
+  
+  <!-- 箭头：下载 -> 校验 -->
+  <line x1="410" y1="85" x2="480" y2="85" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="445" y="75" text-anchor="middle" font-size="11" fill="#4A90D9">逐块CRC</text>
+  
+  <!-- 校验模块 -->
+  <rect x="490" y="60" width="140" height="50" rx="8" fill="#F0AD4E" stroke="#2C3E50" stroke-width="2"/>
+  <text x="560" y="80" text-anchor="middle" font-size="13" fill="white" font-weight="bold">完整性校验</text>
+  <text x="560" y="98" text-anchor="middle" font-size="11" fill="white">MD5校验</text>
+  
+  <!-- 箭头：校验 -> 分区切换 -->
+  <line x1="630" y1="85" x2="700" y2="85" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="665" y="75" text-anchor="middle" font-size="11" fill="#4A90D9">校验通过</text>
+  
+  <!-- 分区切换 -->
+  <rect x="700" y="60" width="80" height="50" rx="8" fill="#D9534F" stroke="#2C3E50" stroke-width="2"/>
+  <text x="740" y="90" text-anchor="middle" font-size="12" fill="white" font-weight="bold">切换分区</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="740" y1="110" x2="740" y2="170" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 重启 -->
+  <rect x="660" y="175" width="160" height="45" rx="8" fill="#5BC0DE" stroke="#2C3E50" stroke-width="2"/>
+  <text x="740" y="202" text-anchor="middle" font-size="14" fill="white" font-weight="bold">系统重启</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="740" y1="220" x2="740" y2="270" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 自检 -->
+  <rect x="660" y="275" width="160" height="45" rx="8" fill="#337AB7" stroke="#2C3E50" stroke-width="2"/>
+  <text x="740" y="302" text-anchor="middle" font-size="14" fill="white" font-weight="bold">自检与健康检查</text>
+  
+  <!-- 自检结果分支 -->
+  <line x1="660" y1="297" x2="580" y2="297" stroke="#4A90D9" stroke-width="2"/>
+  <line x1="580" y1="297" x2="580" y2="370" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="620" y="290" text-anchor="middle" font-size="11" fill="#D9534F">自检异常</text>
+  
+  <line x1="820" y1="297" x2="880" y2="297" stroke="#4A90D9" stroke-width="2"/>
+  <line x1="880" y1="297" x2="880" y2="370" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="850" y="290" text-anchor="middle" font-size="11" fill="#5CB85C">自检正常</text>
+  
+  <!-- 回滚 -->
+  <rect x="480" y="375" width="200" height="45" rx="8" fill="#D9534F" stroke="#2C3E50" stroke-width="2"/>
+  <text x="580" y="402" text-anchor="middle" font-size="14" fill="white" font-weight="bold">回滚到旧版本</text>
+  
+  <!-- 正常运行 -->
+  <rect x="780" y="375" width="200" height="45" rx="8" fill="#5CB85C" stroke="#2C3E50" stroke-width="2"/>
+  <text x="880" y="402" text-anchor="middle" font-size="14" fill="white" font-weight="bold">正常运行新固件</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="470" text-anchor="middle" font-size="12" fill="#7F8C8D">核心设计原则：升级不破坏当前运行区，校验不遗漏任何错误，回滚不依赖运气</text>
+  
+  <!-- 分区示意 -->
+  <rect x="50" y="140" width="200" height="120" rx="5" fill="#E8F6F3" stroke="#2C3E50" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="150" y="160" text-anchor="middle" font-size="12" font-weight="bold" fill="#2C3E50">Flash分区布局</text>
+  <rect x="60" y="170" width="180" height="20" rx="3" fill="#4A90D9"/>
+  <text x="150" y="184" text-anchor="middle" font-size="10" fill="white">Bootloader区</text>
+  <rect x="60" y="193" width="180" height="20" rx="3" fill="#5CB85C"/>
+  <text x="150" y="207" text-anchor="middle" font-size="10" fill="white">App主区（A区）</text>
+  <rect x="60" y="216" width="180" height="20" rx="3" fill="#F0AD4E"/>
+  <text x="150" y="230" text-anchor="middle" font-size="10" fill="white">App备份区（B区）</text>
+  <rect x="60" y="239" width="180" height="15" rx="3" fill="#5BC0DE"/>
+  <text x="150" y="250" text-anchor="middle" font-size="9" fill="white">参数区 + 升级标志区</text>
+</svg>
+
+        <div class="footer-nav">
+            <a href="14PersistenceAndLog.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

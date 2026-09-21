@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV调度系统任务分配策略实战 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 0.8rem;
+            font-size: 0.95rem;
+            color: #2c5a6b;
+            background: rgba(255, 245, 200, 0.5);
+            display: inline-block;
+            padding: 0.3rem 2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV调度系统任务分配策略实战</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 01 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01DispatchSystemOverview.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">AGV调度系统概述</div>
+            <div class="chapter-desc">AGV定义与分类 · 调度系统核心功能 · 任务分配策略的重要性</div>
+            <div class="card-tags"><span class="tag">基础</span><span class="tag">概念</span></div>
+        </div>
+        <!-- 02 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02TaskModelDataStruct.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">任务建模与数据结构</div>
+            <div class="chapter-desc">任务属性定义（起点、终点、优先级、时间窗）· 任务状态机 · 任务队列设计</div>
+            <div class="card-tags"><span class="tag">建模</span><span class="tag">核心</span></div>
+        </div>
+        <!-- 03 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03ShortestPathTopology.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">最短路径与地图拓扑</div>
+            <div class="chapter-desc">地图抽象方法（节点-边模型）· Dijkstra算法 · A*算法与启发式函数</div>
+            <div class="card-tags"><span class="tag">算法</span><span class="tag">路径</span></div>
+        </div>
+        <!-- 04 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04SingleTaskAllocation.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">单任务分配策略</div>
+            <div class="chapter-desc">就近分配 · 最早空闲车辆优先 · 基于距离的贪心算法</div>
+            <div class="card-tags"><span class="tag">贪心</span><span class="tag">基础</span></div>
+        </div>
+        <!-- 05 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05BatchTaskAllocation.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">多任务批量分配策略</div>
+            <div class="chapter-desc">匈牙利算法 · 任务-车辆二分图匹配 · 最小化总行驶距离</div>
+            <div class="card-tags"><span class="tag">匹配</span><span class="tag">优化</span></div>
+        </div>
+        <!-- 06 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06TimeWindowAllocation.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">时间窗约束下的分配</div>
+            <div class="chapter-desc">硬时间窗与软时间窗 · 冲突检测 · 基于时间窗的可行解搜索</div>
+            <div class="card-tags"><span class="tag">约束</span><span class="tag">时间</span></div>
+        </div>
+        <!-- 07 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07DynamicTaskInsert.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">动态任务插入策略</div>
+            <div class="chapter-desc">在线任务到达 · 任务抢占与重分配 · 动态优先级调整</div>
+            <div class="card-tags"><span class="tag">动态</span><span class="tag">在线</span></div>
+        </div>
+        <!-- 08 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08LoadBalance.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">负载均衡策略</div>
+            <div class="chapter-desc">车辆利用率均衡 · 队列长度均衡 · 基于阈值的触发式重分配</div>
+            <div class="card-tags"><span class="tag">均衡</span><span class="tag">调度</span></div>
+        </div>
+        <!-- 09 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09DeadlockConflictAvoid.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">死锁与冲突避免</div>
+            <div class="chapter-desc">路径冲突类型 · 预留表机制 · 交通管制策略</div>
+            <div class="card-tags"><span class="tag">死锁</span><span class="tag">安全</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10MultiAgvCoopDispatch.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">多AGV协同调度</div>
+            <div class="chapter-desc">集中式 · 分布式 · 混合式调度架构对比</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">协同</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11ReinforcementLearningAlloc.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">基于强化学习的分配策略</div>
+            <div class="chapter-desc">Q-learning基础 · 状态-动作空间 · 奖励函数设计</div>
+            <div class="card-tags"><span class="tag">强化学习</span><span class="tag">AI</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12GeneticAlgoAlloc.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">基于遗传算法的分配优化</div>
+            <div class="chapter-desc">染色体编码 · 适应度函数 · 交叉与变异操作</div>
+            <div class="card-tags"><span class="tag">遗传</span><span class="tag">进化</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13ParticleSwarmAlloc.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">基于粒子群算法的分配优化</div>
+            <div class="chapter-desc">粒子编码 · 速度与位置更新 · 全局最优搜索</div>
+            <div class="card-tags"><span class="tag">粒子群</span><span class="tag">群智能</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14TaskPriority.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">任务优先级策略</div>
+            <div class="chapter-desc">静态优先级（FIFO、EDF）· 动态优先级（截止时间、价值密度）</div>
+            <div class="card-tags"><span class="tag">优先级</span><span class="tag">排序</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15ChargeAndTaskDispatch.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">充电与任务联合调度</div>
+            <div class="chapter-desc">电池电量模型 · 充电站管理 · 低电量触发重分配</div>
+            <div class="card-tags"><span class="tag">充电</span><span class="tag">能量</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16ExceptionFaultTolerance.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">异常处理与容错机制</div>
+            <div class="chapter-desc">AGV故障检测 · 任务超时处理 · 降级运行模式</div>
+            <div class="card-tags"><span class="tag">容错</span><span class="tag">鲁棒</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17SimulationEnvironment.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">仿真环境搭建</div>
+            <div class="chapter-desc">仿真平台选择 · 场景配置 · 性能指标定义</div>
+            <div class="card-tags"><span class="tag">仿真</span><span class="tag">实验</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18PerformanceMetrics.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">性能评估指标</div>
+            <div class="chapter-desc">任务完成率 · 平均等待时间 · 总行驶距离 · 系统吞吐量</div>
+            <div class="card-tags"><span class="tag">指标</span><span class="tag">评估</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19GoodsToPersonCase.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">实际案例：仓储场景AGV调度</div>
+            <div class="chapter-desc">货架到人模式 · 拣选任务分配 · 路径规划集成</div>
+            <div class="card-tags"><span class="tag">仓储</span><span class="tag">案例</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20FactoryLineDispatchCase.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">实际案例：工厂产线AGV调度</div>
+            <div class="chapter-desc">物料配送任务 · 工位对接 · 多楼层地图</div>
+            <div class="card-tags"><span class="tag">工厂</span><span class="tag">产线</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21PortContainerCase.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">实际案例：港口AGV调度</div>
+            <div class="chapter-desc">集装箱搬运 · 岸桥-场桥协同 · 水平运输优化</div>
+            <div class="card-tags"><span class="tag">港口</span><span class="tag">重载</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22RealtimeAllocOptimize.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">任务分配策略的实时性优化</div>
+            <div class="chapter-desc">时间复杂度分析 · 增量式更新 · 并行计算</div>
+            <div class="card-tags"><span class="tag">实时</span><span class="tag">优化</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23CommDataSync.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">通信与数据同步</div>
+            <div class="chapter-desc">MQTT、ROS2 · 状态同步机制 · 延迟补偿</div>
+            <div class="card-tags"><span class="tag">通信</span><span class="tag">协议</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24DynamicMapUpdate.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">地图动态更新</div>
+            <div class="chapter-desc">障碍物检测与避让 · 动态路权分配 · 局部路径重规划</div>
+            <div class="card-tags"><span class="tag">动态地图</span><span class="tag">避障</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25MultiObjectiveAlloc.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">多目标优化分配</div>
+            <div class="chapter-desc">Pareto最优解 · 加权求和法 · NSGA-II算法简介</div>
+            <div class="card-tags"><span class="tag">多目标</span><span class="tag">Pareto</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26TaskSplitMerge.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">任务拆分与合并策略</div>
+            <div class="chapter-desc">大任务拆分子任务 · 顺路任务合并 · 减少空载率</div>
+            <div class="card-tags"><span class="tag">拆分</span><span class="tag">合并</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27HumanMachineCoop.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">人机协同调度</div>
+            <div class="chapter-desc">人机交互界面 · 人工干预机制 · 半自动模式切换</div>
+            <div class="card-tags"><span class="tag">人机</span><span class="tag">交互</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28SystemScalability.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">系统可扩展性设计</div>
+            <div class="chapter-desc">模块化架构 · 微服务化 · 水平扩展策略</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">扩展</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29SafetyCompliance.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">安全与合规</div>
+            <div class="chapter-desc">AGV安全标准（ISO 3691-4）· 紧急停止 · 安全区域划分</div>
+            <div class="card-tags"><span class="tag">安全</span><span class="tag">标准</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30FutureFrontier.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">未来趋势与前沿</div>
+            <div class="chapter-desc">多模态感知融合 · 数字孪生调度 · 云端调度平台</div>
+            <div class="card-tags"><span class="tag">前沿</span><span class="tag">趋势</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

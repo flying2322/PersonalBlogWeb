@@ -1,0 +1,370 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>28 性能评估与测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="active">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>28 性能评估与测试：定位精度评估（ATE、RPE）、地图质量评估</h2>
+
+<p>做AGV导航系统这么多年，我越来越觉得一个道理：<strong>没有评估，就没有改进</strong>。你辛辛苦苦建了图、调了定位，到底跑得怎么样？不能光靠“感觉还行”来判断。这一章，我们就来聊聊怎么用数据说话——定位精度怎么算、地图质量怎么评。</p>
+
+<h3>28.1 定位精度评估：ATE 和 RPE</h3>
+
+<p>定位精度，说白了就是“机器人认为自己在哪”和“它实际在哪”之间的差距。但实际位置怎么知道？这就需要<strong>真值（Ground Truth）</strong>。通常我们用高精度激光跟踪仪、运动捕捉系统，或者高精度RTK-GPS来获取真值轨迹。</p>
+
+<p>评估定位精度，业界有两个核心指标：<strong>ATE（绝对轨迹误差）</strong>和<strong>RPE（相对位姿误差）</strong>。我刚开始接触时也容易搞混，后来发现其实很好区分。</p>
+
+<h4>28.1.1 ATE：看整体漂不漂</h4>
+
+<p>ATE衡量的是<strong>估计轨迹与真值轨迹之间的全局一致性</strong>。它会先对齐两条轨迹（通常用最小二乘法做刚体变换），然后计算每个时间点上位置误差的均方根。</p>
+
+<p>公式长这样：</p>
+
+<pre><code>ATE = sqrt( (1/N) * Σ ||trans(est_i) - trans(gt_i)||² )</code></pre>
+
+<p>其中 trans(est_i) 是估计轨迹在第 i 个时刻的平移向量，trans(gt_i) 是真值轨迹的平移向量。</p>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>ATE 值如果超过 10cm，在室内仓储场景下基本就不可用了。AGV 过窄通道时，10cm 的误差足够让它撞上货架。我曾经在一个项目中，ATE 跑出来 15cm，结果机器人每次过门都要“蹭”一下门框，后来硬是把轮子编码器标定重做了一遍，才降到 5cm 以内。</p>
+</div>
+
+<h4>28.1.2 RPE：看局部抖不抖</h4>
+
+<p>RPE 衡量的是<strong>短时间内的相对运动误差</strong>。它不关心全局漂移，只看“从时刻 i 到时刻 i+Δt”这段相对运动准不准。</p>
+
+<p>公式：</p>
+
+<pre><code>RPE = sqrt( (1/M) * Σ || (ΔT_est_i)⁻¹ * ΔT_gt_i ||²_F )</code></pre>
+
+<p>这里 ΔT 是相对变换矩阵，||·||_F 是 Frobenius 范数。</p>
+
+<p>RPE 对<strong>局部抖动、打滑、颠簸</strong>特别敏感。你想想看，如果 AGV 在光滑地面上突然打滑，ATE 可能看不出来（因为整体轨迹还在），但 RPE 会立刻飙升。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中只看了 ATE，觉得 3cm 很不错。结果实际运行时，机器人每走 2 米就会突然“跳”一下。后来一查 RPE，发现局部误差高达 8cm。原因是地面有油污，轮子偶尔打滑。所以我现在评估定位，<strong>ATE 和 RPE 必须同时看</strong>。</p>
+</div>
+
+<h3>28.2 地图质量评估</h3>
+
+<p>地图质量评估，说实话比定位评估更“玄学”。因为地图没有绝对的真值——你没法说“这张地图就是标准答案”。但我们可以从几个维度来量化。</p>
+
+<h4>28.2.1 几何一致性</h4>
+
+<p>几何一致性看的是<strong>地图中的几何结构是否合理</strong>。比如墙壁应该是直的，直角应该是 90 度，走廊宽度应该恒定。</p>
+
+<p>我常用的方法：</p>
+<ul>
+  <li><strong>直线度检测</strong>：提取地图中的直线特征，计算拟合残差。残差超过 5cm 的直线，说明该区域建图有问题。</li>
+  <li><strong>角度一致性</strong>：检查地图中相邻墙面的夹角。如果应该是 90 度的墙角，地图里显示 87 度或 93 度，那就有问题。</li>
+  <li><strong>回环闭合误差</strong>：机器人走一圈回到原点，地图上的位置偏差。这个值超过 20cm 就需要警惕。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>几何一致性差，往往不是建图算法的问题，而是传感器标定出了问题。我遇到过最离谱的一次，激光雷达安装歪了 2 度，结果建出来的地图整个是“歪”的，走廊都变成了平行四边形。</p>
+</div>
+
+<h4>28.2.2 可定位性</h4>
+
+<p>地图建好了，能不能用来稳定定位？这是更实际的评估维度。</p>
+
+<p>我一般用<strong>定位成功率</strong>和<strong>定位收敛时间</strong>来评估：</p>
+
+<table>
+  <tr>
+    <th>评估指标</th>
+    <th>优秀</th>
+    <th>合格</th>
+    <th>不合格</th>
+  </tr>
+  <tr>
+    <td>定位成功率（全局）</td>
+    <td>&gt; 95%</td>
+    <td>80% - 95%</td>
+    <td>&lt; 80%</td>
+  </tr>
+  <tr>
+    <td>定位收敛时间</td>
+    <td>&lt; 3 秒</td>
+    <td>3 - 10 秒</td>
+    <td>&gt; 10 秒</td>
+  </tr>
+  <tr>
+    <td>重定位成功率</td>
+    <td>&gt; 90%</td>
+    <td>70% - 90%</td>
+    <td>&lt; 70%</td>
+  </tr>
+</table>
+
+<p>为什么会这样？因为地图中如果存在大量<strong>重复结构</strong>（比如一模一样的货架通道），定位算法就容易“迷路”。我曾在某电商仓库遇到这个问题——所有货架通道看起来都一样，机器人经常在两条相邻通道之间“跳来跳去”。后来我们在通道入口加了反光条作为地标，才解决。</p>
+
+<h4>28.2.3 信息熵评估</h4>
+
+<p>这个方法比较学术，但很实用。信息熵衡量的是<strong>地图中每个栅格的不确定性</strong>。</p>
+
+<p>对于占据栅格地图，每个栅格 p 的信息熵为：</p>
+
+<pre><code>H(p) = -p * log(p) - (1-p) * log(1-p)</code></pre>
+
+<p>整张地图的平均信息熵越低，说明地图越“确定”，质量越高。</p>
+
+<p>我个人习惯：建图完成后，先跑一遍信息熵分析。如果某个区域的信息熵明显高于周围，那这个地方十有八九建图有问题——要么是动态物体干扰，要么是传感器噪声过大。</p>
+
+<h3>28.3 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的评估体系框架。每次做项目评估时，我都会对照这张图来检查，确保没有遗漏。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV导航系统性能评估体系</text>
+  
+  <!-- 两大分支 -->
+  <!-- 左侧：定位精度评估 -->
+  <rect x="50" y="70" width="320" height="50" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="210" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="white">定位精度评估</text>
+  
+  <!-- 右侧：地图质量评估 -->
+  <rect x="430" y="70" width="320" height="50" rx="10" fill="#e67e22" opacity="0.9"/>
+  <text x="590" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="white">地图质量评估</text>
+  
+  <!-- 连接线 -->
+  <line x1="210" y1="120" x2="210" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="590" y1="120" x2="590" y2="150" stroke="#e67e22" stroke-width="2"/>
+  
+  <!-- 左侧子项 -->
+  <rect x="50" y="150" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="125" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">ATE（绝对轨迹误差）</text>
+  
+  <rect x="220" y="150" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="295" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">RPE（相对位姿误差）</text>
+  
+  <!-- 右侧子项 -->
+  <rect x="430" y="150" width="150" height="40" rx="8" fill="#f0b27a"/>
+  <text x="505" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">几何一致性</text>
+  
+  <rect x="600" y="150" width="150" height="40" rx="8" fill="#f0b27a"/>
+  <text x="675" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">可定位性</text>
+  
+  <!-- 第三层连接 -->
+  <line x1="125" y1="190" x2="125" y2="220" stroke="#85c1e9" stroke-width="2"/>
+  <line x1="295" y1="190" x2="295" y2="220" stroke="#85c1e9" stroke-width="2"/>
+  <line x1="505" y1="190" x2="505" y2="220" stroke="#f0b27a" stroke-width="2"/>
+  <line x1="675" y1="190" x2="675" y2="220" stroke="#f0b27a" stroke-width="2"/>
+  
+  <!-- 第三层：具体指标 -->
+  <rect x="30" y="220" width="190" height="80" rx="8" fill="#d4e6f1"/>
+  <text x="125" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">• 全局漂移量</text>
+  <text x="125" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">• 均方根误差（RMSE）</text>
+  <text x="125" y="285" text-anchor="middle" font-size="12" fill="#2c3e50">• 轨迹对齐精度</text>
+  
+  <rect x="240" y="220" width="190" height="80" rx="8" fill="#d4e6f1"/>
+  <text x="335" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">• 局部抖动检测</text>
+  <text x="335" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">• 打滑/颠簸敏感度</text>
+  <text x="335" y="285" text-anchor="middle" font-size="12" fill="#2c3e50">• 短时运动误差</text>
+  
+  <rect x="420" y="220" width="190" height="80" rx="8" fill="#fdebd0"/>
+  <text x="515" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">• 直线度检测</text>
+  <text x="515" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">• 角度一致性</text>
+  <text x="515" y="285" text-anchor="middle" font-size="12" fill="#2c3e50">• 回环闭合误差</text>
+  
+  <rect x="630" y="220" width="150" height="80" rx="8" fill="#fdebd0"/>
+  <text x="705" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">• 定位成功率</text>
+  <text x="705" y="265" text-anchor="middle" font-size="12" fill="#2c3e50">• 收敛时间</text>
+  <text x="705" y="285" text-anchor="middle" font-size="12" fill="#2c3e50">• 重定位能力</text>
+  
+  <!-- 底部：信息熵评估 -->
+  <rect x="250" y="340" width="300" height="50" rx="10" fill="#27ae60" opacity="0.85"/>
+  <text x="400" y="370" text-anchor="middle" font-size="16" font-weight="bold" fill="white">信息熵评估（贯穿全局）</text>
+  
+  <line x1="210" y1="300" x2="350" y2="340" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="590" y1="300" x2="450" y2="340" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="12" fill="#7f8c8d">评估原则：ATE + RPE 同时看，几何 + 定位 + 熵 三管齐下</text>
+  
+  <!-- 装饰线 -->
+  <line x1="50" y1="450" x2="750" y2="450" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="475" text-anchor="middle" font-size="11" fill="#95a5a6">图28-1 AGV导航系统性能评估体系框架</text>
+</svg>
+
+<h3>28.4 实操建议</h3>
+
+<p>说了这么多理论，最后给点实操建议。嗯，这里要注意：</p>
+
+<ol>
+  <li><strong>先跑仿真再跑实车</strong>：我习惯先在 Gazebo 或 Stage 仿真环境中跑一遍评估流程。仿真环境有完美的真值，可以帮你快速定位算法问题。</li>
+  <li><strong>多场景测试</strong>：别只在一个场景下评估。空旷大厅、狭窄走廊、货架密集区，每个场景的表现可能完全不同。</li>
+  <li><strong>记录日志</strong>：每次测试都保存完整的轨迹数据和地图数据。我吃过亏——有一次调参后效果“感觉”变好了，但没保存之前的日志，没法对比，只能重跑一遍。</li>
+  <li><strong>自动化评估脚本</strong>：写一个脚本，一键跑完 ATE、RPE、信息熵等所有指标。手动算太慢了，而且容易出错。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的小工具：</strong>我写了一个 Python 脚本，基于 evo 库（一个轨迹评估工具），可以自动读取 ROS bag 中的 /tf 和 /odom 话题，计算 ATE 和 RPE，并生成可视化图表。有需要的同学可以自己搜一下 evo 的文档，非常实用。</p>
+</div>
+
+<p>评估这件事，说白了就是给系统“体检”。定期体检，才能及早发现问题。别等到机器人撞墙了才想起来检查定位精度——那时候就晚了。</p>
+
+<div class="footer-nav">
+            <a href="27SimulationEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="29EngineeringDeploy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

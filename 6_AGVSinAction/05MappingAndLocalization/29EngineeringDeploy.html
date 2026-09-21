@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 工程化与部署</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="active">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 工程化与部署——嵌入式部署、实时性优化、系统可靠性设计</h2>
+
+<p>好，聊到工程化与部署了。说实话，很多同学在仿真环境里跑得飞起，一到真车上就各种翻车。我当年第一次把导航算法部署到嵌入式板子上时，也是踩了不少坑。今天咱们就把这些实战经验掰开揉碎，好好聊聊。</p>
+
+<h3>一、嵌入式部署：从PC到ARM的迁移</h3>
+
+<p>AGV导航系统最终要跑在嵌入式平台上。最常见的是ARM Cortex-A系列，比如树莓派、RK3399、NVIDIA Jetson系列。迁移过程，说白了就是一场「资源瘦身战」。</p>
+
+<div class="highlight">
+  <p><strong>核心差异点：</strong></p>
+  <ul>
+    <li>CPU主频从3GHz降到1.5GHz左右</li>
+    <li>内存从16GB降到2-4GB</li>
+    <li>没有独立显卡，全靠CPU算</li>
+    <li>存储空间有限，不能装大库</li>
+  </ul>
+</div>
+
+<p>我建议第一步先做依赖裁剪。别一股脑把ROS全套搬上去。我有个项目，原本依赖ros-noetic-desktop-full，光安装包就占了3GB。后来我改成只装ros-noetic-robot-core，再加几个必要的包，体积直接砍到500MB。</p>
+
+<p>代码层面，要注意几个点：</p>
+
+<ul>
+  <li><strong>浮点运算优化</strong>：启用NEON指令集，编译时加 -mfpu=neon -mfloat-abi=hard</li>
+  <li><strong>内存池管理</strong>：避免频繁malloc/free，预分配固定大小的内存池</li>
+  <li><strong>日志降级</strong>：生产环境只保留ERROR级别日志，DEBUG日志全关掉</li>
+</ul>
+
+<pre><code>// 示例：内存池预分配
+#define MAP_POOL_SIZE 1024 * 1024 * 50  // 50MB
+static uint8_t map_pool[MAP_POOL_SIZE];
+static size_t pool_offset = 0;
+
+void* map_malloc(size_t size) {
+    if (pool_offset + size > MAP_POOL_SIZE) {
+        return NULL;  // 池满了，需要处理
+    }
+    void* ptr = &map_pool[pool_offset];
+    pool_offset += size;
+    return ptr;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>交叉编译时，一定要用目标平台的工具链。我见过有人用x86的gcc编译ARM代码，跑起来各种段错误。嗯，别问我怎么知道的。</p>
+</div>
+
+<h3>二、实时性优化：让AGV反应快起来</h3>
+
+<p>AGV导航最怕什么？怕延迟。你想想看，传感器采到障碍物，到控制指令发出，中间如果延迟超过100ms，车可能已经撞上去了。</p>
+
+<p>实时性优化的核心，就是缩短「感知-规划-控制」这个闭环的延迟。</p>
+
+<h4>2.1 任务优先级划分</h4>
+
+<p>我习惯把任务分成三个等级：</p>
+
+<table>
+  <tr>
+    <th>优先级</th>
+    <th>任务类型</th>
+    <th>最大延迟要求</th>
+    <th>示例</th>
+  </tr>
+  <tr>
+    <td>高</td>
+    <td>安全关键</td>
+    <td>&lt;10ms</td>
+    <td>急停、碰撞检测</td>
+  </tr>
+  <tr>
+    <td>中</td>
+    <td>控制关键</td>
+    <td>&lt;50ms</td>
+    <td>里程计融合、PID控制</td>
+  </tr>
+  <tr>
+    <td>低</td>
+    <td>非实时</td>
+    <td>&lt;500ms</td>
+    <td>地图更新、日志记录</td>
+  </tr>
+</table>
+
+<p>在Linux上，我用SCHED_FIFO实时调度策略。但要注意，别把所有线程都设成实时优先级，否则系统可能卡死。我曾经犯过这个错——把日志线程也设成高优先级，结果日志刷屏时，控制线程反而被抢占了。</p>
+
+<h4>2.2 算法层面的优化</h4>
+
+<p>路径规划这块，A*算法在嵌入式上跑，如果地图是1000x1000的网格，每次规划可能要几百毫秒。我常用的优化手段：</p>
+
+<ul>
+  <li><strong>分层规划</strong>：先做粗粒度规划（50cm网格），再做细粒度局部规划（5cm网格）</li>
+  <li><strong>增量式更新</strong>：环境变化不大时，复用上次的规划结果，只更新局部</li>
+  <li><strong>提前计算</strong>：在AGV行驶过程中，提前计算下一段路径</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>实时性优化不能牺牲安全性。我见过有人为了提速，把碰撞检测的采样频率从100Hz降到20Hz，结果车撞了。安全相关的任务，优先级永远最高。</p>
+</div>
+
+<h3>三、系统可靠性设计：别让AGV在产线上罢工</h3>
+
+<p>AGV在工厂里跑，一天24小时，一周7天。如果动不动就死机，产线负责人会疯掉的。可靠性设计，说白了就是「防呆」+「容错」。</p>
+
+<h4>3.1 看门狗机制</h4>
+
+<p>硬件看门狗是必须的。我一般设置3秒超时。主循环里每1秒喂一次狗。如果某个任务卡住了，看门狗会触发系统复位。</p>
+
+<pre><code>// 伪代码：看门狗任务
+void watchdog_task() {
+    while(1) {
+        if (main_loop_healthy) {
+            feed_watchdog();  // 喂狗
+            main_loop_healthy = false;
+        }
+        sleep(1);  // 1秒检查一次
+    }
+}
+
+void main_loop() {
+    while(1) {
+        // 执行导航任务
+        navigate();
+        main_loop_healthy = true;
+    }
+}</code></pre>
+
+<h4>3.2 状态机与异常恢复</h4>
+
+<p>AGV不能一出错就傻站着。我设计的状态机包含这些状态：</p>
+
+<ul>
+  <li><strong>INIT</strong>：初始化，自检</li>
+  <li><strong>RUNNING</strong>：正常运行</li>
+  <li><strong>ERROR</strong>：检测到异常，尝试恢复</li>
+  <li><strong>SAFE_STOP</strong>：安全停车</li>
+  <li><strong>EMERGENCY</strong>：紧急状态，需要人工介入</li>
+</ul>
+
+<p>举个例子，如果激光雷达突然丢数据了，系统不会直接急停。它会先尝试重启雷达驱动，如果3秒内恢复，就继续运行。如果不行，才进入SAFE_STOP，缓慢停车。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经遇到过一个问题——AGV在充电站附近反复重启。后来发现是看门狗复位后，系统重新初始化，但充电站的电磁干扰导致传感器数据异常，又触发复位。解决方案是：复位后先进入一个「稳定期」，等待5秒再开始正常导航。</p>
+</div>
+
+<h4>3.3 数据冗余与掉电保护</h4>
+
+<p>地图数据、定位数据这些关键信息，不能只存在内存里。我习惯：</p>
+
+<ul>
+  <li>每5分钟写一次地图到Flash</li>
+  <li>每次定位更新时，同时写两份到不同存储区域</li>
+  <li>掉电检测电路触发时，立即保存当前状态</li>
+</ul>
+
+<p>嗯，这里要注意，Flash写入次数有限。我一般用环形缓冲区，只保存最近10份地图数据，避免频繁擦写。</p>
+
+<h3>四、知识体系总览</h3>
+
+<p>下面这张图，是我对本章内容的一个梳理。你可以把它当作部署时的检查清单。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV导航系统工程化部署知识体系</text>
+  
+  <!-- 三个核心模块 -->
+  <!-- 模块1：嵌入式部署 -->
+  <rect x="30" y="70" width="220" height="380" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="8"/>
+  <text x="140" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">嵌入式部署</text>
+  <line x1="50" y1="115" x2="230" y2="115" stroke="#4caf50" stroke-width="1"/>
+  <text x="50" y="140" font-size="13" fill="#333">• 依赖裁剪</text>
+  <text x="50" y="165" font-size="13" fill="#333">• 交叉编译</text>
+  <text x="50" y="190" font-size="13" fill="#333">• 内存池管理</text>
+  <text x="50" y="215" font-size="13" fill="#333">• NEON指令优化</text>
+  <text x="50" y="240" font-size="13" fill="#333">• 日志降级策略</text>
+  <text x="50" y="265" font-size="13" fill="#333">• 存储空间规划</text>
+  
+  <!-- 模块2：实时性优化 -->
+  <rect x="290" y="70" width="220" height="380" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="8"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">实时性优化</text>
+  <line x1="310" y1="115" x2="490" y2="115" stroke="#ff9800" stroke-width="1"/>
+  <text x="310" y="140" font-size="13" fill="#333">• 任务优先级划分</text>
+  <text x="310" y="165" font-size="13" fill="#333">• SCHED_FIFO调度</text>
+  <text x="310" y="190" font-size="13" fill="#333">• 分层路径规划</text>
+  <text x="310" y="215" font-size="13" fill="#333">• 增量式更新</text>
+  <text x="310" y="240" font-size="13" fill="#333">• 提前计算策略</text>
+  <text x="310" y="265" font-size="13" fill="#333">• 延迟预算分配</text>
+  
+  <!-- 模块3：可靠性设计 -->
+  <rect x="550" y="70" width="220" height="380" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="8"/>
+  <text x="660" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">系统可靠性设计</text>
+  <line x1="570" y1="115" x2="750" y2="115" stroke="#2196f3" stroke-width="1"/>
+  <text x="570" y="140" font-size="13" fill="#333">• 硬件看门狗</text>
+  <text x="570" y="165" font-size="13" fill="#333">• 状态机设计</text>
+  <text x="570" y="190" font-size="13" fill="#333">• 异常恢复机制</text>
+  <text x="570" y="215" font-size="13" fill="#333">• 数据冗余存储</text>
+  <text x="570" y="240" font-size="13" fill="#333">• 掉电保护</text>
+  <text x="570" y="265" font-size="13" fill="#333">• 稳定期策略</text>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="430" width="600" height="40" fill="#fce4ec" stroke="#e91e63" stroke-width="1" rx="5"/>
+  <text x="400" y="455" text-anchor="middle" font-size="14" fill="#c62828">核心目标：在有限资源下，实现安全、稳定、低延迟的导航系统</text>
+</svg>
+
+<p>好了，以上就是工程化部署的核心内容。从嵌入式迁移到实时性优化，再到可靠性设计，每一步都是实战中摸爬滚打出来的经验。希望这些内容能帮你少走些弯路。</p>
+
+        <div class="footer-nav">
+            <a href="28PerformanceEvalTest.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30FrontierOutlook.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

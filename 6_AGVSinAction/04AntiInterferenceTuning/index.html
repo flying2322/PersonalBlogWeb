@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV导航系统抗干扰调优技巧 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #2d5a4b;
+            background: #f0f7e6;
+            display: inline-block;
+            padding: 0.4rem 2rem;
+            border-radius: 60px;
+            border: 1px solid #b7d7a8;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV导航系统抗干扰调优技巧</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01AntiInterferenceBasics.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">抗干扰基础</div>
+            <div class="chapter-desc">干扰源分类·电磁/振动/光噪/纹理 · 定位精度影响 · 调优总体思路</div>
+            <div class="card-tags"><span class="tag">原理</span><span class="tag">入门</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02SensorSelectionLayout.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">传感器选型与布局</div>
+            <div class="chapter-desc">激光雷达/IMU/编码器/视觉 · 安装角度优化 · 冗余融合策略</div>
+            <div class="card-tags"><span class="tag">硬件</span><span class="tag">选型</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03EmcShieldingFilter.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">电磁屏蔽与滤波</div>
+            <div class="chapter-desc">电机驱动屏蔽 · 电源/信号滤波 · 接地与等电位连接</div>
+            <div class="card-tags"><span class="tag">电磁</span><span class="tag">电路</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04VibrationDamping.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">机械减振与结构优化</div>
+            <div class="chapter-desc">底盘减振设计 · 橡胶垫/弹簧选型 · 防松与动平衡</div>
+            <div class="card-tags"><span class="tag">机械</span><span class="tag">结构</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05AmbientLightNoise.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">环境光噪抑制</div>
+            <div class="chapter-desc">激光雷达抗光算法 · 视觉曝光自适应 · 红外补光/滤光片</div>
+            <div class="card-tags"><span class="tag">光学</span><span class="tag">算法</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06GroundTextureAdapt.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">地面纹理适应性</div>
+            <div class="chapter-desc">环氧/水泥/钢板影响 · 自适应纹理匹配 · 二维码辅助</div>
+            <div class="card-tags"><span class="tag">地面</span><span class="tag">定位</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07MultiSensorFusionAntiInterfere.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">多传感器融合抗干扰</div>
+            <div class="chapter-desc">卡尔曼/粒子滤波 · 异常剔除(卡方/残差) · 时间戳对齐</div>
+            <div class="card-tags"><span class="tag">融合</span><span class="tag">滤波</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08LocalizationRobustness.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">定位算法鲁棒性增强</div>
+            <div class="chapter-desc">AMCL参数调优 · 粒子数/重采样 · 动态障碍物定位保持</div>
+            <div class="card-tags"><span class="tag">定位</span><span class="tag">鲁棒</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09PathPlanningAntiInterfere.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">路径规划抗干扰</div>
+            <div class="chapter-desc">DWA参数调优 · 局部避障重规划 · 全局平滑/曲率约束</div>
+            <div class="card-tags"><span class="tag">规划</span><span class="tag">动态</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10MotionControlAntiInterfere.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">运动控制抗干扰</div>
+            <div class="chapter-desc">PID抗积分饱和 · 前馈/扰动观测器 · 电流/速度环整定</div>
+            <div class="card-tags"><span class="tag">控制</span><span class="tag">电机</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11CommunicationAntiInterfere.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">通信抗干扰</div>
+            <div class="chapter-desc">WiFi/UWB/5G选型 · 重传校验 · 多AGV冲突避免</div>
+            <div class="card-tags"><span class="tag">通信</span><span class="tag">无线</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12SoftwareFilterData.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">软件滤波与数据处理</div>
+            <div class="chapter-desc">滑动平均/中值/低通 · 异常值检测插值 · 平滑降噪</div>
+            <div class="card-tags"><span class="tag">软件</span><span class="tag">滤波</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13Calibration.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">标定与校准</div>
+            <div class="chapter-desc">激光雷达/IMU外参 · 编码器刻度 · 视觉内参畸变校正</div>
+            <div class="card-tags"><span class="tag">标定</span><span class="tag">校准</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14MapModelingOptimize.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">环境建模与地图优化</div>
+            <div class="chapter-desc">栅格/特征地图抗干扰更新 · 动态剔除 · 多时相融合</div>
+            <div class="card-tags"><span class="tag">地图</span><span class="tag">SLAM</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15FaultDiagnosisRecovery.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">故障诊断与自恢复</div>
+            <div class="chapter-desc">FDIR传感器故障隔离 · 重定位策略 · 安全降级模式</div>
+            <div class="card-tags"><span class="tag">诊断</span><span class="tag">安全</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16AntiInterfereTestMethod.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">抗干扰测试方法论</div>
+            <div class="chapter-desc">干扰注入测试 · RMSE/CEP指标 · 自动化场景设计</div>
+            <div class="card-tags"><span class="tag">测试</span><span class="tag">指标</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17InterferenceCaseStudy.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">案例实战</div>
+            <div class="chapter-desc">电磁干扰跳变 · 地面反光误检测 · 振动IMU漂移调优</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">案例</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18TuningToolchain.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">抗干扰调优工具链</div>
+            <div class="chapter-desc">ROS2诊断/rosbag · PlotJuggler/Foxglove可视化</div>
+            <div class="card-tags"><span class="tag">工具</span><span class="tag">ROS2</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19AutoParameterTuning.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">参数调优自动化</div>
+            <div class="chapter-desc">贝叶斯/网格搜索 · 强化学习自适应 · 仿真环境搭建</div>
+            <div class="card-tags"><span class="tag">自动</span><span class="tag">优化</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20AntiInterfereDesignSpec.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">抗干扰设计规范</div>
+            <div class="chapter-desc">设计检查清单 · 硬件布局规范 · 软件容错设计</div>
+            <div class="card-tags"><span class="tag">规范</span><span class="tag">体系</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21LidarAntiInterfereAdvanced.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">激光雷达抗干扰进阶</div>
+            <div class="chapter-desc">多回波/抗干扰波形 · 动态阈值 · 毫米波融合</div>
+            <div class="card-tags"><span class="tag">激光</span><span class="tag">进阶</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22ImuAntiInterfereAdvanced.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">IMU抗干扰进阶</div>
+            <div class="chapter-desc">温度/振动补偿 · 零偏稳定性 · 轮式里程计融合</div>
+            <div class="card-tags"><span class="tag">IMU</span><span class="tag">补偿</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23VisualNavAntiInterfere.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">视觉导航抗干扰</div>
+            <div class="chapter-desc">光照鲁棒性 · 特征匹配(RANSAC/GMS) · 视觉激光融合</div>
+            <div class="card-tags"><span class="tag">视觉</span><span class="tag">SLAM</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24MultiAgvCoopAntiInterfere.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">多AGV协同抗干扰</div>
+            <div class="chapter-desc">通信干扰协调 · 相对观测抗干扰 · 分布式地图一致性</div>
+            <div class="card-tags"><span class="tag">多机</span><span class="tag">协同</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25DeepLearningAntiInterfere.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">深度学习抗干扰</div>
+            <div class="chapter-desc">数据去噪 · 异常检测网络 · 端到端抗干扰模型</div>
+            <div class="card-tags"><span class="tag">AI</span><span class="tag">深度</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26RealtimeVsRobustness.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">实时性与抗干扰平衡</div>
+            <div class="chapter-desc">算法复杂度 · 多线程调度 · FPGA/GPU加速</div>
+            <div class="card-tags"><span class="tag">实时</span><span class="tag">加速</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27TuningPracticeFlow.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">抗干扰调优实战流程</div>
+            <div class="chapter-desc">问题定位→数据分析→调整验证 · 日志复盘 · 经验库</div>
+            <div class="card-tags"><span class="tag">流程</span><span class="tag">方法论</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28IndustryStandards.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">行业标准与认证</div>
+            <div class="chapter-desc">ISO/IEC/GB标准 · EMC测试认证 · 功能安全</div>
+            <div class="card-tags"><span class="tag">标准</span><span class="tag">认证</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29FrontierAntiInterfere.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">前沿抗干扰技术</div>
+            <div class="chapter-desc">事件相机导航 · 量子传感器 · 数字孪生调优</div>
+            <div class="card-tags"><span class="tag">前沿</span><span class="tag">创新</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30CourseSummaryPath.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">课程总结与进阶路径</div>
+            <div class="chapter-desc">知识体系回顾 · 学习资源 · 调优→架构师成长</div>
+            <div class="card-tags"><span class="tag">总结</span><span class="tag">职业</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

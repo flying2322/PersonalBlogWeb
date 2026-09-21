@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 地图构建基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="active">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 地图构建基础：栅格地图、拓扑地图、混合地图的对比与选择</h2>
+
+<p>做AGV路径规划这么多年，我经常被问到同一个问题：<strong>「地图到底该怎么建？」</strong></p>
+<p>说实话，这个问题没有标准答案。不同的仓储场景，对地图的要求天差地别。你想想看，一个几万平米的电商仓库，和一个几百平米的精密零件库，能共用同一种地图吗？显然不能。</p>
+<p>今天我就把三种主流地图——栅格地图、拓扑地图、混合地图——掰开揉碎了讲清楚。我会结合自己踩过的坑，告诉你什么场景该选什么地图。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>没有最好的地图，只有最合适的。选错了地图，你的AGV可能连货架都找不到。</p>
+</div>
+
+<h3>3.1 栅格地图：最直观，但最占内存</h3>
+
+<p>栅格地图，说白了就是把真实环境切成一个个小格子。每个格子要么是障碍物（黑色），要么是自由空间（白色）。</p>
+
+<p>我记得刚入行时，第一个项目就是给一个图书仓库做AGV。当时我图省事，直接用了栅格地图。结果呢？地图分辨率设得太高，一个1000平米的仓库，内存直接爆了。</p>
+
+<p><strong>栅格地图的核心参数：</strong></p>
+<ul>
+  <li><strong>分辨率：</strong>每个格子代表的实际尺寸。比如0.1m/格，还是0.5m/格。</li>
+  <li><strong>存储方式：</strong>二维数组，0表示空闲，1表示障碍。</li>
+  <li><strong>更新频率：</strong>静态地图一次建好，动态地图需要实时更新。</li>
+</ul>
+
+<pre><code>// 栅格地图的简单表示（C++伪代码）
+const int MAP_WIDTH = 1000;   // 1000列
+const int MAP_HEIGHT = 800;   // 800行
+int gridMap[MAP_HEIGHT][MAP_WIDTH]; // 0=空闲, 1=障碍
+
+// 检查某个点是否可通行
+bool isFree(int x, int y) {
+    return gridMap[y][x] == 0;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>栅格地图的分辨率不要低于0.2m/格。太细了内存扛不住，太粗了AGV容易卡在缝隙里。我曾经试过0.5m/格，结果AGV在货架通道里频繁报警——因为格子太大，把通道给「吞掉」了。</p>
+</div>
+
+<p><strong>栅格地图的优缺点：</strong></p>
+<table>
+  <tr>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>实现简单，容易理解</td>
+    <td>内存占用大（尤其大面积场景）</td>
+  </tr>
+  <tr>
+    <td>路径规划算法成熟（A*、Dijkstra）</td>
+    <td>无法表达语义信息（比如「这是货架区」）</td>
+  </tr>
+  <tr>
+    <td>容易更新和维护</td>
+    <td>高分辨率下计算量大</td>
+  </tr>
+</table>
+
+<h3>3.2 拓扑地图：轻量级，但不够精细</h3>
+
+<p>拓扑地图就不一样了。它不关心具体尺寸，只关心「点」和「线」。点代表关键位置（比如货架、充电站），线代表可通行的路径。</p>
+
+<p>为什么会有人用拓扑地图？你想想看，一个大型仓库里，AGV真的需要知道每个角落的精确坐标吗？其实不需要。它只需要知道：从A点到B点，走哪条路最近。</p>
+
+<p>我做过一个汽车零配件仓库的项目，面积很大但路径很简单——就是几条主通道。用栅格地图的话，内存占用太大。后来我换成了拓扑地图，整个地图文件不到10KB，AGV跑得飞快。</p>
+
+<pre><code>// 拓扑地图的简单表示（Python伪代码）
+graph = {
+    'A': {'B': 10, 'C': 15},
+    'B': {'A': 10, 'D': 12, 'E': 8},
+    'C': {'A': 15, 'F': 20},
+    'D': {'B': 12, 'E': 6},
+    'E': {'B': 8, 'D': 6, 'F': 5},
+    'F': {'C': 20, 'E': 5}
+}
+
+// 使用Dijkstra算法找最短路径
+def shortest_path(graph, start, end):
+    // ... 标准实现
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>拓扑地图有一个致命缺陷——它无法处理动态障碍物。如果某个通道临时堆了货物，拓扑地图不会知道。我曾经因为这个吃过亏，AGV按照拓扑路径走，结果撞上了临时堆放的纸箱。</p>
+</div>
+
+<p><strong>拓扑地图的优缺点：</strong></p>
+<table>
+  <tr>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>内存占用极小</td>
+    <td>无法表达精细的障碍物信息</td>
+  </tr>
+  <tr>
+    <td>路径搜索速度快</td>
+    <td>构建和维护需要人工干预</td>
+  </tr>
+  <tr>
+    <td>适合大规模简单场景</td>
+    <td>动态环境适应性差</td>
+  </tr>
+</table>
+
+<h3>3.3 混合地图：取长补短，但复杂度高</h3>
+
+<p>混合地图，顾名思义，就是把栅格地图和拓扑地图结合起来。这也是我个人最推荐的方式。</p>
+
+<p>具体怎么做呢？<strong>顶层用拓扑地图做全局规划，底层用栅格地图做局部避障。</strong></p>
+
+<p>举个例子：AGV要从A点到Z点。拓扑地图告诉它：先走到B点，再走到C点，最后到Z点。但走到B点的过程中，如果前面突然出现一个障碍物，栅格地图就派上用场了——它负责局部路径重规划，绕过障碍物。</p>
+
+<p>我在一个3C电子仓库里就是这么干的。仓库有5000平米，货架密集，而且经常有工人走动。纯栅格地图太慢，纯拓扑地图又太危险。混合地图一上，问题全解决了。</p>
+
+<pre><code>// 混合地图的伪代码逻辑
+class HybridMap {
+    TopoMap topoMap;   // 全局拓扑层
+    GridMap gridMap;   // 局部栅格层
+    
+    Path planPath(Point start, Point end) {
+        // 1. 拓扑层规划全局路径
+        List&lt;Node&gt; globalPath = topoMap.findPath(start, end);
+        
+        // 2. 对每个拓扑段，用栅格地图做局部规划
+        Path finalPath;
+        for each segment in globalPath {
+            Path localPath = gridMap.planLocalPath(segment);
+            finalPath.append(localPath);
+        }
+        return finalPath;
+    }
+}</code></pre>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你预算充足，直接上混合地图。虽然前期开发成本高一点，但后期维护省心太多。我曾经在一个项目里，纯栅格地图的AGV每天要人工干预3-4次，换成混合地图后，一周都出不了1次问题。</p>
+</div>
+
+<h3>3.4 三种地图的对比与选择</h3>
+
+<p>好了，三种地图都讲完了。到底怎么选？我总结了一个简单的判断标准：</p>
+
+<ul>
+  <li><strong>场景简单、面积大、路径固定</strong> → 拓扑地图（比如：大型电商仓库的主通道运输）</li>
+  <li><strong>场景复杂、障碍物多、需要精细避障</strong> → 栅格地图（比如：精密零件仓库）</li>
+  <li><strong>场景大且复杂、动态障碍物多</strong> → 混合地图（比如：3C电子仓库、生鲜冷链仓库）</li>
+</ul>
+
+<p>嗯，这里要注意：<strong>不要为了追求「高级」而盲目选择混合地图。</strong>如果你的仓库只有200平米，路径也简单，用栅格地图就足够了。混合地图的开发和维护成本，对于小场景来说完全是浪费。</p>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经在一个小项目里强行上混合地图，结果开发周期从2周拖到了6周。最后发现，用栅格地图+简单A*算法，效果一样好。所以，<strong>选地图之前，先搞清楚你的场景到底需要什么。</strong></p>
+</div>
+
+<h3>3.5 知识体系总览</h3>
+
+<p>下面这张图是我自己画的，把三种地图的核心逻辑串起来了。你看完应该能有个整体印象。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">地图构建基础：三种地图对比</text>
+  
+  <!-- 三个主分支 -->
+  <!-- 栅格地图 -->
+  <rect x="50" y="80" width="200" height="50" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="110" text-anchor="middle" font-size="18" fill="white" font-weight="bold">栅格地图</text>
+  
+  <!-- 拓扑地图 -->
+  <rect x="300" y="80" width="200" height="50" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="110" text-anchor="middle" font-size="18" fill="white" font-weight="bold">拓扑地图</text>
+  
+  <!-- 混合地图 -->
+  <rect x="550" y="80" width="200" height="50" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="110" text-anchor="middle" font-size="18" fill="white" font-weight="bold">混合地图</text>
+  
+  <!-- 连线到特性 -->
+  <line x1="150" y1="130" x2="150" y2="160" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="130" x2="400" y2="160" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="650" y1="130" x2="650" y2="160" stroke="#2ecc71" stroke-width="2"/>
+  
+  <!-- 栅格地图特性 -->
+  <rect x="30" y="160" width="240" height="120" rx="8" fill="#ebf5fb" stroke="#3498db" stroke-width="1"/>
+  <text x="150" y="185" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">特性</text>
+  <text x="50" y="210" font-size="12" fill="#34495e">• 二维数组存储</text>
+  <text x="50" y="230" font-size="12" fill="#34495e">• 0/1表示障碍/空闲</text>
+  <text x="50" y="250" font-size="12" fill="#34495e">• 适合A*、Dijkstra算法</text>
+  <text x="50" y="270" font-size="12" fill="#34495e">• 内存占用大</text>
+  
+  <!-- 拓扑地图特性 -->
+  <rect x="280" y="160" width="240" height="120" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1"/>
+  <text x="400" y="185" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">特性</text>
+  <text x="300" y="210" font-size="12" fill="#34495e">• 节点+边表示</text>
+  <text x="300" y="230" font-size="12" fill="#34495e">• 只关心连通性</text>
+  <text x="300" y="250" font-size="12" fill="#34495e">• 搜索速度快</text>
+  <text x="300" y="270" font-size="12" fill="#34495e">• 无法处理动态障碍</text>
+  
+  <!-- 混合地图特性 -->
+  <rect x="530" y="160" width="240" height="120" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="1"/>
+  <text x="650" y="185" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">特性</text>
+  <text x="550" y="210" font-size="12" fill="#34495e">• 拓扑全局+栅格局部</text>
+  <text x="550" y="230" font-size="12" fill="#34495e">• 兼顾效率与精度</text>
+  <text x="550" y="250" font-size="12" fill="#34495e">• 开发成本高</text>
+  <text x="550" y="270" font-size="12" fill="#34495e">• 适合大型复杂场景</text>
+  
+  <!-- 适用场景 -->
+  <line x1="150" y1="280" x2="150" y2="310" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="280" x2="400" y2="310" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="650" y1="280" x2="650" y2="310" stroke="#2ecc71" stroke-width="2"/>
+  
+  <rect x="30" y="310" width="240" height="80" rx="8" fill="#ebf5fb" stroke="#3498db" stroke-width="1"/>
+  <text x="150" y="335" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">适用场景</text>
+  <text x="50" y="360" font-size="12" fill="#34495e">• 小面积复杂仓库</text>
+  <text x="50" y="380" font-size="12" fill="#34495e">• 需要精细避障</text>
+  
+  <rect x="280" y="310" width="240" height="80" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="1"/>
+  <text x="400" y="335" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">适用场景</text>
+  <text x="300" y="360" font-size="12" fill="#34495e">• 大面积简单仓库</text>
+  <text x="300" y="380" font-size="12" fill="#34495e">• 路径固定、障碍少</text>
+  
+  <rect x="530" y="310" width="240" height="80" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="1"/>
+  <text x="650" y="335" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">适用场景</text>
+  <text x="550" y="360" font-size="12" fill="#34495e">• 大型复杂仓库</text>
+  <text x="550" y="380" font-size="12" fill="#34495e">• 动态障碍物多</text>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="420" width="600" height="50" rx="25" fill="#2c3e50" opacity="0.8"/>
+  <text x="400" y="450" text-anchor="middle" font-size="16" fill="white">选择原则：场景决定地图，不要为了技术而技术</text>
+</svg>
+
+<p>这张图把三种地图的核心特性、适用场景都列出来了。你保存下来，以后选地图时拿出来对照一下，基本不会出错。</p>
+
+<div class="tip">
+  <p><strong>最后说一句：</strong>地图构建是AGV路径规划的地基。地基没打好，上面盖的房子再漂亮也没用。我见过太多项目，AGV硬件买得顶级，结果因为地图没选对，天天出故障。所以，<strong>花时间把地图选好，后面能省你80%的麻烦。</strong></p>
+</div>
+
+<div class="footer-nav">
+            <a href="02WarehouseSceneAnalysis.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04CoordinateAndLocalization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

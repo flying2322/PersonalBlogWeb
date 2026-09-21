@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 DWA算法详解</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="active">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 DWA算法详解：速度空间采样、轨迹预测、评价函数设计、动态窗口的工程调参</h2>
+
+<p>DWA，全称Dynamic Window Approach，中文叫动态窗口法。</p>
+<p>说实话，这名字起得挺贴切的。它核心就干一件事：<strong>在每一帧控制周期里，从所有可能的速度组合中，找出那个最安全、最接近目标、跑得还最快的速度</strong>。</p>
+<p>我当年刚接触AGV时，觉得这算法挺玄乎。后来亲手调过几台车，踩过坑，才真正理解它的精髓。今天咱们就把DWA掰开揉碎，从采样到评价，再到工程调参，一次性讲透。</p>
+
+<div class="highlight">
+  <p><strong>核心思想一句话</strong>：DWA不是规划一条长路径，而是每时每刻都在问自己——「我现在踩油门、打方向，接下来几秒钟会不会撞墙？能不能往前走？」</p>
+</div>
+
+<h3>11.1 速度空间采样：到底哪些速度是「合法」的？</h3>
+
+<p>DWA的第一步，就是找出所有「可能的速度」。但注意，不是随便什么速度都行。</p>
+<p>我习惯把速度空间分成三层过滤：</p>
+
+<ol>
+  <li><strong>第一层：机器人自身极限</strong><br>
+  说白了，电机能转多快？最大线速度v_max，最小v_min，最大角速度ω_max。超出这个范围，物理上就做不到。</li>
+  <li><strong>第二层：电机加减速能力</strong><br>
+  就算你当前能跑到1m/s，但电机加速度有限。下一时刻你最多能加速到v_max_acc，或者减速到v_min_acc。这个窗口就是「动态窗口」的由来。</li>
+  <li><strong>第三层：安全约束</strong><br>
+  即使速度在物理范围内，但如果按这个速度跑下去，会在刹车距离内撞到障碍物，那也得排除。</li>
+</ol>
+
+<p>嗯，这里要注意：<strong>第三层其实已经属于轨迹预测的范畴了</strong>。很多初学者把采样和预测混在一起，我建议你分开理解——先采样出候选速度，再逐个预测轨迹，最后评价。</p>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：采样分辨率别设太密。v方向0.1m/s步长，ω方向0.1rad/s步长，对于大多数室内AGV已经够用。太密了计算量爆炸，实时性扛不住。</p>
+</div>
+
+<h3>11.2 轨迹预测：给定速度，未来几秒会怎样？</h3>
+
+<p>采样出一堆(v, ω)组合后，接下来要预测：如果我用这个速度跑Δt时间，轨迹长什么样？</p>
+
+<p>这里用的是最简单的运动学模型——差速模型。公式不复杂：</p>
+
+<pre><code>// 假设当前位姿 (x, y, θ)
+// 给定线速度 v，角速度 ω，预测时间 dt
+x_next = x + v * cos(θ) * dt
+y_next = y + v * sin(θ) * dt
+θ_next = θ + ω * dt</code></pre>
+
+<p>就这么简单？对，就这么简单。DWA不关心复杂的动力学，它只关心「接下来一小段时间内，车会走到哪里」。</p>
+
+<p>我见过有人把预测时间设得特别长，比如5秒。结果呢？轨迹预测得乱七八糟，因为误差会累积。我个人习惯：<strong>预测时间1.5~2秒</strong>，步长0.1秒。这样既能看到前方障碍，又不会因为累积误差导致误判。</p>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经遇到一个案例，AGV在转弯时总是急刹。查了半天，发现是预测时间太短（0.5秒），导致算法看不到弯道内侧的障碍物。等看到了，已经来不及减速。把预测时间调到1.8秒后，问题解决。</p>
+</div>
+
+<h3>11.3 评价函数设计：三个维度的博弈</h3>
+
+<p>采样了，预测了，现在有N条候选轨迹。选哪条？</p>
+<p>DWA用三个评价指标来打分：</p>
+
+<table>
+  <tr>
+    <th>评价项</th>
+    <th>含义</th>
+    <th>权重符号</th>
+  </tr>
+  <tr>
+    <td>方位角评价</td>
+    <td>轨迹终点朝向与目标方向的偏差</td>
+    <td>α (heading)</td>
+  </tr>
+  <tr>
+    <td>障碍物距离评价</td>
+    <td>轨迹与最近障碍物的距离</td>
+    <td>β (dist)</td>
+  </tr>
+  <tr>
+    <td>速度评价</td>
+    <td>线速度大小，鼓励跑得快</td>
+    <td>γ (velocity)</td>
+  </tr>
+</table>
+
+<p>最终得分 = α * heading + β * dist + γ * velocity</p>
+
+<p>你想想看，这三个指标其实是互相矛盾的：</p>
+<ul>
+  <li>想跑得快？可能离障碍物近。</li>
+  <li>想对准目标？可能得减速转弯。</li>
+  <li>想离障碍物远？可能绕大圈。</li>
+</ul>
+
+<p>DWA的厉害之处就在于，它用加权求和的方式，在每一帧都找到那个「最优妥协点」。</p>
+
+<div class="highlight">
+  <p><strong>调参口诀</strong>：</p>
+  <ul>
+    <li>α（朝向权重）大 → 车更激进，直奔目标，容易撞墙</li>
+    <li>β（避障权重）大 → 车更保守，绕路远，但安全</li>
+    <li>γ（速度权重）大 → 车更莽，能跑多快跑多快</li>
+  </ul>
+</div>
+
+<p>我刚开始调参时，α设得特别大，结果AGV直愣愣地往墙上怼。后来把β调高，车又变得畏畏缩缩，半天到不了目标。最后找到一个平衡点：<strong>α:β:γ = 0.3:0.5:0.2</strong>，对于大多数室内场景都适用。</p>
+
+<h3>11.4 动态窗口的工程调参：从理论到实战</h3>
+
+<p>理论说完了，咱们聊聊工程调参。这部分我踩过的坑最多。</p>
+
+<h4>11.4.1 动态窗口大小怎么设？</h4>
+
+<p>动态窗口的大小，取决于电机的加减速能力。公式很简单：</p>
+
+<pre><code>v_min_dw = v_current - a_max * dt
+v_max_dw = v_current + a_max * dt
+ω_min_dw = ω_current - α_max * dt
+ω_max_dw = ω_current + α_max * dt</code></pre>
+
+<p>其中a_max是最大线加速度，α_max是最大角加速度。这两个参数怎么来？</p>
+<p>我建议你直接查电机手册，或者做一次「急加速急减速」实验。把AGV放在空地上，给一个最大速度指令，记录从0到最大速度的时间。反过来也一样。</p>
+
+<div class="tip">
+  <p><strong>我的习惯</strong>：a_max设得比实际值小20%。为什么？因为电机老化、负载变化都会影响实际性能。留点余量，避免算法计算出「理论上可行但实际做不到」的速度。</p>
+</div>
+
+<h4>11.4.2 评价函数归一化</h4>
+
+<p>这是新手最容易忽略的点。三个评价项的量纲不一样：</p>
+<ul>
+  <li>heading：角度偏差，范围0~π</li>
+  <li>dist：距离，范围0~几米</li>
+  <li>velocity：速度，范围0~v_max</li>
+</ul>
+
+<p>如果不归一化，dist的数值天然就大，权重β再大一点，heading和velocity就完全被淹没了。</p>
+
+<p>我常用的归一化方法：</p>
+<pre><code>// 对每条轨迹
+heading_norm = heading / max_heading
+dist_norm = dist / max_dist
+velocity_norm = velocity / max_velocity
+
+// 然后加权求和
+score = α * heading_norm + β * dist_norm + γ * velocity_norm</code></pre>
+
+<p>说白了，就是把所有指标都压到0~1之间，这样权重才有意义。</p>
+
+<h4>11.4.3 避障距离的「死区」处理</h4>
+
+<p>你想想看，如果障碍物距离评价函数是线性的，会出现什么问题？</p>
+<p>离障碍物1米和离障碍物0.1米，得分差距很大。但0.1米其实已经非常危险了！</p>
+
+<p>我建议设置一个「安全死区」：</p>
+<pre><code>if (dist &lt; safe_threshold) {
+    dist_score = 0;  // 直接判死刑
+} else {
+    dist_score = dist / max_dist;  // 正常归一化
+}</code></pre>
+
+<p>safe_threshold我一般设为机器人半径的1.5倍。小于这个距离，不管其他指标多好，这条轨迹直接淘汰。</p>
+
+<div class="warning">
+  <p><strong>我曾经犯过的错</strong>：有一次在仓库里调试，AGV总是贴着货架走，距离只有5厘米。理论上没撞，但稍微有点打滑就蹭上了。后来加了死区处理，强制要求距离货架至少20厘米，再也没出过问题。</p>
+</div>
+
+<h3>11.5 DWA的局限性（实话实说）</h3>
+
+<p>DWA不是万能的。我用了这么多年，总结出几个硬伤：</p>
+
+<ul>
+  <li><strong>局部最优陷阱</strong>：DWA只看未来几秒，容易陷入U形障碍物出不来。</li>
+  <li><strong>对参数敏感</strong>：换个场景，权重可能就得重新调。</li>
+  <li><strong>不适合高速场景</strong>：预测时间短，高速下反应不过来。</li>
+</ul>
+
+<p>但话说回来，对于室内AGV、服务机器人这些中低速场景，DWA依然是性价比最高的选择。简单、稳定、好调试。</p>
+
+<div class="highlight">
+  <p><strong>总结一下DWA的工程调参流程</strong>：</p>
+  <ol>
+    <li>先确定机器人物理极限（v_max, ω_max, a_max, α_max）</li>
+    <li>设定采样分辨率（v步长0.1，ω步长0.1）</li>
+    <li>设定预测时间（1.5~2秒）</li>
+    <li>初始化权重（α=0.3, β=0.5, γ=0.2）</li>
+    <li>加入安全死区（1.5倍半径）</li>
+    <li>跑仿真，观察轨迹，微调权重</li>
+    <li>实车测试，重点观察转弯和靠近障碍物时的行为</li>
+  </ol>
+</div>
+
+<p>嗯，DWA的内容就这些。算法本身不复杂，难的是调参和工程适配。希望今天的分享能帮你少走弯路。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#2C3E50">DWA算法核心流程</text>
+  
+  <!-- 第一步：速度空间采样 -->
+  <rect x="50" y="60" width="200" height="80" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="150" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">① 速度空间采样</text>
+  <text x="150" y="110" text-anchor="middle" font-size="12" fill="#666">物理极限 → 动态窗口</text>
+  <text x="150" y="128" text-anchor="middle" font-size="12" fill="#666">→ 安全约束过滤</text>
+  
+  <!-- 箭头1 -->
+  <line x1="250" y1="100" x2="320" y2="100" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 第二步：轨迹预测 -->
+  <rect x="330" y="60" width="200" height="80" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="430" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">② 轨迹预测</text>
+  <text x="430" y="110" text-anchor="middle" font-size="12" fill="#666">运动学模型</text>
+  <text x="430" y="128" text-anchor="middle" font-size="12" fill="#666">预测未来1.5~2秒</text>
+  
+  <!-- 箭头2 -->
+  <line x1="530" y1="100" x2="600" y2="100" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 第三步：评价函数 -->
+  <rect x="610" y="60" width="160" height="80" rx="8" fill="#E8F4FD" stroke="#4A90D9" stroke-width="2"/>
+  <text x="690" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">③ 评价函数</text>
+  <text x="690" y="110" text-anchor="middle" font-size="12" fill="#666">heading + dist</text>
+  <text x="690" y="128" text-anchor="middle" font-size="12" fill="#666">+ velocity</text>
+  
+  <!-- 箭头3 向下 -->
+  <line x1="690" y1="140" x2="690" y2="200" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 第四步：选择最优 -->
+  <rect x="590" y="210" width="200" height="60" rx="8" fill="#FFF3CD" stroke="#F0AD4E" stroke-width="2"/>
+  <text x="690" y="238" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">④ 选择最优轨迹</text>
+  <text x="690" y="256" text-anchor="middle" font-size="12" fill="#666">得分最高 → 执行</text>
+  
+  <!-- 反馈箭头 -->
+  <path d="M 690 270 L 690 320 L 150 320 L 150 140" fill="none" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+  <text x="420" y="340" text-anchor="middle" font-size="12" fill="#E74C3C">下一控制周期，重复以上流程</text>
+  
+  <!-- 评价函数细节 -->
+  <rect x="50" y="200" width="480" height="120" rx="8" fill="#F5F5F5" stroke="#999" stroke-width="1"/>
+  <text x="290" y="225" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">评价函数细节</text>
+  
+  <text x="70" y="250" font-size="12" fill="#333">heading = 轨迹终点朝向与目标方向的偏差</text>
+  <text x="70" y="270" font-size="12" fill="#333">dist = 轨迹与最近障碍物的距离（含死区处理）</text>
+  <text x="70" y="290" font-size="12" fill="#333">velocity = 线速度大小（鼓励高效移动）</text>
+  <text x="70" y="310" font-size="12" fill="#E74C3C" font-weight="bold">score = α·heading + β·dist + γ·velocity</text>
+  
+  <!-- 调参建议 -->
+  <rect x="50" y="350" width="700" height="120" rx="8" fill="#E8F8E8" stroke="#27AE60" stroke-width="1"/>
+  <text x="400" y="375" text-anchor="middle" font-size="14" font-weight="bold" fill="#2C3E50">工程调参建议</text>
+  
+  <text x="70" y="400" font-size="12" fill="#333">• 采样分辨率：v步长0.1m/s，ω步长0.1rad/s</text>
+  <text x="70" y="420" font-size="12" fill="#333">• 预测时间：1.5~2秒，步长0.1秒</text>
+  <text x="70" y="440" font-size="12" fill="#333">• 初始权重：α=0.3, β=0.5, γ=0.2</text>
+  <text x="70" y="460" font-size="12" fill="#333">• 安全死区：1.5倍机器人半径</text>
+</svg>
+
+        <div class="footer-nav">
+            <a href="10LocalPlannerOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12TebAlgorithm.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

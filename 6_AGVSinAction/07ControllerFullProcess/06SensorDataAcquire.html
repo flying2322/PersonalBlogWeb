@@ -1,0 +1,473 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 传感器数据采集</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="active">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 传感器数据采集：AGV的“感官系统”</h2>
+
+<p>各位同学，欢迎来到《AGV控制器开发全流程实战》的第一章。</p>
+
+<p>咱们做AGV，说白了就是让一台机器自己走路。那它怎么知道自己在哪？怎么知道周围有没有障碍物？怎么知道自己走了多远？</p>
+
+<p>答案就藏在传感器里。</p>
+
+<p>这一章，我带你搞定AGV最核心的三个传感器：<strong>激光雷达（RPLIDAR）</strong>、<strong>IMU（MPU6050）</strong>和<strong>编码器</strong>。这三样东西，就是AGV的眼睛、耳朵和腿脚神经。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>传感器数据采集是AGV控制的基础。数据不准，后面一切算法都是空中楼阁。我见过太多项目，算法调得天花乱坠，最后发现是传感器没校准——白费功夫。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e3f2fd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4caf50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#388e3c;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2196f3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1565c0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff9800;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e65100;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="url(#bgGrad)" rx="15" ry="15"/>
+
+  <!-- 标题 -->
+  <text x="400" y="45" text-anchor="middle" font-size="22" font-weight="bold" fill="#1b5e20">AGV传感器数据采集知识体系</text>
+
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" ry="25" fill="#37474f" filter="url(#shadow)"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="white">传感器数据采集</text>
+
+  <!-- 分支1：激光雷达 -->
+  <rect x="50" y="160" width="200" height="50" rx="10" ry="10" fill="url(#boxGrad1)" filter="url(#shadow)"/>
+  <text x="150" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="white">激光雷达 (RPLIDAR)</text>
+
+  <line x1="300" y1="120" x2="150" y2="160" stroke="#388e3c" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="150" y="235" text-anchor="middle" font-size="12" fill="#2e7d32">驱动初始化</text>
+  <text x="150" y="255" text-anchor="middle" font-size="12" fill="#2e7d32">串口通信协议解析</text>
+  <text x="150" y="275" text-anchor="middle" font-size="12" fill="#2e7d32">360°点云数据获取</text>
+  <text x="150" y="295" text-anchor="middle" font-size="12" fill="#2e7d32">极坐标→笛卡尔坐标转换</text>
+
+  <!-- 分支2：IMU -->
+  <rect x="300" y="160" width="200" height="50" rx="10" ry="10" fill="url(#boxGrad2)" filter="url(#shadow)"/>
+  <text x="400" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="white">IMU (MPU6050)</text>
+
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#1565c0" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="400" y="235" text-anchor="middle" font-size="12" fill="#1565c0">I2C总线配置</text>
+  <text x="400" y="255" text-anchor="middle" font-size="12" fill="#1565c0">加速度计/陀螺仪数据</text>
+  <text x="400" y="275" text-anchor="middle" font-size="12" fill="#1565c0">姿态解算（互补滤波）</text>
+  <text x="400" y="295" text-anchor="middle" font-size="12" fill="#1565c0">欧拉角输出</text>
+
+  <!-- 分支3：编码器 -->
+  <rect x="550" y="160" width="200" height="50" rx="10" ry="10" fill="url(#boxGrad3)" filter="url(#shadow)"/>
+  <text x="650" y="190" text-anchor="middle" font-size="15" font-weight="bold" fill="white">编码器</text>
+
+  <line x1="500" y1="120" x2="650" y2="160" stroke="#e65100" stroke-width="2" stroke-dasharray="5,3"/>
+
+  <text x="650" y="235" text-anchor="middle" font-size="12" fill="#e65100">AB相脉冲捕获</text>
+  <text x="650" y="255" text-anchor="middle" font-size="12" fill="#e65100">定时器编码器模式</text>
+  <text x="650" y="275" text-anchor="middle" font-size="12" fill="#e65100">速度/里程计算</text>
+  <text x="650" y="295" text-anchor="middle" font-size="12" fill="#e65100">方向判断</text>
+
+  <!-- 底部总结 -->
+  <rect x="200" y="330" width="400" height="45" rx="10" ry="10" fill="#607d8b" filter="url(#shadow)"/>
+  <text x="400" y="358" text-anchor="middle" font-size="14" font-weight="bold" fill="white">融合输出：位置 + 姿态 + 环境感知 → 控制决策</text>
+</svg>
+
+<h3>1.1 激光雷达（RPLIDAR）驱动与数据解析</h3>
+
+<p>先聊激光雷达。RPLIDAR是思岚科技的产品，性价比很高。我最早接触它是在2016年，那时候还只有A1型号，现在都出到A3了。</p>
+
+<p>它的工作原理很简单：激光发射器旋转，测量每个角度上的距离。一圈360°，每0.5°或1°一个采样点，就形成了我们常说的“点云”。</p>
+
+<p>驱动它，核心就三步：</p>
+
+<ol>
+  <li><strong>串口初始化</strong>——波特率通常115200或256000</li>
+  <li><strong>发送启动指令</strong>——0xA5 0x20</li>
+  <li><strong>循环读取数据帧</strong>——解析距离和角度</li>
+</ol>
+
+<p>数据帧格式是这样的：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background-color:#e8f5e9;">
+    <th>字节偏移</th>
+    <th>长度</th>
+    <th>含义</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>1</td>
+    <td>起始标志 (0xFA)</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>1</td>
+    <td>数据包类型</td>
+  </tr>
+  <tr>
+    <td>2-3</td>
+    <td>2</td>
+    <td>角度值 (低字节在前)</td>
+  </tr>
+  <tr>
+    <td>4-5</td>
+    <td>2</td>
+    <td>距离值 (低字节在前)</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>1</td>
+    <td>信号质量</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>1</td>
+    <td>校验和</td>
+  </tr>
+</table>
+
+<p>代码实现其实不复杂。我贴一段核心的解析函数：</p>
+
+<pre><code>// RPLIDAR数据解析示例
+typedef struct {
+    float angle;      // 角度（度）
+    float distance;   // 距离（毫米）
+    uint8_t quality;  // 信号质量 0-255
+} lidar_point_t;
+
+int rplidar_parse_frame(uint8_t *buf, lidar_point_t *point) {
+    // 检查起始标志
+    if (buf[0] != 0xFA) return -1;
+    
+    // 解析角度（单位0.01度）
+    uint16_t angle_raw = buf[2] | (buf[3] &lt;&lt; 8);
+    point-&gt;angle = angle_raw / 100.0f;
+    
+    // 解析距离（单位毫米）
+    uint16_t dist_raw = buf[4] | (buf[5] &lt;&lt; 8);
+    point-&gt;distance = dist_raw;
+    
+    // 信号质量
+    point-&gt;quality = buf[6];
+    
+    return 0;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>实战小技巧：</strong>我在项目中遇到过一个问题——雷达数据偶尔会跳变，比如明明前面是墙，突然显示距离为0。后来发现是校验和没做。RPLIDAR的校验和算法是累加和取低8位，千万别偷懒不校验。</p>
+</div>
+
+<h3>1.2 IMU（MPU6050）姿态解算</h3>
+
+<p>IMU这东西，说白了就是告诉你车头朝哪、车身有没有倾斜。MPU6050集成了三轴加速度计和三轴陀螺仪，通过I2C接口读取数据。</p>
+
+<p>加速度计测的是重力在三个轴上的分量，陀螺仪测的是角速度。但单独用哪个都有问题：</p>
+
+<ul>
+  <li><strong>加速度计</strong>——静态准，动态时受震动干扰大</li>
+  <li><strong>陀螺仪</strong>——动态响应快，但会漂移</li>
+</ul>
+
+<p>所以需要融合。我常用的方法是<strong>互补滤波</strong>，简单又有效。</p>
+
+<p>先看初始化代码：</p>
+
+<pre><code>// MPU6050初始化
+void mpu6050_init(void) {
+    // 唤醒MPU6050
+    i2c_write_byte(MPU6050_ADDR, 0x6B, 0x00);
+    
+    // 设置加速度计量程为±2g
+    i2c_write_byte(MPU6050_ADDR, 0x1C, 0x00);
+    
+    // 设置陀螺仪量程为±250°/s
+    i2c_write_byte(MPU6050_ADDR, 0x1B, 0x00);
+    
+    // 设置数字低通滤波器
+    i2c_write_byte(MPU6050_ADDR, 0x1A, 0x06);
+}</code></pre>
+
+<p>姿态解算的核心是互补滤波：</p>
+
+<pre><code>// 互补滤波姿态解算
+#define Kp 0.98f  // 陀螺仪权重
+#define Ki 0.02f  // 加速度计权重
+
+void complementary_filter(float ax, float ay, float az,
+                          float gx, float gy, float gz, float dt) {
+    // 从加速度计计算俯仰角和横滚角
+    float accel_pitch = atan2(-ax, sqrt(ay*ay + az*az)) * 180.0f / M_PI;
+    float accel_roll  = atan2(ay, az) * 180.0f / M_PI;
+    
+    // 陀螺仪积分
+    gyro_pitch += gx * dt;
+    gyro_roll  += gy * dt;
+    
+    // 互补融合
+    pitch = Kp * (pitch + gx * dt) + Ki * accel_pitch;
+    roll  = Kp * (roll  + gy * dt) + Ki * accel_roll;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>MPU6050的原始数据是16位有符号整数，需要根据量程转换成实际的物理值。比如±2g量程下，每LSB对应16384 LSB/g。我见过有人直接拿原始值去算角度，结果可想而知。</p>
+</div>
+
+<h3>1.3 编码器速度计算</h3>
+
+<p>编码器是AGV的“里程计”。它装在电机轴上，每转一圈输出固定数量的脉冲。通过统计单位时间内的脉冲数，就能算出速度。</p>
+
+<p>常用的编码器有增量式和绝对值式两种。AGV上大多用增量式，AB两相输出，相位差90°，可以判断方向。</p>
+
+<p>STM32的定时器有编码器模式，硬件上就能完成脉冲计数和方向判断，省心不少。</p>
+
+<pre><code>// 定时器编码器模式配置
+void encoder_timer_init(void) {
+    TIM_EncoderInterfaceConfig(TIM2, TIM_ENCODERMODE_TI12,
+                               TIM_ICPolarity_Rising, TIM_ICPolarity_Rising);
+    TIM_Cmd(TIM2, ENABLE);
+}
+
+// 速度计算（单位：mm/s）
+float calc_speed(int32_t pulse_cnt, float dt_ms) {
+    // 编码器分辨率：每转脉冲数
+    const float PULSE_PER_REV = 1024.0f;
+    // 车轮直径（mm）
+    const float WHEEL_DIAMETER = 100.0f;
+    // 减速比
+    const float GEAR_RATIO = 30.0f;
+    
+    // 每脉冲对应的移动距离（mm）
+    float dist_per_pulse = (M_PI * WHEEL_DIAMETER) / 
+                           (PULSE_PER_REV * GEAR_RATIO);
+    
+    // 速度 = 脉冲数 * 每脉冲距离 / 时间
+    float speed = (pulse_cnt * dist_per_pulse) / (dt_ms / 1000.0f);
+    
+    return speed;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里发现，AGV走直线时左右轮编码器读数差异很大。排查了半天，发现是编码器安装时联轴器没锁紧，有轻微打滑。所以编码器安装后，一定要做<strong>空转测试</strong>，确认脉冲数稳定。</p>
+</div>
+
+<h3>1.4 三种传感器如何协同工作</h3>
+
+<p>你可能会问：这三个传感器各干各的，怎么配合？</p>
+
+<p>我打个比方：</p>
+<ul>
+  <li><strong>激光雷达</strong>负责看路——检测障碍物，构建地图</li>
+  <li><strong>IMU</strong>负责感觉——知道车身姿态，辅助定位</li>
+  <li><strong>编码器</strong>负责记步——推算走了多远</li>
+</ul>
+
+<p>在实际的AGV控制器中，这三个传感器的数据会以不同的频率被采集，然后送入融合算法（比如卡尔曼滤波），最终得到更准确的位置和姿态估计。</p>
+
+<p>数据采集的时序安排也很重要。我一般这样分配：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background-color:#e3f2fd;">
+    <th>传感器</th>
+    <th>采样频率</th>
+    <th>数据用途</th>
+  </tr>
+  <tr>
+    <td>激光雷达</td>
+    <td>5-10 Hz</td>
+    <td>环境感知、避障</td>
+  </tr>
+  <tr>
+    <td>IMU</td>
+    <td>100-200 Hz</td>
+    <td>姿态估计、辅助定位</td>
+  </tr>
+  <tr>
+    <td>编码器</td>
+    <td>50-100 Hz</td>
+    <td>速度控制、里程计算</td>
+  </tr>
+</table>
+
+<p>嗯，这一章的内容就到这里。三种传感器的驱动和解析方法，都是AGV开发的“基本功”。你把这些吃透了，后面讲运动控制、路径规划的时候，才能得心应手。</p>
+
+<hr style="border:1px dashed #ccc; margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="05MotorControlBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07CommunicationProtocol.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

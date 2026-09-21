@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 路径规划基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="active">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 路径规划基础：环境建模、拓扑地图、栅格地图、A*算法原理</h2>
+
+<p>各位同学，欢迎来到第四章。</p>
+<p>前面我们聊了AGV的硬件、通信和调度架构。但有个核心问题一直没解决——<strong>车到底该怎么走？</strong></p>
+<p>你想想看，一辆AGV在车间里跑，它要知道自己从A点到B点，中间有没有障碍物，哪条路最近，哪条路不堵车。这就是路径规划要干的事。</p>
+<p>我个人习惯把路径规划拆成两步：<strong>第一步，把现实世界变成计算机能理解的数据结构（环境建模）；第二步，在这个数据结构上找出一条最优路径（搜索算法）。</strong></p>
+<p>好，我们一步步来。</p>
+
+<h3>4.1 环境建模：把物理世界“翻译”给机器</h3>
+
+<p>AGV不像人，它没有“直觉”。它需要我们把车间、仓库、走廊这些物理空间，用一种它看得懂的方式描述出来。</p>
+<p>说白了，环境建模就是<strong>“翻译”</strong>。</p>
+<p>常见的建模方式有三种：</p>
+
+<ul>
+  <li><strong>拓扑地图</strong>：只保留节点和连接关系，像地铁线路图。</li>
+  <li><strong>栅格地图</strong>：把空间切成一个个小格子，每个格子标记“可通行”或“障碍物”。</li>
+  <li><strong>几何地图</strong>：用精确的坐标和几何形状描述环境，比如激光SLAM建出来的图。</li>
+</ul>
+
+<p>在AGV调度系统里，<strong>拓扑地图和栅格地图用得最多</strong>。几何地图通常用于单车的定位和避障，不太适合多车协同的全局规划。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>环境建模没有“最好”，只有“最合适”。拓扑地图轻量、快，适合大范围路径规划；栅格地图精细、灵活，适合局部避障和动态环境。</p>
+</div>
+
+<h3>4.2 拓扑地图：用“点”和“线”说话</h3>
+
+<p>拓扑地图，说白了就是一张<strong>“节点-边”图</strong>。</p>
+<p>节点代表关键位置，比如工位、充电站、交叉口、货架入口。边代表可通行的路径，比如一段直道、一个转弯。</p>
+<p>我在项目中遇到过这样一个场景：一个汽车零部件仓库，面积很大，但AGV只走固定路线。如果用栅格地图，整个仓库几千平米全要建图，数据量太大。后来我改用拓扑地图，只标注了30多个节点和50多条边，调度系统跑起来飞快。</p>
+
+<p><strong>拓扑地图的构建要点：</strong></p>
+<ul>
+  <li><strong>节点要“有意义”</strong>：不是随便一个点都能当节点。必须是AGV需要停、需要拐弯、需要决策的地方。</li>
+  <li><strong>边要“可通行”</strong>：每条边都要确认AGV能安全通过，包括宽度、转弯半径、地面承重等。</li>
+  <li><strong>权重要“真实”</strong>：边的权重不只是距离，还要考虑时间、能耗、拥堵概率。我曾经吃过亏，只按距离算权重，结果AGV全挤到一条近路上，堵成一锅粥。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>拓扑地图适合<strong>结构化环境</strong>，比如工厂车间、仓库通道。如果环境经常变化（比如临时堆货），拓扑地图维护起来会很痛苦。这时候栅格地图更合适。</p>
+</div>
+
+<h3>4.3 栅格地图：把世界切成“像素”</h3>
+
+<p>栅格地图的思路很直观：把环境划分成一个个大小相同的格子（比如10cm×10cm），每个格子标记为“空闲”、“占用”或“未知”。</p>
+<p>你想想看，这就像一张黑白像素图。白色格子可以走，黑色格子不能走。</p>
+
+<p><strong>栅格地图的优缺点：</strong></p>
+<table>
+  <tr>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>实现简单，容易理解</td>
+    <td>网格大小影响精度和性能</td>
+  </tr>
+  <tr>
+    <td>容易融合传感器数据（激光、超声波）</td>
+    <td>大范围环境内存占用高</td>
+  </tr>
+  <tr>
+    <td>适合动态障碍物更新</td>
+    <td>路径可能不够平滑（锯齿状）</td>
+  </tr>
+</table>
+
+<p>我记得有一次做AGV项目，客户要求AGV在仓库里能绕开临时堆放的货物。拓扑地图改起来太麻烦，我直接上了栅格地图。AGV每扫描到新障碍物，就把对应格子标记为“占用”，路径规划自动避开。效果立竿见影。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>栅格地图的网格大小很关键。网格太大，路径精度不够，AGV可能撞到障碍物；网格太小，计算量爆炸，实时性跟不上。我个人建议：<strong>网格大小取AGV宽度的一半到三分之一</strong>。比如AGV宽80cm，网格设30cm左右比较合适。</p>
+</div>
+
+<h3>4.4 A*算法原理：启发式搜索的“扛把子”</h3>
+
+<p>地图建好了，接下来就是找路。在AGV领域，<strong>A*算法</strong>是绝对的主流。</p>
+<p>为什么是A*？因为它比Dijkstra快，比BFS聪明。</p>
+
+<p><strong>A*的核心公式：</strong></p>
+<pre><code>F(n) = G(n) + H(n)</code></pre>
+
+<ul>
+  <li><strong>G(n)</strong>：从起点到当前节点n的实际代价（已经花掉的路程）。</li>
+  <li><strong>H(n)</strong>：从当前节点n到终点的估计代价（还要花多少，通常用曼哈顿距离或欧几里得距离）。</li>
+  <li><strong>F(n)</strong>：总代价，A*每次选F值最小的节点去探索。</li>
+</ul>
+
+<p>说白了，A*就是<strong>“既要看过去，也要看未来”</strong>。Dijkstra只看过去（G值），所以它像个无头苍蝇一样四面八方乱搜。A*有了H值的引导，会朝着终点方向优先搜索，效率高得多。</p>
+
+<p><strong>A*算法的基本步骤：</strong></p>
+<ol>
+  <li>把起点加入Open List（待探索列表）。</li>
+  <li>从Open List中取出F值最小的节点，记为当前节点。</li>
+  <li>如果当前节点是终点，搜索结束，回溯路径。</li>
+  <li>否则，遍历当前节点的所有邻居节点：
+    <ul>
+      <li>如果邻居不可通行（障碍物），跳过。</li>
+      <li>计算邻居的G、H、F值。</li>
+      <li>如果邻居不在Open List中，加入；如果在，且新G值更小，更新。</li>
+    </ul>
+  </li>
+  <li>把当前节点移入Close List（已探索列表）。</li>
+  <li>重复步骤2-5，直到找到终点或Open List为空。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>避坑指南：</strong>我曾经在项目里直接用A*跑栅格地图，结果AGV走出来的路径全是锯齿状的折线。后来加了<strong>路径平滑</strong>处理（比如用B样条曲线拟合），AGV走起来才顺滑。记住：A*找到的路径是“可行路径”，不一定是“可执行路径”。</p>
+</div>
+
+<h3>4.5 三种地图与A*的配合关系</h3>
+
+<p>为了让你更直观地理解，我画了一张图：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">环境建模与路径规划关系图</text>
+  
+  <!-- 物理世界 -->
+  <rect x="50" y="80" width="200" height="60" rx="10" fill="#3498db" opacity="0.8"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">物理世界</text>
+  <text x="150" y="135" text-anchor="middle" font-size="12" fill="white">（车间、仓库、走廊）</text>
+  
+  <!-- 箭头1 -->
+  <line x1="250" y1="110" x2="320" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="285" y="100" text-anchor="middle" font-size="12" fill="#2c3e50">环境建模</text>
+  
+  <!-- 三种地图 -->
+  <rect x="330" y="60" width="180" height="40" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="420" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">拓扑地图</text>
+  
+  <rect x="330" y="110" width="180" height="40" rx="8" fill="#e67e22" opacity="0.8"/>
+  <text x="420" y="135" text-anchor="middle" font-size="14" fill="white" font-weight="bold">栅格地图</text>
+  
+  <rect x="330" y="160" width="180" height="40" rx="8" fill="#9b59b6" opacity="0.8"/>
+  <text x="420" y="185" text-anchor="middle" font-size="14" fill="white" font-weight="bold">几何地图</text>
+  
+  <!-- 箭头2 -->
+  <line x1="510" y1="110" x2="580" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="545" y="100" text-anchor="middle" font-size="12" fill="#2c3e50">搜索算法</text>
+  
+  <!-- A*算法 -->
+  <rect x="590" y="80" width="160" height="60" rx="10" fill="#27ae60" opacity="0.8"/>
+  <text x="670" y="110" text-anchor="middle" font-size="16" fill="white" font-weight="bold">A*算法</text>
+  <text x="670" y="130" text-anchor="middle" font-size="12" fill="white">（启发式搜索）</text>
+  
+  <!-- 箭头3 -->
+  <line x1="670" y1="140" x2="670" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出路径 -->
+  <rect x="570" y="200" width="200" height="50" rx="10" fill="#1abc9c" opacity="0.8"/>
+  <text x="670" y="225" text-anchor="middle" font-size="14" fill="white" font-weight="bold">最优路径</text>
+  <text x="670" y="242" text-anchor="middle" font-size="12" fill="white">（节点序列/栅格序列）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="300" text-anchor="middle" font-size="13" fill="#7f8c8d">拓扑地图 + A* → 适合大范围、结构化环境</text>
+  <text x="400" y="320" text-anchor="middle" font-size="13" fill="#7f8c8d">栅格地图 + A* → 适合动态、精细环境</text>
+  <text x="400" y="340" text-anchor="middle" font-size="13" fill="#7f8c8d">几何地图 + A* → 适合高精度、单车导航</text>
+</svg>
+
+<p>嗯，这张图把关系理得很清楚了。你想想看，实际项目中往往是<strong>多种地图配合使用</strong>。比如全局用拓扑地图做快速规划，局部用栅格地图做避障调整。A*算法在两种地图上都能跑，只是邻居节点的定义不同——拓扑地图里是相邻节点，栅格地图里是相邻格子。</p>
+
+<h3>4.6 实战中的选择建议</h3>
+
+<p>说了这么多，到底怎么选？我根据自己的项目经验，给你几个参考：</p>
+
+<ul>
+  <li><strong>场景一：固定路线、环境稳定</strong> → 拓扑地图 + A*。轻量、高效、维护成本低。</li>
+  <li><strong>场景二：环境动态变化、需要避障</strong> → 栅格地图 + A*。灵活、实时性好。</li>
+  <li><strong>场景三：大范围 + 局部动态</strong> → 拓扑地图全局规划 + 栅格地图局部规划。这是工业AGV最常用的方案。</li>
+  <li><strong>场景四：高精度定位、狭窄通道</strong> → 几何地图 + A*（或更高级的Hybrid A*）。适合AGV在狭小空间里精确移动。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>如果你用栅格地图，可以给不同格子设置不同的“通行代价”。比如靠近障碍物的格子代价高一点，AGV就会自动远离障碍物走。这比单纯标记“可通行/不可通行”要智能得多。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。环境建模和A*算法是AGV路径规划的基石，理解了它们，后面讲多车协同避障、交通管制就好办了。</p>
+
+<p>记住：<strong>地图是基础，算法是灵魂</strong>。地图建得不好，算法再牛也白搭。</p>
+
+<div class="footer-nav">
+            <a href="03TaskManagement.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05MultiAgvPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

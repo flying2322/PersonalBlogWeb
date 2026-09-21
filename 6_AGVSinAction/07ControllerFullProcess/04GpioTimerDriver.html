@@ -1,0 +1,438 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 基础驱动开发（GPIO与定时器）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="active">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 基础驱动开发：GPIO与定时器</h2>
+
+<p>各位同学，今天咱们聊聊AGV控制器开发中最基础、也最绕不开的一环——GPIO和定时器。说实话，很多新手一上来就急着调运动控制、搞路径规划，结果连个LED都点不亮，编码器脉冲也读不准。我当年带项目时就吃过这个亏，后来老老实实把底层驱动打磨扎实了，上层应用才跑得顺。</p>
+
+<p>这一章，我会带着大家把GPIO初始化、中断配置、定时器PWM生成、编码器脉冲捕获，还有SysTick系统时钟，一个一个啃下来。别急，咱们慢慢来。</p>
+
+<h3>1. GPIO初始化与中断</h3>
+
+<p>GPIO，说白了就是芯片的“手脚”。你要让AGV的电机驱动板知道“往前走”，或者让传感器告诉芯片“我检测到障碍物了”，都得靠GPIO。</p>
+
+<p>我个人习惯，写GPIO驱动时先画个表格，把每个引脚的功能、方向、默认电平列清楚。不然项目一复杂，引脚复用起来容易乱。</p>
+
+<table>
+  <tr>
+    <th>引脚</th>
+    <th>功能</th>
+    <th>方向</th>
+    <th>默认电平</th>
+  </tr>
+  <tr>
+    <td>PA0</td>
+    <td>急停按钮输入</td>
+    <td>输入</td>
+    <td>上拉高</td>
+  </tr>
+  <tr>
+    <td>PB1</td>
+    <td>电机使能输出</td>
+    <td>输出</td>
+    <td>低</td>
+  </tr>
+  <tr>
+    <td>PC2</td>
+    <td>编码器A相</td>
+    <td>输入</td>
+    <td>浮空</td>
+  </tr>
+</table>
+
+<p>初始化代码其实很固定，我一般这样写：</p>
+
+<pre><code>void GPIO_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    // 使能时钟
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+
+    // 配置PA0为输入，上拉
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // 配置PB1为输出，推挽
+    GPIO_InitStruct.Pin = GPIO_PIN_1;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+}
+</code></pre>
+
+<div class="tip">
+  <strong>小技巧：</strong> 初始化时把不用的引脚也设成模拟输入或上拉输入，能省电，还能抗干扰。我在AGV项目里吃过亏，有个引脚悬空，结果半夜自己触发中断，AGV自己跑起来了……后来加了内部上拉才解决。
+</div>
+
+<h4>GPIO中断配置</h4>
+
+<p>中断，就是让芯片“放下手里的活，先来处理紧急事件”。比如急停按钮按下，必须立刻停车。</p>
+
+<p>配置中断分三步：</p>
+<ol>
+  <li>设置GPIO为中断模式（上升沿、下降沿或双边沿触发）</li>
+  <li>配置NVIC（嵌套向量中断控制器）优先级</li>
+  <li>编写中断服务函数</li>
+</ol>
+
+<pre><code>void GPIO_Interrupt_Init(void)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING; // 下降沿触发
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    // 配置NVIC
+    HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+}
+
+// 中断服务函数
+void EXTI0_IRQHandler(void)
+{
+    if(__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_0) != RESET)
+    {
+        // 急停！立刻停车
+        Motor_Stop();
+        __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_0);
+    }
+}
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong> 中断服务函数里不要做复杂运算，更不要调用HAL_Delay()这类阻塞函数。我曾经见过有人在中端里打印日志，结果系统直接卡死。中断里只做标志位设置，具体处理放到主循环。
+</div>
+
+<h3>2. 定时器PWM生成</h3>
+
+<p>AGV的电机调速，靠的就是PWM（脉宽调制）。说白了，就是让电压快速开关，通过占空比控制平均电压，从而控制电机转速。</p>
+
+<p>我一般用通用定时器（比如TIM2、TIM3）来生成PWM。配置要点：</p>
+<ul>
+  <li>设置预分频器（PSC）和自动重装载值（ARR）决定PWM频率</li>
+  <li>设置比较值（CCR）决定占空比</li>
+  <li>选择PWM模式1或模式2</li>
+</ul>
+
+<pre><code>void PWM_Init(void)
+{
+    TIM_HandleTypeDef htim2;
+    TIM_OC_InitTypeDef sConfigOC = {0};
+
+    __HAL_RCC_TIM2_CLK_ENABLE();
+
+    htim2.Instance = TIM2;
+    htim2.Init.Prescaler = 84 - 1;      // 84MHz / 84 = 1MHz
+    htim2.Init.Period = 1000 - 1;       // 1MHz / 1000 = 1kHz
+    htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_PWM_Init(&htim2);
+
+    sConfigOC.OCMode = TIM_OCMODE_PWM1;
+    sConfigOC.Pulse = 500;              // 50%占空比
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+    HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_1);
+
+    HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+}
+</code></pre>
+
+<div class="highlight">
+  <strong>核心要点：</strong> PWM频率不能太低，否则电机会发出嗡嗡声；也不能太高，否则MOS管开关损耗大。AGV电机一般用10kHz~20kHz，我习惯用16kHz，人耳不太敏感。
+</div>
+
+<h3>3. 编码器脉冲捕获</h3>
+
+<p>AGV要知道自己走了多远、速度多快，靠的就是编码器。增量式编码器输出两路相位差90°的脉冲（A相和B相），通过捕获这两路脉冲，就能算出位置和方向。</p>
+
+<p>我推荐用定时器的编码器模式，硬件自动处理，省CPU资源。配置如下：</p>
+
+<pre><code>void Encoder_Init(void)
+{
+    TIM_HandleTypeDef htim3;
+
+    __HAL_RCC_TIM3_CLK_ENABLE();
+
+    htim3.Instance = TIM3;
+    htim3.Init.Prescaler = 0;           // 不分频
+    htim3.Init.Period = 0xFFFF;         // 最大计数值
+    htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_Encoder_Init(&htim3, &sEncoderConfig);
+
+    // 编码器配置
+    sEncoderConfig.EncoderMode = TIM_ENCODERMODE_TI12; // 双沿捕获
+    sEncoderConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
+    sEncoderConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
+    HAL_TIM_Encoder_Init(&htim3, &sEncoderConfig);
+
+    HAL_TIM_Encoder_Start(&htim3, TIM_CHANNEL_ALL);
+}
+
+// 读取编码器值
+int32_t Get_Encoder_Count(void)
+{
+    return (int16_t)__HAL_TIM_GET_COUNTER(&htim3);
+}
+</code></pre>
+
+<div class="tip">
+  <strong>避坑指南：</strong> 我曾经遇到过编码器计数跳变的问题，查了半天发现是信号线没加滤波电容。编码器脉冲频率高，线长一点就容易受干扰。建议在硬件上加RC滤波，软件里也可以做消抖处理。
+</div>
+
+<h3>4. SysTick系统时钟</h3>
+
+<p>SysTick是ARM Cortex-M内核自带的24位递减定时器，专门用来产生系统滴答中断。HAL库里的HAL_Delay()、各种超时判断，都靠它。</p>
+
+<p>配置其实很简单，HAL库在初始化时已经帮我们做好了。但我想强调的是：<strong>SysTick的优先级一定要设得合适</strong>。设太高，会影响其他实时任务；设太低，HAL_Delay()会不准。</p>
+
+<pre><code>// HAL库默认配置，一般在SystemClock_Config()里调用
+HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000); // 1ms中断一次
+HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+HAL_NVIC_SetPriority(SysTick_IRQn, 15, 0); // 最低优先级
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong> 不要在中断里调用HAL_Delay()！因为HAL_Delay()依赖SysTick中断，而SysTick中断优先级可能比当前中断低，导致死锁。我见过有人踩了这个坑，调试了一整天。
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的本章知识结构。你可以把它当成一张地图，学完后再回来看，会更有感觉。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+
+  <!-- 中心标题 -->
+  <rect x="250" y="20" width="300" height="50" fill="#4a90d9" rx="10"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="20" font-weight="bold">基础驱动开发</text>
+
+  <!-- 四个模块 -->
+  <!-- GPIO -->
+  <rect x="50" y="120" width="160" height="60" fill="#5cb85c" rx="8"/>
+  <text x="130" y="155" text-anchor="middle" fill="white" font-size="16" font-weight="bold">GPIO</text>
+
+  <!-- 定时器 -->
+  <rect x="320" y="120" width="160" height="60" fill="#f0ad4e" rx="8"/>
+  <text x="400" y="155" text-anchor="middle" fill="white" font-size="16" font-weight="bold">定时器</text>
+
+  <!-- 编码器 -->
+  <rect x="590" y="120" width="160" height="60" fill="#d9534f" rx="8"/>
+  <text x="670" y="155" text-anchor="middle" fill="white" font-size="16" font-weight="bold">编码器</text>
+
+  <!-- SysTick -->
+  <rect x="320" y="380" width="160" height="60" fill="#5bc0de" rx="8"/>
+  <text x="400" y="415" text-anchor="middle" fill="white" font-size="16" font-weight="bold">SysTick</text>
+
+  <!-- 连线 -->
+  <line x1="130" y1="180" x2="130" y2="280" stroke="#5cb85c" stroke-width="2"/>
+  <line x1="400" y1="180" x2="400" y2="280" stroke="#f0ad4e" stroke-width="2"/>
+  <line x1="670" y1="180" x2="670" y2="280" stroke="#d9534f" stroke-width="2"/>
+  <line x1="400" y1="340" x2="400" y2="380" stroke="#5bc0de" stroke-width="2"/>
+
+  <!-- 子功能 -->
+  <rect x="30" y="280" width="200" height="40" fill="#e8f5e9" rx="5" stroke="#5cb85c"/>
+  <text x="130" y="305" text-anchor="middle" fill="#333" font-size="13">初始化 / 中断配置</text>
+
+  <rect x="300" y="280" width="200" height="40" fill="#fff3e0" rx="5" stroke="#f0ad4e"/>
+  <text x="400" y="305" text-anchor="middle" fill="#333" font-size="13">PWM生成 / 捕获</text>
+
+  <rect x="570" y="280" width="200" height="40" fill="#fce4ec" rx="5" stroke="#d9534f"/>
+  <text x="670" y="305" text-anchor="middle" fill="#333" font-size="13">脉冲计数 / 方向判断</text>
+
+  <rect x="300" y="440" width="200" height="40" fill="#e1f5fe" rx="5" stroke="#5bc0de"/>
+  <text x="400" y="465" text-anchor="middle" fill="#333" font-size="13">系统时钟 / 延时基准</text>
+
+  <!-- 中心连接线 -->
+  <line x1="130" y1="120" x2="250" y2="70" stroke="#4a90d9" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="400" y1="120" x2="400" y2="70" stroke="#4a90d9" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="670" y1="120" x2="550" y2="70" stroke="#4a90d9" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="400" y1="380" x2="400" y2="70" stroke="#4a90d9" stroke-width="2" stroke-dasharray="5,5"/>
+</svg>
+
+<p>这张图里，GPIO和定时器是基础中的基础。编码器依赖定时器的捕获功能，SysTick则是一个特殊的定时器。把这四个模块吃透了，AGV的底层驱动你就掌握了七成。</p>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong></p>
+  <ul>
+    <li>GPIO：芯片的“手脚”，输入输出加中断</li>
+    <li>定时器PWM：电机调速的核心，频率和占空比要算准</li>
+    <li>编码器捕获：AGV的“眼睛”，知道位置和速度</li>
+    <li>SysTick：系统的“心跳”，一切延时和超时的基准</li>
+  </ul>
+</div>
+
+<p>嗯，这一章的内容就到这儿。代码不多，但每行都值得你亲手敲一遍。下一章咱们聊更深入的内容，到时候见。</p>
+
+<div class="footer-nav">
+            <a href="03DevEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05MotorControlBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

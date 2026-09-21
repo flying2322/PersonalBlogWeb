@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 运动控制模块设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="active">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 运动控制模块设计：两轮差速模型、PID速度控制、加速度与减速度规划、轨迹跟踪</h2>
+
+<p>各位同学，今天我们来聊聊AGV运动控制里最核心的一块——两轮差速模型。说实话，我在这个领域摸爬滚打十几年，见过太多项目栽在运动控制上。硬件选得再好，算法写得再花哨，运动控制这块要是拉胯了，车跑起来就跟喝醉了酒似的，左右摇摆，定位精度一塌糊涂。</p>
+
+<p>所以，咱们今天把这四个核心知识点掰开揉碎了讲清楚。</p>
+
+<h3>6.1 两轮差速运动模型</h3>
+
+<p>先说说两轮差速模型。说白了，就是靠左右两个驱动轮的转速差来实现转向。你想想看，左轮转得快、右轮转得慢，车就往右拐；反过来就往左拐。两个轮子转速一样，那就直着走。</p>
+
+<p>这个模型在数学上其实挺简单的。我给大家一个最常用的公式：</p>
+
+<pre><code>// 两轮差速模型核心公式
+v = (v_right + v_left) / 2          // 车体线速度
+ω = (v_right - v_left) / L          // 车体角速度，L为轮距
+
+// 逆运动学：从目标速度到轮速
+v_left  = v - (ω * L) / 2
+v_right = v + (ω * L) / 2
+</code></pre>
+
+<p>嗯，这里要注意一个坑。我在项目里遇到过，很多人直接把轮子转速当成线速度来算。实际上，轮子转速是角速度，要乘以轮子半径才能得到线速度。这个转换千万别忘了。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong>我曾经在一个项目中，同事直接用电机编码器的脉冲数代入公式，结果车跑起来轨迹完全不对。后来排查了半天，发现是忘了做单位换算。轮子半径、编码器线数、减速比，这三个参数必须校准到位。
+</div>
+
+<h3>6.2 PID速度控制</h3>
+
+<p>有了运动模型，接下来就是怎么让轮子精确地跑到目标转速。PID控制，这是最经典的方法，也是我个人的首选。</p>
+
+<p>PID的公式大家应该都熟悉：</p>
+
+<pre><code>// 位置式PID
+error = target_speed - current_speed
+integral += error * dt
+derivative = (error - last_error) / dt
+output = Kp * error + Ki * integral + Kd * derivative
+last_error = error
+</code></pre>
+
+<p>但实际工程中，我建议你用增量式PID。为什么？因为位置式PID的积分项容易饱和，一旦积分饱和，系统响应会变得很迟钝。增量式PID只计算输出变化量，天然抗饱和。</p>
+
+<pre><code>// 增量式PID
+error = target_speed - current_speed
+delta_output = Kp * (error - last_error) + Ki * error + Kd * (error - 2*last_error + last_last_error)
+output += delta_output
+
+// 更新历史误差
+last_last_error = last_error
+last_error = error
+</code></pre>
+
+<div class="tip">
+  <strong>调参心得：</strong>我个人习惯先调Kp，让系统能快速响应但不振荡。然后加一点Kd抑制超调。最后才加Ki消除静差。记住，Ki不要太大，否则系统会低频振荡。我见过有人把Ki调得很大，结果轮子一直在目标转速附近来回晃，就是稳不住。
+</div>
+
+<h3>6.3 加速度与减速度规划</h3>
+
+<p>速度控制搞定了，但还有个问题——你直接给轮子一个阶跃速度指令，电机瞬间加速，车体就会猛地一冲。这在AGV上绝对不行，货物会倒，定位会偏。</p>
+
+<p>所以我们需要做加速度规划。说白了，就是让速度平滑地变化，而不是跳变。</p>
+
+<p>最常用的方法是梯形速度规划：</p>
+
+<pre><code>// 梯形速度规划
+// 输入：目标速度v_target，当前速度v_current，最大加速度a_max，控制周期dt
+
+if (v_target > v_current) {
+    // 加速阶段
+    v_cmd = v_current + a_max * dt;
+    if (v_cmd > v_target) v_cmd = v_target;
+} else if (v_target < v_current) {
+    // 减速阶段
+    v_cmd = v_current - a_max * dt;
+    if (v_cmd < v_target) v_cmd = v_target;
+} else {
+    v_cmd = v_target;
+}
+</code></pre>
+
+<p>但梯形规划有个问题——加速度突变。从零加速到最大加速度那一瞬间，其实还是有冲击。更平滑的做法是用S形曲线规划，也就是加速度本身也是连续变化的。</p>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>对于一般的AGV，梯形规划已经够用了。但如果你做的是重载AGV或者运载精密仪器的AGV，我建议上S形曲线。我曾经帮一个客户调试半导体晶圆搬运AGV，用梯形规划时晶圆总是轻微移位，换成S形曲线后问题就解决了。</p>
+</div>
+
+<h3>6.4 轨迹跟踪</h3>
+
+<p>最后一块，轨迹跟踪。前面我们讲了怎么控制轮子转速，怎么平滑加减速，但这些都是底层的。上层要给运动控制模块发什么指令？是发目标点坐标，还是发路径点序列？</p>
+
+<p>常用的轨迹跟踪方法有两种：</p>
+
+<ul>
+  <li><strong>Pure Pursuit（纯追踪法）</strong>：在路径上找一个前瞻点，然后控制车体朝这个点运动。简单直观，适合低速场景。</li>
+  <li><strong>Stanley方法</strong>：基于前轮偏角的控制方法，收敛性更好，适合高速场景。</li>
+</ul>
+
+<p>我个人更常用Pure Pursuit，因为它实现简单，而且对路径的平滑度要求不高。核心逻辑如下：</p>
+
+<pre><code>// Pure Pursuit 核心算法
+// 输入：当前位姿(x, y, yaw)，路径点序列path[]，前瞻距离lookahead
+
+// 1. 找到距离当前位置为lookahead的路径点
+target_point = findLookaheadPoint(path, x, y, lookahead);
+
+// 2. 计算目标点相对于车体的角度
+alpha = atan2(target_point.y - y, target_point.x - x) - yaw;
+
+// 3. 计算曲率半径
+curvature = 2 * sin(alpha) / lookahead;
+
+// 4. 根据曲率计算左右轮速
+v_left  = v_target * (1 - curvature * L / 2);
+v_right = v_target * (1 + curvature * L / 2);
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong>前瞻距离的选择很关键。太短了，车会振荡；太长了，车会切弯。我一般把前瞻距离设为车体长度的2-3倍，然后根据车速动态调整。车速快的时候前瞻远一点，车速慢的时候近一点。
+</div>
+
+<p>好了，这四个知识点串起来，就是一个完整的运动控制模块。从运动模型到速度控制，再到加减速规划，最后到轨迹跟踪，每一层都有它的作用。少了任何一个环节，AGV都跑不好。</p>
+
+<p>下面这张图是我自己画的运动控制模块架构图，大家可以对照着理解：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV运动控制模块架构</text>
+  
+  <!-- 顶层：轨迹规划 -->
+  <rect x="250" y="60" width="300" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" fill="white" font-weight="bold">轨迹规划层</text>
+  <text x="400" y="112" text-anchor="middle" font-size="12" fill="#ecf0f1">Pure Pursuit / Stanley 轨迹跟踪</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：速度规划 -->
+  <rect x="250" y="150" width="300" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="185" text-anchor="middle" font-size="16" fill="white" font-weight="bold">速度规划层</text>
+  <text x="400" y="202" text-anchor="middle" font-size="12" fill="#ecf0f1">梯形/S形加减速规划</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="210" x2="400" y2="240" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：速度控制 -->
+  <rect x="250" y="240" width="300" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="275" text-anchor="middle" font-size="16" fill="white" font-weight="bold">速度控制层</text>
+  <text x="400" y="292" text-anchor="middle" font-size="12" fill="#ecf0f1">增量式PID / 位置式PID</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="300" x2="400" y2="330" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：运动模型 -->
+  <rect x="250" y="330" width="300" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="365" text-anchor="middle" font-size="16" fill="white" font-weight="bold">运动模型层</text>
+  <text x="400" y="382" text-anchor="middle" font-size="12" fill="#ecf0f1">两轮差速模型（正/逆运动学）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="390" x2="400" y2="420" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底层：电机驱动 -->
+  <rect x="250" y="420" width="300" height="50" rx="8" fill="#34495e" opacity="0.9"/>
+  <text x="400" y="450" text-anchor="middle" font-size="16" fill="white" font-weight="bold">电机驱动层</text>
+  <text x="400" y="465" text-anchor="middle" font-size="11" fill="#bdc3c7">左轮电机 / 右轮电机</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边说明 -->
+  <rect x="580" y="60" width="200" height="410" rx="8" fill="#fff3cd" opacity="0.8"/>
+  <text x="680" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#856404">关键参数</text>
+  <text x="590" y="120" font-size="12" fill="#856404">• 轮距L</text>
+  <text x="590" y="145" font-size="12" fill="#856404">• 轮子半径r</text>
+  <text x="590" y="170" font-size="12" fill="#856404">• 编码器线数</text>
+  <text x="590" y="195" font-size="12" fill="#856404">• 减速比</text>
+  <text x="590" y="220" font-size="12" fill="#856404">• PID参数</text>
+  <text x="590" y="245" font-size="12" fill="#856404">• 最大加速度</text>
+  <text x="590" y="270" font-size="12" fill="#856404">• 前瞻距离</text>
+  <text x="590" y="295" font-size="12" fill="#856404">• 控制周期dt</text>
+  
+  <text x="680" y="340" text-anchor="middle" font-size="14" font-weight="bold" fill="#856404">常见问题</text>
+  <text x="590" y="365" font-size="11" fill="#856404">1. 单位换算错误</text>
+  <text x="590" y="385" font-size="11" fill="#856404">2. PID积分饱和</text>
+  <text x="590" y="405" font-size="11" fill="#856404">3. 前瞻距离不当</text>
+  <text x="590" y="425" font-size="11" fill="#856404">4. 加速度突变</text>
+</svg>
+
+<p>从这张图可以看得很清楚，运动控制模块是分层设计的。每一层只负责自己的事情，层与层之间通过标准接口通信。这样做的好处是，哪一层出了问题，我们可以单独调试，不影响其他层。</p>
+
+<p>举个例子，如果你发现AGV在转弯时轨迹偏差大，可能是轨迹跟踪层的前瞻距离没调好，也可能是速度控制层的PID参数不对，还可能是运动模型层的轮距参数没校准。分层设计让你能快速定位问题。</p>
+
+<div class="tip">
+  <strong>调试建议：</strong>我一般从底层往上调。先确保电机能精确响应速度指令（PID调好），再验证运动模型是否正确（让车走直线和圆弧），然后测试加减速规划是否平滑，最后才调轨迹跟踪。一层一层来，问题就清晰了。
+</div>
+
+<p>好了，以上就是运动控制模块设计的核心内容。两轮差速模型是基础，PID速度控制是保障，加减速规划是品质，轨迹跟踪是目标。这四个环节环环相扣，缺一不可。</p>
+
+<div class="footer-nav">
+            <a href="05PathPlanningModule.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07LocalizationMappingModule.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

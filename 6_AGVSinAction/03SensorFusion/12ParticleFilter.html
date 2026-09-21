@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 粒子滤波(PF)</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="active">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 粒子滤波(PF)：蒙特卡洛方法、重要性采样、重采样、粒子滤波定位</h2>
+
+<p>粒子滤波，这个名字听起来挺唬人的。其实说白了，它就是一套「用一堆随机点去猜位置」的方法。</p>
+
+<p>我刚开始接触SLAM的时候，对粒子滤波也是一头雾水。后来在AGV项目里调试定位，遇到一个特别头疼的问题——机器人从仓库出来，经过一段长长的金属货架走廊，激光雷达数据全是噪点，卡尔曼滤波直接崩了。嗯，那时候我才真正意识到，有些场景下，你非得用粒子滤波不可。</p>
+
+<h3>蒙特卡洛方法：用随机数解决确定性问题</h3>
+
+<p>蒙特卡洛方法的核心思想，我总结成一句话：<strong>如果算不出来，那就猜，多猜几次就准了</strong>。</p>
+
+<p>举个例子。你想知道一个不规则形状的面积，用公式算很麻烦。怎么办？往这个形状里随机撒点，数一数落在里面的点占总点数的比例，再乘以整个包围盒的面积，就得到了近似值。撒的点越多，结果越准。</p>
+
+<p>在定位问题里，我们面对的是同样的困境。机器人的真实位置是一个连续空间里的未知数，我们没法精确知道它在哪里。但我们可以撒一堆「粒子」——每个粒子代表一个可能的位置假设。然后让这些粒子在状态空间里传播、更新、筛选。</p>
+
+<div class="highlight">
+  <p><strong>关键理解：</strong>粒子数量决定了估计精度，也决定了计算开销。我一般建议在AGV场景下用500-2000个粒子。太少容易发散，太多实时性扛不住。</p>
+</div>
+
+<h3>重要性采样：给每个粒子打分</h3>
+
+<p>粒子撒下去了，问题来了——哪些粒子更可信？</p>
+
+<p>这就是重要性采样登场的时候。每个粒子都有一个权重，权重越高，代表这个粒子与当前观测数据越吻合。</p>
+
+<p>我记得有一次调试，发现机器人明明在走廊中间，但粒子全都聚集在墙边。排查了半天，发现是激光观测模型写错了——我把激光击中障碍物的概率算反了。嗯，这种坑踩过一次就记住了。</p>
+
+<p>重要性采样的流程其实很简单：</p>
+
+<ol>
+  <li><strong>预测阶段</strong>：根据运动模型，让每个粒子向前走一步（加一点噪声）</li>
+  <li><strong>更新阶段</strong>：用当前传感器观测数据，计算每个粒子的似然概率</li>
+  <li><strong>权重归一化</strong>：把所有粒子的权重加起来，每个权重除以总和</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>权重计算这一步最容易出bug。建议先写一个简单的仿真环境，用已知轨迹验证权重计算是否正确。别问我怎么知道的——我debug了整整两天才发现是角度单位搞混了。</p>
+</div>
+
+<h3>重采样：优胜劣汰</h3>
+
+<p>重要性采样之后，你会发现一个问题：大部分粒子的权重变得很小，只有少数几个粒子权重很大。这就是所谓的「粒子退化」现象。</p>
+
+<p>怎么办？重采样。</p>
+
+<p>重采样的本质就是「<strong>把权重高的粒子复制几份，把权重低的粒子扔掉</strong>」。这样，粒子总数不变，但分布更集中在高概率区域。</p>
+
+<p>常用的重采样方法有几种：</p>
+
+<table>
+  <tr>
+    <th>方法名称</th>
+    <th>原理</th>
+    <th>我个人的评价</th>
+  </tr>
+  <tr>
+    <td>多项式重采样</td>
+    <td>按权重比例随机抽取</td>
+    <td>实现简单，但方差较大</td>
+  </tr>
+  <tr>
+    <td>残差重采样</td>
+    <td>先确定保留份数，再随机补全</td>
+    <td>效率高，我项目里常用这个</td>
+  </tr>
+  <tr>
+    <td>系统重采样</td>
+    <td>等间隔抽取，减少随机性</td>
+    <td>稳定性好，适合高精度场景</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>注意：</strong>重采样不是越多越好。频繁重采样会导致「粒子贫化」——所有粒子都挤在一起，失去了多样性。我一般建议在有效粒子数低于总粒子数的一半时才触发重采样。</p>
+</div>
+
+<h3>粒子滤波定位：从理论到实践</h3>
+
+<p>好了，把上面三块拼起来，就是完整的粒子滤波定位流程。我画了一张图，帮你理清整个逻辑：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="420" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">粒子滤波定位流程</text>
+  
+  <!-- 初始化 -->
+  <rect x="260" y="55" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="85" text-anchor="middle" fill="white" font-size="14" font-weight="bold">初始化粒子群</text>
+  
+  <!-- 箭头1 -->
+  <line x1="360" y1="105" x2="360" y2="135" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 预测 -->
+  <rect x="260" y="135" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="360" y="165" text-anchor="middle" fill="white" font-size="14" font-weight="bold">预测：运动模型更新</text>
+  
+  <!-- 箭头2 -->
+  <line x1="360" y1="185" x2="360" y2="215" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 更新 -->
+  <rect x="260" y="215" width="200" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="360" y="245" text-anchor="middle" fill="white" font-size="14" font-weight="bold">更新：计算粒子权重</text>
+  
+  <!-- 箭头3 -->
+  <line x1="360" y1="265" x2="360" y2="295" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断 -->
+  <polygon points="360,295 440,330 360,365 280,330" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="360" y="334" text-anchor="middle" fill="white" font-size="12" font-weight="bold">有效粒子</text>
+  <text x="360" y="348" text-anchor="middle" fill="white" font-size="12" font-weight="bold">足够多？</text>
+  
+  <!-- 是 分支 -->
+  <text x="450" y="310" fill="#27ae60" font-size="13" font-weight="bold">是</text>
+  <line x1="440" y1="315" x2="520" y2="315" stroke="#27ae60" stroke-width="2"/>
+  <line x1="520" y1="315" x2="520" y2="165" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="460" y1="165" x2="520" y2="165" stroke="#27ae60" stroke-width="2"/>
+  <text x="530" y="240" fill="#27ae60" font-size="12" transform="rotate(90,530,240)">下一时刻</text>
+  
+  <!-- 否 分支 -->
+  <text x="250" y="310" fill="#e74c3c" font-size="13" font-weight="bold">否</text>
+  <line x1="280" y1="315" x2="200" y2="315" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="200" y1="315" x2="200" y2="240" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="200" y1="240" x2="260" y2="240" stroke="#e74c3c" stroke-width="2"/>
+  
+  <!-- 重采样 -->
+  <rect x="80" y="215" width="120" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="140" y="245" text-anchor="middle" fill="white" font-size="14" font-weight="bold">重采样</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="360" y="405" text-anchor="middle" fill="#7f8c8d" font-size="12">循环执行预测→更新→重采样，粒子逐渐收敛到真实位置</text>
+</svg>
+
+<p>实际写代码的时候，我习惯把粒子滤波封装成一个类。核心接口就三个：<code>predict()</code>、<code>update()</code>、<code>resample()</code>。这样调试起来方便，哪个环节出问题了直接定位。</p>
+
+<pre><code>class ParticleFilter:
+    def __init__(self, num_particles=1000):
+        self.particles = np.random.rand(num_particles, 3)  # x, y, theta
+        self.weights = np.ones(num_particles) / num_particles
+    
+    def predict(self, control, noise_std):
+        # 运动模型：加噪声
+        self.particles += control + np.random.randn(*self.particles.shape) * noise_std
+    
+    def update(self, observation, map_data):
+        # 计算每个粒子的观测似然
+        for i, p in enumerate(self.particles):
+            expected = self.raycast(p, map_data)
+            self.weights[i] = self.likelihood(observation, expected)
+        self.weights /= np.sum(self.weights)  # 归一化
+    
+    def resample(self):
+        # 系统重采样
+        cumsum = np.cumsum(self.weights)
+        step = cumsum[-1] / len(self.particles)
+        positions = np.arange(0, cumsum[-1], step) + np.random.rand() * step
+        indices = np.searchsorted(cumsum, positions)
+        self.particles = self.particles[indices]
+        self.weights = np.ones_like(self.weights) / len(self.weights)</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在重采样后忘记重置权重，导致下一轮权重累加时出现NaN。另外，粒子数量建议设置成2的幂次方（比如1024），这样在某些硬件加速场景下有奇效。</p>
+</div>
+
+<p>粒子滤波最大的优势是什么？<strong>它能处理非高斯、多模态的分布</strong>。什么意思呢？就是机器人可能同时觉得「我在A点」和「我在B点」都有道理——比如在对称的走廊里。卡尔曼滤波遇到这种情况就傻了，但粒子滤波可以同时保留这两种假设，直到后续观测数据打破歧义。</p>
+
+<p>当然，粒子滤波也有短板。计算量大、维度灾难（超过4维就很容易发散）、粒子退化问题。所以在实际AGV项目中，我通常的做法是：<strong>正常场景用卡尔曼滤波，遇到激光退化或者绑架问题时，切换到粒子滤波做全局重定位</strong>。两者互补，效果最好。</p>
+
+<p>嗯，粒子滤波就讲到这里。这套方法虽然老，但在实际工程中依然能打。关键是要理解它的本质——用一群随机样本去逼近真实分布，而不是试图精确求解。</p>
+
+<div class="footer-nav">
+            <a href="11UnscentedKalmanFilter.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13MultiSensorTimeSync.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

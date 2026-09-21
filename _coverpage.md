@@ -32,4 +32,5 @@
 
 [**LinkMe**](https://dominicli.bio/)
 [**KnowledgeRepo**](README.md)
+[**AGVS Courses**](/6_AGVSinAction/index.html ':ignore')
 [**Github Profile**](https://github.com/flying2322)

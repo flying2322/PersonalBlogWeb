@@ -1,0 +1,387 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 坐标系与位姿表示</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="active">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 坐标系与位姿表示：世界坐标系、机器人坐标系、欧拉角与四元数</h2>
+
+<p>各位同学，咱们今天聊点硬核的。坐标系和位姿表示，说白了就是回答三个问题：<strong>我在哪？我往哪看？我怎么描述这个状态？</strong></p>
+
+<p>我刚开始做AGV那会儿，觉得坐标系不就是个原点加三个轴嘛，有啥好讲的？结果第一次联调，车在车间里乱窜，定位数据跳得跟心电图似的。查了一整天，最后发现是坐标系定义搞反了。嗯，从那以后，我再也不敢小看这个基础环节了。</p>
+
+<h3>2.1 世界坐标系与机器人坐标系</h3>
+
+<p>先说说两个最常用的坐标系。</p>
+
+<p><strong>世界坐标系</strong>，也叫全局坐标系。你可以把它想象成一张大地图，原点固定，方向固定。比如工厂车间里，我们通常把原点设在某个墙角，X轴指向东，Y轴指向北。这个坐标系是<strong>绝对参考</strong>，所有地图、路径、目标点都基于它定义。</p>
+
+<p><strong>机器人坐标系</strong>，也叫本体坐标系。原点在机器人中心，X轴朝前，Y轴朝左（或者朝右，看你的习惯）。这个坐标系是<strong>相对参考</strong>，跟着机器人一起动。传感器数据、控制指令通常都在这个坐标系下表达。</p>
+
+<p>为什么要区分这两个？你想想看，激光雷达扫到的障碍物，距离是相对于机器人自身的。但你要规划路径，得知道障碍物在世界地图上的位置。这就涉及到坐标变换。</p>
+
+<div class="highlight">
+  <p><strong>核心公式：</strong></p>
+  <p>世界坐标 = 旋转矩阵 × 机器人坐标 + 平移向量</p>
+  <p>反过来，机器人坐标 = 旋转矩阵的逆 × (世界坐标 - 平移向量)</p>
+</div>
+
+<p>我个人习惯把变换矩阵写成齐次形式，4×4矩阵，一次搞定旋转和平移。代码里用Eigen库的<code>Isometry3d</code>，或者ROS里的<code>tf2</code>，都很方便。</p>
+
+<h3>2.2 欧拉角：直观但危险</h3>
+
+<p>欧拉角，就是用三个角度来描述姿态：绕X轴转的叫横滚角（Roll），绕Y轴转的叫俯仰角（Pitch），绕Z轴转的叫偏航角（Yaw）。</p>
+
+<p>为什么说它直观？因为三个数字，一看就懂。比如偏航角30度，就是车头朝东北方向。做上位机界面显示姿态时，我一般用欧拉角，操作员看着舒服。</p>
+
+<p>但欧拉角有个大坑——<strong>万向锁</strong>。当俯仰角接近±90度时，横滚和偏航会耦合，丢失一个自由度。我在项目里遇到过，AGV爬坡时俯仰角到了85度，姿态解算突然炸了，车直接原地打转。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经在融合IMU和里程计时，直接用欧拉角做插值。结果姿态跳变，定位全乱。后来才明白，欧拉角不适合做插值和滤波。如果你要做姿态估计，老老实实用四元数或者旋转矩阵。</p>
+</div>
+
+<p>欧拉角的另一个问题是表示不唯一。同样的姿态，可以有多种欧拉角组合。比如偏航角360度和0度，其实一样。做差值和滤波时，这个问题很头疼。</p>
+
+<h3>2.3 四元数：优雅但抽象</h3>
+
+<p>四元数，说白了就是四个数：一个实部加三个虚部。写成 <code>q = w + xi + yj + zk</code>，其中 <code>w² + x² + y² + z² = 1</code>。</p>
+
+<p>我第一次接触四元数时，觉得这东西太抽象了。四个数，怎么就能表示三维旋转？后来做多了才理解，四元数其实是在四维空间里描述旋转，投影到三维空间就是我们要的姿态。</p>
+
+<p>四元数的好处很明显：</p>
+<ul>
+  <li><strong>无万向锁</strong>，随便转，不会丢自由度</li>
+  <li><strong>插值平滑</strong>，用球面线性插值（SLERP），姿态过渡很自然</li>
+  <li><strong>计算高效</strong>，比旋转矩阵少几个乘法</li>
+</ul>
+
+<p>我建议你在做传感器融合时，内部运算全部用四元数。只在最后输出给显示界面时，才转成欧拉角。这样既保证了精度，又方便人看。</p>
+
+<div class="tip">
+  <p><strong>实用技巧：</strong></p>
+  <p>四元数乘法不满足交换律，顺序很重要。我习惯用 <code>q_result = q2 * q1</code> 表示先做q1旋转，再做q2旋转。ROS里的tf2也是这个约定。</p>
+</div>
+
+<h3>2.4 坐标系变换与位姿链</h3>
+
+<p>实际AGV系统里，坐标系远不止两个。我列一下常见的：</p>
+
+<table>
+  <tr>
+    <th>坐标系</th>
+    <th>原点位置</th>
+    <th>用途</th>
+  </tr>
+  <tr>
+    <td>世界坐标系</td>
+    <td>固定点</td>
+    <td>地图、路径、目标点</td>
+  </tr>
+  <tr>
+    <td>机器人坐标系</td>
+    <td>机器人中心</td>
+    <td>控制指令、局部规划</td>
+  </tr>
+  <tr>
+    <td>激光雷达坐标系</td>
+    <td>雷达安装位置</td>
+    <td>激光点云数据</td>
+  </tr>
+  <tr>
+    <td>IMU坐标系</td>
+    <td>IMU芯片位置</td>
+    <td>加速度、角速度</td>
+  </tr>
+  <tr>
+    <td>相机坐标系</td>
+    <td>相机光心</td>
+    <td>视觉图像</td>
+  </tr>
+</table>
+
+<p>这些坐标系之间通过变换矩阵连接，形成一条<strong>位姿链</strong>。比如激光点云要转到世界坐标系，需要经过：激光→机器人→世界，两步变换。</p>
+
+<p>我见过不少新手，直接硬编码变换参数。结果换了个传感器，或者重新标定后，代码改得一团糟。我的建议是：<strong>用树状结构管理坐标系</strong>，每个坐标系只存父节点和变换关系。ROS的tf树就是这种思路。</p>
+
+<h3>2.5 实战：位姿表示的选择策略</h3>
+
+<p>讲了这么多，到底什么时候用啥？我总结一下个人经验：</p>
+
+<ul>
+  <li><strong>存储和传输</strong>：用四元数+平移向量。比如保存路径点、发送定位结果。四个数加三个数，紧凑无歧义。</li>
+  <li><strong>显示和调试</strong>：用欧拉角。Rviz里显示姿态，或者打印日志，三个角度一目了然。</li>
+  <li><strong>滤波和融合</strong>：用四元数。卡尔曼滤波、粒子滤波，内部状态都用四元数。注意归一化，防止数值漂移。</li>
+  <li><strong>控制指令</strong>：用旋转矩阵。计算速度、加速度时，矩阵形式方便做微分和积分。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>代码示例：四元数转欧拉角（C++）</strong></p>
+  <pre><code>#include &lt;Eigen/Dense&gt;
+#include &lt;cmath&gt;
+
+Eigen::Vector3d quatToEuler(const Eigen::Quaterniond&amp; q) {
+    // 四元数转欧拉角（ZYX顺序）
+    double roll = atan2(2.0*(q.w()*q.x() + q.y()*q.z()),
+                        1.0 - 2.0*(q.x()*q.x() + q.y()*q.y()));
+    double pitch = asin(2.0*(q.w()*q.y() - q.z()*q.x()));
+    double yaw = atan2(2.0*(q.w()*q.z() + q.x()*q.y()),
+                       1.0 - 2.0*(q.y()*q.y() + q.z()*q.z()));
+    return {roll, pitch, yaw};
+}</code></pre>
+</div>
+
+<p>注意，这个转换在pitch接近±90度时会有数值问题。实际项目中，我会加个阈值判断，如果pitch绝对值大于85度，就用其他方法处理。</p>
+
+<h3>2.6 知识体系总览</h3>
+
+<p>下面这张图，是我自己梳理的坐标系与位姿表示的知识结构。你看一眼，心里就有谱了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">坐标系与位姿表示 知识体系</text>
+  
+  <!-- 三个主分支 -->
+  <!-- 坐标系 -->
+  <rect x="50" y="80" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="110" text-anchor="middle" font-size="16" fill="white" font-weight="bold">坐标系</text>
+  
+  <rect x="30" y="150" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="80" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">世界坐标系</text>
+  
+  <rect x="170" y="150" width="100" height="40" rx="5" fill="#85c1e9"/>
+  <text x="220" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">机器人坐标系</text>
+  
+  <rect x="100" y="210" width="100" height="40" rx="5" fill="#aed6f1"/>
+  <text x="150" y="235" text-anchor="middle" font-size="12" fill="#2c3e50">传感器坐标系</text>
+  
+  <!-- 位姿表示 -->
+  <rect x="300" y="80" width="200" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="110" text-anchor="middle" font-size="16" fill="white" font-weight="bold">位姿表示</text>
+  
+  <rect x="280" y="150" width="90" height="40" rx="5" fill="#f1948a"/>
+  <text x="325" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">欧拉角</text>
+  
+  <rect x="390" y="150" width="90" height="40" rx="5" fill="#f1948a"/>
+  <text x="435" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">四元数</text>
+  
+  <rect x="335" y="210" width="90" height="40" rx="5" fill="#f5b7b1"/>
+  <text x="380" y="235" text-anchor="middle" font-size="12" fill="#2c3e50">旋转矩阵</text>
+  
+  <!-- 变换与融合 -->
+  <rect x="550" y="80" width="200" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="650" y="110" text-anchor="middle" font-size="16" fill="white" font-weight="bold">变换与融合</text>
+  
+  <rect x="530" y="150" width="100" height="40" rx="5" fill="#82e0aa"/>
+  <text x="580" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">坐标变换</text>
+  
+  <rect x="660" y="150" width="100" height="40" rx="5" fill="#82e0aa"/>
+  <text x="710" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">位姿链</text>
+  
+  <rect x="595" y="210" width="100" height="40" rx="5" fill="#abebc6"/>
+  <text x="645" y="235" text-anchor="middle" font-size="12" fill="#2c3e50">多传感器融合</text>
+  
+  <!-- 连接线 -->
+  <line x1="150" y1="130" x2="80" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="150" y1="130" x2="220" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="80" y1="190" x2="150" y2="210" stroke="#85c1e9" stroke-width="1.5"/>
+  <line x1="220" y1="190" x2="150" y2="210" stroke="#85c1e9" stroke-width="1.5"/>
+  
+  <line x1="400" y1="130" x2="325" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="130" x2="435" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="325" y1="190" x2="380" y2="210" stroke="#f1948a" stroke-width="1.5"/>
+  <line x1="435" y1="190" x2="380" y2="210" stroke="#f1948a" stroke-width="1.5"/>
+  
+  <line x1="650" y1="130" x2="580" y2="150" stroke="#27ae60" stroke-width="2"/>
+  <line x1="650" y1="130" x2="710" y2="150" stroke="#27ae60" stroke-width="2"/>
+  <line x1="580" y1="190" x2="645" y2="210" stroke="#82e0aa" stroke-width="1.5"/>
+  <line x1="710" y1="190" x2="645" y2="210" stroke="#82e0aa" stroke-width="1.5"/>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="300" width="600" height="80" rx="10" fill="#f9e79f" opacity="0.8"/>
+  <text x="400" y="330" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">核心原则</text>
+  <text x="400" y="355" text-anchor="middle" font-size="13" fill="#2c3e50">内部运算用四元数 → 显示调试用欧拉角 → 存储传输用齐次变换</text>
+  
+  <!-- 箭头 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  <line x1="250" y1="105" x2="300" y2="105" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="105" x2="550" y2="105" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>
+
+<p>你看，整个体系分三块：坐标系定义、位姿表示方法、变换与融合。三者环环相扣，缺一不可。</p>
+
+<p>最后说一句，坐标系和位姿表示是传感器融合的<strong>地基</strong>。地基没打好，上层算法再牛也白搭。我见过太多项目，定位精度上不去，最后查出来是坐标系标定有偏差。所以，这块内容值得你花时间吃透。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong></p>
+  <p>动手写个小程序，实现四元数、欧拉角、旋转矩阵之间的互相转换。然后拿真实数据跑一遍，看看转换前后是否一致。这个练习做完，你对位姿表示的理解会上一个台阶。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="01NavigationOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03OdometerModel.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

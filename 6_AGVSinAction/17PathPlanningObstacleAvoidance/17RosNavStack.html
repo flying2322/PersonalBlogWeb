@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 ROS导航栈详解</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="active">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 ROS导航栈详解：move_base框架、costmap_2d、global_planner与local_planner配置</h2>
+
+<p>各位同行，今天我们来聊聊ROS导航栈。说实话，这是AGV实战中最核心、也最容易出问题的一环。我见过太多团队，算法理论一套一套的，结果一上真车就撞墙。为什么？因为对导航栈的理解停留在表面。</p>
+
+<p>ROS导航栈，说白了就是一个“大脑”。它告诉机器人：<strong>你在哪，要去哪，路上有没有坑，怎么绕过去</strong>。今天我就把move_base、costmap_2d、global_planner和local_planner这四块掰开揉碎了讲。</p>
+
+<!-- SVG框架图 -->
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;margin:20px auto;display:block;background:#f0f8ff;border-radius:12px;padding:10px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f4f8;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#d1ecf1;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="15"/>
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">ROS导航栈核心架构</text>
+  <!-- move_base 主框 -->
+  <rect x="250" y="60" width="300" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="97" text-anchor="middle" font-size="20" font-weight="bold" fill="white">move_base 调度中心</text>
+  <!-- 箭头向下 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- 全局规划 -->
+  <rect x="100" y="170" width="250" height="70" rx="10" fill="#2ecc71" opacity="0.85"/>
+  <text x="225" y="200" text-anchor="middle" font-size="16" font-weight="bold" fill="white">global_planner</text>
+  <text x="225" y="222" text-anchor="middle" font-size="13" fill="white">全局路径规划（A* / Dijkstra）</text>
+  <!-- 局部规划 -->
+  <rect x="450" y="170" width="250" height="70" rx="10" fill="#e67e22" opacity="0.85"/>
+  <text x="575" y="200" text-anchor="middle" font-size="16" font-weight="bold" fill="white">local_planner</text>
+  <text x="575" y="222" text-anchor="middle" font-size="13" fill="white">局部轨迹跟踪（DWA / TEB）</text>
+  <!-- 箭头从move_base到两个planner -->
+  <line x1="320" y1="120" x2="225" y2="170" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="480" y1="120" x2="575" y2="170" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- costmap_2d 层 -->
+  <rect x="100" y="280" width="600" height="60" rx="10" fill="#9b59b6" opacity="0.8"/>
+  <text x="400" y="310" text-anchor="middle" font-size="16" font-weight="bold" fill="white">costmap_2d 代价地图</text>
+  <text x="400" y="330" text-anchor="middle" font-size="13" fill="white">静态层 | 障碍物层 | 膨胀层 | 其他插件层</text>
+  <!-- 箭头从planner到costmap -->
+  <line x1="225" y1="240" x2="225" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="575" y1="240" x2="575" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- 传感器输入 -->
+  <rect x="100" y="380" width="250" height="50" rx="8" fill="#1abc9c" opacity="0.75"/>
+  <text x="225" y="410" text-anchor="middle" font-size="14" fill="white">激光雷达 / 深度相机</text>
+  <rect x="450" y="380" width="250" height="50" rx="8" fill="#1abc9c" opacity="0.75"/>
+  <text x="575" y="410" text-anchor="middle" font-size="14" fill="white">里程计 / IMU</text>
+  <!-- 箭头到costmap -->
+  <line x1="225" y1="380" x2="225" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="575" y1="380" x2="575" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- 输出 -->
+  <rect x="250" y="450" width="300" height="40" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="400" y="475" text-anchor="middle" font-size="15" font-weight="bold" fill="white">输出：cmd_vel 速度指令</text>
+  <line x1="400" y1="340" x2="400" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+</svg>
+
+<h3>17.1 move_base：导航调度中心</h3>
+
+<p>move_base是整个导航栈的“项目经理”。它不干活，但它知道谁该干活。我个人习惯把move_base理解成一个<strong>状态机</strong>：接收目标点→调用全局规划器算路径→交给局部规划器跟踪→遇到障碍物触发重规划。</p>
+
+<p>它的核心工作流程是这样的：</p>
+<ul>
+  <li><strong>接收目标</strong>：通过<code>actionlib</code>接口接收<code>MoveBaseActionGoal</code></li>
+  <li><strong>全局规划</strong>：调用global_planner生成从起点到终点的路径</li>
+  <li><strong>局部跟踪</strong>：local_planner沿着全局路径走，同时避障</li>
+  <li><strong>状态反馈</strong>：实时发布机器人的位置、速度、规划状态</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>关键参数配置示例（move_base.launch）：</strong></p>
+  <pre><code>&lt;node pkg="move_base" type="move_base" name="move_base" output="screen"&gt;
+  &lt;param name="base_global_planner" value="global_planner/GlobalPlanner"/&gt;
+  &lt;param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS"/&gt;
+  &lt;param name="controller_frequency" value="10.0"/&gt;
+  &lt;param name="planner_frequency" value="1.0"/&gt;
+  &lt;param name="recovery_behavior_enabled" value="true"/&gt;
+&lt;/node&gt;</code></pre>
+</div>
+
+<p>这里有个坑：<code>controller_frequency</code>和<code>planner_frequency</code>的比值很关键。我曾经在一个项目中把planner_frequency设成5Hz，结果机器人每0.2秒就重规划一次，路径抖得像帕金森。后来改成1Hz，稳了。</p>
+
+<h3>17.2 costmap_2d：机器人的“电子皮肤”</h3>
+
+<p>costmap_2d，说白了就是一张<strong>带代价的栅格地图</strong>。每个格子都有一个代价值：0表示完全空闲，255表示绝对不可通行。机器人规划路径时，会尽量走代价值低的区域。</p>
+
+<p>costmap_2d采用<strong>分层架构</strong>，我特别喜欢这个设计——各层各司其职：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;margin:15px 0;background:#fff;">
+  <tr style="background:#3498db;color:white;">
+    <th>层名称</th>
+    <th>作用</th>
+    <th>数据来源</th>
+  </tr>
+  <tr>
+    <td>静态地图层</td>
+    <td>加载预先建好的地图</td>
+    <td>map_server</td>
+  </tr>
+  <tr>
+    <td>障碍物层</td>
+    <td>实时检测动态障碍物</td>
+    <td>激光雷达、深度相机</td>
+  </tr>
+  <tr>
+    <td>膨胀层</td>
+    <td>给障碍物加“安全距离”</td>
+    <td>基于障碍物层计算</td>
+  </tr>
+  <tr>
+    <td>自定义插件层</td>
+    <td>比如禁止区域、减速区域</td>
+    <td>用户自定义</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>膨胀半径的设置直接影响通过性。设太大，窄通道过不去；设太小，容易刮蹭。我一般取<strong>机器人半径的1.2倍</strong>作为起步值，然后根据实际测试微调。</p>
+</div>
+
+<p>配置costmap_2d时，<code>observation_sources</code>这个参数特别容易搞错。我记得有一次调试，激光雷达数据明明有，但costmap就是不更新。查了半天，发现是<code>topic</code>名字写错了——代码里写的是<code>/scan</code>，实际发布的是<code>/lidar/scan</code>。嗯，这种低级错误，谁没犯过呢？</p>
+
+<h3>17.3 global_planner：全局路径规划</h3>
+
+<p>global_planner负责在<strong>全局代价地图</strong>上找一条从起点到终点的路径。ROS默认用的是<strong>A*算法</strong>，也可以换成Dijkstra或其它。</p>
+
+<p>我个人更倾向于A*，因为它在大多数场景下效率更高。但要注意：A*的启发函数设计不好，容易走“贴墙路径”。</p>
+
+<div class="highlight">
+  <p><strong>global_planner参数调优：</strong></p>
+  <pre><code>GlobalPlanner:
+  use_dijkstra: false          # true用Dijkstra，false用A*
+  use_quadratic: true          # 二次近似，路径更平滑
+  use_grid_path: false         # 是否只走网格线
+  old_navfn_behavior: false    # 兼容旧版navfn
+  visualize_potential: true    # 可视化势场，调试利器</code></pre>
+</div>
+
+<p>这里有个技巧：<code>visualize_potential</code>设为true后，你可以在Rviz里看到势场图。颜色越亮表示代价值越高。我曾经靠这个功能，一眼就发现地图上有个“幽灵障碍物”——原来是静态地图层和障碍物层重叠导致的。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个工厂项目里，机器人总是绕远路。排查后发现是<code>use_grid_path</code>设为true，导致路径只能走网格线，无法斜着穿过去。改成false后，路径直接缩短了30%。</p>
+</div>
+
+<h3>17.4 local_planner：局部轨迹跟踪</h3>
+
+<p>local_planner是真正“开车”的模块。它接收全局路径，然后结合当前传感器数据，实时生成速度指令。ROS里最常用的是<strong>DWA（Dynamic Window Approach）</strong>和<strong>TEB（Timed Elastic Band）</strong>。</p>
+
+<p>DWA的原理很简单：在速度空间里采样，找一条“不撞墙、走得快、靠近目标”的轨迹。我刚开始学的时候觉得这算法太暴力了，后来发现——暴力往往最有效。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;margin:15px 0;background:#fff;">
+  <tr style="background:#e67e22;color:white;">
+    <th>参数</th>
+    <th>作用</th>
+    <th>推荐值</th>
+  </tr>
+  <tr>
+    <td>max_vel_x</td>
+    <td>最大前进速度</td>
+    <td>0.5 ~ 1.0 m/s</td>
+  </tr>
+  <tr>
+    <td>min_vel_x</td>
+    <td>最小前进速度</td>
+    <td>0.0 ~ 0.1 m/s</td>
+  </tr>
+  <tr>
+    <td>max_vel_theta</td>
+    <td>最大旋转速度</td>
+    <td>0.5 ~ 1.0 rad/s</td>
+  </tr>
+  <tr>
+    <td>acc_lim_x</td>
+    <td>X轴加速度限制</td>
+    <td>0.5 ~ 1.0 m/s²</td>
+  </tr>
+  <tr>
+    <td>acc_lim_theta</td>
+    <td>旋转加速度限制</td>
+    <td>0.5 ~ 1.0 rad/s²</td>
+  </tr>
+  <tr>
+    <td>sim_time</td>
+    <td>轨迹模拟时间窗口</td>
+    <td>1.5 ~ 3.0 s</td>
+  </tr>
+</table>
+
+<p>为什么<code>sim_time</code>这么重要？你想想看，模拟时间太短，机器人只看眼前几步，容易钻死胡同；模拟时间太长，计算量暴增，实时性就保不住了。我一般取2.0秒作为基准值。</p>
+
+<div class="tip">
+  <p><strong>我的调试心得：</strong>如果你发现机器人原地打转，多半是<code>yaw_goal_tolerance</code>和<code>xy_goal_tolerance</code>设得太小。给点余量，别让机器人为了“精确到毫米”而反复调整。毕竟AGV不是精密机床，差个几厘米不影响干活。</p>
+</div>
+
+<h3>17.5 四者协同：一个完整的导航周期</h3>
+
+<p>这四个模块是怎么配合的？我画个时间线你就明白了：</p>
+
+<ol>
+  <li><strong>第0秒</strong>：move_base收到目标点，调用global_planner</li>
+  <li><strong>第0.1秒</strong>：global_planner在costmap上算出一条全局路径</li>
+  <li><strong>第0.1~10秒</strong>：local_planner每0.1秒（10Hz）跟踪路径，同时costmap实时更新障碍物</li>
+  <li><strong>第3秒</strong>：前方突然出现一个箱子，costmap障碍物层更新</li>
+  <li><strong>第3.1秒</strong>：local_planner检测到路径被堵，触发move_base的<code>规划重试</code>机制</li>
+  <li><strong>第3.2秒</strong>：global_planner重新规划，绕开箱子</li>
+  <li><strong>第10秒</strong>：到达目标点，move_base发布成功状态</li>
+</ol>
+
+<p>这个过程中，<strong>costmap_2d是“眼睛”</strong>，<strong>global_planner是“大脑”</strong>，<strong>local_planner是“手脚”</strong>，<strong>move_base是“神经中枢”</strong>。缺一个，机器人就废了。</p>
+
+<div class="warning">
+  <p><strong>曾经踩过的坑：</strong>有一次我在一个仓库里测试，机器人总是突然急刹车。查了三天，发现是costmap的<code>update_frequency</code>设成了50Hz，而激光雷达只有10Hz。costmap在“空转”，每次更新都以为前方有障碍物。后来把更新频率降到10Hz，问题解决。</p>
+</div>
+
+<h3>17.6 实战配置清单</h3>
+
+<p>最后，我整理了一份配置清单。你照着这个顺序调，基本不会出大问题：</p>
+
+<ul>
+  <li><strong>第一步</strong>：确认传感器数据正常（激光雷达、里程计、IMU）</li>
+  <li><strong>第二步</strong>：配置costmap_2d的静态层和障碍物层</li>
+  <li><strong>第三步</strong>：设置膨胀半径（建议从0.3m开始）</li>
+  <li><strong>第四步</strong>：配置global_planner（选A*，关闭grid_path）</li>
+  <li><strong>第五步</strong>：配置local_planner（DWA，sim_time=2.0）</li>
+  <li><strong>第六步</strong>：设置move_base的controller_frequency=10，planner_frequency=1</li>
+  <li><strong>第七步</strong>：在Rviz中观察，逐步微调</li>
+</ul>
+
+<p>嗯，这套流程我用了好几年，基本没翻过车。当然，每个项目都有它的脾气，关键还是多试、多看、多总结。</p>
+
+<hr style="margin:30px 0;border:1px dashed #ccc;">
+
+        <div class="footer-nav">
+            <a href="16KinematicConstraints.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

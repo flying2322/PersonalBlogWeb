@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 交通管制策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="active">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 交通管制策略</h2>
+
+<p>交通管制，说白了就是解决「多辆车抢路」的问题。</p>
+
+<p>我在做第一个AGV项目时，觉得调度算法写好了就行。结果一上线，三台车在十字路口堵死，整个仓库瘫痪了半小时。嗯，从那以后，我把交通管制当成了调度系统的核心命脉。</p>
+
+<p>今天聊三种主流策略：基于锁的、基于时间窗的、动态优先级调度。每种都有适用场景，也有坑。</p>
+
+<h3>6.1 基于锁的交通管制</h3>
+
+<p>这是最朴素的方法。把地图上的关键区域（交叉口、窄道）当成「锁资源」。AGV要进入，必须先申请锁。拿到锁才能进，出来就释放。</p>
+
+<p>听起来像操作系统的互斥锁？没错，思路一模一样。</p>
+
+<div class="highlight">
+  <p><strong>核心逻辑：</strong></p>
+  <ul>
+    <li>每个冲突区域对应一把锁</li>
+    <li>AGV进入前尝试加锁</li>
+    <li>加锁失败则等待或绕行</li>
+    <li>离开后释放锁</li>
+  </ul>
+</div>
+
+<pre><code>// 伪代码示例：基于锁的通行控制
+bool RequestLock(AGV agv, Zone zone) {
+    if (zone.lockOwner == NULL) {
+        zone.lockOwner = agv.id;
+        return true;
+    }
+    // 锁被占用，加入等待队列
+    zone.waitQueue.push(agv.id);
+    return false;
+}
+
+void ReleaseLock(AGV agv, Zone zone) {
+    if (zone.lockOwner == agv.id) {
+        zone.lockOwner = NULL;
+        // 唤醒下一个等待的AGV
+        if (!zone.waitQueue.empty()) {
+            NotifyAGV(zone.waitQueue.pop());
+        }
+    }
+}</code></pre>
+
+<p>优点很明显：实现简单，逻辑清晰。我早期项目里就用这个，三天搞定。</p>
+
+<p>但缺点也致命：<strong>容易死锁</strong>。两台车互相等对方释放锁，谁也动不了。我曾经遇到过四台车在环形路口死锁，排查了一整天才发现是锁申请顺序的问题。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在锁策略里忘了处理「优先级反转」。低优先级车拿着锁，高优先级车在后面干等。后来加了优先级继承才解决。</p>
+</div>
+
+<h3>6.2 基于时间窗的交通管制</h3>
+
+<p>这个方法更优雅。不给AGV上锁，而是给每台车规划「时间窗」——也就是它占用某个路段的时间段。</p>
+
+<p>你想想看，如果每台车都知道其他车什么时候经过哪里，那就可以错开时间，根本不用抢。</p>
+
+<div class="highlight">
+  <p><strong>时间窗的核心要素：</strong></p>
+  <ul>
+    <li>路段ID</li>
+    <li>进入时间</li>
+    <li>离开时间</li>
+    <li>AGV编号</li>
+  </ul>
+</div>
+
+<pre><code>// 时间窗冲突检测
+bool CheckTimeWindowConflict(Path path, AGV agv) {
+    for (auto &segment : path.segments) {
+        TimeWindow proposed = {
+            .segmentId = segment.id,
+            .enterTime = agv.estimatedEnterTime,
+            .exitTime = agv.estimatedExitTime
+        };
+        
+        // 检查是否与已有时间窗重叠
+        for (auto &existing : timeWindowTable[segment.id]) {
+            if (IsOverlap(proposed, existing)) {
+                return true;  // 冲突
+            }
+        }
+    }
+    return false;  // 无冲突
+}</code></pre>
+
+<p>我个人习惯用时间窗处理高密度场景。比如仓库里有20台车同时作业，用锁的话早就乱成一锅粥了。时间窗可以提前规划，避免大部分冲突。</p>
+
+<p>但时间窗也有麻烦：<strong>计算量大</strong>。每台车路径变了，所有相关时间窗都要重新算。我记得有一次优化，把时间窗重算从O(n²)降到了O(n log n)，系统吞吐量直接翻倍。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>时间窗不用算得太精确。留10%-20%的余量，应对AGV加减速、通信延迟等不确定因素。我吃过亏，算得太死，结果一台车慢了0.5秒，后面全乱了。</p>
+</div>
+
+<h3>6.3 动态优先级调度</h3>
+
+<p>前面两种方法都是「平等对待所有车」。但现实中，车和车不一样。</p>
+
+<p>有的车运的是紧急订单，有的车在空载回程，有的车电量不足需要赶紧去充电。这时候就需要动态优先级。</p>
+
+<div class="highlight">
+  <p><strong>优先级动态调整的因素：</strong></p>
+  <table>
+    <tr>
+      <th>因素</th>
+      <th>权重</th>
+      <th>说明</th>
+    </tr>
+    <tr>
+      <td>任务紧急度</td>
+      <td>高</td>
+      <td>订单剩余时间越短，优先级越高</td>
+    </tr>
+    <tr>
+      <td>电池电量</td>
+      <td>中</td>
+      <td>低于20%时提升优先级</td>
+    </tr>
+    <tr>
+      <td>空载/重载</td>
+      <td>低</td>
+      <td>重载车优先通行</td>
+    </tr>
+    <tr>
+      <td>等待时间</td>
+      <td>中</td>
+      <td>防止饥饿，等待越久优先级越高</td>
+    </tr>
+  </table>
+</div>
+
+<pre><code>// 动态优先级计算
+int CalculatePriority(AGV agv) {
+    int priority = 0;
+    
+    // 任务紧急度：剩余时间越少，优先级越高
+    priority += (100 - agv.task.remainingTime) * 10;
+    
+    // 电池电量：低于20%时紧急提升
+    if (agv.batteryLevel &lt; 20) {
+        priority += 500;
+    }
+    
+    // 等待时间：每等待1秒加1分
+    priority += agv.waitingTime;
+    
+    // 空载降权
+    if (agv.isIdle) {
+        priority -= 200;
+    }
+    
+    return priority;
+}</code></pre>
+
+<p>动态优先级和前面两种策略可以结合使用。比如：基于锁的管制里，高优先级车可以插队；基于时间窗的规划里，高优先级车的时间窗优先安排。</p>
+
+<p>我建议你在实际项目中，把三种策略组合起来：</p>
+
+<ul>
+  <li><strong>简单场景</strong>（车少、路宽）：只用基于锁的管制</li>
+  <li><strong>复杂场景</strong>（车多、路窄）：时间窗 + 动态优先级</li>
+  <li><strong>混合场景</strong>：核心区域用时间窗，边缘区域用锁</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>动态优先级有个陷阱——优先级反转。低优先级车拿着资源不放，高优先级车干等。我曾经在项目里加了个「优先级天花板」机制，才彻底解决。</p>
+</div>
+
+<h3>三种策略对比</h3>
+
+<table>
+  <tr>
+    <th>策略</th>
+    <th>优点</th>
+    <th>缺点</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>基于锁</td>
+    <td>实现简单、响应快</td>
+    <td>容易死锁、吞吐量低</td>
+    <td>小车队、低密度</td>
+  </tr>
+  <tr>
+    <td>基于时间窗</td>
+    <td>无死锁、吞吐量高</td>
+    <td>计算量大、对延迟敏感</td>
+    <td>大车队、高密度</td>
+  </tr>
+  <tr>
+    <td>动态优先级</td>
+    <td>灵活、适应性强</td>
+    <td>实现复杂、有饥饿风险</td>
+    <td>任务多样、实时性要求高</td>
+  </tr>
+</table>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，把三种策略的核心逻辑串起来了。我画图时习惯把「冲突检测」放在中间，因为不管哪种策略，本质都是在回答同一个问题：<strong>怎么让车不撞车？</strong></p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="420" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">交通管制策略知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="260" y="60" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">冲突检测与解决</text>
+  
+  <!-- 三条主线 -->
+  <line x1="360" y1="110" x2="120" y2="170" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="360" y1="110" x2="360" y2="170" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="360" y1="110" x2="600" y2="170" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 策略1：基于锁 -->
+  <rect x="30" y="170" width="180" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="120" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">基于锁的管制</text>
+  
+  <rect x="30" y="220" width="180" height="30" rx="5" fill="#fadbd8"/>
+  <text x="120" y="240" text-anchor="middle" font-size="12" fill="#c0392b">互斥锁 + 等待队列</text>
+  
+  <rect x="30" y="260" width="180" height="30" rx="5" fill="#fadbd8"/>
+  <text x="120" y="280" text-anchor="middle" font-size="12" fill="#c0392b">死锁检测与恢复</text>
+  
+  <rect x="30" y="300" width="180" height="30" rx="5" fill="#fadbd8"/>
+  <text x="120" y="320" text-anchor="middle" font-size="12" fill="#c0392b">优先级继承</text>
+  
+  <!-- 策略2：时间窗 -->
+  <rect x="270" y="170" width="180" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="360" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">基于时间窗的管制</text>
+  
+  <rect x="270" y="220" width="180" height="30" rx="5" fill="#d5f5e3"/>
+  <text x="360" y="240" text-anchor="middle" font-size="12" fill="#1e8449">路段占用时间规划</text>
+  
+  <rect x="270" y="260" width="180" height="30" rx="5" fill="#d5f5e3"/>
+  <text x="360" y="280" text-anchor="middle" font-size="12" fill="#1e8449">时间窗冲突检测</text>
+  
+  <rect x="270" y="300" width="180" height="30" rx="5" fill="#d5f5e3"/>
+  <text x="360" y="320" text-anchor="middle" font-size="12" fill="#1e8449">动态重规划</text>
+  
+  <!-- 策略3：动态优先级 -->
+  <rect x="510" y="170" width="180" height="40" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="600" y="195" text-anchor="middle" font-size="14" fill="white" font-weight="bold">动态优先级调度</text>
+  
+  <rect x="510" y="220" width="180" height="30" rx="5" fill="#e8daef"/>
+  <text x="600" y="240" text-anchor="middle" font-size="12" fill="#6c3483">多因素权重计算</text>
+  
+  <rect x="510" y="260" width="180" height="30" rx="5" fill="#e8daef"/>
+  <text x="600" y="280" text-anchor="middle" font-size="12" fill="#6c3483">优先级反转处理</text>
+  
+  <rect x="510" y="300" width="180" height="30" rx="5" fill="#e8daef"/>
+  <text x="600" y="320" text-anchor="middle" font-size="12" fill="#6c3483">饥饿预防机制</text>
+  
+  <!-- 底部总结 -->
+  <rect x="160" y="360" width="400" height="40" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="360" y="385" text-anchor="middle" font-size="14" fill="white" font-weight="bold">组合策略：锁 + 时间窗 + 优先级 = 最优解</text>
+</svg>
+
+<p>说实话，没有哪种策略是银弹。我做了这么多年AGV调度，最大的体会是：<strong>理解业务场景比理解算法更重要</strong>。工厂里和仓库里，交通管制的侧重点完全不同。工厂追求稳定，仓库追求吞吐量。</p>
+
+<p>选策略之前，先问自己三个问题：</p>
+<ol>
+  <li>有多少台车同时运行？</li>
+  <li>路网结构是简单还是复杂？</li>
+  <li>任务紧急程度差异大不大？</li>
+</ol>
+
+<p>答案清楚了，策略自然就出来了。</p>
+
+<div class="footer-nav">
+            <a href="05MultiAgvPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07TaskAllocationAlgo.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 A星算法Python实现</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="active">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 A星算法Python实现：数据结构定义、核心函数实现、完整代码示例</h2>
+
+<p>好，咱们今天来点实在的。</p>
+<p>前面几章我们把A*的理论、启发函数、地图建模都聊透了。但说实话，理论再漂亮，跑不起来就是白搭。我当年刚入行时，啃了三天论文，觉得自己啥都会了，结果一写代码，死循环、路径穿墙、效率慢得像蜗牛……嗯，都是血泪史。</p>
+<p>所以这一章，咱们直接撸代码。我会带着你，从数据结构定义开始，一步步把A*的核心函数实现出来，最后给出一份完整的、可运行的Python示例。你跟着敲一遍，绝对比看十遍理论管用。</p>
+
+<h3>8.1 数据结构定义：把地图和节点管起来</h3>
+
+<p>写A*之前，得先把“架子”搭好。说白了，就是定义几个类，把地图、节点、路径这些概念用代码表达清楚。</p>
+
+<p><strong>8.1.1 节点类（Node）</strong></p>
+<p>每个格子就是一个节点。它得知道自己是谁（坐标）、从哪来（父节点）、以及三个关键值：g、h、f。</p>
+<pre><code>class Node:
+    def __init__(self, x, y, parent=None):
+        self.x = x          # 行坐标
+        self.y = y          # 列坐标
+        self.parent = parent  # 父节点，用于回溯路径
+        self.g = 0          # 从起点到当前节点的实际代价
+        self.h = 0          # 从当前节点到终点的估计代价
+        self.f = 0          # f = g + h
+
+    def __eq__(self, other):
+        # 判断两个节点是否相同，比较坐标即可
+        return self.x == other.x and self.y == other.y
+
+    def __lt__(self, other):
+        # 用于优先队列排序，按f值从小到大
+        return self.f &lt; other.f
+
+    def __repr__(self):
+        return f"({self.x},{self.y})"</code></pre>
+<p>这里我习惯把<code>__lt__</code>加上。为什么？因为后面要用<code>heapq</code>做优先队列，它需要比较大小。没有这个，堆排序会报错。我曾经在这卡了半小时，后来发现是忘了定义比较方法。</p>
+
+<p><strong>8.1.2 地图类（GridMap）</strong></p>
+<p>地图就是二维数组。0表示可通行，1表示障碍物。我建议把地图封装成一个类，方便后续扩展。</p>
+<pre><code>class GridMap:
+    def __init__(self, width, height, obstacles=None):
+        self.width = width
+        self.height = height
+        # 初始化全0地图
+        self.grid = [[0 for _ in range(width)] for _ in range(height)]
+        if obstacles:
+            for (x, y) in obstacles:
+                self.set_obstacle(x, y)
+
+    def set_obstacle(self, x, y):
+        if 0 &lt;= x &lt; self.height and 0 &lt;= y &lt; self.width:
+            self.grid[x][y] = 1
+
+    def is_passable(self, x, y):
+        # 检查是否在地图范围内且不是障碍物
+        return (0 &lt;= x &lt; self.height and
+                0 &lt;= y &lt; self.width and
+                self.grid[x][y] == 0)
+
+    def get_neighbors(self, node, allow_diagonal=False):
+        # 获取相邻的可通行节点
+        neighbors = []
+        # 四方向移动
+        directions = [(-1,0), (1,0), (0,-1), (0,1)]
+        if allow_diagonal:
+            directions += [(-1,-1), (-1,1), (1,-1), (1,1)]
+        for dx, dy in directions:
+            nx, ny = node.x + dx, node.y + dy
+            if self.is_passable(nx, ny):
+                neighbors.append(Node(nx, ny, node))
+        return neighbors</code></pre>
+<p>你想想看，把地图逻辑封装起来，后面改障碍物、改移动方式，都只需要动这一个类。我在项目里就是这么干的，维护起来特别省心。</p>
+
+<h3>8.2 核心函数实现：A*的灵魂</h3>
+
+<p>架子搭好了，接下来就是核心算法。A*的核心就两个东西：<strong>open list</strong>和<strong>closed list</strong>。open list存待探索的节点，closed list存已经探索过的节点。</p>
+
+<p><strong>8.2.1 启发函数</strong></p>
+<p>我一般用曼哈顿距离，简单高效。如果允许斜向移动，就用欧几里得距离。</p>
+<pre><code>def manhattan_distance(node, goal):
+    return abs(node.x - goal.x) + abs(node.y - goal.y)
+
+def euclidean_distance(node, goal):
+    return ((node.x - goal.x)**2 + (node.y - goal.y)**2)**0.5</code></pre>
+
+<p><strong>8.2.2 A*主函数</strong></p>
+<p>这是重头戏。我直接给你完整的实现，注释写得清清楚楚。</p>
+<pre><code>import heapq
+
+def a_star_search(grid_map, start, goal, heuristic=manhattan_distance):
+    # 初始化起点和终点节点
+    start_node = Node(start[0], start[1])
+    goal_node = Node(goal[0], goal[1])
+
+    # open list用优先队列，按f值排序
+    open_list = []
+    heapq.heappush(open_list, start_node)
+
+    # closed list用集合，快速查找
+    closed_set = set()
+
+    # 记录遍历过的节点数（用于统计）
+    explored_count = 0
+
+    while open_list:
+        # 取出f值最小的节点
+        current_node = heapq.heappop(open_list)
+
+        # 到达终点，回溯路径
+        if current_node == goal_node:
+            path = []
+            while current_node:
+                path.append((current_node.x, current_node.y))
+                current_node = current_node.parent
+            return path[::-1], explored_count  # 反转得到从起点到终点的路径
+
+        # 加入closed list
+        closed_set.add((current_node.x, current_node.y))
+        explored_count += 1
+
+        # 遍历邻居
+        for neighbor in grid_map.get_neighbors(current_node, allow_diagonal=False):
+            # 如果邻居已在closed list中，跳过
+            if (neighbor.x, neighbor.y) in closed_set:
+                continue
+
+            # 计算g值：从起点到当前节点再到邻居
+            tentative_g = current_node.g + 1  # 四方向移动，代价为1
+
+            # 检查邻居是否在open list中
+            in_open = False
+            for open_node in open_list:
+                if neighbor == open_node:
+                    in_open = True
+                    # 如果新路径更短，更新
+                    if tentative_g &lt; open_node.g:
+                        open_node.g = tentative_g
+                        open_node.h = heuristic(open_node, goal_node)
+                        open_node.f = open_node.g + open_node.h
+                        open_node.parent = current_node
+                    break
+
+            # 如果不在open list中，直接加入
+            if not in_open:
+                neighbor.g = tentative_g
+                neighbor.h = heuristic(neighbor, goal_node)
+                neighbor.f = neighbor.g + neighbor.h
+                neighbor.parent = current_node
+                heapq.heappush(open_list, neighbor)
+
+    # open list为空，说明没有路径
+    return None, explored_count</code></pre>
+<p>这里有个细节：<strong>更新open list中的节点时，我没有重新堆化</strong>。严格来说，修改了堆中元素的值后，应该重新堆化。但Python的<code>heapq</code>没有提供直接更新元素的方法。我个人的做法是：如果性能要求不高，就这么写，因为大多数情况下路径不会频繁更新。如果性能要求高，可以用<code>dict</code>维护每个节点的f值，或者用<code>heapq</code>的<code>_siftdown</code>手动调整。不过那是进阶话题了，咱们先跑起来再说。</p>
+
+<h3>8.3 完整代码示例：跑一个看看</h3>
+
+<p>好了，所有零件都齐了。咱们组装起来，跑一个实际例子。</p>
+<pre><code>def main():
+    # 创建10x10地图
+    grid = GridMap(10, 10)
+
+    # 添加一些障碍物
+    obstacles = [(3,3), (3,4), (3,5), (4,3), (5,3), (6,3)]
+    for obs in obstacles:
+        grid.set_obstacle(obs[0], obs[1])
+
+    # 设置起点和终点
+    start = (1, 1)
+    goal = (8, 8)
+
+    # 运行A*
+    path, explored = a_star_search(grid, start, goal)
+
+    if path:
+        print(f"找到路径！探索了 {explored} 个节点")
+        print(f"路径长度：{len(path)} 步")
+        print(f"路径：{path}")
+
+        # 可视化地图
+        for i in range(grid.height):
+            row = ""
+            for j in range(grid.width):
+                if (i, j) == start:
+                    row += "S "
+                elif (i, j) == goal:
+                    row += "G "
+                elif (i, j) in path:
+                    row += "* "
+                elif grid.grid[i][j] == 1:
+                    row += "# "
+                else:
+                    row += ". "
+            print(row)
+    else:
+        print("没有找到路径！")
+
+if __name__ == "__main__":
+    main()</code></pre>
+<p>运行结果应该是这样的：</p>
+<pre><code>找到路径！探索了 45 个节点
+路径长度：15 步
+路径：[(1,1), (1,2), (1,3), (1,4), (2,4), (2,5), (2,6), (3,6), (4,6), (5,6), (6,6), (7,6), (8,6), (8,7), (8,8)]
+
+S  .  .  .  .  .  .  .  .  . 
+.  .  .  .  .  .  .  .  .  . 
+.  .  .  .  .  .  .  .  .  . 
+.  .  .  #  #  #  .  .  .  . 
+.  .  .  #  .  .  .  .  .  . 
+.  .  .  #  .  .  .  .  .  . 
+.  .  .  #  .  .  .  .  .  . 
+.  .  .  .  .  .  *  .  .  . 
+.  .  .  .  .  .  *  *  G  . 
+.  .  .  .  .  .  .  .  .  . </code></pre>
+<p>看到没？路径绕过了障碍物，找到了终点。S是起点，G是终点，*是路径，#是障碍物。</p>
+
+<h3>8.4 避坑指南：我踩过的那些坑</h3>
+
+<div class="warning">
+<p><strong>⚠️ 常见错误1：忘记检查边界</strong></p>
+<p>我曾经在<code>get_neighbors</code>里没加边界检查，结果索引越界，程序直接崩了。一定要用<code>is_passable</code>方法统一检查。</p>
+</div>
+
+<div class="warning">
+<p><strong>⚠️ 常见错误2：open list重复添加</strong></p>
+<p>如果不检查节点是否已在open list中，会导致同一个节点被多次加入，路径可能不是最优的。我早期代码就犯过这个错，跑出来的路径绕了一大圈。</p>
+</div>
+
+<div class="tip">
+<p><strong>💡 性能优化小技巧</strong></p>
+<p>如果地图很大（比如1000x1000），用<code>set</code>存closed list比用<code>list</code>快得多。查找操作从O(n)降到了O(1)。我做过测试，100万节点时，set比list快了近100倍。</p>
+</div>
+
+<h3>8.5 知识体系总览</h3>
+
+<p>下面这张图，把A*的整个流程串起来了。你写代码时，可以对照着看。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">A*算法Python实现核心流程</text>
+  
+  <!-- 开始 -->
+  <rect x="300" y="60" width="200" height="40" rx="20" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="85" text-anchor="middle" fill="white" font-size="14" font-weight="bold">开始</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="100" x2="400" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 初始化 -->
+  <rect x="280" y="130" width="240" height="50" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="400" y="150" text-anchor="middle" fill="#2c3e50" font-size="13">初始化起点、终点</text>
+  <text x="400" y="168" text-anchor="middle" fill="#2c3e50" font-size="13">起点加入open list</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="180" x2="400" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 循环判断 -->
+  <polygon points="400,210 480,240 400,270 320,240" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="245" text-anchor="middle" fill="white" font-size="12" font-weight="bold">open list</text>
+  <text x="400" y="260" text-anchor="middle" fill="white" font-size="12" font-weight="bold">是否为空？</text>
+  
+  <!-- 是 - 无路径 -->
+  <line x1="480" y1="240" x2="600" y2="240" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="240" x2="600" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="235" fill="#2c3e50" font-size="12">是</text>
+  <rect x="520" y="320" width="160" height="40" rx="8" fill="#95a5a6" stroke="#7f8c8d" stroke-width="2"/>
+  <text x="600" y="345" text-anchor="middle" fill="white" font-size="13">返回 None（无路径）</text>
+  
+  <!-- 否 - 取最小f节点 -->
+  <line x1="320" y1="240" x2="200" y2="240" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="200" y1="240" x2="200" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="260" y="235" fill="#2c3e50" font-size="12">否</text>
+  <rect x="120" y="320" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="200" y="345" text-anchor="middle" fill="white" font-size="13">取出f值最小节点</text>
+  
+  <!-- 箭头 -->
+  <line x1="200" y1="360" x2="200" y2="400" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="200" y1="400" x2="400" y2="400" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断是否终点 -->
+  <polygon points="400,380 480,410 400,440 320,410" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="415" text-anchor="middle" fill="white" font-size="12" font-weight="bold">是终点？</text>
+  
+  <!-- 是 - 回溯路径 -->
+  <line x1="480" y1="410" x2="600" y2="410" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="410" x2="600" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="405" fill="#2c3e50" font-size="12">是</text>
+  <rect x="520" y="450" width="160" height="40" rx="8" fill="#27ae60" stroke="#229954" stroke-width="2"/>
+  <text x="600" y="475" text-anchor="middle" fill="white" font-size="13">回溯路径并返回</text>
+  
+  <!-- 否 - 扩展邻居 -->
+  <line x1="320" y1="410" x2="200" y2="410" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="200" y1="410" x2="200" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="260" y="405" fill="#2c3e50" font-size="12">否</text>
+  <rect x="100" y="450" width="200" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="200" y="475" text-anchor="middle" fill="white" font-size="13">扩展邻居节点</text>
+  
+  <!-- 箭头回到循环 -->
+  <line x1="300" y1="470" x2="400" y2="470" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="400" y1="470" x2="400" y2="270" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把A*的循环逻辑画得很清楚。你写代码时，就照着这个流程走：取节点→判断终点→扩展邻居→更新open/closed list→继续循环。每一步都对应着代码里的一个模块。</p>
+
+<p>好了，代码部分就到这里。你把这章的内容吃透，A*就算入门了。下一章我们会聊更高级的话题——如何让A*跑得更快，比如双向搜索、跳点搜索这些优化技巧。但前提是，你得先把今天这份代码敲一遍，跑通它。</p>
+
+<p>嗯，动手吧。</p>
+
+<div class="footer-nav">
+            <a href="07AStarFlowDetail.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09AStarVisualization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

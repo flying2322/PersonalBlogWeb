@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 项目实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="active">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 项目实战：仓储AGV（三）：导航与定位算法部署、地图构建</h2>
+
+<p>好，咱们接着往下走。前两章我们把硬件搭起来了，底层驱动也调通了。现在要动真格的了——导航与定位算法部署，还有地图构建。</p>
+
+<p>说实话，这部分是AGV的灵魂。没有好的定位，车就是瞎跑。没有好的地图，定位也无从谈起。我当年第一次做仓储项目时，就吃过这个亏——地图建得马马虎虎，结果车子在货架间来回撞，差点把客户的货给怼翻了。嗯，从那以后，我对地图构建和定位算法就格外较真。</p>
+
+<h3>25.1 导航与定位的整体架构</h3>
+
+<p>先看整体。导航定位系统，说白了就是三个模块：<strong>传感器输入</strong>、<strong>定位引擎</strong>、<strong>路径规划输出</strong>。</p>
+
+<p>我个人习惯把架构画成下面这样，你一看就明白：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="0" y="0" width="720" height="420" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2C3E50">AGV导航定位系统架构图</text>
+  
+  <!-- 传感器层 -->
+  <rect x="60" y="60" width="180" height="50" rx="8" fill="#FFE4B5" stroke="#E67E22" stroke-width="2"/>
+  <text x="150" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#E67E22">传感器输入层</text>
+  
+  <rect x="60" y="120" width="180" height="100" rx="6" fill="#FFF8DC" stroke="#E67E22" stroke-width="1"/>
+  <text x="150" y="145" text-anchor="middle" font-size="12" fill="#333">• 激光雷达(LiDAR)</text>
+  <text x="150" y="165" text-anchor="middle" font-size="12" fill="#333">• 编码器(轮式里程计)</text>
+  <text x="150" y="185" text-anchor="middle" font-size="12" fill="#333">• IMU(惯性测量单元)</text>
+  <text x="150" y="205" text-anchor="middle" font-size="12" fill="#333">• 磁条/二维码(可选)</text>
+  
+  <!-- 箭头1 -->
+  <line x1="240" y1="145" x2="290" y2="145" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 定位引擎层 -->
+  <rect x="290" y="60" width="200" height="50" rx="8" fill="#B0E0E6" stroke="#2980B9" stroke-width="2"/>
+  <text x="390" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#2980B9">定位引擎层</text>
+  
+  <rect x="290" y="120" width="200" height="130" rx="6" fill="#E0F7FA" stroke="#2980B9" stroke-width="1"/>
+  <text x="390" y="145" text-anchor="middle" font-size="12" fill="#333">• 粒子滤波定位(AMCL)</text>
+  <text x="390" y="165" text-anchor="middle" font-size="12" fill="#333">• 卡尔曼滤波融合</text>
+  <text x="390" y="185" text-anchor="middle" font-size="12" fill="#333">• 扫描匹配(ICP/CSM)</text>
+  <text x="390" y="205" text-anchor="middle" font-size="12" fill="#333">• 全局定位初始化</text>
+  <text x="390" y="225" text-anchor="middle" font-size="12" fill="#333">• 位姿跟踪与修正</text>
+  
+  <!-- 箭头2 -->
+  <line x1="490" y1="145" x2="540" y2="145" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 规划输出层 -->
+  <rect x="540" y="60" width="140" height="50" rx="8" fill="#C8E6C9" stroke="#27AE60" stroke-width="2"/>
+  <text x="610" y="90" text-anchor="middle" font-size="14" font-weight="bold" fill="#27AE60">规划输出层</text>
+  
+  <rect x="540" y="120" width="140" height="100" rx="6" fill="#E8F5E9" stroke="#27AE60" stroke-width="1"/>
+  <text x="610" y="145" text-anchor="middle" font-size="12" fill="#333">• 全局路径规划</text>
+  <text x="610" y="165" text-anchor="middle" font-size="12" fill="#333">• 局部路径规划</text>
+  <text x="610" y="185" text-anchor="middle" font-size="12" fill="#333">• 速度控制指令</text>
+  <text x="610" y="205" text-anchor="middle" font-size="12" fill="#333">• 运动控制输出</text>
+  
+  <!-- 地图模块 -->
+  <rect x="290" y="280" width="200" height="50" rx="8" fill="#D8BFD8" stroke="#8E44AD" stroke-width="2"/>
+  <text x="390" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#8E44AD">地图构建模块</text>
+  
+  <rect x="290" y="340" width="200" height="60" rx="6" fill="#F3E5F5" stroke="#8E44AD" stroke-width="1"/>
+  <text x="390" y="362" text-anchor="middle" font-size="12" fill="#333">• 栅格地图(Grid Map)</text>
+  <text x="390" y="382" text-anchor="middle" font-size="12" fill="#333">• 占据概率更新</text>
+  
+  <!-- 双向箭头连接地图和定位 -->
+  <line x1="390" y1="280" x2="390" y2="250" stroke="#8E44AD" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrow)"/>
+  <line x1="390" y1="250" x2="390" y2="280" stroke="#8E44AD" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- 反馈箭头 -->
+  <path d="M 610 220 L 610 260 L 150 260 L 150 220" fill="none" stroke="#E74C3C" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  <text x="380" y="275" text-anchor="middle" font-size="11" fill="#E74C3C">闭环反馈修正</text>
+</svg>
+
+<p>你看，传感器数据进来，定位引擎算出位姿，然后规划层给出控制指令。同时地图模块和定位引擎是双向的——地图帮定位，定位反过来更新地图。这就是SLAM的核心思想。</p>
+
+<h3>25.2 地图构建：从激光数据到栅格地图</h3>
+
+<p>仓储AGV最常用的地图形式是<strong>栅格地图</strong>。每个格子代表一小块区域，值表示这个格子被占用的概率。</p>
+
+<p>我一般用0到100表示概率。0代表完全空闲，100代表完全占用，50代表未知。你想想看，这样处理起来多直观。</p>
+
+<div class="highlight">
+  <p><strong>核心公式：</strong>栅格地图的更新基于贝叶斯公式。简单说就是：</p>
+  <p>新概率 = 旧概率 × 传感器模型</p>
+  <p>每次激光扫描回来，我们就更新经过的格子。扫到障碍物的格子概率升高，扫到空闲区域的格子概率降低。</p>
+</div>
+
+<p>代码实现上，我习惯这样写：</p>
+
+<pre><code>// 栅格地图更新函数
+void updateGridMap(GridMap* map, LaserScan* scan, Pose robot_pose) {
+    // 1. 将激光点从传感器坐标系转换到世界坐标系
+    for (int i = 0; i &lt; scan-&gt;num_points; i++) {
+        float angle = robot_pose.theta + scan-&gt;angles[i];
+        float range = scan-&gt;ranges[i];
+        
+        // 跳过无效点
+        if (range &lt; MIN_RANGE || range &gt; MAX_RANGE) continue;
+        
+        // 计算激光点在世界坐标系中的位置
+        float world_x = robot_pose.x + range * cos(angle);
+        float world_y = robot_pose.y + range * sin(angle);
+        
+        // 2. 更新障碍物格子
+        int grid_x, grid_y;
+        worldToGrid(map, world_x, world_y, &amp;grid_x, &amp;grid_y);
+        if (isValidGrid(map, grid_x, grid_y)) {
+            // 增加占用概率
+            map-&gt;cells[grid_x][grid_y] += OCCUPIED_INC;
+            if (map-&gt;cells[grid_x][grid_y] &gt; 100) 
+                map-&gt;cells[grid_x][grid_y] = 100;
+        }
+        
+        // 3. 更新射线经过的空闲格子
+        // 从机器人位置到激光点做Bresenham直线
+        int robot_gx, robot_gy;
+        worldToGrid(map, robot_pose.x, robot_pose.y, &amp;robot_gx, &amp;robot_gy);
+        
+        // Bresenham算法遍历路径上的格子
+        bresenhamLine(map, robot_gx, robot_gy, grid_x, grid_y, 
+                      FREE_DEC, &amp;updateFreeCell);
+    }
+}</code></pre>
+
+<div class="tip">
+  <p><strong>实战小技巧：</strong>我在项目中遇到过一个问题——激光雷达的噪声会导致地图出现很多"鬼影"。后来我加了一个中值滤波，效果立竿见影。另外，更新概率时不要一步到位，用增量更新更稳健。</p>
+</div>
+
+<h3>25.3 定位算法部署：粒子滤波实战</h3>
+
+<p>定位算法我首推<strong>粒子滤波</strong>，也就是AMCL（自适应蒙特卡洛定位）。为什么？因为它能处理非高斯分布，而且实现起来相对直观。</p>
+
+<p>粒子滤波的核心思想很简单：用一堆粒子来猜测机器人的位置。每个粒子代表一个可能的位姿，粒子越密集的地方，机器人越可能在那里。</p>
+
+<p>算法流程分四步：</p>
+
+<ol>
+  <li><strong>初始化</strong>：在已知地图上撒粒子。如果不知道初始位置，就全图均匀撒。</li>
+  <li><strong>预测</strong>：根据里程计数据，让每个粒子移动。加入噪声模拟不确定性。</li>
+  <li><strong>更新</strong>：用激光扫描数据计算每个粒子的权重。匹配度高的粒子权重大。</li>
+  <li><strong>重采样</strong>：根据权重重新抽取粒子。权重高的粒子被复制，权重低的被淘汰。</li>
+</ol>
+
+<p>我当年第一次部署粒子滤波时，遇到一个坑——粒子数量设得太少，定位精度不够；设得太多，CPU扛不住。后来我用了自适应策略：定位稳定时减少粒子，遇到绑架或丢失时增加粒子。</p>
+
+<pre><code>// 粒子滤波核心循环
+void particleFilterUpdate(ParticleFilter* pf, Odometry* odom, LaserScan* scan) {
+    // 1. 预测阶段：根据里程计移动粒子
+    for (int i = 0; i &lt; pf-&gt;num_particles; i++) {
+        // 加入高斯噪声模拟里程计误差
+        float noise_x = gaussianRandom(0, ODOM_NOISE_XY);
+        float noise_y = gaussianRandom(0, ODOM_NOISE_XY);
+        float noise_theta = gaussianRandom(0, ODOM_NOISE_THETA);
+        
+        pf-&gt;particles[i].pose.x += odom-&gt;dx + noise_x;
+        pf-&gt;particles[i].pose.y += odom-&gt;dy + noise_y;
+        pf-&gt;particles[i].pose.theta += odom-&gt;dtheta + noise_theta;
+    }
+    
+    // 2. 更新阶段：计算每个粒子的权重
+    float total_weight = 0;
+    for (int i = 0; i &lt; pf-&gt;num_particles; i++) {
+        // 用激光扫描与地图的匹配度计算权重
+        pf-&gt;particles[i].weight = 
+            computeLikelihood(pf-&gt;map, scan, pf-&gt;particles[i].pose);
+        total_weight += pf-&gt;particles[i].weight;
+    }
+    
+    // 3. 重采样阶段
+    if (total_weight &gt; 0) {
+        resampleParticles(pf, total_weight);
+    }
+    
+    // 4. 估计最终位姿（加权平均）
+    estimatePose(pf);
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>重采样不能每次都做。我建议设置一个阈值——当有效粒子数低于总粒子数的一半时，才触发重采样。否则粒子会快速退化，全部集中到一个点上，失去多样性。</p>
+</div>
+
+<h3>25.4 部署到嵌入式平台</h3>
+
+<p>好了，算法讲完了。但算法再好，跑不到板子上也是白搭。嵌入式部署有几个关键点：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#E8F4FD;">
+    <th>资源</th>
+    <th>建议配置</th>
+    <th>我的经验</th>
+  </tr>
+  <tr>
+    <td>CPU</td>
+    <td>ARM Cortex-A72 以上</td>
+    <td>粒子数控制在500-1000，否则帧率掉到10Hz以下</td>
+  </tr>
+  <tr>
+    <td>内存</td>
+    <td>≥512MB</td>
+    <td>地图10m×10m，分辨率5cm，约4万个格子，够用</td>
+  </tr>
+  <tr>
+    <td>激光雷达</td>
+    <td>360° 2D LiDAR</td>
+    <td>我用过RPLIDAR和思岚的，性价比不错</td>
+  </tr>
+  <tr>
+    <td>操作系统</td>
+    <td>Linux + RT补丁</td>
+    <td>裸机跑也可以，但调试起来太痛苦</td>
+  </tr>
+</table>
+
+<p>部署时我习惯把定位和建图拆成两个线程。定位线程跑高频（20-30Hz），建图线程跑低频（1-2Hz）。这样既保证了实时性，又不会把CPU吃满。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在STM32上硬跑粒子滤波，结果发现浮点运算慢得离谱。后来改用定点数，速度提升了3倍。如果你用MCU，记得把浮点运算换成定点或者查表法。</p>
+</div>
+
+<h3>25.5 调试与验证</h3>
+
+<p>算法部署完，怎么知道它跑对了？我一般用三个方法验证：</p>
+
+<ul>
+  <li><strong>回放测试</strong>：录一段真实数据，离线跑算法，看定位轨迹是否平滑。</li>
+  <li><strong>闭环检测</strong>：让AGV走一圈回到起点，看定位误差是否累积。</li>
+  <li><strong>人工推车</strong>：推着AGV走，观察地图是否和实际环境一致。</li>
+</ul>
+
+<p>我记得有一次，回放测试时定位轨迹一直在漂。查了两天才发现——编码器标定参数错了，导致里程计误差被放大。所以啊，<strong>传感器标定是基础，基础不牢，地动山摇</strong>。</p>
+
+<p>好了，这一章的内容就到这。地图构建和定位算法部署，说白了就是让AGV知道自己在哪里、周围长什么样。下一章我们会接着讲路径规划和控制，到时候这些定位数据就要派上大用场了。</p>
+
+<div class="footer-nav">
+            <a href="24WarehouseAgvDriverComm.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26WarehouseAgvDispatchHmi.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 IMU抗干扰进阶</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="active">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 IMU抗干扰进阶：温度补偿、振动补偿与融合抗干扰</h2>
+
+<p>做AGV导航这么多年，IMU（惯性测量单元）一直是个让人又爱又恨的传感器。爱它是因为它不依赖外部信号，能提供高频的姿态和加速度信息；恨它是因为——它太容易受干扰了。温度一变，零偏就飘；振动一来，噪声就炸。今天我就把这几年的实战经验掰开揉碎，跟你聊聊IMU抗干扰的那些进阶技巧。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>IMU的干扰主要来自三个方面——温度漂移、机械振动、以及随机噪声。这三者如果不处理，IMU数据基本没法直接用。但处理好了，它就能成为导航系统里最可靠的“定海神针”。</p>
+</div>
+
+<h3>22.1 温度补偿：别让IMU“发烧”</h3>
+
+<p>IMU里的MEMS传感器对温度极其敏感。我遇到过一台AGV，夏天在车间跑得好好的，一到冬天冷启动，航向角直接偏了5度。查了半天，就是温度补偿没做好。</p>
+
+<p>温度补偿的核心思路其实很简单：建立温度与零偏的映射关系，然后在运行时实时修正。具体做法分三步：</p>
+
+<ol>
+  <li><strong>标定阶段：</strong>把IMU放进温箱，从-20°C到60°C，每5°C记录一次零偏数据。</li>
+  <li><strong>建模阶段：</strong>用多项式拟合温度-零偏曲线。我个人习惯用三阶多项式，精度够用，计算量也不大。</li>
+  <li><strong>运行阶段：</strong>根据当前温度查表或计算补偿值，实时修正IMU输出。</li>
+</ol>
+
+<p>下面是我常用的温度补偿代码框架：</p>
+
+<pre><code>// 温度补偿函数
+void imu_temp_compensate(float temp, float *gyro_bias, float *accel_bias) {
+    // 三阶多项式系数（标定得到）
+    float coeff_gx[4] = {0.0012, -0.0034, 0.0089, -0.0156};
+    float coeff_ax[4] = {0.0008, -0.0021, 0.0056, -0.0098};
+    
+    // 计算补偿值
+    float comp_gx = coeff_gx[0] + coeff_gx[1]*temp + 
+                    coeff_gx[2]*temp*temp + coeff_gx[3]*temp*temp*temp;
+    float comp_ax = coeff_ax[0] + coeff_ax[1]*temp + 
+                    coeff_ax[2]*temp*temp + coeff_ax[3]*temp*temp*temp;
+    
+    // 修正零偏
+    gyro_bias[0] -= comp_gx;
+    accel_bias[0] -= comp_ax;
+}</code></pre>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>标定时别忘了让IMU充分预热。我一般会先通电30分钟，等内部温度稳定了再开始采集数据。否则你标定出来的曲线，实际用起来还是会有偏差。</p>
+</div>
+
+<h3>22.2 振动补偿：把“抖”出来的噪声滤掉</h3>
+
+<p>AGV在粗糙地面跑的时候，IMU输出的加速度数据简直没法看。高频振动会混入真实运动信号里，导致姿态解算出错。你想想看，本来车子在直行，结果IMU告诉你它在上下颠簸，这导航还能准吗？</p>
+
+<p>振动补偿我常用的方法有两种：</p>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>原理</th>
+    <th>适用场景</th>
+    <th>我踩过的坑</th>
+  </tr>
+  <tr>
+    <td>低通滤波</td>
+    <td>截止频率设为5-10Hz，滤除高频振动</td>
+    <td>地面较平整，振动频率稳定</td>
+    <td>截止频率设太低，真实转弯信号也被滤掉了</td>
+  </tr>
+  <tr>
+    <td>自适应陷波滤波</td>
+    <td>实时检测振动主频，动态抑制</td>
+    <td>振动频率变化大的场景</td>
+    <td>参数调不好容易产生震荡</td>
+  </tr>
+  <tr>
+    <td>小波去噪</td>
+    <td>多尺度分解，分离信号与噪声</td>
+    <td>振动复杂，需要高精度姿态</td>
+    <td>计算量大，嵌入式上跑不动</td>
+  </tr>
+</table>
+
+<p>我个人最常用的是自适应陷波滤波。为什么呢？因为AGV在不同路面上的振动频率不一样——水泥地是20-30Hz，钢板地是40-50Hz。固定参数的滤波器根本搞不定。</p>
+
+<pre><code>// 自适应陷波滤波器示例
+typedef struct {
+    float freq;      // 当前陷波频率
+    float Q;         // 品质因数
+    float b0, b1, b2;
+    float a0, a1, a2;
+    float x1, x2, y1, y2;
+} NotchFilter;
+
+void notch_filter_update(NotchFilter *f, float sample_rate, float input) {
+    // 实时检测主频（通过FFT或锁相环）
+    f-&gt;freq = detect_dominant_freq(input, sample_rate);
+    
+    // 更新滤波器系数
+    float w0 = 2 * PI * f-&gt;freq / sample_rate;
+    float alpha = sin(w0) / (2 * f-&gt;Q);
+    
+    f-&gt;b0 = 1;
+    f-&gt;b1 = -2 * cos(w0);
+    f-&gt;b2 = 1;
+    f-&gt;a0 = 1 + alpha;
+    f-&gt;a1 = -2 * cos(w0);
+    f-&gt;a2 = 1 - alpha;
+    
+    // 滤波计算
+    float output = (f-&gt;b0 * input + f-&gt;b1 * f-&gt;x1 + f-&gt;b2 * f-&gt;x2
+                   - f-&gt;a1 * f-&gt;y1 - f-&gt;a2 * f-&gt;y2) / f-&gt;a0;
+    
+    // 更新状态
+    f-&gt;x2 = f-&gt;x1;
+    f-&gt;x1 = input;
+    f-&gt;y2 = f-&gt;y1;
+    f-&gt;y1 = output;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>振动补偿不是越强越好。滤波太狠，真实运动信号也会被衰减。我见过有人把截止频率设到2Hz，结果AGV转弯时IMU完全没反应，导航直接崩了。记住一个原则：在保证不丢失真实信号的前提下，尽量滤除噪声。</p>
+</div>
+
+<h3>22.3 零偏稳定性与随机游走抑制</h3>
+
+<p>零偏稳定性（Bias Stability）和角度随机游走（Angle Random Walk, ARW）是IMU的两个核心指标。说白了，前者衡量的是零偏随时间漂移的程度，后者衡量的是噪声积分后产生的角度误差。</p>
+
+<p>为什么会这样？因为IMU的噪声是随机的，积分之后会累积成随机游走误差。时间越长，误差越大。这就是为什么纯IMU导航几分钟就飘得没边了。</p>
+
+<p>抑制随机游走，我常用的方法有：</p>
+
+<ul>
+  <li><strong>Allan方差分析：</strong>先分析IMU的噪声特性，确定最优的平滑窗口大小。</li>
+  <li><strong>滑动平均滤波：</strong>对陀螺仪输出做滑动平均，降低高频噪声。</li>
+  <li><strong>零速检测+零偏修正：</strong>当AGV静止时，实时更新零偏估计值。</li>
+</ul>
+
+<p>这里重点说说零速检测。我曾经在一个项目里发现，AGV停着的时候IMU的角速度输出居然有0.5°/s的漂移。如果不做零速修正，10秒就能偏5度，导航根本没法用。</p>
+
+<pre><code>// 零速检测与零偏修正
+void zero_velocity_update(float gyro[3], float accel[3], float *bias) {
+    // 检测条件：角速度小 + 加速度接近重力
+    float gyro_norm = sqrt(gyro[0]*gyro[0] + gyro[1]*gyro[1] + gyro[2]*gyro[2]);
+    float accel_norm = sqrt(accel[0]*accel[0] + accel[1]*accel[1] + accel[2]*accel[2]);
+    
+    if (gyro_norm &lt; 0.1 &amp;&amp; fabs(accel_norm - 9.81) &lt; 0.2) {
+        // 静止状态，更新零偏
+        for (int i = 0; i &lt; 3; i++) {
+            bias[i] = 0.99 * bias[i] + 0.01 * gyro[i];  // 一阶低通
+        }
+    }
+}</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>零速检测的阈值不能设得太死。我曾经设了0.05°/s的角速度阈值，结果AGV在斜坡上静止时，因为重力分量导致加速度判断不通过，零偏一直没更新。后来我把加速度阈值放宽到0.3m/s²，问题就解决了。</p>
+</div>
+
+<h3>22.4 IMU与轮式里程计融合抗干扰</h3>
+
+<p>IMU有高频姿态但会漂移，轮式里程计有低频位置但会打滑。两者融合，正好互补。但融合不是简单加权平均，得讲究策略。</p>
+
+<p>我常用的融合框架是扩展卡尔曼滤波（EKF），状态量包括位置、速度、姿态、以及IMU零偏。观测值来自轮式里程计的位移和速度。</p>
+
+<p>这里的关键在于：<strong>当轮式里程计打滑时，要降低它的置信度</strong>。怎么判断打滑？看IMU加速度和轮速的一致性。</p>
+
+<pre><code>// 打滑检测与融合权重调整
+float detect_slip(float imu_accel, float wheel_accel) {
+    float diff = fabs(imu_accel - wheel_accel);
+    if (diff &lt; 0.5) {
+        return 1.0;   // 正常，完全信任里程计
+    } else if (diff &lt; 2.0) {
+        return 0.5;   // 轻微打滑，半信半疑
+    } else {
+        return 0.1;   // 严重打滑，几乎不信
+    }
+}
+
+// EKF观测更新时，根据打滑程度调整观测噪声协方差
+void ekf_update_with_slip(float slip_factor) {
+    float R_base = 0.1;  // 基础观测噪声
+    float R_adjusted = R_base / (slip_factor + 0.01);  // 打滑越严重，噪声越大
+    // ... 执行EKF更新
+}</code></pre>
+
+<p>说白了，融合的核心就是一句话：<strong>谁可靠就信谁多一点</strong>。IMU在短时间内的姿态很准，那就用它来修正航向；轮式里程计在平整地面上的位移很准，那就用它来修正位置。一旦检测到打滑或振动异常，立刻切换信任权重。</p>
+
+<div class="highlight">
+  <p><strong>我的经验总结：</strong>IMU抗干扰不是靠单一技巧就能搞定的。温度补偿解决的是环境变化问题，振动补偿解决的是机械干扰问题，零偏修正解决的是器件自身缺陷问题，融合算法解决的是多传感器协同问题。这四个层面缺一不可。</p>
+</div>
+
+<p>嗯，今天就聊到这儿。IMU这东西，你越了解它的脾气，就越能驾驭它。下次遇到IMU数据异常，别急着换硬件，先看看是不是温度补偿没做好，或者振动滤波参数没调对。很多时候，软件层面的优化比换一个更贵的IMU管用得多。</p>
+
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0f8ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e6f3ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a90d9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#357abd;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5cb85c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#449d44;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f0ad4e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ec971f;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#d9534f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c9302c;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="url(#bgGrad)" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">IMU抗干扰调优知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="60" width="200" height="50" rx="25" fill="#2c3e50" filter="url(#shadow)"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="white">IMU抗干扰调优</text>
+  
+  <!-- 四个分支 -->
+  <!-- 分支1：温度补偿 -->
+  <rect x="50" y="150" width="160" height="45" rx="8" fill="url(#boxGrad1)" filter="url(#shadow)"/>
+  <text x="130" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">温度补偿</text>
+  
+  <line x1="300" y1="110" x2="130" y2="150" stroke="#4a90d9" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <rect x="30" y="220" width="200" height="80" rx="6" fill="white" stroke="#4a90d9" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="130" y="242" text-anchor="middle" font-size="12" fill="#333">温箱标定</text>
+  <text x="130" y="260" text-anchor="middle" font-size="12" fill="#333">多项式拟合建模</text>
+  <text x="130" y="278" text-anchor="middle" font-size="12" fill="#333">实时查表修正</text>
+  
+  <!-- 分支2：振动补偿 -->
+  <rect x="290" y="150" width="160" height="45" rx="8" fill="url(#boxGrad2)" filter="url(#shadow)"/>
+  <text x="370" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">振动补偿</text>
+  
+  <line x1="350" y1="110" x2="370" y2="150" stroke="#5cb85c" stroke-width="2"/>
+  
+  <rect x="270" y="220" width="200" height="80" rx="6" fill="white" stroke="#5cb85c" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="370" y="242" text-anchor="middle" font-size="12" fill="#333">低通/陷波滤波</text>
+  <text x="370" y="260" text-anchor="middle" font-size="12" fill="#333">自适应频率检测</text>
+  <text x="370" y="278" text-anchor="middle" font-size="12" fill="#333">多尺度小波去噪</text>
+  
+  <!-- 分支3：零偏抑制 -->
+  <rect x="530" y="150" width="160" height="45" rx="8" fill="url(#boxGrad3)" filter="url(#shadow)"/>
+  <text x="610" y="178" text-anchor="middle" font-size="14" font-weight="bold" fill="white">零偏与随机游走</text>
+  
+  <line x1="450" y1="110" x2="610" y2="150" stroke="#f0ad4e" stroke-width="2"/>
+  
+  <rect x="510" y="220" width="200" height="80" rx="6" fill="white" stroke="#f0ad4e" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="610" y="242" text-anchor="middle" font-size="12" fill="#333">Allan方差分析</text>
+  <text x="610" y="260" text-anchor="middle" font-size="12" fill="#333">滑动平均滤波</text>
+  <text x="610" y="278" text-anchor="middle" font-size="12" fill="#333">零速检测修正</text>
+  
+  <!-- 分支4：融合抗干扰 -->
+  <rect x="290" y="340" width="160" height="45" rx="8" fill="url(#boxGrad4)" filter="url(#shadow)"/>
+  <text x="370" y="368" text-anchor="middle" font-size="14" font-weight="bold" fill="white">IMU+里程计融合</text>
+  
+  <line x1="350" y1="300" x2="370" y2="340" stroke="#d9534f" stroke-width="2"/>
+  
+  <rect x="270" y="410" width="200" height="70" rx="6" fill="white" stroke="#d9534f" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="370" y="432" text-anchor="middle" font-size="12" fill="#333">EKF融合框架</text>
+  <text x="370" y="450" text-anchor="middle" font-size="12" fill="#333">打滑检测与权重调整</text>
+  <text x="370" y="468" text-anchor="middle" font-size="12" fill="#333">自适应观测噪声</text>
+  
+  <!-- 连接线到中心 -->
+  <line x1="400" y1="110" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="340" width="160" height="45" rx="8" fill="#8e44ad" filter="url(#shadow)"/>
+  <text x="180" y="368" text-anchor="middle" font-size="13" font-weight="bold" fill="white">四层协同抗干扰</text>
+  
+  <line x1="180" y1="385" x2="370" y2="410" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="4,3"/>
+</svg>
+
+        <div class="footer-nav">
+            <a href="21LidarAntiInterfereAdvanced.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23VisualNavAntiInterfere.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

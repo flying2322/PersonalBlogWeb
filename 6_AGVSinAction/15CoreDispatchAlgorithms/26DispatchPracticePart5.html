@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 AGV调度系统实战（五）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="active">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 系统集成与联调测试——AGV调度系统落地的最后一道坎</h2>
+
+<p>各位同学，欢迎来到实战系列的第五讲。前面几讲我们聊了路径规划、任务分配、交通管制这些核心算法，代码也写了不少。但说实话，算法写得再漂亮，如果系统集成做不好，联调测试过不了，那一切都是纸上谈兵。</p>
+
+<p>我见过太多项目，算法仿真跑得飞起，一到现场就趴窝。为什么？因为系统集成和联调测试，才是真正考验一个调度系统是否“能打”的关键环节。今天，我就把我在几个大型AGV项目中踩过的坑、总结的经验，毫无保留地分享给大家。</p>
+
+<div class="highlight">
+    <p><strong>核心观点：</strong>系统集成不是简单的“拼积木”，而是要让调度系统、AGV本体、上位系统（MES/WMS）、充电桩、电梯、卷帘门等所有参与者，像一个交响乐团一样协同工作。联调测试，就是找出那些“不和谐的音符”。</p>
+</div>
+
+<h3>一、系统集成的“三横两纵”架构</h3>
+
+<p>我个人习惯把AGV调度系统的集成架构，画成“三横两纵”。你想想看，这样分层清晰，出了问题也好定位。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">AGV调度系统集成架构（三横两纵）</text>
+    
+    <!-- 横向三层 -->
+    <!-- 上层：业务系统 -->
+    <rect x="50" y="50" width="700" height="70" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="8"/>
+    <text x="400" y="80" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">上层：业务系统集成层</text>
+    <text x="400" y="105" text-anchor="middle" font-size="13" fill="#555">MES / WMS / ERP / 呼叫系统 / 电梯系统 / 门禁系统</text>
+    
+    <!-- 中层：调度核心 -->
+    <rect x="50" y="140" width="700" height="70" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="8"/>
+    <text x="400" y="170" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">中层：调度核心层</text>
+    <text x="400" y="195" text-anchor="middle" font-size="13" fill="#555">任务管理 / 路径规划 / 交通管制 / 状态监控 / 数据持久化</text>
+    
+    <!-- 下层：车辆通信 -->
+    <rect x="50" y="230" width="700" height="70" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="8"/>
+    <text x="400" y="260" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">下层：车辆通信层</text>
+    <text x="400" y="285" text-anchor="middle" font-size="13" fill="#555">TCP/UDP / MQTT / HTTP / 串口 / 自定义协议解析</text>
+    
+    <!-- 纵向两条 -->
+    <!-- 左纵：安全与监控 -->
+    <rect x="50" y="320" width="340" height="50" fill="#fce4ec" stroke="#e91e63" stroke-width="2" rx="8"/>
+    <text x="220" y="350" text-anchor="middle" font-size="14" font-weight="bold" fill="#c2185b">纵向：安全与监控体系</text>
+    
+    <!-- 右纵：日志与运维 -->
+    <rect x="410" y="320" width="340" height="50" fill="#ede7f6" stroke="#673ab7" stroke-width="2" rx="8"/>
+    <text x="580" y="350" text-anchor="middle" font-size="14" font-weight="bold" fill="#4527a0">纵向：日志与运维体系</text>
+    
+    <!-- 连接线 -->
+    <line x1="400" y1="120" x2="400" y2="140" stroke="#999" stroke-width="1" stroke-dasharray="5,5"/>
+    <line x1="400" y1="210" x2="400" y2="230" stroke="#999" stroke-width="1" stroke-dasharray="5,5"/>
+</svg>
+
+<p>说白了，上层是“甲方爸爸”的系统，中层是我们的调度大脑，下层是AGV的“手脚”。两个纵向体系贯穿始终，一个是保命的（安全），一个是查案的（日志）。</p>
+
+<h3>二、集成过程中的“硬骨头”</h3>
+
+<p>集成工作，说白了就是和各种“方言”打交道。每个系统都有自己的“方言”，你得把它们翻译成统一的“普通话”。</p>
+
+<h4>2.1 与MES/WMS的接口对接</h4>
+
+<p>这是最常遇到的。MES下发一个任务，格式可能是JSON，也可能是XML，甚至可能是老旧的CSV文件。我遇到过最离谱的，是用FTP传TXT文件……</p>
+
+<p><strong>接口设计原则：</strong></p>
+<ul>
+    <li><strong>异步非阻塞：</strong>MES下发任务后，不要让它等着。用消息队列（RabbitMQ/Kafka）或者回调接口。</li>
+    <li><strong>幂等性：</strong>同一个任务重复下发两次，结果应该一样。我在项目中就吃过这个亏，MES网络抖动重发了任务，结果AGV把同一个货搬了两遍……</li>
+    <li><strong>状态机清晰：</strong>任务状态（新建→分配→执行→完成/异常）要明确定义，MES和调度系统要能同步。</li>
+</ul>
+
+<div class="tip">
+    <p><strong>我的经验：</strong>接口文档一定要先定下来，双方签字确认。别边做边改，否则联调的时候你会想哭。我曾经因为接口字段名从“taskId”改成“taskID”，排查了整整一个下午。</p>
+</div>
+
+<h4>2.2 与电梯、卷帘门等外围设备的集成</h4>
+
+<p>AGV要跨楼层？那就得和电梯打交道。电梯的接口五花八门，有的是干接点，有的是Modbus，有的是HTTP。</p>
+
+<p><strong>典型流程：</strong></p>
+<ol>
+    <li>AGV到达电梯口，发送“呼梯请求”。</li>
+    <li>调度系统通知电梯：AGV要上3楼。</li>
+    <li>电梯到达，开门，给调度系统“已就绪”信号。</li>
+    <li>调度系统通知AGV进入电梯。</li>
+    <li>AGV进入后，发送“已就位”。</li>
+    <li>电梯关门，运行到3楼。</li>
+    <li>电梯开门，AGV驶出。</li>
+</ol>
+
+<div class="warning">
+    <p><strong>注意：</strong>这里最容易出问题的是“超时”。电梯门关到一半卡住了怎么办？AGV在电梯里没信号了怎么办？一定要设计超时重试和异常处理机制。我曾经遇到过电梯门感应器坏了，AGV在电梯里困了10分钟……</p>
+</div>
+
+<h4>2.3 与充电桩的集成</h4>
+
+<p>AGV没电了，得自己去找充电桩。这里有个坑：充电桩的通信协议不统一。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:10px 0;">
+    <tr style="background-color:#e3f2fd;">
+        <th>充电桩类型</th>
+        <th>通信方式</th>
+        <th>常见问题</th>
+    </tr>
+    <tr>
+        <td>接触式充电桩</td>
+        <td>Modbus RTU / TCP</td>
+        <td>触点氧化导致通信失败</td>
+    </tr>
+    <tr>
+        <td>无线充电桩</td>
+        <td>HTTP / MQTT</td>
+        <td>对位不准导致充电效率低</td>
+    </tr>
+    <tr>
+        <td>换电站</td>
+        <td>自定义TCP协议</td>
+        <td>机械结构卡死</td>
+    </tr>
+</table>
+
+<p>我的建议是：在调度系统中抽象出一个“充电桩适配器”接口，不同的充电桩实现不同的适配器。这样换充电桩品牌，只需要换适配器，不用动核心逻辑。</p>
+
+<h3>三、联调测试——从“能跑”到“跑得好”</h3>
+
+<p>联调测试，我把它分为三个阶段。每个阶段的目标不同，方法也不同。</p>
+
+<h4>3.1 第一阶段：单机功能测试</h4>
+
+<p>先让一台AGV跑起来。测试内容：</p>
+<ul>
+    <li>通信是否正常（心跳、指令下发、状态上报）</li>
+    <li>基础动作（前进、后退、转弯、举升）</li>
+    <li>任务执行（从A点到B点）</li>
+    <li>异常处理（低电量、离线、碰撞传感器触发）</li>
+</ul>
+
+<p>这个阶段，我习惯用“脚本自动化”来测。写个Python脚本，模拟调度系统下发1000次任务，看AGV能不能全部正确执行。别手动点，点1000次你会疯的。</p>
+
+<h4>3.2 第二阶段：多机协同测试</h4>
+
+<p>两台、三台、五台……逐步增加AGV数量。这个阶段主要测：</p>
+<ul>
+    <li><strong>交通管制：</strong>多车在路口会不会死锁？</li>
+    <li><strong>任务分配：</strong>任务来了，会不会分配给最合适的车？</li>
+    <li><strong>资源竞争：</strong>多个AGV同时要充电，充电桩够不够？</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>避坑指南：</strong>我曾经在测试时发现，3台车跑得好好的，加到第4台就开始频繁死锁。查了半天，原来是路径规划算法里有个“最大搜索深度”设得太小了，车一多就找不到路。这种问题，单机测试根本发现不了。</p>
+</div>
+
+<h4>3.3 第三阶段：压力与稳定性测试</h4>
+
+<p>这是最接近真实场景的测试。连续跑24小时、48小时、72小时。看系统会不会内存泄漏？会不会丢任务？会不会死机？</p>
+
+<p><strong>测试指标：</strong></p>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:10px 0;">
+    <tr style="background-color:#e3f2fd;">
+        <th>指标</th>
+        <th>合格标准</th>
+        <th>备注</th>
+    </tr>
+    <tr>
+        <td>任务完成率</td>
+        <td>≥99.9%</td>
+        <td>丢任务不可接受</td>
+    </tr>
+    <tr>
+        <td>平均响应延迟</td>
+        <td>≤500ms</td>
+        <td>从任务下发到AGV开始执行</td>
+    </tr>
+    <tr>
+        <td>系统CPU使用率</td>
+        <td>≤70%</td>
+        <td>留有余量应对突发</td>
+    </tr>
+    <tr>
+        <td>内存泄漏</td>
+        <td>72小时无增长</td>
+        <td>用JProfiler或VisualVM监控</td>
+    </tr>
+</table>
+
+<h3>四、联调中的“黑天鹅”事件</h3>
+
+<p>说几个我亲身经历过的“黑天鹅”，给大家提个醒。</p>
+
+<p><strong>案例一：AGV的时钟漂移</strong></p>
+<p>有一次联调，发现AGV上报的时间总是比调度系统慢几秒。一开始没在意，后来发现交通管制模块依赖时间戳来判断车辆位置，时间一错，管制逻辑全乱了。解决方案：所有AGV强制NTP对时，调度系统作为NTP服务器。</p>
+
+<p><strong>案例二：Wi-Fi漫游导致断连</strong></p>
+<p>AGV在车间里移动，从一个AP切换到另一个AP时，会有短暂的断连。如果调度系统没有重连机制，任务就丢了。后来我们在通信层加了“心跳+自动重连+任务断点续传”机制。</p>
+
+<p><strong>案例三：数据库连接池耗尽</strong></p>
+<p>压力测试时，突然所有任务都卡住了。一看日志，数据库连接池满了。原来有个查询接口没加索引，每次查询都全表扫描，把连接池占满了。加了个索引，问题解决。</p>
+
+<div class="tip">
+    <p><strong>我的习惯：</strong>联调测试期间，日志级别调到DEBUG。虽然日志量会很大，但出了问题能快速定位。等正式上线了，再调到INFO或WARN。</p>
+</div>
+
+<h3>五、总结</h3>
+
+<p>系统集成和联调测试，说白了就是“把纸面上的设计变成能跑的系统”。这个过程很痛苦，但也很锻炼人。你想想看，当你看到几十台AGV在车间里井然有序地穿梭，任务完成率100%，那种成就感，是写代码无法比拟的。</p>
+
+<p>最后送大家一句话：<strong>集成无小事，测试要较真。</strong>每一个你觉得“应该没问题”的地方，往往就是出问题的地方。</p>
+
+<hr style="border:1px dashed #ccc; margin:20px 0;">
+
+        <div class="footer-nav">
+            <a href="25DispatchPracticePart4.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27DispatchPracticePart6.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

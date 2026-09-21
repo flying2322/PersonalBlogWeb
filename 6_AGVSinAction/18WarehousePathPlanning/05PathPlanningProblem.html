@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 路径规划问题定义</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="active">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 路径规划问题定义：输入输出、约束条件（避障、电量、时间窗）、优化目标</h2>
+
+<p>好，咱们进入正题。路径规划这个词，听起来挺高大上的。说白了，就是给AGV找一条路，让它从A点跑到B点。</p>
+
+<p>但问题来了——仓储里不是空地。有货架、有工人、有其他AGV，还有充电桩。你想想看，如果只找最短路径，那AGV很可能一头撞上障碍物，或者半路没电趴窝。</p>
+
+<p>所以，我们需要把路径规划定义成一个<strong>有约束的优化问题</strong>。我个人习惯把这个问题拆成三块：输入输出、约束条件、优化目标。咱们一块一块说。</p>
+
+<h3>5.1 输入与输出：你给什么，它吐什么</h3>
+
+<p>先讲输入。路径规划器的输入，其实就三样东西：</p>
+
+<ul>
+  <li><strong>地图信息</strong>：仓储环境的栅格地图或拓扑地图。每个格子标记了是空地、货架、充电站还是障碍物。</li>
+  <li><strong>任务信息</strong>：AGV的起点坐标、终点坐标（比如从A货架取货送到B出库口）。</li>
+  <li><strong>AGV状态</strong>：当前电量、载重、尺寸、最大速度等。这些参数直接影响路径是否可行。</li>
+</ul>
+
+<p>输出呢？很简单——一条<strong>路径</strong>。路径由一系列坐标点组成，比如：<code>(x1, y1) → (x2, y2) → ... → (xn, yn)</code>。每个点还附带时间戳和速度指令。</p>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：输入决定了规划的上限，输出决定了执行的可行性。我见过不少项目，输入地图精度不够，导致规划出来的路径AGV根本走不了——嗯，这就是典型的“垃圾进，垃圾出”。</p>
+</div>
+
+<h3>5.2 约束条件：三条红线不能碰</h3>
+
+<p>约束条件，就是路径必须满足的硬性要求。我把它归纳为三大类：</p>
+
+<h4>5.2.1 避障约束</h4>
+
+<p>这个最好理解。AGV不能撞到任何东西。</p>
+
+<ul>
+  <li><strong>静态障碍物</strong>：货架、立柱、墙壁。这些在地图里是固定的。</li>
+  <li><strong>动态障碍物</strong>：其他AGV、工人、叉车。这些会移动，所以路径规划必须考虑时间维度。</li>
+</ul>
+
+<p>我曾经在一个项目里遇到过一个问题：地图更新不及时，货架位置变了但地图没改。结果AGV按照旧路径走，直接怼到货架上。从那以后，我要求所有项目必须做<strong>实时地图更新</strong>。</p>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经以为避障只要考虑静态障碍物就够了。直到有一次，两台AGV在狭窄通道里“顶牛”，谁也过不去。后来我才意识到，动态避障必须考虑<strong>时间窗</strong>——也就是每台AGV什么时间占用哪个区域。</p>
+</div>
+
+<h4>5.2.2 电量约束</h4>
+
+<p>AGV是电池驱动的。电量不够，再短的路径也白搭。</p>
+
+<p>约束条件很简单：<strong>路径消耗的电量 ≤ 当前剩余电量</strong>。</p>
+
+<p>但这里有个细节——电量消耗不是线性的。空载和满载不一样，上坡和下坡不一样，加速和匀速也不一样。我建议在规划时预留<strong>20%的安全余量</strong>。为什么？因为电池老化后实际容量会下降，你想想看，如果规划时刚好够用，半年后AGV可能半路就趴窝了。</p>
+
+<table>
+  <tr>
+    <th>因素</th>
+    <th>对电量的影响</th>
+  </tr>
+  <tr>
+    <td>空载行驶</td>
+    <td>基准消耗</td>
+  </tr>
+  <tr>
+    <td>满载行驶</td>
+    <td>增加30%-50%</td>
+  </tr>
+  <tr>
+    <td>频繁启停</td>
+    <td>增加20%-40%</td>
+  </tr>
+  <tr>
+    <td>电池老化</td>
+    <td>容量下降10%-30%</td>
+  </tr>
+</table>
+
+<h4>5.2.3 时间窗约束</h4>
+
+<p>这个稍微复杂一点。时间窗约束，说白了就是<strong>什么时间能走，什么时间不能走</strong>。</p>
+
+<p>举个例子：某个通道在8:00-8:30是工人换班时间，AGV不能通行。或者，某个充电桩在10:00-10:15被另一台AGV预约了，你的AGV不能在那个时间点去充电。</p>
+
+<p>时间窗约束在<strong>多AGV协同</strong>场景下特别重要。我记得有一次做项目，三台AGV同时要经过同一个十字路口。如果没有时间窗约束，它们就会撞在一起。解决方案是给每个路口分配时间窗，每台AGV只能在分配的时间段内通过。</p>
+
+<div class="tip">
+  <p><strong>个人经验</strong>：时间窗约束的粒度很重要。太粗（比如按小时分）会导致资源浪费；太细（比如按毫秒分）会导致计算量爆炸。我一般建议按<strong>秒级</strong>来划分，既保证精度，又不会让规划器算到死机。</p>
+</div>
+
+<h3>5.3 优化目标：不只是最短路径</h3>
+
+<p>约束条件保证了路径“可行”，优化目标决定了路径“好不好”。</p>
+
+<p>常见的优化目标有这几个：</p>
+
+<ul>
+  <li><strong>路径最短</strong>：最直观的目标。但注意，最短路径不一定是最优路径——如果最短路径上全是拥堵区域，那还不如绕远路。</li>
+  <li><strong>时间最短</strong>：考虑行驶速度、等待时间、装卸时间。这个比路径最短更实用。</li>
+  <li><strong>能耗最低</strong>：适合电量紧张的场景。有时候绕一点路但少爬坡，反而更省电。</li>
+  <li><strong>均衡负载</strong>：避免某条路径被过度使用，导致拥堵。这个在多AGV场景下特别重要。</li>
+</ul>
+
+<p>实际项目中，我们通常做<strong>多目标优化</strong>。比如：<code>总成本 = 距离 × 权重1 + 时间 × 权重2 + 能耗 × 权重3</code>。权重怎么调？嗯，这个得看具体业务需求。我一般先跑仿真，看看不同权重下AGV的表现，再跟业务方一起定。</p>
+
+<div class="highlight">
+  <p><strong>一句话总结</strong>：路径规划问题 = 输入（地图+任务+状态）+ 约束（避障+电量+时间窗）+ 目标（距离/时间/能耗）。三者缺一不可。</p>
+</div>
+
+<h3>5.4 知识体系框架图</h3>
+
+<p>下面这张图，把路径规划问题的核心逻辑串起来了。我建议你多看几遍，理解输入怎么变成输出，约束怎么卡住路径，目标怎么引导优化。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">路径规划问题定义 - 核心框架</text>
+  
+  <!-- 输入模块 -->
+  <rect x="50" y="70" width="200" height="120" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">输入</text>
+  <text x="150" y="125" text-anchor="middle" font-size="13" fill="#2c3e50">• 地图信息</text>
+  <text x="150" y="145" text-anchor="middle" font-size="13" fill="#2c3e50">• 任务信息</text>
+  <text x="150" y="165" text-anchor="middle" font-size="13" fill="#2c3e50">• AGV状态</text>
+  
+  <!-- 箭头1 -->
+  <line x1="250" y1="130" x2="320" y2="130" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 约束模块 -->
+  <rect x="320" y="60" width="200" height="140" rx="8" fill="#fff3e0" stroke="#e67e22" stroke-width="2"/>
+  <text x="420" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="#d35400">约束条件</text>
+  <text x="420" y="115" text-anchor="middle" font-size="13" fill="#2c3e50">• 避障（静态+动态）</text>
+  <text x="420" y="135" text-anchor="middle" font-size="13" fill="#2c3e50">• 电量（安全余量）</text>
+  <text x="420" y="155" text-anchor="middle" font-size="13" fill="#2c3e50">• 时间窗（协同）</text>
+  <text x="420" y="175" text-anchor="middle" font-size="13" fill="#2c3e50">• 车辆动力学</text>
+  
+  <!-- 箭头2 -->
+  <line x1="520" y1="130" x2="590" y2="130" stroke="#e67e22" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  
+  <!-- 优化目标模块 -->
+  <rect x="590" y="70" width="160" height="120" rx="8" fill="#e8f5e9" stroke="#27ae60" stroke-width="2"/>
+  <text x="670" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e8449">优化目标</text>
+  <text x="670" y="125" text-anchor="middle" font-size="13" fill="#2c3e50">• 路径最短</text>
+  <text x="670" y="145" text-anchor="middle" font-size="13" fill="#2c3e50">• 时间最短</text>
+  <text x="670" y="165" text-anchor="middle" font-size="13" fill="#2c3e50">• 能耗最低</text>
+  
+  <!-- 输出模块 -->
+  <rect x="300" y="260" width="200" height="100" rx="8" fill="#fce4ec" stroke="#e74c3c" stroke-width="2"/>
+  <text x="400" y="290" text-anchor="middle" font-size="16" font-weight="bold" fill="#c0392b">输出</text>
+  <text x="400" y="315" text-anchor="middle" font-size="13" fill="#2c3e50">• 路径坐标序列</text>
+  <text x="400" y="335" text-anchor="middle" font-size="13" fill="#2c3e50">• 时间戳 + 速度指令</text>
+  
+  <!-- 箭头3：约束到输出 -->
+  <line x1="420" y1="200" x2="400" y2="260" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+  
+  <!-- 箭头4：优化目标到输出 -->
+  <line x1="670" y1="190" x2="500" y2="290" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 反馈箭头 -->
+  <path d="M 400 360 Q 400 400 150 400 Q 50 400 50 190" fill="none" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrowGray)"/>
+  <text x="200" y="420" text-anchor="middle" font-size="12" fill="#7f8c8d">反馈迭代（路径不可行时重新规划）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e67e22"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="tip">
+  <p><strong>我的建议</strong>：做路径规划时，先把约束条件列清楚，再谈优化目标。约束不明确，优化就是空中楼阁。我见过太多团队一上来就调算法参数，结果连最基本的避障都没做好——嗯，这种项目最后都返工了。</p>
+</div>
+
+<p>好了，路径规划问题的定义就讲到这里。记住：<strong>输入是基础，约束是红线，目标是方向</strong>。下一节咱们聊聊具体的规划算法——怎么在满足约束的前提下，找到那条最优路径。</p>
+
+<div class="footer-nav">
+            <a href="04CoordinateAndLocalization.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06EnvironmentModeling.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

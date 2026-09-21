@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV系统概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="active">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV系统概述：从定义到实战</h2>
+
+<p>大家好，我是老张。在AGV调度这个领域摸爬滚打了十几年，今天咱们来聊聊AGV系统的基础。别小看这些基础内容，我见过不少项目翻车，就是因为团队对AGV的理解还停留在「会跑的小车」这个层面。</p>
+
+<p>AGV，全称Automated Guided Vehicle，中文叫自动导引运输车。说白了，就是不用人开、自己会跑的小车。但这里有个关键点——它不只是车，而是一整套系统。</p>
+
+<h3>1.1 AGV的定义：不只是车</h3>
+
+<p>AGV的核心特征有三个：</p>
+
+<ul>
+  <li><strong>自动行驶</strong>：不需要驾驶员，靠导航系统自己走</li>
+  <li><strong>路径可控</strong>：不是乱跑，是按预设路线或动态规划路线走</li>
+  <li><strong>任务驱动</strong>：有明确的搬运任务，不是瞎溜达</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我个人习惯把AGV理解成「长了轮子的机器人」</strong>。它跟普通叉车最大的区别是——它有大脑（控制系统），有眼睛（导航传感器），还会跟别人聊天（通信系统）。</p>
+</div>
+
+<h3>1.2 AGV发展史：从磁条到AI</h3>
+
+<p>AGV的发展，我把它分成三个阶段：</p>
+
+<table>
+  <tr>
+    <th>阶段</th>
+    <th>时间</th>
+    <th>导航方式</th>
+    <th>典型应用</th>
+  </tr>
+  <tr>
+    <td>第一代</td>
+    <td>1950s-1980s</td>
+    <td>电磁感应、磁条</td>
+    <td>汽车产线</td>
+  </tr>
+  <tr>
+    <td>第二代</td>
+    <td>1990s-2010s</td>
+    <td>激光反射板、二维码</td>
+    <td>仓储物流</td>
+  </tr>
+  <tr>
+    <td>第三代</td>
+    <td>2010s至今</td>
+    <td>SLAM、视觉、多传感器融合</td>
+    <td>柔性制造、电商仓库</td>
+  </tr>
+</table>
+
+<p>我记得刚入行那会儿，用的还是磁条导航的AGV。那时候调试一台车，得在地上贴几百米的磁条，贴歪了车就跑偏。现在想想，真是原始。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在一个项目里，客户非要沿用10年前的磁条方案。结果产线一调整，磁条就得重贴，成本比换新车还高。所以选导航方式时，一定要考虑未来的柔性需求。</p>
+</div>
+
+<h3>1.3 AGV应用场景：哪里需要搬哪里</h3>
+
+<p>AGV的应用场景，说白了就是「有人搬东西的地方，都可能被AGV替代」。目前主流场景有：</p>
+
+<ul>
+  <li><strong>制造业</strong>：产线物料配送、成品入库。这是AGV的老本行</li>
+  <li><strong>仓储物流</strong>：电商仓库的货到人、整箱搬运。你想想看，双十一的包裹能那么快发出，AGV功不可没</li>
+  <li><strong>医院</strong>：药品、标本、被服的自动配送。疫情期间我参与过一个医院项目，AGV减少了医护人员90%的跑腿时间</li>
+  <li><strong>港口码头</strong>：集装箱搬运。这个场景对AGV的载重和精度要求极高</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意</strong>：不是所有场景都适合上AGV。我见过一个项目，客户非要在狭窄的旧厂房里用AGV，结果转弯半径不够，车天天撞墙。所以评估场景时，一定要实地勘测，别光看图纸。</p>
+</div>
+
+<h3>1.4 AGV系统组成：一辆车背后的秘密</h3>
+
+<p>一套完整的AGV系统，远不止你看到的那辆车。它包含：</p>
+
+<ol>
+  <li><strong>车体本体</strong>：底盘、驱动轮、电池。这是硬件基础</li>
+  <li><strong>导航系统</strong>：激光雷达、摄像头、IMU等。相当于车的眼睛</li>
+  <li><strong>控制系统</strong>：车载控制器、运动控制算法。这是大脑</li>
+  <li><strong>调度系统</strong>：任务分配、路径规划、交通管理。这是指挥官</li>
+  <li><strong>通信系统</strong>：WiFi、5G、UWB。让车跟系统说话</li>
+  <li><strong>充电系统</strong>：自动充电桩、换电站。保证车不停机</li>
+</ol>
+
+<p>这里我重点说一下调度系统。很多新手以为AGV的核心是车，其实错了。真正决定系统效率的，是调度算法。车再快，调度不好也是堵成一锅粥。</p>
+
+<h3>1.5 AGV分类：五花八门怎么选</h3>
+
+<p>AGV的分类方式很多，我按最常见的三种维度来分：</p>
+
+<p><strong>按导航方式分：</strong></p>
+<ul>
+  <li>磁导航：便宜但柔性差</li>
+  <li>激光导航：精度高，成本适中</li>
+  <li>视觉导航：信息丰富，但计算量大</li>
+  <li>SLAM导航：无需改造环境，但技术门槛高</li>
+</ul>
+
+<p><strong>按负载方式分：</strong></p>
+<ul>
+  <li>潜伏式：顶升货架，电商常用</li>
+  <li>牵引式：拖拽料车，产线常见</li>
+  <li>叉车式：堆高搬运，仓库必备</li>
+  <li>重载式：几十吨的大家伙，港口用</li>
+</ul>
+
+<p><strong>按应用场景分：</strong></p>
+<ul>
+  <li>产线AGV：精度要求高</li>
+  <li>仓储AGV：效率要求高</li>
+  <li>特种AGV：防爆、洁净等特殊环境</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的建议</strong>：选型时别只看参数。我见过一个项目，选了精度最高的激光导航，结果车间粉尘太大，激光雷达天天报警。最后换成了视觉导航，反而稳定多了。所以一定要结合现场环境来选。</p>
+</div>
+
+<h3>1.6 知识体系总览</h3>
+
+<p>下面这张图，是我自己梳理的AGV调度系统知识体系。你把它理解成一张地图，后面每一章都会在这张图上找到位置。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV调度系统知识体系</text>
+  
+  <!-- 第一层：基础层 -->
+  <rect x="50" y="70" width="700" height="60" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">基础层：AGV定义、发展史、应用场景、系统组成与分类</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="130" x2="400" y2="160" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：导航与定位 -->
+  <rect x="50" y="160" width="700" height="60" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="195" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">导航与定位：磁导航、激光导航、视觉导航、SLAM</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="220" x2="400" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：调度算法 -->
+  <rect x="50" y="250" width="700" height="60" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">调度算法：任务分配、路径规划、交通管理、死锁避免</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="310" x2="400" y2="340" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：系统集成 -->
+  <rect x="50" y="340" width="700" height="60" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="400" y="375" text-anchor="middle" font-size="16" font-weight="bold" fill="#c2185b">系统集成：WMS/ERP对接、通信协议、多车协同</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第五层：优化与运维 -->
+  <rect x="50" y="430" width="700" height="50" rx="8" fill="#ede7f6" stroke="#673ab7" stroke-width="2"/>
+  <text x="400" y="460" text-anchor="middle" font-size="16" font-weight="bold" fill="#4527a0">优化与运维：效率分析、故障诊断、持续迭代</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图从下往上看，就是AGV调度系统的完整知识栈。第一章我们讲的是最底层的基础层，后面每一章都会往上走一层。你想想看，是不是有点像盖房子？地基打不牢，上面再花哨也没用。</p>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：AGV调度系统的本质，是解决「谁去、去哪、怎么走、怎么不撞」这四个问题。后面的所有算法，都是围绕这四个问题展开的。</p>
+</div>
+
+<p>好了，第一章就到这里。内容不多，但都是干货。下一章我们开始深入导航技术，聊聊各种导航方式的原理和实战坑点。</p>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02DispatchArchitecture.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

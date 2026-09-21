@@ -1,0 +1,439 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 全局路径规划算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="active">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 全局路径规划算法</h2>
+
+<p>全局路径规划，说白了就是给AGV找一条从A到B的可行路径。很多新手觉得这事简单——不就是找条路吗？但实际做起来，坑多得很。我最早做AGV时，用的就是Dijkstra，后来发现效率不行，才换的A*。再后来遇到阿克曼底盘的车，A*又不好使了，这才上了Hybrid-A*。</p>
+
+<p>这一章，我把这三种算法掰开揉碎了讲。你跟着走一遍，基本就能应付大部分场景了。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>全局规划 ≠ 最短路径。要考虑车辆运动约束、地图更新频率、计算资源限制。选对算法，比调参更重要。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; margin:20px auto; display:block;">
+  <rect x="10" y="10" width="780" height="380" rx="15" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2"/>
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">全局路径规划算法体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#4a90d9" stroke="#2c6aa0" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">全局路径规划</text>
+  
+  <!-- 三个分支 -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#4a90d9" stroke-width="2"/>
+  
+  <!-- Dijkstra -->
+  <rect x="50" y="180" width="200" height="60" rx="8" fill="#e8f4e8" stroke="#27ae60" stroke-width="2"/>
+  <text x="150" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#27ae60">Dijkstra算法</text>
+  <text x="150" y="225" text-anchor="middle" font-size="11" fill="#555">广度优先 + 贪心</text>
+  
+  <!-- A* -->
+  <rect x="300" y="180" width="200" height="60" rx="8" fill="#fff3e0" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#e67e22">A*算法</text>
+  <text x="400" y="225" text-anchor="middle" font-size="11" fill="#555">启发式搜索 + 代价函数</text>
+  
+  <!-- Hybrid-A* -->
+  <rect x="550" y="180" width="200" height="60" rx="8" fill="#fce4ec" stroke="#c0392b" stroke-width="2"/>
+  <text x="650" y="205" text-anchor="middle" font-size="14" font-weight="bold" fill="#c0392b">Hybrid-A*算法</text>
+  <text x="650" y="225" text-anchor="middle" font-size="11" fill="#555">连续状态 + 运动学约束</text>
+  
+  <!-- 特性 -->
+  <line x1="150" y1="240" x2="100" y2="300" stroke="#27ae60" stroke-width="1.5"/>
+  <line x1="150" y1="240" x2="200" y2="300" stroke="#27ae60" stroke-width="1.5"/>
+  <line x1="400" y1="240" x2="350" y2="300" stroke="#e67e22" stroke-width="1.5"/>
+  <line x1="400" y1="240" x2="450" y2="300" stroke="#e67e22" stroke-width="1.5"/>
+  <line x1="650" y1="240" x2="600" y2="300" stroke="#c0392b" stroke-width="1.5"/>
+  <line x1="650" y1="240" x2="700" y2="300" stroke="#c0392b" stroke-width="1.5"/>
+  
+  <rect x="30" y="300" width="140" height="40" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="100" y="325" text-anchor="middle" font-size="12" fill="#1a5276">适用于静态地图</text>
+  
+  <rect x="160" y="300" width="100" height="40" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="210" y="325" text-anchor="middle" font-size="12" fill="#1a5276">保证最优解</text>
+  
+  <rect x="310" y="300" width="180" height="40" rx="5" fill="#fdebd0" stroke="#e67e22" stroke-width="1"/>
+  <text x="400" y="325" text-anchor="middle" font-size="12" fill="#1a5276">启发式加速，效率高</text>
+  
+  <rect x="560" y="300" width="180" height="40" rx="5" fill="#fadbd8" stroke="#c0392b" stroke-width="1"/>
+  <text x="650" y="325" text-anchor="middle" font-size="12" fill="#1a5276">支持阿克曼/差速底盘</text>
+  
+  <text x="400" y="380" text-anchor="middle" font-size="11" fill="#888">选择依据：地图类型、底盘运动学、实时性要求</text>
+</svg>
+
+<h3>11.1 Dijkstra算法原理</h3>
+
+<p>Dijkstra是全局路径规划的「老祖宗」。它的思路很简单：从起点开始，一层层往外扩散，直到碰到终点。每次只选当前代价最小的节点扩展。</p>
+
+<p>我当年在学校学这个算法时，觉得它挺完美的。直到第一次在AGV上跑——地图稍微大一点，计算时间就飙上去了。为什么呢？因为它不知道终点在哪，只能盲目地往所有方向扩散。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>Dijkstra适合静态地图、小规模场景（比如50x50网格以内）。如果地图超过200x200，建议直接上A*。</p>
+</div>
+
+<p>伪代码其实很简单：</p>
+
+<pre><code>function Dijkstra(start, goal, grid):
+    open_set = {start}          // 待扩展节点
+    closed_set = {}             // 已扩展节点
+    g[start] = 0                // 起点代价为0
+    
+    while open_set is not empty:
+        current = min_cost_node(open_set)  // 取代价最小的
+        if current == goal:
+            return reconstruct_path(current)
+        
+        open_set.remove(current)
+        closed_set.add(current)
+        
+        for neighbor in get_neighbors(current):
+            if neighbor in closed_set:
+                continue
+            tentative_g = g[current] + cost(current, neighbor)
+            if tentative_g < g[neighbor]:
+                g[neighbor] = tentative_g
+                parent[neighbor] = current
+                if neighbor not in open_set:
+                    open_set.add(neighbor)
+    
+    return None  // 无路径</code></pre>
+
+<p>注意看，它没有用到任何终点信息。这就是它慢的根本原因。</p>
+
+<h3>11.2 A*算法原理与实现</h3>
+
+<p>A*算法在Dijkstra基础上加了一个启发式函数。说白了，就是告诉搜索器：「嘿，终点在那边，别往反方向瞎跑。」</p>
+
+<p>代价函数变成了：<code>f(n) = g(n) + h(n)</code></p>
+<ul>
+  <li><code>g(n)</code>：从起点到当前节点的实际代价</li>
+  <li><code>h(n)</code>：从当前节点到终点的估计代价（启发式）</li>
+</ul>
+
+<p>启发式函数怎么选？我一般用欧几里得距离或曼哈顿距离。对于网格地图，曼哈顿距离更常用，因为它考虑了只能上下左右走的情况。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中用了欧几里得距离做启发式，结果路径经常穿墙。后来才发现，对于有障碍物的地图，欧几里得距离会低估实际代价，导致搜索方向偏了。换成曼哈顿距离后，问题就解决了。</p>
+</div>
+
+<p>A*的代码实现：</p>
+
+<pre><code>function AStar(start, goal, grid):
+    open_set = PriorityQueue()
+    open_set.put(start, 0)
+    g[start] = 0
+    f[start] = heuristic(start, goal)
+    
+    while not open_set.empty():
+        current = open_set.get()
+        if current == goal:
+            return reconstruct_path(current)
+        
+        for neighbor in get_neighbors(current):
+            if not is_walkable(neighbor):
+                continue
+            tentative_g = g[current] + cost(current, neighbor)
+            if tentative_g < g.get(neighbor, float('inf')):
+                g[neighbor] = tentative_g
+                f[neighbor] = g[neighbor] + heuristic(neighbor, goal)
+                parent[neighbor] = current
+                open_set.put(neighbor, f[neighbor])
+    
+    return None</code></pre>
+
+<p>你想想看，A*比Dijkstra快在哪？它用启发式函数引导搜索方向，减少了大量无效扩展。在1000x1000的地图上，A*可能只需要扩展几百个节点，而Dijkstra要扩展几万个。</p>
+
+<h3>11.3 Hybrid-A*算法（适用于阿克曼底盘）</h3>
+
+<p>这里我要重点说一下Hybrid-A*。为什么需要它？因为A*规划出来的路径，阿克曼底盘根本走不了。</p>
+
+<p>阿克曼底盘有最小转弯半径，不能原地掉头。A*规划出的路径全是直角转弯、锐角转弯，实际车辆根本执行不了。Hybrid-A*就是在A*的基础上，加入了车辆的运动学约束。</p>
+
+<p>它的核心思想：</p>
+<ul>
+  <li>状态空间是连续的（x, y, theta），而不是离散的网格</li>
+  <li>扩展节点时，用Reeds-Shepp曲线或Dubins曲线生成可行路径段</li>
+  <li>启发式函数考虑非完整约束</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>关键区别：</strong>A*在网格上跳来跳去，Hybrid-A*在连续空间里「开车」。它生成的路径，车辆可以直接跟着走，不需要后处理平滑。</p>
+</div>
+
+<p>伪代码大致如下：</p>
+
+<pre><code>function HybridAStar(start, goal, grid):
+    open_set = {start}
+    g[start] = 0
+    f[start] = heuristic(start, goal)
+    
+    while open_set is not empty:
+        current = min_f(open_set)
+        if distance(current, goal) < threshold:
+            // 尝试用Reeds-Shepp曲线连接
+            path = reeds_shepp(current, goal)
+            if path is valid:
+                return path
+        
+        // 扩展：生成运动学可行的子节点
+        for control in [steer_left, steer_straight, steer_right]:
+            next_state = simulate_motion(current, control)
+            if not is_collision(next_state):
+                tentative_g = g[current] + motion_cost
+                if tentative_g < g.get(next_state, inf):
+                    g[next_state] = tentative_g
+                    f[next_state] = g[next_state] + heuristic(next_state, goal)
+                    open_set.add(next_state)
+    
+    return None</code></pre>
+
+<p>我在做仓储AGV时，一开始用A*规划路径，结果车辆在转弯处频繁卡住。后来换成Hybrid-A*，路径平滑多了，执行成功率从70%提升到了95%以上。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你的AGV是差速底盘（可以原地旋转），用A*就够了。如果是阿克曼底盘（汽车式转向），一定要上Hybrid-A*。别想着用A*规划完再平滑——那只是治标不治本。</p>
+</div>
+
+<h3>11.4 Nav2中全局规划器配置与调优</h3>
+
+<p>Nav2是ROS2的导航框架，它内置了多种全局规划器。常用的有：</p>
+
+<table>
+  <tr>
+    <th>规划器名称</th>
+    <th>适用场景</th>
+    <th>特点</th>
+  </tr>
+  <tr>
+    <td>NavFn规划器</td>
+    <td>差速底盘、静态地图</td>
+    <td>基于Dijkstra/A*，稳定可靠</td>
+  </tr>
+  <tr>
+    <td>Smac Planner</td>
+    <td>阿克曼底盘、动态地图</td>
+    <td>支持Hybrid-A*，支持2D/3D</td>
+  </tr>
+  <tr>
+    <td>Theta*规划器</td>
+    <td>任意角度路径</td>
+    <td>路径更平滑，计算量大</td>
+  </tr>
+</table>
+
+<p>配置Smac Planner的YAML文件示例：</p>
+
+<pre><code>planner_server:
+  ros__parameters:
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_smac_planner/SmacPlanner2D"
+      tolerance: 0.5
+      downsample_costmap: false
+      allow_unknown: false
+      max_iterations: 1000000
+      max_on_approach_iterations: 1000
+      cost_travel_multiplier: 2.0
+      analytic_expansion_ratio: 3.5
+      analytic_expansion_max_length: 3.0
+      motion_model_for_search: "DUBIN"  # 或 REEDS_SHEPP</code></pre>
+
+<p>调优的几个关键参数：</p>
+<ul>
+  <li><strong>tolerance</strong>：终点容差。设太大路径可能不准，设太小可能找不到路径。我一般设0.3-0.5米。</li>
+  <li><strong>analytic_expansion_ratio</strong>：启发式扩展比例。值越大，搜索越快，但可能错过最优解。我习惯设3.0-4.0。</li>
+  <li><strong>motion_model_for_search</strong>：运动模型。阿克曼底盘用DUBIN，差速底盘用REEDS_SHEPP。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把max_iterations设得太小（10万），结果在复杂环境中经常规划失败。后来改成100万，问题就解决了。但注意，迭代次数越大，计算时间越长。要根据你的CPU性能来权衡。</p>
+</div>
+
+<p>启动Nav2时，记得在launch文件中指定规划器：</p>
+
+<pre><code># 在nav2_bringup的launch文件中
+planner_server:
+  ros__parameters:
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_smac_planner/SmacPlannerHybrid"</code></pre>
+
+<p>嗯，这里要注意：如果你用的是阿克曼底盘，一定要选SmacPlannerHybrid，而不是SmacPlanner2D。后者不支持运动学约束，规划出的路径车辆走不了。</p>
+
+<p>最后说一句：全局规划只是导航的一部分。路径规划得再好，局部规划跟不上也是白搭。下一章我们会讲局部规划，到时候你就知道全局和局部怎么配合了。</p>
+
+<div class="highlight">
+  <p><strong>本章总结：</strong></p>
+  <ul>
+    <li>Dijkstra：保证最优解，但效率低，适合小地图</li>
+    <li>A*：启发式加速，效率高，适合差速底盘</li>
+    <li>Hybrid-A*：考虑运动学约束，适合阿克曼底盘</li>
+    <li>Nav2配置：选对规划器，调好参数，比什么都重要</li>
+  </ul>
+</div>
+
+<div class="footer-nav">
+            <a href="10Navigation2Framework.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12LocalPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 基于图优化的定位</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="active">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 基于图优化的定位：因子图构建、非线性优化求解、iSAM2算法</h2>
+
+<p>各位同学，今天我们来聊聊定位中的“硬核”部分——图优化。说实话，我早年做AGV导航时，用的还是扩展卡尔曼滤波（EKF）。那时候觉得EKF挺香的，直到有一次在复杂仓库里，AGV定位飘了，差点撞上货架。从那以后，我彻底转向了图优化。今天就把我的经验分享给你。</p>
+
+<h3>18.1 为什么是图优化？</h3>
+
+<p>你想想看，传统的滤波方法（比如EKF）有个毛病：它只关心当前状态，过去的观测用一次就扔了。这就像你走路只看脚下，不看走过的路——很容易迷路。</p>
+
+<p>图优化不一样。它把所有的位姿（Pose）和观测都记录下来，构建成一个图。然后通过优化，让整个图“自洽”。说白了，就是让所有约束都尽量满足。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>把定位问题转化为一个最小二乘问题。我们有一堆节点（位姿）和一堆边（约束），目标是调整节点位置，让边的误差最小。</p>
+</div>
+
+<h3>18.2 因子图构建</h3>
+
+<p>因子图（Factor Graph）是图优化的一种具体实现。我习惯把它看作一个“积木模型”：</p>
+
+<ul>
+  <li><strong>变量节点：</strong>AGV的位姿（x, y, θ），还有路标点（Landmark）的位置。</li>
+  <li><strong>因子节点：</strong>各种约束，比如里程计约束、激光匹配约束、GPS约束等。</li>
+</ul>
+
+<p>举个例子，假设AGV在时刻t1和t2有两个位姿节点x1和x2。里程计告诉我们从x1到x2的位移是Δx。那么我们就添加一个里程计因子，连接x1和x2。这个因子的“任务”就是让x2 - x1 ≈ Δx。</p>
+
+<p>再比如，AGV在x1位置观测到一个路标点L。激光雷达告诉我们距离和角度。我们就添加一个观测因子，连接x1和L。它的任务是让观测模型算出来的值等于实际测量值。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>因子图构建时，千万别贪多。我见过有人把几百个因子塞进去，结果优化半天不收敛。建议先加关键因子（里程计+激光匹配），跑通了再加别的。</p>
+</div>
+
+<h3>18.3 非线性优化求解</h3>
+
+<p>因子图建好了，接下来就是求解。这本质上是一个非线性最小二乘问题：</p>
+
+<pre><code>min Σ ||e_i(x)||²</code></pre>
+
+<p>其中e_i(x)是第i个因子的误差函数。比如里程计因子的误差就是：</p>
+
+<pre><code>e_odom = (x2 - x1) - Δx</code></pre>
+
+<p>求解方法我常用高斯-牛顿法（Gauss-Newton）或列文伯格-马夸尔特法（LM）。步骤很简单：</p>
+
+<ol>
+  <li>给所有变量一个初始值（通常用里程计推算）</li>
+  <li>计算每个因子的误差和雅可比矩阵</li>
+  <li>构建线性系统 H·Δx = b</li>
+  <li>求解Δx，更新变量</li>
+  <li>重复直到收敛</li>
+</ol>
+
+<p>这里有个坑：雅可比矩阵一定要算对。我曾经因为一个符号写反，导致优化结果发散，查了三天bug。嗯，从那以后我写雅可比都会手动验证一遍。</p>
+
+<div class="warning">
+  <p><strong>注意事项：</strong>非线性优化对初值敏感。如果初值离真实值太远，可能收敛到局部最优。建议先用里程计或IMU做初步估计，再用图优化精调。</p>
+</div>
+
+<h3>18.4 iSAM2算法</h3>
+
+<p>传统的图优化是“批处理”的——每次有新数据，都要重新优化整个图。这在实时系统中很要命。你想想看，AGV每秒产生几十个数据，每次都全图优化，CPU直接爆炸。</p>
+
+<p>iSAM2（Incremental Smoothing and Mapping 2）就是来解决这个问题的。它的核心思想是：<strong>只更新受影响的部分</strong>。</p>
+
+<p>具体来说，iSAM2做了两件事：</p>
+
+<ul>
+  <li><strong>贝叶斯树（Bayes Tree）：</strong>把因子图转换成一种树形结构。新数据只影响树的一部分，不用动整棵树。</li>
+  <li><strong>增量更新：</strong>只重新计算受影响节点的雅可比和H矩阵，其他部分保持不变。</li>
+</ul>
+
+<p>我举个例子。假设AGV在走廊里直行，突然拐了个弯。传统方法会把从起点到拐弯的所有位姿都重新优化一遍。iSAM2呢？它只优化拐弯附近的那几个位姿，前面的位姿基本不动。效率高了一个数量级。</p>
+
+<div class="highlight">
+  <p><strong>iSAM2的优势：</strong></p>
+  <ul>
+    <li>实时性：每次更新只处理局部，计算量小</li>
+    <li>精度：和全图优化几乎一样</li>
+    <li>内存：只保存贝叶斯树，不保存全图</li>
+  </ul>
+</div>
+
+<h3>18.5 实战：一个简单的因子图定位</h3>
+
+<p>下面我给出一个简化版的代码示例，用Python和GTSAM库实现。GTSAM是iSAM2的经典实现库。</p>
+
+<pre><code>import gtsam
+
+# 1. 创建因子图
+graph = gtsam.NonlinearFactorGraph()
+
+# 2. 添加里程计因子
+# 假设从x1到x2的里程计测量是(1.0, 0.0, 0.0)
+odom_noise = gtsam.noiseModel.Diagonal.Sigmas([0.1, 0.1, 0.05])
+graph.add(gtsam.BetweenFactorPose2(1, 2, gtsam.Pose2(1.0, 0.0, 0.0), odom_noise))
+
+# 3. 添加观测因子
+# 在x1位置观测到路标点L1，测量值为(2.0, 0.0)
+measurement_noise = gtsam.noiseModel.Diagonal.Sigmas([0.1, 0.1])
+graph.add(gtsam.BearingRangeFactor2D(1, 0, gtsam.Rot2(0.0), 2.0, measurement_noise))
+
+# 4. 设置初始值
+initial_estimate = gtsam.Values()
+initial_estimate.insert(1, gtsam.Pose2(0.0, 0.0, 0.0))
+initial_estimate.insert(2, gtsam.Pose2(1.1, 0.0, 0.0))  # 带一点噪声
+initial_estimate.insert(0, gtsam.Point2(2.0, 0.0))
+
+# 5. 使用iSAM2求解
+isam = gtsam.ISAM2()
+isam.update(graph, initial_estimate)
+result = isam.calculateEstimate()
+
+# 6. 输出结果
+print("优化后的位姿x2:", result.atPose2(2))
+print("优化后的路标点L:", result.atPoint2(0))
+</code></pre>
+
+<p>这段代码虽然简单，但涵盖了因子图优化的核心流程。我在实际项目中，就是在这个基础上加了更多因子（比如闭环检测因子），跑起来效果很好。</p>
+
+<h3>18.6 避坑指南</h3>
+
+<p>最后，我总结几个实战中容易踩的坑：</p>
+
+<ul>
+  <li><strong>噪声模型别乱设：</strong>里程计噪声和激光噪声的量级差很多。我习惯先做标定，拿到真实噪声方差再设参数。</li>
+  <li><strong>闭环检测要谨慎：</strong>错误的闭环会毁掉整个优化。我一般会加一个“置信度”阈值，低于阈值的闭环直接丢弃。</li>
+  <li><strong>内存管理：</strong>iSAM2虽然高效，但长时间运行后贝叶斯树会膨胀。建议定期做一次全图优化，清理冗余节点。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>调试时，先把所有因子可视化出来。看看误差大的因子在哪里，往往能快速定位问题。我常用Python的matplotlib画图，一目了然。</p>
+</div>
+
+<p>好了，关于基于图优化的定位，我就讲这么多。因子图构建、非线性优化求解、iSAM2算法，这三块是核心。你只要把原理搞懂，代码跑通，AGV定位这块基本就稳了。</p>
+
+<div class="footer-nav">
+            <a href="17AmclAlgorithm.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19VisualLocalization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

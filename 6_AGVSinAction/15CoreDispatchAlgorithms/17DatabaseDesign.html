@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 调度系统数据库设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="active">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 调度系统数据库设计：选型、表结构与持久化策略</h2>
+
+<p>数据库设计，说白了就是AGV调度系统的“记忆系统”。</p>
+<p>我做了这么多年调度系统，见过太多因为数据库没设计好导致系统崩掉的案例。有一次，一个客户现场AGV跑着跑着突然全部停摆，查了半天——MySQL连接池爆了，因为历史轨迹数据没做归档。嗯，从那以后，我对数据库设计就格外上心。</p>
+
+<h3>1.1 数据库选型：各司其职</h3>
+
+<p>调度系统里，数据种类很多。有实时性要求极高的，有需要持久化存储的，有时序性很强的。指望一个数据库搞定所有，不现实。</p>
+
+<p>我个人习惯用“三库协同”的方案：</p>
+
+<table>
+  <tr>
+    <th>数据库</th>
+    <th>核心用途</th>
+    <th>我为什么选它</th>
+  </tr>
+  <tr>
+    <td><strong>MySQL</strong></td>
+    <td>结构化业务数据</td>
+    <td>任务单、AGV档案、地图配置、用户权限。关系型数据，事务支持好，查起来方便。</td>
+  </tr>
+  <tr>
+    <td><strong>Redis</strong></td>
+    <td>高速缓存与状态</td>
+    <td>AGV实时位置、任务队列、锁。毫秒级响应，扛高并发。</td>
+  </tr>
+  <tr>
+    <td><strong>InfluxDB</strong></td>
+    <td>时序数据存储</td>
+    <td>AGV电量、速度、温度、路径耗时。按时间戳写入，压缩率高，查询快。</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>热数据放Redis，温数据放MySQL，冷数据放InfluxDB。别混着用，也别指望一个库包打天下。</p>
+</div>
+
+<h3>1.2 MySQL：业务数据的基石</h3>
+
+<p>MySQL主要存那些“丢了会出大事”的数据。比如任务记录、AGV配置、地图拓扑。</p>
+
+<p>我设计表结构时，会特别注意索引和分表策略。举个例子，任务表如果单表存几百万条，查询会越来越慢。</p>
+
+<pre><code>-- 任务主表（按日期分表）
+CREATE TABLE task_202501 (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    task_id VARCHAR(64) NOT NULL COMMENT '任务唯一ID',
+    agv_id VARCHAR(32) COMMENT '执行AGV',
+    task_type TINYINT COMMENT '1-取货 2-送货 3-充电',
+    status TINYINT COMMENT '0-待分配 1-执行中 2-完成 3-取消',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    finish_time DATETIME,
+    INDEX idx_agv_id (agv_id),
+    INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经因为没给status字段加索引，导致任务分配时全表扫描，AGV等待时间从50ms飙升到2秒。后来加了索引，问题秒解。</p>
+</div>
+
+<h3>1.3 Redis：调度系统的“神经中枢”</h3>
+
+<p>Redis在调度系统里，地位极高。AGV的实时位置、任务队列、分布式锁，都靠它。</p>
+
+<p>我常用的数据结构：</p>
+
+<ul>
+  <li><strong>String：</strong>存AGV最新位置，key为<code>agv:pos:{agv_id}</code>，value为JSON字符串。</li>
+  <li><strong>List：</strong>做任务队列，左进右出，实现FIFO。</li>
+  <li><strong>Sorted Set：</strong>按优先级排序任务，score就是优先级数值。</li>
+  <li><strong>Set：</strong>存空闲AGV集合，方便快速分配。</li>
+</ul>
+
+<pre><code>// 伪代码：AGV位置更新与读取
+// 写入（每100ms更新一次）
+redis.set("agv:pos:AGV001", "{x:12.5, y:34.2, angle:90}");
+
+// 读取（调度器分配任务时）
+String posJson = redis.get("agv:pos:AGV001");</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>Redis虽然快，但它是内存数据库。如果没做持久化，宕机就会丢数据。我建议开启AOF+RDB混合模式，兼顾性能与安全。</p>
+</div>
+
+<h3>1.4 InfluxDB：时序数据的归宿</h3>
+
+<p>AGV跑起来，会产生海量的时序数据。电量每100ms采集一次，一天下来就是86万条。用MySQL存？查询会慢到怀疑人生。</p>
+
+<p>InfluxDB就是为这种场景设计的。它按时间戳组织数据，写入快，查询也快。</p>
+
+<pre><code>-- 写入AGV电量数据
+INSERT INTO agv_metrics,agv_id=AGV001,metric=battery value=85.2 1704067200
+
+-- 查询最近1小时的电量变化
+SELECT mean(value) FROM agv_metrics 
+WHERE agv_id='AGV001' AND metric='battery' 
+AND time > now() - 1h</code></pre>
+
+<p>你想想看，如果这个查询放在MySQL里，得写多复杂的SQL？而且随着数据量增长，性能会急剧下降。InfluxDB自带数据压缩和自动过期策略，省心很多。</p>
+
+<h3>1.5 数据持久化策略</h3>
+
+<p>数据怎么存、存多久、什么时候删，这些都需要提前规划好。</p>
+
+<p>我一般这样设计：</p>
+
+<table>
+  <tr>
+    <th>数据类别</th>
+    <th>存储位置</th>
+    <th>保留周期</th>
+    <th>归档策略</th>
+  </tr>
+  <tr>
+    <td>AGV实时位置</td>
+    <td>Redis</td>
+    <td>实时（秒级）</td>
+    <td>过期后丢弃</td>
+  </tr>
+  <tr>
+    <td>任务记录</td>
+    <td>MySQL</td>
+    <td>3个月</td>
+    <td>按月分表，过期归档到HDFS</td>
+  </tr>
+  <tr>
+    <td>AGV轨迹点</td>
+    <td>InfluxDB</td>
+    <td>7天</td>
+    <td>自动过期（RETENTION POLICY）</td>
+  </tr>
+  <tr>
+    <td>系统日志</td>
+    <td>Elasticsearch</td>
+    <td>30天</td>
+    <td>按索引滚动删除</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>我的经验：</strong>别把所有数据都往一个库里塞。实时数据用Redis，历史数据用InfluxDB，业务数据用MySQL。各司其职，系统才能跑得稳。</p>
+</div>
+
+<h3>1.6 整体架构图</h3>
+
+<p>下面这张图，是我设计调度系统数据库时的核心思路。你看一眼就能明白数据是怎么流转的。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">调度系统数据库架构图</text>
+  
+  <!-- AGV层 -->
+  <rect x="50" y="70" width="700" height="60" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">AGV 车辆层（数据采集源）</text>
+  <text x="400" y="125" text-anchor="middle" font-size="12" fill="#555">位置、电量、速度、任务状态（每100ms上报）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="130" x2="400" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 调度引擎层 -->
+  <rect x="150" y="170" width="500" height="60" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="205" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">调度引擎层（数据消费与处理）</text>
+  <text x="400" y="225" text-anchor="middle" font-size="12" fill="#555">任务分配、路径规划、交通管制、状态管理</text>
+  
+  <!-- 三条分支箭头 -->
+  <line x1="200" y1="230" x2="100" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="230" x2="400" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="600" y1="230" x2="700" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 数据库层 -->
+  <!-- Redis -->
+  <rect x="30" y="280" width="180" height="80" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="120" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#c2185b">Redis</text>
+  <text x="120" y="330" text-anchor="middle" font-size="11" fill="#555">实时位置缓存</text>
+  <text x="120" y="345" text-anchor="middle" font-size="11" fill="#555">任务队列</text>
+  <text x="120" y="355" text-anchor="middle" font-size="11" fill="#555">分布式锁</text>
+  
+  <!-- MySQL -->
+  <rect x="310" y="280" width="180" height="80" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#1565c0">MySQL</text>
+  <text x="400" y="330" text-anchor="middle" font-size="11" fill="#555">任务记录</text>
+  <text x="400" y="345" text-anchor="middle" font-size="11" fill="#555">AGV档案</text>
+  <text x="400" y="355" text-anchor="middle" font-size="11" fill="#555">地图配置</text>
+  
+  <!-- InfluxDB -->
+  <rect x="590" y="280" width="180" height="80" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="680" y="310" text-anchor="middle" font-size="14" font-weight="bold" fill="#2e7d32">InfluxDB</text>
+  <text x="680" y="330" text-anchor="middle" font-size="11" fill="#555">AGV轨迹点</text>
+  <text x="680" y="345" text-anchor="middle" font-size="11" fill="#555">电量时序</text>
+  <text x="680" y="355" text-anchor="middle" font-size="11" fill="#555">性能指标</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="12" fill="#777">数据流向：AGV → 调度引擎 → 数据库（按数据类型分流）</text>
+  
+  <!-- 图例 -->
+  <rect x="200" y="440" width="12" height="12" fill="#fce4ec" stroke="#e91e63"/>
+  <text x="218" y="451" font-size="11" fill="#555">热数据</text>
+  <rect x="300" y="440" width="12" height="12" fill="#e3f2fd" stroke="#2196f3"/>
+  <text x="318" y="451" font-size="11" fill="#555">温数据</text>
+  <rect x="400" y="440" width="12" height="12" fill="#e8f5e9" stroke="#4caf50"/>
+  <text x="418" y="451" font-size="11" fill="#555">冷数据</text>
+</svg>
+
+<h3>1.7 避坑总结</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>别把Redis当主库用：</strong>Redis宕机丢数据是常态，一定要有MySQL兜底。</li>
+  <li><strong>InfluxDB的保留策略要提前配：</strong>不配的话，磁盘会被时序数据撑爆。我见过一个现场，7天没管，磁盘直接满了。</li>
+  <li><strong>MySQL分表要趁早：</strong>数据量超过500万条再分表，迁移成本很高。最好一开始就按时间分表。</li>
+  <li><strong>连接池别设太大：</strong>MySQL连接数不是越多越好。我一般设20-50个，配合连接池复用，性能反而更好。</li>
+</ul>
+
+<p>数据库设计这块，说白了就是“把合适的数据放到合适的地方”。想清楚数据流向，设计好存储策略，调度系统才能跑得稳、跑得快。</p>
+
+<div class="footer-nav">
+            <a href="16CommProtocol.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18HighAvailability.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

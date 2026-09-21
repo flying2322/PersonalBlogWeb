@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 基于粒子群算法的分配优化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="active">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 基于粒子群算法的分配优化：粒子编码、速度与位置更新、全局最优搜索</h2>
+
+<p>粒子群算法，简称PSO。说实话，我第一次接触它是在一个多AGV协同搬运的项目里。当时任务量一上来，贪心算法就开始"摆烂"——分配结果越来越离谱。我翻了不少论文，最后发现PSO这玩意儿，思路简单，效果却出奇的好。</p>
+
+<p>你想想看，一群鸟找食物，每只鸟都不知道食物在哪，但它们会互相交流信息。有的鸟飞得高，视野广；有的鸟飞得低，但嗅觉灵。最终整个鸟群总能找到食物。PSO就是模拟这个过程。</p>
+
+<p>在AGV调度里，我们的"食物"就是最优的任务分配方案。每个粒子代表一种分配方案，粒子群就是一群候选方案。它们通过迭代，不断向最优解靠拢。</p>
+
+<h3>13.1 粒子编码——怎么把分配方案变成粒子</h3>
+
+<p>编码是PSO的第一步。说白了，就是怎么用一串数字表示"哪个AGV去干哪个任务"。</p>
+
+<p>我个人习惯用<strong>整数编码</strong>。假设有M个AGV，N个任务。每个粒子的位置就是一个N维向量，每一维的值表示该任务分配给哪个AGV。</p>
+
+<div class="highlight">
+  <p><strong>举个例子：</strong></p>
+  <p>3台AGV（编号0,1,2），5个任务。</p>
+  <p>粒子位置：[2, 0, 1, 2, 1]</p>
+  <p>含义：任务0→AGV2，任务1→AGV0，任务2→AGV1，任务3→AGV2，任务4→AGV1</p>
+</div>
+
+<p>这里有个坑。我在项目里遇到过：如果直接用连续值编码，比如位置是2.7，那它到底对应AGV2还是AGV3？所以我的做法是——<strong>取整</strong>。位置值在[0, M-1]范围内，计算适应度时四舍五入取整。</p>
+
+<pre><code># 粒子编码示例
+def decode_particle(position, num_agvs):
+    """
+    将粒子位置解码为任务分配方案
+    position: [0, num_agvs-1] 之间的浮点数数组
+    """
+    assignment = [int(round(p)) for p in position]
+    # 边界处理：防止越界
+    assignment = [min(max(a, 0), num_agvs-1) for a in assignment]
+    return assignment</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>编码时最好预留一个"空闲"标记。比如用-1表示该任务暂不分配，等后续再动态调整。这在任务数多于AGV容量时特别有用。</p>
+</div>
+
+<h3>13.2 速度与位置更新——粒子怎么"飞"</h3>
+
+<p>PSO的核心就两个公式：速度更新和位置更新。别被公式吓到，其实逻辑很简单。</p>
+
+<p><strong>速度更新公式：</strong></p>
+<pre><code>v_new = w * v_old 
+       + c1 * r1 * (pbest - x) 
+       + c2 * r2 * (gbest - x)</code></pre>
+
+<p>拆开来看：</p>
+<ul>
+  <li><strong>w * v_old</strong>：惯性部分。粒子保持原来的运动趋势。w越大，全局搜索能力越强；w越小，局部搜索越精细。</li>
+  <li><strong>c1 * r1 * (pbest - x)</strong>：个体认知。粒子向自己历史最优位置靠拢。c1控制"自信"程度。</li>
+  <li><strong>c2 * r2 * (gbest - x)</strong>：社会认知。粒子向群体最优位置靠拢。c2控制"从众"程度。</li>
+</ul>
+
+<p>r1和r2是[0,1]之间的随机数，给搜索引入随机性。我刚开始调参时，总想把随机数去掉，觉得它不靠谱。后来发现，没有随机性，粒子群很容易陷入局部最优——就像一群人开会，大家都听一个人的，最后方案肯定有盲区。</p>
+
+<p><strong>位置更新公式：</strong></p>
+<pre><code>x_new = x_old + v_new</code></pre>
+
+<p>简单吧？就是老位置加上速度向量，得到新位置。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>速度需要做限幅处理。我曾经在一个项目中没做限幅，结果粒子位置直接飞到了AGV编号100多（实际只有5台AGV）。后来我加了速度上限，一般设为位置范围的10%-20%。</p>
+</div>
+
+<pre><code>def update_velocity(velocity, position, pbest, gbest, w, c1, c2, v_max):
+    import random
+    r1 = random.random()
+    r2 = random.random()
+    
+    # 速度更新
+    new_velocity = (w * velocity 
+                    + c1 * r1 * (pbest - position) 
+                    + c2 * r2 * (gbest - position))
+    
+    # 速度限幅
+    new_velocity = [max(min(v, v_max), -v_max) for v in new_velocity]
+    return new_velocity
+
+def update_position(position, velocity, pos_min, pos_max):
+    new_position = position + velocity
+    # 位置限幅
+    new_position = [max(min(p, pos_max), pos_min) for p in new_position]
+    return new_position</code></pre>
+
+<h3>13.3 全局最优搜索——怎么找到最好的方案</h3>
+
+<p>全局最优搜索，说白了就是"比一比，留最好的"。每个粒子有两个"记忆"：</p>
+<ul>
+  <li><strong>个体最优（pbest）</strong>：这个粒子自己历史上找到的最好位置</li>
+  <li><strong>全局最优（gbest）</strong>：整个粒子群中所有粒子找到的最好位置</li>
+</ul>
+
+<p>每次迭代，我们都要做两件事：</p>
+<ol>
+  <li>计算每个粒子当前位置的适应度（比如总行驶距离、任务完成时间等）</li>
+  <li>更新pbest和gbest</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>适应度函数设计：</strong></p>
+  <p>在AGV调度中，我通常把适应度设计为<strong>最小化总完成时间</strong>。但光这样不够，还要加惩罚项：</p>
+  <ul>
+    <li>任务超时惩罚</li>
+    <li>AGV冲突惩罚（两车同时去同一个站点）</li>
+    <li>电量不足惩罚</li>
+  </ul>
+  <p>适应度值越小，方案越好。</p>
+</div>
+
+<pre><code>def evaluate_fitness(assignment, tasks, agvs):
+    """
+    计算分配方案的适应度
+    assignment: [任务0的AGV, 任务1的AGV, ...]
+    返回：总完成时间 + 惩罚项
+    """
+    total_time = 0
+    penalty = 0
+    
+    # 计算每个AGV的任务序列和总时间
+    agv_tasks = {i: [] for i in range(len(agvs))}
+    for task_id, agv_id in enumerate(assignment):
+        agv_tasks[agv_id].append(task_id)
+    
+    for agv_id, task_list in agv_tasks.items():
+        time = calculate_agv_time(agv_id, task_list, tasks, agvs)
+        total_time += time
+        
+        # 检查是否超时
+        if time > agvs[agv_id]['max_work_time']:
+            penalty += 1000  # 超时惩罚
+    
+    return total_time + penalty</code></pre>
+
+<h3>13.4 完整算法流程</h3>
+
+<p>嗯，到这里，我们把PSO的三个核心部分都讲完了。把它们串起来，就是完整的算法流程：</p>
+
+<ol>
+  <li><strong>初始化</strong>：随机生成N个粒子，每个粒子随机分配任务给AGV</li>
+  <li><strong>评估</strong>：计算每个粒子的适应度</li>
+  <li><strong>更新pbest</strong>：如果当前位置比历史最优好，就更新</li>
+  <li><strong>更新gbest</strong>：从所有pbest中挑最好的</li>
+  <li><strong>更新速度和位置</strong>：用公式计算新速度和位置</li>
+  <li><strong>检查终止条件</strong>：达到最大迭代次数或适应度不再改善，就停止</li>
+  <li><strong>输出</strong>：gbest对应的分配方案</li>
+</ol>
+
+<div class="tip">
+  <p><strong>调参建议：</strong></p>
+  <ul>
+    <li>w（惯性权重）：我一般从0.9线性递减到0.4。前期大范围搜索，后期精细调整</li>
+    <li>c1、c2：通常取2.0。如果问题复杂，可以c1大一点（鼓励探索），c2小一点</li>
+    <li>粒子数量：20-50个。任务少就少点，任务多就多点</li>
+  </ul>
+</div>
+
+<p>我曾经在一个仓储项目里用PSO做任务分配。仓库有15台AGV，高峰期每小时要处理200多个任务。用贪心算法，任务完成率只有78%。换成PSO后，完成率提升到了93%。虽然每次计算要多花2-3秒，但效果立竿见影。</p>
+
+<p>当然，PSO也不是万能的。如果任务数量特别大（比如上千个），粒子群的收敛速度会变慢。这时候我通常会结合<strong>启发式初始化</strong>——先用贪心算法生成一个不错的初始解，把它作为一个粒子的初始位置，其他粒子随机生成。这样既能保证收敛速度，又能避免陷入局部最优。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">粒子群算法(PSO)任务分配流程图</text>
+  
+  <!-- 开始 -->
+  <rect x="300" y="60" width="200" height="40" rx="20" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">开始</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="100" x2="400" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 初始化粒子群 -->
+  <rect x="250" y="130" width="300" height="50" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="400" y="150" text-anchor="middle" font-size="13" fill="#2c3e50">初始化粒子群</text>
+  <text x="400" y="168" text-anchor="middle" font-size="11" fill="#7f8c8d">随机生成N个粒子（分配方案）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="180" x2="400" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 评估适应度 -->
+  <rect x="250" y="210" width="300" height="50" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="2"/>
+  <text x="400" y="230" text-anchor="middle" font-size="13" fill="#2c3e50">评估每个粒子的适应度</text>
+  <text x="400" y="248" text-anchor="middle" font-size="11" fill="#7f8c8d">计算总完成时间 + 惩罚项</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="260" x2="400" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 更新pbest和gbest -->
+  <rect x="230" y="290" width="340" height="50" rx="8" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" font-size="13" fill="#2c3e50">更新个体最优(pbest)和全局最优(gbest)</text>
+  <text x="400" y="328" text-anchor="middle" font-size="11" fill="#7f8c8d">比较当前位置与历史最优位置</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 更新速度和位置 -->
+  <rect x="230" y="370" width="340" height="50" rx="8" fill="#fef9e7" stroke="#f39c12" stroke-width="2"/>
+  <text x="400" y="390" text-anchor="middle" font-size="13" fill="#2c3e50">更新粒子速度和位置</text>
+  <text x="400" y="408" text-anchor="middle" font-size="11" fill="#7f8c8d">v_new = w*v + c1*r1*(pbest-x) + c2*r2*(gbest-x)</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="420" x2="400" y2="450" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断 -->
+  <polygon points="400,450 480,480 400,510 320,480" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="400" y="484" text-anchor="middle" font-size="12" fill="#c0392b" font-weight="bold">终止?</text>
+  
+  <!-- 是 - 输出 -->
+  <line x1="480" y1="480" x2="550" y2="480" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="550" y="460" width="180" height="40" rx="20" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="640" y="485" text-anchor="middle" font-size="14" fill="white" font-weight="bold">输出gbest方案</text>
+  
+  <!-- 否 - 返回 -->
+  <line x1="320" y1="480" x2="150" y2="480" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="150" y1="480" x2="150" y2="155" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="150" y1="155" x2="250" y2="155" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="140" y="320" text-anchor="middle" font-size="11" fill="#e74c3c" transform="rotate(-90, 140, 320)">否，继续迭代</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>最后说一句，PSO的参数调优没有银弹。我在不同项目里用过完全不同的参数组合。关键是要理解每个参数的作用，然后根据实际问题去试。多跑几次实验，你就能找到感觉。</p>
+
+<div class="footer-nav">
+            <a href="12GeneticAlgoAlloc.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14TaskPriority.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

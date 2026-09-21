@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 死锁解除策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="active">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 死锁解除策略：杀死进程法（终止AGV）</h2>
+
+<p>说实话，死锁解除里最粗暴的方法，就是「杀死进程」。</p>
+<p>在AGV调度系统里，这就意味着——直接终止某个AGV的任务。让它停下来，甚至把它拖走。听起来有点野蛮，对吧？但有时候，这反而是最有效的办法。</p>
+
+<h3>8.1 什么是「杀死进程法」？</h3>
+<p>简单说，就是强制结束一个或多个AGV的当前任务。释放它占用的资源（比如路径段、工位、充电桩）。这样，其他AGV就能继续跑了。</p>
+<p>我习惯把它比作「交通管制里的拖车」。你想想看，路口堵死了，交警最直接的办法是什么？把其中一辆车拖走。虽然粗暴，但立竿见影。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>牺牲局部，保全整体。</p>
+  <p>终止一个AGV，让整个系统活过来。</p>
+</div>
+
+<h3>8.2 什么时候该用这招？</h3>
+<p>不是所有死锁都要杀人。我一般只在以下情况才考虑：</p>
+
+<ul>
+  <li><strong>死锁范围太大</strong>——涉及5台以上AGV，回退法算不过来</li>
+  <li><strong>资源抢占严重</strong>——多个AGV互相等，谁也动不了</li>
+  <li><strong>系统实时性要求高</strong>——比如产线已经停了，必须秒级恢复</li>
+  <li><strong>其他方法都试过了</strong>——回退、资源抢占都无效</li>
+</ul>
+
+<p>嗯，这里要注意：<strong>不要一上来就杀人</strong>。我曾经在一个项目里，新来的同事看到死锁就终止AGV，结果一天杀了十几次。后来发现，其实大部分死锁通过路径重规划就能解决。</p>
+
+<h3>8.3 怎么选「被杀」的AGV？</h3>
+<p>这是个关键问题。选谁？我总结了几条原则：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>优先级</th>
+      <th>选择依据</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>任务紧急度最低</td>
+      <td>先杀非紧急任务的AGV</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>占用资源最多</td>
+      <td>释放资源效率最高</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>距离最近</td>
+      <td>方便人工干预拖走</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>电量最低</td>
+      <td>反正也要充电，先停了</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯用<strong>加权评分法</strong>。给每个AGV打分，分数最高的「被杀」。代码大概长这样：</p>
+
+<pre><code>def select_victim(deadlocked_agvs):
+    """
+    选择要终止的AGV
+    返回AGV ID
+    """
+    best_score = -999
+    victim = None
+    
+    for agv in deadlocked_agvs:
+        score = 0
+        # 任务紧急度越低，分数越高
+        score += (10 - agv.task_priority) * 3
+        # 占用资源越多，分数越高
+        score += agv.occupied_resources * 2
+        # 距离越近，分数越高
+        score += (100 - agv.distance_to_home) * 0.1
+        # 电量越低，分数越高
+        score += (100 - agv.battery_level) * 0.05
+        
+        if score > best_score:
+            best_score = score
+            victim = agv
+    
+    return victim.id</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>权重可以动态调整。比如产线高峰期，任务紧急度的权重可以调高。我一般会在配置中心留个接口，方便现场调参。</p>
+</div>
+
+<h3>8.4 终止AGV后，怎么善后？</h3>
+<p>杀了人，不是就完事了。后续处理很重要：</p>
+
+<ol>
+  <li><strong>释放资源</strong>——立即释放该AGV占用的所有路径段、工位</li>
+  <li><strong>通知其他AGV</strong>——广播消息，让它们重新规划路径</li>
+  <li><strong>记录日志</strong>——谁被杀了、为什么杀、杀了多久</li>
+  <li><strong>人工干预</strong>——派人去把AGV拖到安全区域</li>
+  <li><strong>任务重分配</strong>——把被杀AGV的任务转给其他空闲AGV</li>
+</ol>
+
+<p>我曾经遇到过一个坑：终止AGV后，忘了释放它占用的充电桩。结果其他AGV一直等那个桩，又死锁了。嗯，从那以后，我就在终止函数里加了个强制释放的步骤。</p>
+
+<h3>8.5 杀死进程法的优缺点</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>解除速度快，秒级恢复</td>
+      <td>需要人工干预，增加运维成本</td>
+    </tr>
+    <tr>
+      <td>实现简单，代码量少</td>
+      <td>可能丢失任务进度</td>
+    </tr>
+    <tr>
+      <td>适用于复杂死锁场景</td>
+      <td>频繁使用会影响系统效率</td>
+    </tr>
+    <tr>
+      <td>不依赖复杂算法</td>
+      <td>对AGV硬件有损耗（频繁启停）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>说白了，这就是个<strong>保底方案</strong>。能不用就不用，但必须得有。</p>
+
+<h3>8.6 核心逻辑流程图</h3>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="520" fill="#f8f9fa" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">杀死进程法核心逻辑</text>
+  
+  <!-- 开始 -->
+  <rect x="260" y="55" width="200" height="45" rx="22" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="83" text-anchor="middle" font-size="14" fill="white" font-weight="bold">检测到死锁</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="100" x2="360" y2="130" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断1 -->
+  <polygon points="360,130 520,170 360,210 200,170" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="360" y="175" text-anchor="middle" font-size="13" fill="white" font-weight="bold">是否可回退？</text>
+  
+  <!-- 箭头：是 -->
+  <line x1="520" y1="170" x2="600" y2="170" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="560" y="160" text-anchor="middle" font-size="12" fill="#27ae60">是</text>
+  
+  <!-- 回退处理 -->
+  <rect x="600" y="148" width="100" height="45" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="650" y="176" text-anchor="middle" font-size="13" fill="white">执行回退</text>
+  
+  <!-- 箭头：否 -->
+  <line x1="360" y1="210" x2="360" y2="250" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="235" text-anchor="middle" font-size="12" fill="#e74c3c">否</text>
+  
+  <!-- 判断2 -->
+  <polygon points="360,250 520,290 360,330 200,290" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="360" y="295" text-anchor="middle" font-size="13" fill="white" font-weight="bold">资源抢占可行？</text>
+  
+  <!-- 箭头：是 -->
+  <line x1="520" y1="290" x2="600" y2="290" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="560" y="280" text-anchor="middle" font-size="12" fill="#27ae60">是</text>
+  
+  <!-- 抢占处理 -->
+  <rect x="600" y="268" width="100" height="45" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="650" y="296" text-anchor="middle" font-size="13" fill="white">抢占资源</text>
+  
+  <!-- 箭头：否 -->
+  <line x1="360" y1="330" x2="360" y2="370" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="355" text-anchor="middle" font-size="12" fill="#e74c3c">否</text>
+  
+  <!-- 选择受害者 -->
+  <rect x="230" y="370" width="260" height="45" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="360" y="398" text-anchor="middle" font-size="14" fill="white" font-weight="bold">选择要终止的AGV（受害者）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="415" x2="360" y2="445" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 终止执行 -->
+  <rect x="230" y="445" width="260" height="45" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="360" y="473" text-anchor="middle" font-size="14" fill="white" font-weight="bold">终止AGV + 释放资源 + 善后</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="warning">
+  <p><strong>警告：</strong>杀死进程法是一把双刃剑。用得好，系统秒恢复；用得不好，可能引发连锁反应。我建议你在生产环境里，把这个功能做成「半自动」模式——系统推荐受害者，但需要人工确认后再执行。</p>
+</div>
+
+<h3>8.7 避坑指南</h3>
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>不要连续杀人</strong>——终止一个AGV后，等几秒看看系统反应。我曾经连续杀了3台，结果系统资源过剩，反而更乱了。</li>
+  <li><strong>注意AGV的物理位置</strong>——如果AGV在狭窄通道里，终止后可能挡住其他AGV。最好先把它挪到安全区域。</li>
+  <li><strong>记录被杀原因</strong>——方便事后分析。我习惯在日志里加上「死锁ID、受害者ID、选择理由、解除耗时」等信息。</li>
+  <li><strong>设置最大终止次数</strong>——比如每小时最多杀3次。超过这个数，说明系统设计有问题，需要人工介入。</li>
+</ul>
+
+<p>好了，关于杀死进程法，就聊这么多。记住，这是最后的底牌，别轻易亮出来。</p>
+
+<div class="footer-nav">
+            <a href="07TaskRollbackRelease.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09BreakMutualExclusion.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

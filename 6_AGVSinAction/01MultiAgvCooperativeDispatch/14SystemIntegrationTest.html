@@ -1,0 +1,499 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 系统集成测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="active">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 系统集成测试：接口测试、压力测试、稳定性测试</h2>
+
+<p>系统集成测试，说白了就是把各个模块拼在一起，看看它们能不能好好配合。AGV调度系统不是单打独斗的，它要和MES、WMS、RCS、PLC等一堆系统打交道。我见过太多项目，每个模块单独跑都没问题，一联调就崩了。</p>
+
+<p>为什么会这样？因为接口协议没对齐、数据格式不匹配、并发压力扛不住。嗯，这一章我们就来聊聊怎么把这些坑填上。</p>
+
+<h3>14.1 接口测试：打通数据通道</h3>
+
+<p>接口测试是集成测试的第一步。AGV调度系统对外暴露的接口，主要是RESTful API和WebSocket。我个人习惯，先做接口功能验证，再做异常场景覆盖。</p>
+
+<h4>14.1.1 接口清单梳理</h4>
+
+<p>先列清楚有哪些接口要测。我一般用表格来管理：</p>
+
+<table>
+  <tr>
+    <th>接口名称</th>
+    <th>方法</th>
+    <th>路径</th>
+    <th>输入参数</th>
+    <th>预期输出</th>
+  </tr>
+  <tr>
+    <td>下发任务</td>
+    <td>POST</td>
+    <td>/api/v1/task</td>
+    <td>任务ID、起点、终点、优先级</td>
+    <td>任务状态、预计执行时间</td>
+  </tr>
+  <tr>
+    <td>查询AGV状态</td>
+    <td>GET</td>
+    <td>/api/v1/agv/{id}</td>
+    <td>AGV编号</td>
+    <td>位置、电量、任务状态</td>
+  </tr>
+  <tr>
+    <td>取消任务</td>
+    <td>DELETE</td>
+    <td>/api/v1/task/{id}</td>
+    <td>任务ID</td>
+    <td>取消结果</td>
+  </tr>
+  <tr>
+    <td>实时位置推送</td>
+    <td>WebSocket</td>
+    <td>/ws/agv/position</td>
+    <td>订阅AGV列表</td>
+    <td>实时坐标流</td>
+  </tr>
+</table>
+
+<p>接口测试不能只测正常流程。我曾经遇到过一个坑：MES系统下发任务时，把起点和终点字段写反了。我们的调度系统没做校验，结果AGV直接往反方向跑。所以，异常输入、边界值、空值、超长字符串，都得测一遍。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>接口测试要覆盖三类场景——正常流程、异常输入、超时重试。缺一不可。</p>
+</div>
+
+<h4>14.1.2 接口自动化测试脚本</h4>
+
+<p>手动测接口太慢了，我习惯用Python写自动化脚本。下面是一个简单的测试框架示例：</p>
+
+<pre><code>import requests
+import json
+import time
+
+class AGVInterfaceTest:
+    def __init__(self, base_url):
+        self.base_url = base_url
+        self.session = requests.Session()
+    
+    def test_create_task(self):
+        """测试下发任务接口"""
+        url = f"{self.base_url}/api/v1/task"
+        payload = {
+            "task_id": "TASK_001",
+            "start_point": "A01",
+            "end_point": "B03",
+            "priority": 1
+        }
+        resp = self.session.post(url, json=payload)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "accepted"
+        print(f"[PASS] 任务创建成功: {data}")
+    
+    def test_create_task_invalid_params(self):
+        """测试异常参数"""
+        url = f"{self.base_url}/api/v1/task"
+        # 缺少必填字段
+        payload = {"task_id": "TASK_002"}
+        resp = self.session.post(url, json=payload)
+        assert resp.status_code == 400
+        print(f"[PASS] 异常参数校验通过: {resp.text}")
+    
+    def run_all(self):
+        self.test_create_task()
+        self.test_create_task_invalid_params()
+        print("所有接口测试通过")
+
+if __name__ == "__main__":
+    tester = AGVInterfaceTest("http://localhost:8080")
+    tester.run_all()
+</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>接口测试最好集成到CI/CD流水线里。每次代码提交后自动跑一遍，能提前发现接口不兼容的问题。我在项目中吃过这个亏——开发改了接口字段名，测试环境没同步，上线直接炸了。</p>
+</div>
+
+<h3>14.2 压力测试：看看系统能扛多少</h3>
+
+<p>压力测试，说白了就是给系统上强度。AGV调度系统在高峰期可能同时处理几百台AGV的任务调度，接口请求量会暴增。扛不住？那就等着现场报警吧。</p>
+
+<h4>14.2.1 压测指标定义</h4>
+
+<p>我个人习惯，先定好压测目标：</p>
+
+<ul>
+  <li><strong>QPS（每秒查询数）：</strong>目标值500，峰值1000</li>
+  <li><strong>响应时间：</strong>95%的请求在200ms以内</li>
+  <li><strong>错误率：</strong>低于0.1%</li>
+  <li><strong>CPU/内存：</strong>CPU不超过70%，内存不超过80%</li>
+</ul>
+
+<p>你想想看，如果调度接口响应时间超过1秒，AGV在路口等指令，后面的车全堵住了。这就是连锁反应。</p>
+
+<h4>14.2.2 使用JMeter进行压测</h4>
+
+<p>JMeter是我常用的压测工具。下面是一个典型的压测配置：</p>
+
+<pre><code># JMeter测试计划配置要点
+1. 线程组设置：
+   - 线程数：100（模拟100个并发用户）
+   - Ramp-Up时间：10秒（逐步增加负载）
+   - 循环次数：100（每个用户发100次请求）
+
+2. HTTP请求默认值：
+   - 协议：http
+   - 服务器：192.168.1.100
+   - 端口：8080
+   - 内容编码：UTF-8
+
+3. 监听器：
+   - 聚合报告（查看平均响应时间、吞吐量）
+   - 图形结果（观察趋势）
+   - 查看结果树（调试用）
+</code></pre>
+
+<p>压测过程中，我会重点关注几个点：</p>
+
+<ul>
+  <li>响应时间有没有突然飙升？那可能是线程池满了</li>
+  <li>错误率是不是在增加？可能是数据库连接池不够</li>
+  <li>CPU有没有打满？看看是不是死循环或者GC频繁</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>压测一定要在独立环境做，别在生产环境搞。我曾经见过有人直接在线上压测，结果把数据库打挂了，整个仓库停了半小时。嗯，那场面...很酸爽。</p>
+</div>
+
+<h4>14.2.3 压测结果分析</h4>
+
+<p>压测完不是看一眼报告就完事了。我会把结果和指标对比，找出瓶颈：</p>
+
+<table>
+  <tr>
+    <th>场景</th>
+    <th>QPS</th>
+    <th>平均响应时间</th>
+    <th>95%响应时间</th>
+    <th>错误率</th>
+    <th>结论</th>
+  </tr>
+  <tr>
+    <td>单接口压测（任务下发）</td>
+    <td>800</td>
+    <td>45ms</td>
+    <td>120ms</td>
+    <td>0.02%</td>
+    <td>通过</td>
+  </tr>
+  <tr>
+    <td>混合场景（任务+查询+取消）</td>
+    <td>600</td>
+    <td>85ms</td>
+    <td>210ms</td>
+    <td>0.05%</td>
+    <td>接近阈值</td>
+  </tr>
+  <tr>
+    <td>极限压测（持续10分钟）</td>
+    <td>1200</td>
+    <td>320ms</td>
+    <td>890ms</td>
+    <td>2.3%</td>
+    <td>不通过，需优化</td>
+  </tr>
+</table>
+
+<p>看到极限压测不通过，我就知道问题出在哪了。数据库连接池太小，导致请求排队。把连接池从20调到50，重新压测，QPS上去了，响应时间也降下来了。</p>
+
+<h3>14.3 稳定性测试：跑它个三天三夜</h3>
+
+<p>稳定性测试，说白了就是看系统能不能长时间不出问题。AGV调度系统是7×24小时运行的，不能三天两头重启。我见过一个项目，系统跑48小时就内存溢出，最后发现是日志框架有内存泄漏。</p>
+
+<h4>14.3.1 稳定性测试方案</h4>
+
+<p>我个人习惯，稳定性测试至少跑72小时。测试方案包括：</p>
+
+<ul>
+  <li><strong>持续负载：</strong>模拟70%的峰值负载，持续运行</li>
+  <li><strong>周期性波动：</strong>每4小时模拟一次高峰，持续30分钟</li>
+  <li><strong>异常注入：</strong>随机断掉某个AGV的连接，看系统能否自动恢复</li>
+  <li><strong>数据积累：</strong>持续产生任务记录，观察数据库增长对性能的影响</li>
+</ul>
+
+<p>为什么要模拟周期性波动？因为实际场景中，上午10点和下午3点是出货高峰期，其他时间负载较低。系统要能扛住这种节奏。</p>
+
+<h4>14.3.2 监控指标与告警</h4>
+
+<p>稳定性测试期间，我会盯着几个关键指标：</p>
+
+<table>
+  <tr>
+    <th>监控项</th>
+    <th>正常范围</th>
+    <th>告警阈值</th>
+    <th>处理方式</th>
+  </tr>
+  <tr>
+    <td>JVM堆内存</td>
+    <td>使用率&lt;70%</td>
+    <td>&gt;85%持续5分钟</td>
+    <td>检查GC日志，排查内存泄漏</td>
+  </tr>
+  <tr>
+    <td>数据库连接数</td>
+    <td>活跃连接&lt;30</td>
+    <td>&gt;50</td>
+    <td>检查慢查询，优化SQL</td>
+  </tr>
+  <tr>
+    <td>任务队列长度</td>
+    <td>&lt;100</td>
+    <td>&gt;500</td>
+    <td>检查调度算法，增加消费者</td>
+  </tr>
+  <tr>
+    <td>AGV心跳超时率</td>
+    <td>&lt;0.1%</td>
+    <td>&gt;1%</td>
+    <td>检查网络，排查AGV端问题</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>经验之谈：</strong>稳定性测试最容易发现内存泄漏和线程泄漏。我建议在测试前后各做一次堆转储（heap dump），对比分析对象增长情况。有一次我发现一个HashMap只增不减，原来是缓存没设过期时间。</p>
+</div>
+
+<h4>14.3.3 稳定性测试报告</h4>
+
+<p>测试结束后，我会输出一份详细的报告。报告里要有：</p>
+
+<ul>
+  <li>测试时间、环境、负载模型</li>
+  <li>关键指标的趋势图（内存、CPU、响应时间）</li>
+  <li>异常事件记录（时间点、现象、根因）</li>
+  <li>优化建议（按优先级排序）</li>
+</ul>
+
+<p>举个例子，有一次稳定性测试发现，系统运行到第48小时，任务下发接口的响应时间从50ms涨到了500ms。查了半天，发现是数据库里任务表的数据量太大，索引失效了。解决方案很简单：加一个定时任务，每天凌晨清理历史数据。</p>
+
+<h3>14.4 知识体系总览</h3>
+
+<p>下面这张图，是我对系统集成测试的整体理解。你可以把它当作一个检查清单：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">系统集成测试知识体系</text>
+  
+  <!-- 三个核心模块 -->
+  <!-- 接口测试 -->
+  <rect x="50" y="70" width="220" height="380" fill="#e8f5e9" rx="10" stroke="#4caf50" stroke-width="2"/>
+  <text x="160" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">接口测试</text>
+  <line x1="70" y1="115" x2="250" y2="115" stroke="#4caf50" stroke-width="1"/>
+  <text x="70" y="140" font-size="13" fill="#333">• 接口清单梳理</text>
+  <text x="70" y="165" font-size="13" fill="#333">• 正常流程验证</text>
+  <text x="70" y="190" font-size="13" fill="#333">• 异常输入覆盖</text>
+  <text x="70" y="215" font-size="13" fill="#333">• 超时重试机制</text>
+  <text x="70" y="240" font-size="13" fill="#333">• 自动化脚本</text>
+  <text x="70" y="265" font-size="13" fill="#333">• CI/CD集成</text>
+  
+  <!-- 压力测试 -->
+  <rect x="290" y="70" width="220" height="380" fill="#fff3e0" rx="10" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">压力测试</text>
+  <line x1="310" y1="115" x2="490" y2="115" stroke="#ff9800" stroke-width="1"/>
+  <text x="310" y="140" font-size="13" fill="#333">• 压测指标定义</text>
+  <text x="310" y="165" font-size="13" fill="#333">• JMeter配置</text>
+  <text x="310" y="190" font-size="13" fill="#333">• 单接口压测</text>
+  <text x="310" y="215" font-size="13" fill="#333">• 混合场景压测</text>
+  <text x="310" y="240" font-size="13" fill="#333">• 极限压测</text>
+  <text x="310" y="265" font-size="13" fill="#333">• 瓶颈分析</text>
+  
+  <!-- 稳定性测试 -->
+  <rect x="530" y="70" width="220" height="380" fill="#e3f2fd" rx="10" stroke="#2196f3" stroke-width="2"/>
+  <text x="640" y="100" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">稳定性测试</text>
+  <line x1="550" y1="115" x2="730" y2="115" stroke="#2196f3" stroke-width="1"/>
+  <text x="550" y="140" font-size="13" fill="#333">• 72小时持续运行</text>
+  <text x="550" y="165" font-size="13" fill="#333">• 周期性波动模拟</text>
+  <text x="550" y="190" font-size="13" fill="#333">• 异常注入测试</text>
+  <text x="550" y="215" font-size="13" fill="#333">• 数据积累影响</text>
+  <text x="550" y="240" font-size="13" fill="#333">• 监控与告警</text>
+  <text x="550" y="265" font-size="13" fill="#333">• 内存泄漏排查</text>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="380" width="500" height="50" fill="#fce4ec" rx="8" stroke="#e91e63" stroke-width="1.5"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" font-weight="bold" fill="#c2185b">核心目标：确保系统在真实场景下稳定、高效、可靠</text>
+  
+  <!-- 连接线 -->
+  <line x1="270" y1="260" x2="290" y2="260" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="510" y1="260" x2="530" y2="260" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+</svg>
+
+<p>这三类测试，环环相扣。接口测试保证功能正确，压力测试保证性能达标，稳定性测试保证长期可靠。少一个都不行。</p>
+
+<div class="tip">
+  <p><strong>最后说一句：</strong>测试不是走过场，而是为了发现问题。我见过太多项目，测试报告写得漂漂亮亮，上线第一天就出问题。为什么？因为测试环境和生产环境不一样，数据量不一样，并发模型也不一样。所以，尽量让测试环境接近生产环境，别偷懒。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="13SimulationEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15DeployAndOps.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

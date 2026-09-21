@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 动态避障进阶</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="active">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 动态避障进阶：基于学习的避障方法（RL、IL）、社会力模型</h2>
+
+<p>各位同学，欢迎来到动态避障的进阶篇。</p>
+<p>前面几章我们聊了DWA、TEB这些经典方法，说实话，它们在结构化场景下表现不错。但一旦遇到人车混杂、行为高度不确定的环境，传统方法的局限性就暴露出来了。我当年在做一个仓储物流项目时，就遇到过这样的尴尬：机器人面对一个犹豫不决的行人，反复“前进-后退-再前进”，像个无头苍蝇。嗯，从那时起，我开始认真研究基于学习的避障方法。</p>
+
+<h3>14.1 为什么需要“学习”？</h3>
+
+<p>传统方法本质上是“规则驱动”的。你设定好代价函数，机器人就按部就班地求解。但问题是，真实世界中的人类行为，很难用几条规则完全描述。</p>
+<ul>
+    <li><strong>不确定性</strong>：行人可能突然转向、加速、甚至倒退。</li>
+    <li><strong>社会习惯</strong>：比如迎面走来时，大家会默契地偏向同一侧。</li>
+    <li><strong>交互性</strong>：你的决策会影响对方的决策，这是一个博弈过程。</li>
+</ul>
+<p>说白了，传统方法缺少“预测”和“意图理解”的能力。而基于学习的方法，正好可以补上这块短板。</p>
+
+<div class="highlight">
+    <p><strong>核心思路</strong>：让机器人从大量交互数据中，自己学会“什么行为是安全的、高效的、符合社会规范的”。</p>
+</div>
+
+<h3>14.2 基于强化学习（RL）的避障</h3>
+
+<p>强化学习，说白了就是“试错学习”。机器人像个孩子，做对了给奖励，做错了给惩罚。最终学会一套最优策略。</p>
+
+<h4>14.2.1 核心要素定义</h4>
+<p>在避障问题中，我们通常这样定义RL的要素：</p>
+<ul>
+    <li><strong>状态空间</strong>：机器人自身位姿、速度，以及周围障碍物的相对位置、速度。有时还会加上目标点的方向。</li>
+    <li><strong>动作空间</strong>：通常是线速度和角速度的离散或连续值。我个人习惯用连续动作空间，控制更平滑。</li>
+    <li><strong>奖励函数</strong>：这是最关键的。我一般会设计三部分：
+        <ul>
+            <li>正向奖励：接近目标点。</li>
+            <li>负向惩罚：碰撞（-100）、靠近障碍物（-1/distance）。</li>
+            <li>社会奖励：保持合理间距、不突然变向。</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>14.2.2 常用算法：PPO与SAC</h4>
+<p>在移动机器人领域，PPO（Proximal Policy Optimization）和SAC（Soft Actor-Critic）是两大主流。PPO实现简单、训练稳定；SAC则更擅长处理连续动作空间，探索性更好。</p>
+<p>我曾经在仿真环境中对比过两者。PPO大概需要500万步才能收敛，而SAC只需要300万步。但PPO的最终策略更鲁棒，不容易出现“抖动”现象。</p>
+
+<div class="tip">
+    <p><strong>我的经验</strong>：如果你刚入门，先从PPO开始。它就像一把瑞士军刀，虽然不够锋利，但什么都能干。等你对调参有感觉了，再尝试SAC。</p>
+</div>
+
+<h4>14.2.3 训练流程与代码骨架</h4>
+<p>下面是一个简化版的训练循环，我用的是PyTorch + Stable-Baselines3：</p>
+
+<pre><code>import gym
+from stable_baselines3 import PPO
+from stable_baselines3.common.env_util import make_vec_env
+
+# 1. 创建环境（这里用自定义的避障环境）
+env = make_vec_env("AvoidanceEnv-v0", n_envs=4)
+
+# 2. 初始化模型
+model = PPO(
+    "MlpPolicy",
+    env,
+    learning_rate=3e-4,
+    n_steps=2048,
+    batch_size=64,
+    verbose=1
+)
+
+# 3. 开始训练
+model.learn(total_timesteps=1_000_000)
+
+# 4. 保存模型
+model.save("ppo_avoidance")</code></pre>
+
+<p>嗯，这里要注意：仿真环境的设计直接决定了训练效果。我见过太多人花90%的时间调算法，却忽略了环境本身的逼真度。你想想看，如果仿真里的行人都是直线运动，那学出来的策略到了真实世界肯定抓瞎。</p>
+
+<h3>14.3 模仿学习（IL）：向人类专家学习</h3>
+
+<p>强化学习有个痛点：奖励函数很难设计。你给少了，机器人学不会；给多了，它可能钻空子。比如你只惩罚碰撞，它可能就停在原地不动了——反正不撞就行。</p>
+<p>模仿学习（Imitation Learning, IL）提供了另一种思路：让机器人直接模仿人类专家的行为。</p>
+
+<h4>14.3.1 行为克隆（BC）</h4>
+<p>这是最直接的方法。你收集大量人类驾驶或操控机器人的数据，然后训练一个神经网络，输入是状态，输出是动作。本质上就是一个监督学习问题。</p>
+
+<div class="warning">
+    <p><strong>我曾经踩过的坑</strong>：行为克隆有个致命问题——分布偏移。训练时，机器人看到的都是专家状态；但一旦它自己执行，哪怕有一点点偏差，就会进入一个从未见过的状态，然后越跑越偏。这就像学开车时，教练一直在旁边扶着方向盘，你觉得自己会了，但一松手就撞树。</p>
+</div>
+
+<h4>14.3.2 逆强化学习（IRL）</h4>
+<p>IRL的思路更巧妙：我不直接学策略，而是从专家数据中反推出奖励函数。然后把这个奖励函数交给RL去优化。</p>
+<p>举个例子，你观察一个老司机开车，发现他从不急刹车。IRL会推断出：这个司机的奖励函数里，对“舒适性”的权重很高。然后机器人就知道，不仅要快，还要稳。</p>
+
+<h3>14.4 社会力模型（Social Force Model, SFM）</h3>
+
+<p>讲完学习型方法，我们回头看看一个经典模型——社会力模型。它虽然不是“学习”出来的，但它的思想深刻影响了后来的很多RL方法。</p>
+
+<h4>14.4.1 模型原理</h4>
+<p>社会力模型认为，行人的运动受到三种“力”的驱动：</p>
+<ul>
+    <li><strong>驱动力</strong>：指向目标点的吸引力。</li>
+    <li><strong>排斥力</strong>：来自障碍物和其他行人的排斥。</li>
+    <li><strong>波动项</strong>：随机扰动，模拟人的不确定性。</li>
+</ul>
+<p>数学上可以写成：</p>
+<pre><code>F_total = F_drive + Σ F_repulsion + noise</code></pre>
+<p>这个模型简单、可解释性强。我早期做行人轨迹预测时，就用它做baseline，效果出奇地好。</p>
+
+<h4>14.4.2 与RL的结合</h4>
+<p>现在很多工作把社会力模型嵌入到RL的奖励函数中。比如，让机器人的行为也符合“社会力”的约束，这样它就能更好地融入人群。</p>
+
+<div class="highlight">
+    <p><strong>一个实用的组合方案</strong>：用社会力模型生成“社会可接受”的参考轨迹，然后用RL去跟踪这条轨迹。这样既保证了安全性，又保留了RL的灵活性。</p>
+</div>
+
+<h3>14.5 本章知识体系总览</h3>
+
+<p>为了让你更直观地理解这些方法之间的关系，我画了一张图：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">动态避障进阶方法体系</text>
+    
+    <!-- 第一层：三大方法 -->
+    <rect x="50" y="70" width="200" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+    <text x="150" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">强化学习 (RL)</text>
+    
+    <rect x="300" y="70" width="200" height="60" rx="10" fill="#e67e22" opacity="0.9"/>
+    <text x="400" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">模仿学习 (IL)</text>
+    
+    <rect x="550" y="70" width="200" height="60" rx="10" fill="#2ecc71" opacity="0.9"/>
+    <text x="650" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">社会力模型 (SFM)</text>
+    
+    <!-- 箭头 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+        </marker>
+    </defs>
+    
+    <!-- 第二层：子方法 -->
+    <line x1="150" y1="130" x2="100" y2="180" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="150" y1="130" x2="200" y2="180" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <rect x="30" y="185" width="140" height="45" rx="8" fill="#85c1e9"/>
+    <text x="100" y="212" text-anchor="middle" font-size="13" fill="white">PPO</text>
+    
+    <rect x="180" y="185" width="140" height="45" rx="8" fill="#85c1e9"/>
+    <text x="250" y="212" text-anchor="middle" font-size="13" fill="white">SAC</text>
+    
+    <line x1="400" y1="130" x2="350" y2="180" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="400" y1="130" x2="450" y2="180" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <rect x="280" y="185" width="140" height="45" rx="8" fill="#f0b27a"/>
+    <text x="350" y="212" text-anchor="middle" font-size="13" fill="white">行为克隆 (BC)</text>
+    
+    <rect x="430" y="185" width="140" height="45" rx="8" fill="#f0b27a"/>
+    <text x="500" y="212" text-anchor="middle" font-size="13" fill="white">逆强化学习 (IRL)</text>
+    
+    <line x1="650" y1="130" x2="650" y2="180" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <rect x="580" y="185" width="140" height="45" rx="8" fill="#82e0aa"/>
+    <text x="650" y="212" text-anchor="middle" font-size="13" fill="white">驱动力+排斥力</text>
+    
+    <!-- 第三层：关键要素 -->
+    <line x1="100" y1="230" x2="100" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="250" y1="230" x2="250" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="350" y1="230" x2="350" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="500" y1="230" x2="500" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    <line x1="650" y1="230" x2="650" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <rect x="30" y="295" width="140" height="40" rx="6" fill="#d5dbdb"/>
+    <text x="100" y="320" text-anchor="middle" font-size="12" fill="#2c3e50">状态/动作空间</text>
+    
+    <rect x="180" y="295" width="140" height="40" rx="6" fill="#d5dbdb"/>
+    <text x="250" y="320" text-anchor="middle" font-size="12" fill="#2c3e50">奖励函数设计</text>
+    
+    <rect x="280" y="295" width="140" height="40" rx="6" fill="#d5dbdb"/>
+    <text x="350" y="320" text-anchor="middle" font-size="12" fill="#2c3e50">专家数据收集</text>
+    
+    <rect x="430" y="295" width="140" height="40" rx="6" fill="#d5dbdb"/>
+    <text x="500" y="320" text-anchor="middle" font-size="12" fill="#2c3e50">奖励函数推断</text>
+    
+    <rect x="580" y="295" width="140" height="40" rx="6" fill="#d5dbdb"/>
+    <text x="650" y="320" text-anchor="middle" font-size="12" fill="#2c3e50">社会力参数</text>
+    
+    <!-- 底部：融合 -->
+    <line x1="100" y1="335" x2="400" y2="400" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <line x1="250" y1="335" x2="400" y2="400" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <line x1="350" y1="335" x2="400" y2="400" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <line x1="500" y1="335" x2="400" y2="400" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    <line x1="650" y1="335" x2="400" y2="400" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+    
+    <rect x="300" y="400" width="200" height="50" rx="10" fill="#e74c3c" opacity="0.85"/>
+    <text x="400" y="430" text-anchor="middle" font-size="15" fill="white" font-weight="bold">混合方法 / 实际部署</text>
+</svg>
+
+<h3>14.6 实际部署中的建议</h3>
+
+<p>最后，我想分享几点实战中的体会：</p>
+<ol>
+    <li><strong>不要迷信“端到端”</strong>：纯RL端到端避障，在真实机器人上部署风险很高。我建议用RL做高层决策，底层控制还是交给传统方法（如DWA）。</li>
+    <li><strong>仿真到现实的鸿沟</strong>：训练时一定要加入随机化（domain randomization），比如改变传感器噪声、行人速度分布等。否则，你的模型在仿真里是王者，到了现实就是青铜。</li>
+    <li><strong>社会力模型是个好“老师”</strong>：如果你没有专家数据，可以用社会力模型生成“伪专家”轨迹，然后用IL去学。这比从零开始RL要快得多。</li>
+</ol>
+
+<div class="tip">
+    <p><strong>一个小技巧</strong>：在部署RL策略时，加一个“安全过滤器”。当RL输出的动作会导致碰撞时，由传统方法接管。这样既保证了学习方法的灵活性，又守住了安全底线。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。动态避障这条路，越走越深，但也越走越有意思。希望你能把这些方法真正用起来，而不是停留在理论层面。</p>
+
+<div class="footer-nav">
+            <a href="13DynamicAvoidBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15TrajectorySmoothInterp.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

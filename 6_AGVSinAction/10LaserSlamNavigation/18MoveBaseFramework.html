@@ -1,0 +1,430 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 move_base框架</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="active">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 move_base框架：actionlib通信、全局/局部规划器配置、代价地图层、恢复行为</h2>
+
+<p>各位同学，今天我们来啃一块硬骨头——move_base框架。说实话，这个框架是ROS导航的“大脑”，也是我当年入行时花时间最多、踩坑最深的一个模块。你想想看，AGV要自主导航，从A点到B点，中间要避开障碍物、要规划路径、要处理突发情况，所有这些逻辑都靠move_base来调度。</p>
+
+<p>我个人习惯把move_base拆成四个核心部分来理解：<strong>通信机制、规划器配置、代价地图、恢复行为</strong>。咱们一个一个说。</p>
+
+<h3>18.1 actionlib通信：move_base的“神经”</h3>
+
+<p>move_base和外部模块怎么通信？靠的是actionlib。不是简单的topic，也不是service，而是actionlib。为什么？因为导航是一个<strong>长时间、可取消、有反馈</strong>的任务。</p>
+
+<p>举个例子，你给AGV下了一个“去仓库3号货架”的指令。它可能走了一半发现路被堵了，需要重新规划。这时候如果用的是service，你只能等它完成或者超时，中间没法干预。但actionlib不一样——你可以随时取消、可以收到进度反馈、可以知道它当前在干嘛。</p>
+
+<div class="highlight">
+  <p><strong>核心概念：</strong>actionlib基于三个topic实现——goal（目标）、feedback（反馈）、result（结果）。客户端发送goal，服务端持续发布feedback，最终返回result。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：AGV在狭窄通道里反复规划失败，客户端一直收不到result，导致任务卡死。后来发现是actionlib的<strong>超时机制</strong>没配好。默认的timeout是无限等待，这在工业现场是致命的。</p>
+
+<pre><code># 客户端调用示例
+from actionlib import SimpleActionClient
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+
+client = SimpleActionClient('move_base', MoveBaseAction)
+client.wait_for_server()
+
+goal = MoveBaseGoal()
+goal.target_pose.header.frame_id = "map"
+goal.target_pose.pose.position.x = 5.0
+goal.target_pose.pose.position.y = 3.0
+goal.target_pose.pose.orientation.w = 1.0
+
+# 设置超时，避免死等
+client.send_goal(goal)
+finished = client.wait_for_result(timeout=rospy.Duration(30.0))
+if not finished:
+    client.cancel_goal()
+    rospy.logwarn("导航超时，已取消任务")
+</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经因为忘记设置timeout，导致AGV在死胡同里反复尝试了10分钟，电池都耗光了。建议生产环境中timeout设置在30-60秒之间，配合恢复行为使用。</p>
+</div>
+
+<h3>18.2 全局/局部规划器配置</h3>
+
+<p>move_base内部有两个规划器：<strong>全局规划器</strong>和<strong>局部规划器</strong>。说白了，全局规划器负责“看地图”，规划出一条从起点到终点的宏观路径；局部规划器负责“看眼前”，根据实时传感器数据避开动态障碍物。</p>
+
+<p>我刚开始做的时候，以为全局规划器配好就行了。结果AGV一跑起来，要么撞墙，要么原地打转。后来才明白——<strong>两个规划器必须协同工作</strong>。</p>
+
+<h4>全局规划器配置</h4>
+
+<p>常用的全局规划器是<code>navfn/NavfnROS</code>或<code>global_planner/GlobalPlanner</code>。我个人更推荐后者，因为它支持A*和Dijkstra两种算法，灵活性更高。</p>
+
+<pre><code># 全局规划器参数示例
+GlobalPlanner:
+  use_dijkstra: false          # 用A*，速度更快
+  use_quadratic: true          # 二次插值，路径更平滑
+  use_grid_path: false         # 不使用网格路径
+  old_navfn_behavior: false    # 兼容旧版本
+  visualize_potential: false   # 可视化势场，调试用
+</code></pre>
+
+<p>这里有个关键点：<code>use_quadratic</code>一定要设为true。为什么？因为如果不做插值，全局路径就是锯齿状的，局部规划器跟着走会很吃力，AGV会频繁左右摇摆。</p>
+
+<h4>局部规划器配置</h4>
+
+<p>局部规划器我主要用过两种：<code>base_local_planner/TrajectoryPlannerROS</code>（DWA算法）和<code>dwa_local_planner/DWAPlannerROS</code>。DWA是动态窗口法的缩写，核心思想是：在速度空间里采样，找一条不撞障碍物、又最接近全局路径的轨迹。</p>
+
+<pre><code># DWA局部规划器参数示例
+DWAPlannerROS:
+  max_vel_x: 0.5               # 最大前进速度
+  min_vel_x: -0.1              # 最小前进速度（允许后退）
+  max_vel_theta: 1.0           # 最大旋转速度
+  min_vel_theta: -1.0          # 最小旋转速度
+  
+  acc_lim_x: 0.5               # 加速度限制
+  acc_lim_theta: 0.5           # 角加速度限制
+  
+  # 代价权重
+  path_distance_bias: 32.0     # 路径跟踪权重
+  goal_distance_bias: 24.0     # 目标吸引权重
+  occdist_scale: 0.01          # 障碍物惩罚权重
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>这三个权重是调参的核心。path_distance_bias太大，AGV会死板地跟着全局路径，不会灵活避障；occdist_scale太大，AGV会离障碍物太远，在狭窄通道里过不去。我一般先设成32/24/0.01，然后根据实际场景微调。</p>
+</div>
+
+<h3>18.3 代价地图层</h3>
+
+<p>代价地图是move_base的“眼睛”。它把激光雷达、深度相机等传感器的数据融合起来，生成一张栅格地图，每个格子都有一个代价值。代价值越高，表示这个格子越危险。</p>
+
+<p>move_base支持<strong>多层代价地图</strong>，每一层负责不同的数据源。常用的层有：</p>
+
+<table>
+  <tr>
+    <th>层名称</th>
+    <th>作用</th>
+    <th>数据来源</th>
+  </tr>
+  <tr>
+    <td>static_layer</td>
+    <td>静态地图层，加载预先建好的地图</td>
+    <td>map_server</td>
+  </tr>
+  <tr>
+    <td>obstacle_layer</td>
+    <td>障碍物层，实时检测动态障碍物</td>
+    <td>激光雷达、深度相机</td>
+  </tr>
+  <tr>
+    <td>inflation_layer</td>
+    <td>膨胀层，给障碍物周围增加安全距离</td>
+    <td>基于其他层计算</td>
+  </tr>
+  <tr>
+    <td>voxel_layer</td>
+    <td>体素层，3D障碍物投影到2D</td>
+    <td>3D传感器</td>
+  </tr>
+</table>
+
+<p>我在项目中遇到过一个问题：AGV在仓库里总是莫名其妙地绕远路。排查了半天，发现是<code>inflation_layer</code>的膨胀半径设得太大了。默认是0.55米，但我们的AGV宽度只有0.6米，膨胀后几乎没路可走。</p>
+
+<pre><code># 代价地图参数示例
+local_costmap:
+  global_frame: odom
+  robot_base_frame: base_link
+  update_frequency: 5.0        # 更新频率，越高越灵敏
+  publish_frequency: 2.0
+  width: 4.0                   # 局部代价地图大小
+  height: 4.0
+  resolution: 0.05
+  
+  plugins:
+    - {name: obstacle_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
+    
+  obstacle_layer:
+    observation_sources: laser_scan
+    laser_scan: {data_type: LaserScan, topic: /scan, marking: true, clearing: true}
+    
+  inflation_layer:
+    inflation_radius: 0.3      # 根据实际车宽调整
+    cost_scaling_factor: 10.0  # 代价衰减速度
+</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈：</strong>inflation_radius建议设为车宽的一半再加0.1米。比如车宽0.6米，就设0.4米。cost_scaling_factor控制代价从障碍物边缘向外衰减的速度，值越大衰减越快，路径越靠近障碍物。</p>
+</div>
+
+<h3>18.4 恢复行为</h3>
+
+<p>AGV在导航过程中，难免会遇到“卡住”的情况——比如被箱子挡住了、在狭窄通道里进退两难。这时候就需要<strong>恢复行为</strong>来救场。</p>
+
+<p>move_base内置了几种恢复行为：</p>
+
+<ul>
+  <li><strong>旋转恢复</strong>：原地旋转一定角度，重新规划路径</li>
+  <li><strong>后退恢复</strong>：后退一段距离，再尝试</li>
+  <li><strong>清除代价地图</strong>：清除障碍物层，重新感知环境</li>
+</ul>
+
+<p>这些行为是按顺序执行的。如果旋转一次不行，就旋转两次；还不行，就后退；再不行，就清除地图重新感知。如果所有行为都试过了还是不行，move_base就会放弃，返回失败状态。</p>
+
+<pre><code># 恢复行为配置示例
+recovery_behaviors:
+  - {name: rotate_recovery, type: "rotate_recovery/RotateRecovery"}
+  - {name: clear_costmap, type: "clear_costmap_recovery/ClearCostmapRecovery"}
+  
+rotate_recovery:
+  frequency: 20.0
+  sim_granularity: 0.017
+  angular_vel: 0.5             # 旋转速度
+  
+clear_costmap:
+  reset_distance: 3.0          # 清除半径
+</code></pre>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>恢复行为配了，但AGV卡住后一直旋转，就是不后退。后来发现是<code>rotate_recovery</code>的<code>angular_vel</code>设得太小，旋转速度慢，还没转完一圈就被新的障碍物挡住了。建议设到0.5以上。</p>
+</div>
+
+<p>还有一个容易被忽略的点：<strong>恢复行为的触发条件</strong>。默认情况下，move_base在局部规划失败后才会触发恢复行为。但有时候全局规划也会失败——比如目标点被障碍物包围了。这时候需要手动设置<code>planner_frequency</code>和<code>planner_patience</code>参数，让全局规划器也具备重试机制。</p>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图是我自己整理的move_base框架核心逻辑，你看一眼就能明白各个模块之间的关系：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FD;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#D1E8F5;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" fill="#F7F9FC" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2C3E50">move_base框架核心逻辑</text>
+  
+  <!-- actionlib通信 -->
+  <rect x="300" y="55" width="200" height="45" rx="8" fill="#4A90D9" opacity="0.9"/>
+  <text x="400" y="83" text-anchor="middle" font-size="14" fill="white" font-weight="bold">actionlib通信</text>
+  
+  <!-- 箭头：actionlib到全局规划 -->
+  <line x1="400" y1="100" x2="400" y2="130" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 全局规划器 -->
+  <rect x="250" y="135" width="300" height="50" rx="8" fill="#5CB85C" opacity="0.9"/>
+  <text x="400" y="158" text-anchor="middle" font-size="13" fill="white" font-weight="bold">全局规划器 (Global Planner)</text>
+  <text x="400" y="175" text-anchor="middle" font-size="11" fill="white">navfn / global_planner (A* / Dijkstra)</text>
+  
+  <!-- 箭头：全局到局部 -->
+  <line x1="400" y1="185" x2="400" y2="215" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 局部规划器 -->
+  <rect x="250" y="220" width="300" height="50" rx="8" fill="#F0AD4E" opacity="0.9"/>
+  <text x="400" y="243" text-anchor="middle" font-size="13" fill="white" font-weight="bold">局部规划器 (Local Planner)</text>
+  <text x="400" y="260" text-anchor="middle" font-size="11" fill="white">DWA / TrajectoryRollout</text>
+  
+  <!-- 箭头：局部到代价地图 -->
+  <line x1="400" y1="270" x2="400" y2="300" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 代价地图层 -->
+  <rect x="200" y="305" width="400" height="55" rx="8" fill="#D9534F" opacity="0.85"/>
+  <text x="400" y="328" text-anchor="middle" font-size="13" fill="white" font-weight="bold">代价地图层 (Costmap Layers)</text>
+  <text x="400" y="348" text-anchor="middle" font-size="11" fill="white">static_layer | obstacle_layer | inflation_layer | voxel_layer</text>
+  
+  <!-- 箭头：代价地图到恢复行为 -->
+  <line x1="400" y1="360" x2="400" y2="390" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 恢复行为 -->
+  <rect x="250" y="395" width="300" height="50" rx="8" fill="#7B68EE" opacity="0.85"/>
+  <text x="400" y="418" text-anchor="middle" font-size="13" fill="white" font-weight="bold">恢复行为 (Recovery Behaviors)</text>
+  <text x="400" y="438" text-anchor="middle" font-size="11" fill="white">旋转恢复 → 后退恢复 → 清除代价地图</text>
+  
+  <!-- 反馈循环箭头 -->
+  <path d="M 550 420 Q 620 420 620 250 Q 620 160 550 160" fill="none" stroke="#4A90D9" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#arrowhead)"/>
+  <text x="640" y="300" font-size="11" fill="#4A90D9" transform="rotate(90,640,300)">失败时触发恢复</text>
+</svg>
+
+<p>嗯，到这里move_base的核心内容就讲完了。你可能会问：这些参数怎么调？说实话，没有万能参数，每个场景都要微调。我建议你先用默认参数跑一遍，然后根据AGV的表现逐步调整——先调速度限制，再调代价权重，最后调恢复行为。别想着一步到位，调参是个迭代的过程。</p>
+
+<p>最后说一句：move_base虽然强大，但也不是万能的。如果现场环境特别复杂——比如有玻璃墙、镜面反射、或者地面反光严重——光靠move_base是不够的，还需要结合IMU、轮式里程计做多传感器融合。这部分内容，我们后面会讲到。</p>
+
+<div class="highlight">
+  <p><strong>核心要点回顾：</strong></p>
+  <ul>
+    <li>actionlib实现长时间导航任务的通信，记得设timeout</li>
+    <li>全局规划器用A*，局部规划器用DWA，权重参数要配合调</li>
+    <li>代价地图多层叠加，inflation_radius根据车宽设定</li>
+    <li>恢复行为是最后一道防线，按旋转→后退→清除的顺序配置</li>
+  </ul>
+</div>
+
+<hr style="border:1px dashed #ccc;margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="17LocalPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19AmclPrinciple.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 Wi-Fi/以太网通信</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="active">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 Wi-Fi/以太网通信：LWIP协议栈移植、TCP/IP Socket编程、MQTT客户端实现</h2>
+
+<p>说到AGV控制器的网络通信，我脑子里第一个蹦出来的就是LWIP。这玩意儿在嵌入式圈子里，说白了就是轻量级TCP/IP协议栈的扛把子。你想想看，AGV要跟调度系统通信，要上报位置，要接收任务，没有网络怎么行？</p>
+
+<p>我个人习惯把网络通信分成三层来看：底层是物理层，Wi-Fi或者以太网；中间是协议栈，LWIP负责把数据包拆了装、装了拆；上层就是应用层，Socket编程和MQTT协议。今天咱们就把这三层挨个捋一遍。</p>
+
+<h3>15.1 LWIP协议栈移植——从零开始跑通网络</h3>
+
+<p>LWIP移植，我做过不下十次了。每次换芯片平台，第一件事就是把LWIP跑起来。为什么？因为网络通了，调试效率能翻好几倍。</p>
+
+<p>移植LWIP，核心就三个文件：<code>lwipopts.h</code>、<code>cc.h</code>、<code>sys_arch.c</code>。说白了，一个管配置，一个管数据类型，一个管操作系统适配。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>LWIP移植的关键在于底层接口的对接，特别是网卡驱动和操作系统抽象层。</p>
+</div>
+
+<h4>15.1.1 网卡驱动对接</h4>
+
+<p>LWIP跟硬件打交道，靠的是<code>netif</code>结构体。你得实现四个函数：</p>
+
+<ul>
+  <li><code>low_level_init()</code> —— 初始化MAC、PHY，设置MAC地址</li>
+  <li><code>low_level_output()</code> —— 把LWIP封装好的数据包发出去</li>
+  <li><code>low_level_input()</code> —— 从网卡收数据，交给LWIP</li>
+  <li>中断处理函数 —— 收到数据包后通知LWIP来取</li>
+</ul>
+
+<p>我在项目中遇到过一个问题：AGV在仓库里移动时，Wi-Fi信号会波动。一开始没做重传机制，结果丢包率高达30%。后来在驱动层加了重传和链路检测，才稳定下来。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>网卡驱动里，中断处理一定要快。收到数据包后，用<code>netif-&gt;input()</code>交给LWIP，不要在中断里做太多处理。否则实时性会崩。</p>
+</div>
+
+<h4>15.1.2 操作系统适配层</h4>
+
+<p>LWIP支持多线程，但需要你提供几个基础接口：</p>
+
+<table>
+  <tr>
+    <th>接口</th>
+    <th>作用</th>
+    <th>我常用的实现方式</th>
+  </tr>
+  <tr>
+    <td><code>sys_mbox_new/free</code></td>
+    <td>消息邮箱，用于线程间通信</td>
+    <td>基于RTOS的消息队列</td>
+  </tr>
+  <tr>
+    <td><code>sys_sem_new/signal/wait</code></td>
+    <td>信号量，用于同步</td>
+    <td>基于RTOS的二进制信号量</td>
+  </tr>
+  <tr>
+    <td><code>sys_thread_new</code></td>
+    <td>创建LWIP内部线程</td>
+    <td>直接调用RTOS的线程创建函数</td>
+  </tr>
+  <tr>
+    <td><code>sys_arch_protect/unprotect</code></td>
+    <td>临界区保护</td>
+    <td>关中断或使用互斥锁</td>
+  </tr>
+</table>
+
+<p>嗯，这里要注意：LWIP的<code>sys_arch.c</code>实现，直接决定了协议栈的稳定性。我曾经偷懒，信号量实现用了轮询方式，结果CPU占用率飙升到80%。后来改成阻塞等待，CPU占用率直接降到5%。</p>
+
+<h3>15.2 TCP/IP Socket编程——AGV的通信骨架</h3>
+
+<p>LWIP移植好了，接下来就是写应用代码。我个人偏爱用Socket API，因为它跟Linux下的网络编程几乎一模一样。你如果写过PC端的网络程序，上手LWIP的Socket API基本零成本。</p>
+
+<h4>15.2.1 TCP客户端——AGV上报位置</h4>
+
+<p>AGV通常作为TCP客户端，主动连接调度服务器。下面是我常用的代码模板：</p>
+
+<pre><code>int agv_tcp_client_init(void)
+{
+    int sock = -1;
+    struct sockaddr_in server_addr;
+
+    // 1. 创建Socket
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock &lt; 0) {
+        printf("Socket创建失败\n");
+        return -1;
+    }
+
+    // 2. 设置服务器地址
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);  // 调度服务器端口
+    server_addr.sin_addr.s_addr = inet_addr("192.168.1.100");
+
+    // 3. 连接服务器
+    if (connect(sock, (struct sockaddr *)&amp;server_addr, sizeof(server_addr)) &lt; 0) {
+        printf("连接失败\n");
+        closesocket(sock);
+        return -1;
+    }
+
+    // 4. 设置超时（防止网络卡死）
+    struct timeval timeout = {5, 0};  // 5秒超时
+    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &amp;timeout, sizeof(timeout));
+
+    return sock;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在AGV上没设置Socket超时，结果网络断开后，connect()和recv()直接卡死，AGV彻底失联。后来所有Socket都加了超时处理，再也没出过这个问题。</p>
+</div>
+
+<h4>15.2.2 心跳机制——保持连接不断</h4>
+
+<p>AGV在车间里跑，Wi-Fi信号时好时坏。TCP连接看着还在，实际上可能早就断了。怎么办？加心跳包。</p>
+
+<p>我一般这么设计：</p>
+
+<ul>
+  <li>AGV每3秒发一个心跳包，内容就一个字节：0xAA</li>
+  <li>服务器收到后回复0xBB</li>
+  <li>如果连续5次没收到回复，判定连接断开，主动重连</li>
+</ul>
+
+<p>你想想看，这个机制简单吧？但效果特别好。AGV在仓库里跑一天，连接断个十几次都能自动恢复，调度系统完全无感。</p>
+
+<h3>15.3 MQTT客户端实现——轻量级通信的王者</h3>
+
+<p>TCP Socket虽然灵活，但你要自己处理协议格式、重连逻辑、消息路由。MQTT把这些都封装好了，说白了就是物联网界的HTTP协议。</p>
+
+<p>为什么AGV要用MQTT？三个理由：</p>
+
+<ol>
+  <li><strong>发布/订阅模型</strong> —— 多台AGV可以同时订阅同一个主题，调度系统发一条消息，所有AGV都能收到</li>
+  <li><strong>QoS质量等级</strong> —— 关键指令用QoS 1或2，保证不丢消息</li>
+  <li><strong>遗嘱消息</strong> —— AGV突然掉电，服务器能立刻知道，触发报警</li>
+</ol>
+
+<h4>15.3.1 MQTT客户端移植</h4>
+
+<p>嵌入式MQTT客户端，我常用的是Eclipse Paho MQTT C/C++客户端库。它跟LWIP配合得天衣无缝。</p>
+
+<p>移植步骤很简单：</p>
+
+<ul>
+  <li>把<code>MQTTClient-C</code>的源码加到工程里</li>
+  <li>实现网络接口：<code>MQTTClient_setCallbacks()</code>里注册收发函数</li>
+  <li>配置MQTT参数：Broker地址、客户端ID、用户名密码</li>
+</ul>
+
+<pre><code>// MQTT客户端初始化示例
+void agv_mqtt_init(void)
+{
+    MQTTClient client;
+    MQTTClient_connectOptions conn_opts = MQTTClient_connectOptions_initializer;
+    int rc;
+
+    // 1. 创建客户端
+    MQTTClient_create(&amp;client, "tcp://192.168.1.100:1883", 
+                      "AGV_001", MQTTCLIENT_PERSISTENCE_NONE, NULL);
+
+    // 2. 设置回调
+    MQTTClient_setCallbacks(client, NULL, connlost_cb, msgarrvd_cb, delivered_cb);
+
+    // 3. 配置连接参数
+    conn_opts.keepAliveInterval = 20;    // 心跳间隔20秒
+    conn_opts.cleansession = 1;          // 清除会话
+    conn_opts.username = "agv_user";
+    conn_opts.password = "agv_pass";
+
+    // 4. 连接Broker
+    rc = MQTTClient_connect(client, &amp;conn_opts);
+    if (rc != MQTTCLIENT_SUCCESS) {
+        printf("MQTT连接失败，错误码：%d\n", rc);
+        return;
+    }
+
+    // 5. 订阅主题
+    MQTTClient_subscribe(client, "agv/001/cmd", 1);  // QoS 1
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>MQTT的<code>keepAliveInterval</code>一定要设置。我见过有人设成0，结果Broker以为客户端死了，把连接给踢了。AGV正在执行任务，突然断连，那叫一个尴尬。</p>
+</div>
+
+<h4>15.3.2 主题设计——AGV通信的命名规范</h4>
+
+<p>MQTT的主题设计，直接决定了系统的可扩展性。我总结了一套AGV常用的主题命名规则：</p>
+
+<table>
+  <tr>
+    <th>主题</th>
+    <th>方向</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td><code>agv/{id}/status</code></td>
+    <td>AGV → 服务器</td>
+    <td>上报位置、电量、状态</td>
+  </tr>
+  <tr>
+    <td><code>agv/{id}/cmd</code></td>
+    <td>服务器 → AGV</td>
+    <td>下发任务指令</td>
+  </tr>
+  <tr>
+    <td><code>agv/{id}/alarm</code></td>
+    <td>AGV → 服务器</td>
+    <td>报警信息</td>
+  </tr>
+  <tr>
+    <td><code>agv/all/broadcast</code></td>
+    <td>服务器 → 所有AGV</td>
+    <td>全局广播，比如紧急停止</td>
+  </tr>
+</table>
+
+<p>我个人习惯用<code>{id}</code>做通配符，这样新增AGV时，服务器端不用改任何代码。你想想看，车间里几十台AGV，每台都有自己的主题，管理起来多清爽。</p>
+
+<h3>15.4 实战经验总结——网络通信的坑与解</h3>
+
+<p>做了这么多年AGV控制器，网络通信这块踩过的坑，能写一本书。挑几个典型的说说：</p>
+
+<div class="tip">
+  <p><strong>关于Wi-Fi漫游：</strong>AGV在仓库里移动，会从一个AP切换到另一个AP。LWIP的TCP连接在切换时会断，怎么办？我的方案是：在应用层做自动重连，MQTT的自动重连机制正好用上。AGV检测到连接断开，自动重新连接并恢复订阅。</p>
+</div>
+
+<div class="warning">
+  <p><strong>关于内存管理：</strong>LWIP默认的PBUF池大小是256字节，如果你要发大包（比如上传地图数据），会频繁分配大块内存，导致碎片。我建议根据实际数据量调整<code>PBUF_POOL_SIZE</code>和<code>PBUF_POOL_BUFSIZE</code>。AGV上报位置数据一般就几十字节，256够用；但上传日志文件时，我临时把池大小翻倍。</p>
+</div>
+
+<p>嗯，最后说一句：网络通信是AGV控制器的命脉。LWIP移植好了，Socket写对了，MQTT配通了，你的AGV才算真正活过来。调试时多用Wireshark抓包看看，很多问题一眼就能看出来。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV控制器网络通信架构</text>
+  
+  <!-- 应用层 -->
+  <rect x="50" y="70" width="700" height="100" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">应用层</text>
+  
+  <rect x="80" y="110" width="180" height="40" rx="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+  <text x="170" y="135" text-anchor="middle" font-size="14" fill="#1b5e20">MQTT客户端</text>
+  
+  <rect x="310" y="110" width="180" height="40" rx="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+  <text x="400" y="135" text-anchor="middle" font-size="14" fill="#1b5e20">TCP Socket</text>
+  
+  <rect x="540" y="110" width="180" height="40" rx="5" fill="#c8e6c9" stroke="#388e3c" stroke-width="1"/>
+  <text x="630" y="135" text-anchor="middle" font-size="14" fill="#1b5e20">心跳/重连机制</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="170" x2="400" y2="210" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 协议栈层 -->
+  <rect x="50" y="210" width="700" height="100" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">协议栈层</text>
+  
+  <rect x="80" y="250" width="200" height="40" rx="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+  <text x="180" y="275" text-anchor="middle" font-size="14" fill="#bf360c">LWIP TCP/IP协议栈</text>
+  
+  <rect x="330" y="250" width="140" height="40" rx="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+  <text x="400" y="275" text-anchor="middle" font-size="14" fill="#bf360c">Socket API</text>
+  
+  <rect x="520" y="250" width="200" height="40" rx="5" fill="#ffe0b2" stroke="#f57c00" stroke-width="1"/>
+  <text x="620" y="275" text-anchor="middle" font-size="14" fill="#bf360c">操作系统抽象层</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="310" x2="400" y2="350" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 驱动层 -->
+  <rect x="50" y="350" width="700" height="100" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="375" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">驱动层</text>
+  
+  <rect x="80" y="390" width="200" height="40" rx="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+  <text x="180" y="415" text-anchor="middle" font-size="14" fill="#0d47a1">以太网MAC驱动</text>
+  
+  <rect x="330" y="390" width="140" height="40" rx="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+  <text x="400" y="415" text-anchor="middle" font-size="14" fill="#0d47a1">Wi-Fi驱动</text>
+  
+  <rect x="520" y="390" width="200" height="40" rx="5" fill="#bbdefb" stroke="#1976d2" stroke-width="1"/>
+  <text x="620" y="415" text-anchor="middle" font-size="14" fill="#0d47a1">PHY芯片管理</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+        <div class="footer-nav">
+            <a href="14CanBusCommunication.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16FileSystemPorting.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

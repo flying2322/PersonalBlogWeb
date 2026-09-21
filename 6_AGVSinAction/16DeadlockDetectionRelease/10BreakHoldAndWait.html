@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 死锁预防</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="active">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 死锁预防：破坏占有并等待（一次性申请所有资源）</h2>
+
+<p>死锁预防，说白了就是「从根上不让死锁发生」。</p>
+
+<p>今天聊的这种方法，我个人觉得是最直观的一种——<strong>一次性申请所有资源</strong>。它的核心思想很简单：<strong>要么不给，要么全给</strong>。</p>
+
+<h3>10.1 什么是「占有并等待」？</h3>
+
+<p>先回顾一下死锁的四个必要条件。其中第二个条件就是「占有并等待」。</p>
+
+<p>什么意思呢？</p>
+
+<p>一个AGV已经占着某个资源（比如一段路径），但它不放手，还在等另一个资源（比如一个工位）。这就是典型的「占着茅坑不拉屎」。</p>
+
+<p>我在项目中遇到过这种情况：两台AGV在十字路口相遇，A车占了东侧路段，B车占了西侧路段。两车都想往北走，但谁也不让谁。结果就是——死锁。</p>
+
+<p>为什么会这样？因为每台车都是「先占一个，再等一个」。</p>
+
+<h3>10.2 一次性申请：打破「占有并等待」</h3>
+
+<p>破坏这个条件的方法，就是让AGV<strong>一次性申请所有需要的资源</strong>。</p>
+
+<p>也就是说：</p>
+
+<ul>
+  <li>AGV在开始执行任务前，必须把整条路径上所有需要的资源都申请到手</li>
+  <li>如果有一个资源申请不到，那就一个资源都不给</li>
+  <li>AGV要么拥有全部资源，要么一个都没有</li>
+</ul>
+
+<p>嗯，这里要注意：这个「资源」不光是物理路径段，还包括工位、充电站、缓冲区等。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>资源分配要么全有，要么全无。不存在「先占一点，再等一点」的状态。</p>
+</div>
+
+<h3>10.3 具体怎么实现？</h3>
+
+<p>我建议用<strong>资源预分配表</strong>来实现。每台AGV在出发前，先计算好它要走的路径，然后向调度系统申请整条路径上的所有资源。</p>
+
+<p>伪代码大概是这样的：</p>
+
+<pre><code>// AGV任务请求
+AGV task_request(agv_id, path_segments) {
+    // 一次性申请所有路径段
+    for each segment in path_segments {
+        if (!request_resource(segment)) {
+            // 只要有一段申请不到，就释放所有已申请的资源
+            release_all_resources();
+            return FAILED;
+        }
+    }
+    // 全部申请成功，开始执行
+    return SUCCESS;
+}</code></pre>
+
+<p>你看，逻辑很清晰。申请不到就全部释放，绝不拖泥带水。</p>
+
+<h3>10.4 优点与缺点</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>实现简单，逻辑直观</td>
+      <td>资源利用率低，容易造成资源浪费</td>
+    </tr>
+    <tr>
+      <td>彻底杜绝死锁</td>
+      <td>AGV等待时间长，可能阻塞后续任务</td>
+    </tr>
+    <tr>
+      <td>调度系统负担小</td>
+      <td>不适合长路径、多AGV的场景</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我曾经在一个仓库项目里试过这种方法。仓库不大，AGV也就6台，路径也短。刚开始效果不错，死锁确实没了。但后来业务量上来，AGV增加到12台，问题就来了——AGV经常在起点等资源，一等就是十几秒，效率直线下降。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经以为「一次性申请」是万能药。后来发现，它只适合路径短、AGV数量少、资源竞争不激烈的场景。如果你的系统有20台以上AGV，或者路径长度超过50米，建议慎用。</p>
+</div>
+
+<h3>10.5 适用场景分析</h3>
+
+<p>那么，什么情况下适合用这种方法？</p>
+
+<ul>
+  <li><strong>小规模系统</strong>：AGV数量在10台以内</li>
+  <li><strong>短路径任务</strong>：单次任务路径长度不超过30米</li>
+  <li><strong>资源竞争不激烈</strong>：工位、充电站等资源充足</li>
+  <li><strong>对死锁零容忍</strong>：某些特殊场景（如危险品运输）不允许任何死锁风险</li>
+</ul>
+
+<p>你想想看，如果你的系统符合这些条件，那一次性申请确实是个好选择。简单、可靠、容易维护。</p>
+
+<h3>10.6 核心逻辑流程图</h3>
+
+<p>下面这张图，是我用SVG画的。它展示了「一次性申请所有资源」的核心流程：</p>
+
+<svg width="720" height="480" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="480" fill="#f8f9fa" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">一次性申请所有资源 — 核心流程</text>
+  
+  <!-- 开始 -->
+  <ellipse cx="360" cy="70" rx="60" ry="25" fill="#3498db" opacity="0.9"/>
+  <text x="360" y="76" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AGV任务开始</text>
+  
+  <!-- 箭头1 -->
+  <line x1="360" y1="95" x2="360" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 计算路径 -->
+  <rect x="230" y="130" width="260" height="45" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="158" text-anchor="middle" font-size="14" fill="#2c3e50">计算任务所需的所有资源</text>
+  
+  <!-- 箭头2 -->
+  <line x1="360" y1="175" x2="360" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 循环申请 -->
+  <rect x="200" y="210" width="320" height="45" rx="8" fill="#e8f8f5" stroke="#1abc9c" stroke-width="2"/>
+  <text x="360" y="238" text-anchor="middle" font-size="14" fill="#16a085">循环申请每个资源</text>
+  
+  <!-- 箭头3 -->
+  <line x1="200" y1="232" x2="120" y2="232" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="120" y1="232" x2="120" y2="290" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="120" y1="290" x2="200" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断：是否全部成功 -->
+  <polygon points="360,290 440,330 360,370 280,330" fill="#f39c12" opacity="0.9"/>
+  <text x="360" y="335" text-anchor="middle" font-size="13" fill="white" font-weight="bold">全部成功？</text>
+  
+  <!-- 是 -->
+  <line x1="440" y1="330" x2="520" y2="330" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="480" y="320" text-anchor="middle" font-size="12" fill="#27ae60" font-weight="bold">是</text>
+  
+  <!-- 执行任务 -->
+  <rect x="520" y="305" width="160" height="50" rx="8" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="600" y="333" text-anchor="middle" font-size="14" fill="#1e8449">执行任务</text>
+  
+  <!-- 否 -->
+  <line x1="280" y1="330" x2="200" y2="330" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="200" y1="330" x2="200" y2="400" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="200" y1="400" x2="360" y2="400" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="240" y="320" text-anchor="middle" font-size="12" fill="#e74c3c" font-weight="bold">否</text>
+  
+  <!-- 释放所有资源 -->
+  <rect x="230" y="400" width="260" height="45" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="360" y="428" text-anchor="middle" font-size="14" fill="#c0392b">释放所有已申请的资源</text>
+  
+  <!-- 箭头4 -->
+  <line x1="360" y1="445" x2="360" y2="470" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 结束 -->
+  <ellipse cx="360" cy="470" rx="50" ry="20" fill="#e74c3c" opacity="0.8"/>
+  <text x="360" y="476" text-anchor="middle" font-size="13" fill="white" font-weight="bold">任务失败</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>从图上你能看到：申请资源时，只要有一个失败，就立刻释放所有已占资源。这就是「全有或全无」的精髓。</p>
+
+<h3>10.7 实际项目中的一点体会</h3>
+
+<p>说实话，我在实际项目中很少单独用这种方法。更多时候，我会把它和<strong>资源预留</strong>、<strong>优先级调度</strong>结合起来用。</p>
+
+<p>比如：</p>
+<ul>
+  <li>高优先级的AGV可以一次性申请资源，低优先级的AGV则用其他方式</li>
+  <li>或者，只在关键路径段（比如窄通道、单行道）使用一次性申请</li>
+  <li>其他普通路径段，允许AGV分段申请</li>
+</ul>
+
+<p>这样既避免了死锁，又不至于把资源利用率压得太低。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>如果你决定用一次性申请，建议给AGV设置一个「最大等待时间」。超过这个时间还没申请到全部资源，就让AGV放弃当前任务，去做其他事情。这样可以避免AGV在起点干等。</p>
+</div>
+
+<h3>10.8 总结</h3>
+
+<p>一次性申请所有资源，是死锁预防里最直接的方法。它简单、可靠，但代价是资源利用率低。</p>
+
+<p>我个人觉得，它最适合的场景是：<strong>小系统、短路径、低竞争</strong>。如果你的系统符合这些条件，不妨试试看。</p>
+
+<p>如果不符，也别硬套。后面我们会聊到其他预防方法，比如资源排序、超时回退等，总有一款适合你。</p>
+
+<div class="footer-nav">
+            <a href="09BreakMutualExclusion.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11BreakNoPreemption.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

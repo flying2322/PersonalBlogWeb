@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 死锁检测算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="active">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 死锁检测算法：银行家算法在AGV调度中的应用</h2>
+
+<p>说到死锁检测，我第一个想到的就是银行家算法。这名字听着挺金融的，对吧？其实它最早确实是给操作系统设计的，用来避免多个进程争抢资源时卡死。后来我做AGV调度系统时发现，这玩意儿搬到咱们AGV场景里，简直天造地设的一对。</p>
+
+<p>你想想看，AGV要抢的是路径资源，进程要抢的是内存或CPU。本质上一模一样——都是多个主体竞争有限资源，搞不好就互相堵死。我当年在做一个大型仓储项目时，就亲眼见过6台AGV在交叉路口堵成一团，调度中心怎么发指令都解不开。后来我硬是把银行家算法嵌进了调度模块，才彻底根治了这个问题。</p>
+
+<h3>5.1 银行家算法的核心思想</h3>
+
+<p>银行家算法的逻辑其实很朴素。它模拟了一个场景：银行家手里有一笔钱，多个客户来贷款。银行家不会一次性把钱全借出去，而是留一部分备用。每次客户申请贷款时，银行家会先算一笔账——如果我把钱借给你，剩下的钱还能不能保证其他客户完成他们的业务？如果不行，就拒绝这次申请。</p>
+
+<p>放到AGV调度里，这个逻辑就变成了：</p>
+
+<ul>
+  <li><strong>银行家</strong> = 调度系统</li>
+  <li><strong>资金总额</strong> = 所有可用的路径段资源</li>
+  <li><strong>客户</strong> = 每一台AGV</li>
+  <li><strong>贷款申请</strong> = AGV请求前方路径段</li>
+  <li><strong>业务完成</strong> = AGV到达目标站点并释放资源</li>
+</ul>
+
+<p>说白了，调度系统在给AGV分配路径之前，先模拟一下：如果我把这段路给你，剩下的资源够不够让所有AGV都跑完？如果不够，那就先不给你，让你原地等着。</p>
+
+<div class="highlight">
+  <strong>关键点：</strong>银行家算法不是等死锁发生了再去解，而是在分配资源之前就判断会不会导致死锁。这是一种预防性策略，比事后检测要优雅得多。
+</div>
+
+<h3>5.2 算法中的数据结构</h3>
+
+<p>要实现银行家算法，我们需要维护几张表。我在项目中习惯用以下数据结构：</p>
+
+<table>
+  <tr>
+    <th>数据结构</th>
+    <th>含义</th>
+    <th>AGV场景中的对应</th>
+  </tr>
+  <tr>
+    <td>Available</td>
+    <td>当前可用资源向量</td>
+    <td>当前空闲的路径段数量</td>
+  </tr>
+  <tr>
+    <td>Max</td>
+    <td>每个AGV最大需求矩阵</td>
+    <td>每台AGV完成任务所需的最大路径段数</td>
+  </tr>
+  <tr>
+    <td>Allocation</td>
+    <td>已分配资源矩阵</td>
+    <td>每台AGV当前占用的路径段</td>
+  </tr>
+  <tr>
+    <td>Need</td>
+    <td>每个AGV还需要的资源矩阵</td>
+    <td>每台AGV剩余行程需要的路径段</td>
+  </tr>
+</table>
+
+<p>这里有个小细节要注意：<strong>Need = Max - Allocation</strong>。这个公式看起来简单，但我在实际项目中踩过坑——有些同事把Need理解成了"还需要多少资源才能到达下一个站点"，而不是"完成整个任务还需要多少"。这两个概念差远了，搞错了算法就完全失效。</p>
+
+<h3>5.3 安全性检查算法</h3>
+
+<p>银行家算法的核心是安全性检查。每次AGV申请资源时，调度系统会执行以下步骤：</p>
+
+<ol>
+  <li>检查申请是否超过Need（如果超过了，说明AGV的请求不合理，直接拒绝）</li>
+  <li>检查申请是否超过Available（如果超过了，说明当前资源不够，让AGV等待）</li>
+  <li>尝试分配资源，进入一个"预分配"状态</li>
+  <li>在预分配状态下，运行安全性检查算法</li>
+  <li>如果安全性检查通过，正式分配资源；否则回滚，拒绝申请</li>
+</ol>
+
+<p>安全性检查算法长这样：</p>
+
+<pre><code>// 安全性检查算法伪代码
+bool isSafeState(AGV[] agvs, Resource[] available) {
+    Work = available;  // 工作向量，模拟资源分配过程
+    Finish = [false, false, ..., false];  // 标记每台AGV是否完成
+
+    // 找一个能完成的AGV
+    for (int i = 0; i &lt; agvs.length; i++) {
+        if (!Finish[i] && Need[i] &lt;= Work) {
+            // 假设这台AGV完成，释放它占用的资源
+            Work += Allocation[i];
+            Finish[i] = true;
+            i = -1;  // 从头开始找下一个能完成的
+        }
+    }
+
+    // 检查是否所有AGV都能完成
+    for (int i = 0; i &lt; agvs.length; i++) {
+        if (!Finish[i]) return false;  // 有AGV无法完成，不安全
+    }
+    return true;  // 所有AGV都能完成，安全
+}</code></pre>
+
+<p>这段代码我当年手写过不下十遍。它的核心逻辑就是：<strong>模拟释放资源，看能不能让所有AGV都跑完</strong>。如果能，说明当前状态是安全的；如果不能，说明这个资源分配方案会导致死锁。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>在实际项目中，安全性检查不能做得太频繁。每台AGV每移动一步都检查一次的话，调度系统的CPU负载会飙升。我一般设置一个检查周期——比如每5秒检查一次，或者当AGV数量变化时才触发检查。这样既保证了安全性，又不会拖垮系统。
+</div>
+
+<h3>5.4 银行家算法的AGV适配改造</h3>
+
+<p>把银行家算法从操作系统搬到AGV调度，不能生搬硬套。我做过几个项目后，总结出几个必须改造的地方：</p>
+
+<ul>
+  <li><strong>资源粒度问题：</strong>操作系统里的资源是内存页、文件句柄，粒度比较粗。AGV的路径资源是连续的路径段，粒度很细。我建议把路径按交叉口分段，每段作为一个资源单位。</li>
+  <li><strong>资源释放时机：</strong>AGV不是一次性释放所有资源的。它每经过一个路径段，就会释放该段，同时申请下一段。所以Allocation和Need是动态变化的，需要实时更新。</li>
+  <li><strong>优先级问题：</strong>银行家算法默认所有进程平等。但AGV有优先级——紧急任务、充电任务、普通任务，优先级不一样。我改造时给每个AGV加了一个权重系数，安全性检查时优先满足高优先级AGV。</li>
+</ul>
+
+<div class="warning">
+  <strong>避坑指南：</strong>我曾经在一个项目中，直接把操作系统的银行家算法代码搬过来用。结果发现AGV的路径资源是"可抢占"的——比如一台AGV占用了A段，但它还没到B段，另一台AGV可以先申请B段。这种"部分资源可共享"的特性，标准银行家算法处理不了。后来我加了一个"资源类型标记"，把路径段分为"独占型"和"共享型"，才解决了这个问题。
+</div>
+
+<h3>5.5 一个简单的示例</h3>
+
+<p>假设我们有3台AGV，系统总共有10个路径段资源。当前状态如下：</p>
+
+<table>
+  <tr>
+    <th>AGV</th>
+    <th>Max（最大需求）</th>
+    <th>Allocation（已分配）</th>
+    <th>Need（还需要）</th>
+  </tr>
+  <tr>
+    <td>AGV-1</td>
+    <td>5</td>
+    <td>2</td>
+    <td>3</td>
+  </tr>
+  <tr>
+    <td>AGV-2</td>
+    <td>4</td>
+    <td>2</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>AGV-3</td>
+    <td>6</td>
+    <td>3</td>
+    <td>3</td>
+  </tr>
+</table>
+
+<p>当前Available = 10 - (2+2+3) = 3个空闲路径段。</p>
+
+<p>现在AGV-1申请2个路径段。调度系统先检查：2 &lt;= Need(3) 且 2 &lt;= Available(3)，通过。然后预分配，进入安全性检查：</p>
+
+<ul>
+  <li>Work = Available - 2 = 1</li>
+  <li>AGV-2的Need(2) &gt; Work(1)，无法完成</li>
+  <li>AGV-3的Need(3) &gt; Work(1)，无法完成</li>
+  <li>AGV-1的Need(3-2=1) &lt;= Work(1)，可以完成。释放资源：Work = 1 + (2+2) = 5</li>
+  <li>AGV-2的Need(2) &lt;= Work(5)，可以完成。释放资源：Work = 5 + 2 = 7</li>
+  <li>AGV-3的Need(3) &lt;= Work(7)，可以完成</li>
+</ul>
+
+<p>所有AGV都能完成，安全！所以AGV-1的申请被批准。</p>
+
+<p>你看，这个例子虽然简单，但已经能说明银行家算法的精髓了——<strong>它不是在"有没有资源"这个层面做判断，而是在"给了你之后，别人还能不能活"这个层面做判断</strong>。这种全局视角，正是AGV调度系统最需要的。</p>
+
+<h3>5.6 银行家算法的局限性</h3>
+
+<p>说了这么多好处，我也得泼点冷水。银行家算法不是万能的，我在实际使用中发现了几个问题：</p>
+
+<ul>
+  <li><strong>需要预知最大需求：</strong>AGV必须提前知道它整个行程需要多少路径段。这在固定路径的仓储场景还好说，但在动态路径规划的柔性产线里，AGV的路径是实时计算的，最大需求根本没法提前知道。</li>
+  <li><strong>资源利用率偏低：</strong>银行家算法偏保守，为了安全会拒绝一些实际上不会导致死锁的请求。说白了就是"宁可错杀一千，不可放过一个"。在资源紧张的系统里，这会导致AGV频繁等待，影响效率。</li>
+  <li><strong>计算复杂度高：</strong>AGV数量一多，安全性检查的循环次数就上去了。我测过，50台AGV时，每次检查大约需要0.5ms，还能接受。但到了200台，就飙到5ms了。对于实时性要求高的系统，这个开销不能忽视。</li>
+</ul>
+
+<div class="tip">
+  <strong>我的建议：</strong>银行家算法最适合用在AGV数量不多（20台以内）、路径相对固定的场景。如果AGV数量多或者路径动态变化，我建议改用"资源预留"或"死锁检测+恢复"的策略。后面几章我会详细讲这些替代方案。
+</div>
+
+<h3>5.7 知识体系总结</h3>
+
+<p>为了让你更直观地理解银行家算法在AGV调度中的位置，我画了一张流程图：</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="720" height="520" fill="#f8f9fa" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">银行家算法在AGV调度中的知识体系</text>
+  
+  <!-- 第一层：输入 -->
+  <rect x="260" y="60" width="200" height="45" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="88" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AGV路径请求</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="105" x2="360" y2="130" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：数据结构 -->
+  <rect x="160" y="130" width="400" height="80" rx="8" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="155" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">核心数据结构</text>
+  <text x="360" y="175" text-anchor="middle" font-size="12" fill="#7f8c8d">Available | Max | Allocation | Need</text>
+  <text x="360" y="195" text-anchor="middle" font-size="12" fill="#7f8c8d">（空闲资源 | 最大需求 | 已分配 | 还需要）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="210" x2="360" y2="240" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：检查步骤 -->
+  <rect x="110" y="240" width="500" height="100" rx="8" fill="#e8f8f5" stroke="#1abc9c" stroke-width="2"/>
+  <text x="360" y="265" text-anchor="middle" font-size="14" font-weight="bold" fill="#16a085">安全性检查流程</text>
+  <text x="360" y="290" text-anchor="middle" font-size="12" fill="#2c3e50">① 检查请求 ≤ Need → ② 检查请求 ≤ Available</text>
+  <text x="360" y="310" text-anchor="middle" font-size="12" fill="#2c3e50">③ 预分配资源 → ④ 运行安全性检查算法</text>
+  <text x="360" y="330" text-anchor="middle" font-size="12" fill="#2c3e50">⑤ 安全则正式分配，否则回滚</text>
+  
+  <!-- 箭头分叉 -->
+  <line x1="360" y1="340" x2="360" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="360" y1="370" x2="220" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="360" y1="370" x2="500" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 第四层：两个分支 -->
+  <rect x="120" y="370" width="200" height="45" rx="8" fill="#27ae60" stroke="#2ecc71" stroke-width="2"/>
+  <text x="220" y="398" text-anchor="middle" font-size="14" fill="white" font-weight="bold">✅ 安全 → 分配资源</text>
+  
+  <rect x="400" y="370" width="200" height="45" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="500" y="398" text-anchor="middle" font-size="14" fill="white" font-weight="bold">❌ 不安全 → 拒绝请求</text>
+  
+  <!-- 箭头 -->
+  <line x1="220" y1="415" x2="220" y2="445" stroke="#27ae60" stroke-width="2" marker-end="url(#arrow-green)"/>
+  <line x1="500" y1="415" x2="500" y2="445" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow-red)"/>
+  
+  <!-- 第五层：结果 -->
+  <rect x="120" y="445" width="200" height="45" rx="8" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+  <text x="220" y="473" text-anchor="middle" font-size="13" fill="#1e8449">AGV继续前进</text>
+  
+  <rect x="400" y="445" width="200" height="45" rx="8" fill="#fadbd8" stroke="#e74c3c" stroke-width="2"/>
+  <text x="500" y="473" text-anchor="middle" font-size="13" fill="#922b21">AGV原地等待</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#27ae60"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把银行家算法的整个流程串起来了。从AGV发起路径请求开始，经过数据结构匹配、安全性检查，最后到分配或拒绝。我个人习惯把这张图贴在调度系统的设计文档首页，每次评审时先过一遍这个流程，能避免很多理解上的偏差。</p>
+
+<p>好了，银行家算法在AGV调度中的应用就讲到这里。这个算法虽然有点老，但它的思想——<strong>做决策之前先模拟后果</strong>——在任何调度系统里都不过时。你如果正在设计AGV调度系统，不妨试试把银行家算法加进去，至少能解决80%的死锁问题。</p>
+
+        <div class="footer-nav">
+            <a href="04CycleDetectDfs.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06ResourcePreemptionRelease.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

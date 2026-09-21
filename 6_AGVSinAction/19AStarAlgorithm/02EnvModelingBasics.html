@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 环境建模基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="active">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 环境建模：AGV 的「世界地图」长什么样？</h2>
+
+<p>大家好，我是老张。今天咱们聊聊环境建模。</p>
+
+<p>你想想看，AGV 要跑起来，首先得知道「我在哪」、「要去哪」、「路上有什么」。这就像你开车去一个陌生城市，总得先看地图吧？AGV 也一样，它需要一张「地图」来描述周围环境。</p>
+
+<p>但 AGV 的地图，跟我们手机上的高德地图可不一样。它更抽象，更「数学」。说白了，就是把物理世界的信息，转换成计算机能理解的数据结构。</p>
+
+<p>我个人习惯把环境建模分成三大类：<strong>栅格地图</strong>、<strong>拓扑地图</strong>、<strong>几何地图</strong>。每种都有它的脾气，选错了，后面路径规划再牛也白搭。</p>
+
+<h3>1.1 栅格地图：最直观，也最「笨」</h3>
+
+<p>栅格地图，也叫网格地图。就是把环境切成一个个小方块，每个方块要么是「空地」（可通行），要么是「障碍物」（不可通行）。</p>
+
+<p>我最早做 AGV 项目时，用的就是栅格地图。为什么？因为它简单啊！</p>
+
+<ul>
+  <li><strong>优点</strong>：实现容易，更新方便。发现前面有个箱子，把对应格子标成障碍物就行。</li>
+  <li><strong>缺点</strong>：格子大小很难选。格子太大，地图粗糙，小车可能卡在窄通道里；格子太小，地图巨大，计算量爆炸。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：栅格地图的分辨率，直接决定了路径规划的精度和效率。一般建议格子边长取 AGV 车身宽度的 1/3 到 1/2。</p>
+</div>
+
+<p>举个例子，一个 100m x 100m 的仓库，如果用 0.1m 的栅格，那就是 1000 x 1000 = 100 万个格子。A* 算法在上面跑，虽然能跑，但速度会慢得让你怀疑人生。</p>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：我在项目中遇到过，为了追求精度把栅格设得太小，结果路径规划要算好几秒。后来我改用分层策略——先用粗栅格快速规划一条粗略路径，再在关键区域用细栅格做局部优化。效果立竿见影。</p>
+</div>
+
+<h3>1.2 拓扑地图：只关心「怎么走」</h3>
+
+<p>拓扑地图就聪明多了。它不关心具体位置，只关心「节点」和「边」。节点代表关键位置（比如路口、工位），边代表路径（比如走廊、通道）。</p>
+
+<p>说白了，拓扑地图就是一张「关系图」。AGV 不需要知道走廊有多宽，只需要知道从 A 点到 B 点，走哪条路最近。</p>
+
+<ul>
+  <li><strong>优点</strong>：数据量极小，规划速度极快。适合大规模环境。</li>
+  <li><strong>缺点</strong>：建图麻烦，需要人工标注节点和边。而且一旦环境变了（比如新加了一个货架），地图就得重新画。</li>
+</ul>
+
+<p>为什么会这样？因为拓扑地图丢失了环境的「几何信息」。它只知道「有路」，但不知道「路有多宽」。所以如果 AGV 车身很宽，而走廊很窄，拓扑地图是发现不了的。</p>
+
+<div class="warning">
+  <p><strong>注意</strong>：拓扑地图不适合动态障碍物多的场景。我曾经在一个仓库里试过，结果 AGV 按照拓扑路径走，发现路被临时堆的货物堵死了，但它不知道该怎么绕——因为它没有「绕行」的拓扑信息。</p>
+</div>
+
+<h3>1.3 几何地图：最精确，也最「重」</h3>
+
+<p>几何地图，也叫特征地图。它用点、线、面等几何元素来描述环境。比如，墙是一条线段，柱子是一个圆，货架是一个矩形。</p>
+
+<p>这种地图常见于激光 SLAM 建图。激光雷达扫一圈，得到一堆点云，然后提取出直线、圆弧等特征。</p>
+
+<ul>
+  <li><strong>优点</strong>：精度极高，能精确到厘米级。适合需要精确定位的场景，比如 AGV 对接工位。</li>
+  <li><strong>缺点</strong>：数据量大，计算复杂。而且对环境变化敏感——墙上的海报撕了，激光扫到的点就不一样了。</li>
+</ul>
+
+<p>嗯，这里要注意：几何地图通常不直接用于路径规划，而是用于定位。路径规划时，我们会把几何地图「栅格化」或「拓扑化」，再交给 A* 算法。</p>
+
+<h3>1.4 AGV 常用地图：到底选哪个？</h3>
+
+<p>你可能会问：老张，你说了这么多，到底用哪个？</p>
+
+<p>我的答案是：<strong>看场景</strong>。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>场景</th>
+      <th>推荐地图</th>
+      <th>原因</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>小型仓库（< 500m²）</td>
+      <td>栅格地图</td>
+      <td>简单直接，更新方便</td>
+    </tr>
+    <tr>
+      <td>大型工厂（> 5000m²）</td>
+      <td>拓扑地图</td>
+      <td>数据量小，规划快</td>
+    </tr>
+    <tr>
+      <td>需要精确定位（如对接工位）</td>
+      <td>几何地图 + 栅格地图</td>
+      <td>几何地图定位，栅格地图规划</td>
+    </tr>
+    <tr>
+      <td>动态环境（人车混行）</td>
+      <td>栅格地图（实时更新）</td>
+      <td>能快速标记障碍物</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在一个项目里，客户要求 AGV 在 10000m² 的车间里跑，我一开始用了纯栅格地图，结果路径规划要算 10 秒。后来改成拓扑地图，0.1 秒就搞定了。但拓扑地图建图花了我一周时间——这就是 trade-off。</p>
+</div>
+
+<h3>1.5 三种地图的关系：一张图看懂</h3>
+
+<p>下面这张图，是我自己画的。它展示了三种地图的核心逻辑和转换关系。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">环境建模：三种地图的关系</text>
+  
+  <!-- 物理世界 -->
+  <rect x="300" y="60" width="200" height="50" rx="10" fill="#3498db" opacity="0.8"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">物理世界</text>
+  
+  <!-- 箭头：物理世界 -> 三种地图 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 三种地图 -->
+  <rect x="50" y="150" width="200" height="60" rx="10" fill="#e74c3c" opacity="0.8"/>
+  <text x="150" y="185" text-anchor="middle" font-size="16" fill="white" font-weight="bold">栅格地图</text>
+  
+  <rect x="300" y="150" width="200" height="60" rx="10" fill="#2ecc71" opacity="0.8"/>
+  <text x="400" y="185" text-anchor="middle" font-size="16" fill="white" font-weight="bold">拓扑地图</text>
+  
+  <rect x="550" y="150" width="200" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="650" y="185" text-anchor="middle" font-size="16" fill="white" font-weight="bold">几何地图</text>
+  
+  <!-- 箭头：三种地图 -> 路径规划 -->
+  <line x1="150" y1="210" x2="150" y2="250" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="210" x2="400" y2="250" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="210" x2="650" y2="250" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 路径规划 -->
+  <rect x="250" y="260" width="300" height="50" rx="10" fill="#9b59b6" opacity="0.8"/>
+  <text x="400" y="290" text-anchor="middle" font-size="16" fill="white" font-weight="bold">A* 路径规划</text>
+  
+  <!-- 箭头：路径规划 -> AGV -->
+  <line x1="400" y1="310" x2="400" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- AGV -->
+  <rect x="300" y="345" width="200" height="40" rx="10" fill="#1abc9c" opacity="0.8"/>
+  <text x="400" y="370" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV 执行</text>
+  
+  <!-- 箭头标记 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 说明文字 -->
+  <text x="150" y="240" text-anchor="middle" font-size="12" fill="#7f8c8d">直接用于规划</text>
+  <text x="400" y="240" text-anchor="middle" font-size="12" fill="#7f8c8d">直接用于规划</text>
+  <text x="650" y="240" text-anchor="middle" font-size="12" fill="#7f8c8d">需转换后使用</text>
+</svg>
+
+<p>从这张图你能看到：栅格地图和拓扑地图可以直接喂给 A* 算法，而几何地图通常需要先转换成栅格或拓扑形式。这也是为什么很多 AGV 系统会同时维护多种地图——几何地图用于定位，栅格地图用于规划。</p>
+
+<h3>1.6 小结：选地图就是选「抽象层次」</h3>
+
+<p>好了，今天的内容就到这里。总结一下：</p>
+
+<ul>
+  <li><strong>栅格地图</strong>：简单直观，适合小范围、动态环境。但要注意分辨率的选择。</li>
+  <li><strong>拓扑地图</strong>：轻量高效，适合大范围、静态环境。但建图成本高。</li>
+  <li><strong>几何地图</strong>：精度最高，主要用于定位。路径规划时通常需要转换。</li>
+</ul>
+
+<p>我个人建议：如果你刚开始做 AGV 项目，先从栅格地图入手。它最直观，也最容易调试。等你把 A* 算法跑通了，再考虑拓扑地图的优化。</p>
+
+<p>记住一句话：<strong>没有最好的地图，只有最合适的地图</strong>。</p>
+
+        <div class="footer-nav">
+            <a href="01PathPlanningOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03GraphSearchBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

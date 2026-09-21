@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 文件系统移植</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="active">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 文件系统移植：FatFS文件系统集成、SD卡驱动、日志记录与配置存储</h2>
+
+<p>AGV控制器跑起来了，任务调度也稳了，但有个问题一直让我头疼——数据怎么存？</p>
+<p>路径规划的参数、电机PID的系数、运行日志……这些总不能每次都烧固件吧？</p>
+<p>嗯，这时候就需要文件系统上场了。说白了，就是给嵌入式设备装个“硬盘”，让它可以像电脑一样读写文件。</p>
+
+<h3>16.1 为什么选FatFS？</h3>
+
+<p>嵌入式文件系统有不少选择，但我个人习惯用FatFS。原因很简单：</p>
+<ul>
+  <li><strong>轻量</strong>：最小配置下ROM占用不到10KB，RAM更是只有几十字节</li>
+  <li><strong>标准兼容</strong>：FAT12/16/32全支持，拔下SD卡插电脑就能读</li>
+  <li><strong>硬件无关</strong>：它只负责文件系统的逻辑，底层读写由你实现</li>
+</ul>
+
+<p>我在项目中遇到过用其他文件系统结果PC读不了的情况，调试起来特别麻烦。从那以后，只要涉及数据导出，我首选FatFS。</p>
+
+<h3>16.2 FatFS移植三步走</h3>
+
+<p>移植FatFS其实不复杂，核心就三步：</p>
+
+<ol>
+  <li><strong>下载源码</strong>：从官网获取ff.c、ff.h、diskio.c、diskio.h</li>
+  <li><strong>配置ffconf.h</strong>：裁剪功能，定义宏开关</li>
+  <li><strong>实现底层接口</strong>：写diskio.c里的六个函数</li>
+</ol>
+
+<p>我们重点说第三步。FatFS通过diskio.c与硬件交互，你需要实现这些函数：</p>
+
+<table>
+  <tr>
+    <th>函数</th>
+    <th>作用</th>
+    <th>我的经验</th>
+  </tr>
+  <tr>
+    <td>disk_initialize</td>
+    <td>初始化存储设备</td>
+    <td>记得加超时，有些劣质SD卡初始化很慢</td>
+  </tr>
+  <tr>
+    <td>disk_status</td>
+    <td>获取设备状态</td>
+    <td>返回0表示正常，非0表示异常</td>
+  </tr>
+  <tr>
+    <td>disk_read</td>
+    <td>读取扇区</td>
+    <td>注意对齐，有些SDIO控制器要求4字节对齐</td>
+  </tr>
+  <tr>
+    <td>disk_write</td>
+    <td>写入扇区</td>
+    <td>写之前检查写保护，别问我怎么知道的</td>
+  </tr>
+  <tr>
+    <td>disk_ioctl</td>
+    <td>控制命令</td>
+    <td>GET_SECTOR_COUNT必须实现，否则挂载失败</td>
+  </tr>
+  <tr>
+    <td>get_fattime</td>
+    <td>获取当前时间</td>
+    <td>没有RTC就返回固定值，但文件时间戳会不准</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：disk_read和disk_write是性能关键。我建议用DMA方式传输，一次读多个扇区，效率能提升好几倍。</p>
+</div>
+
+<h3>16.3 SD卡驱动：从SPI到SDIO</h3>
+
+<p>AGV控制器上，SD卡是最常用的存储介质。驱动方式有两种：</p>
+
+<ul>
+  <li><strong>SPI模式</strong>：引脚少，速度慢（一般不超过20MHz），适合资源紧张的场景</li>
+  <li><strong>SDIO模式</strong>：速度快（可达50MHz以上），但引脚多，驱动复杂</li>
+</ul>
+
+<p>我个人建议：如果MCU有SDIO外设，优先用SDIO。AGV需要记录高频数据，SPI那点带宽真不够用。</p>
+
+<p>SD卡驱动初始化流程大概是这样的：</p>
+
+<pre><code>// SD卡初始化伪代码
+void SD_Init(void) {
+    // 1. 上电延时，至少74个时钟周期
+    delay_ms(10);
+    
+    // 2. 发送CMD0，进入空闲状态
+    if (SD_SendCmd(CMD0, 0, 0x95) != 0x01) {
+        error("SD卡无响应");
+    }
+    
+    // 3. 发送CMD8，检查SD卡版本
+    if (SD_SendCmd(CMD8, 0x1AA, 0x87) == 0x01) {
+        // SD 2.0卡，继续初始化
+        SD_SendCmd(CMD55, 0, 0);
+        SD_SendCmd(ACMD41, 0x40000000, 0);
+    } else {
+        // SD 1.x或MMC卡，用老方式
+    }
+    
+    // 4. 读取OCR，获取工作电压范围
+    SD_SendCmd(CMD58, 0, 0);
+    
+    // 5. 设置块长度（通常为512字节）
+    SD_SendCmd(CMD16, 512, 0);
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意</strong>：SD卡初始化时序非常严格。我曾经因为延时不够，折腾了两天才发现是上电后没等够74个时钟周期。嗯，这种坑踩过一次就记住了。</p>
+</div>
+
+<h3>16.4 日志记录：别小看这个功能</h3>
+
+<p>AGV跑着跑着突然停了，你怎么办？</p>
+<p>没有日志，你只能对着代码发呆。有了日志，你就能知道是电机堵转、传感器超时还是路径规划死循环。</p>
+
+<p>我设计日志系统时，遵循几个原则：</p>
+
+<ul>
+  <li><strong>分级记录</strong>：DEBUG、INFO、WARN、ERROR，生产环境只记录WARN及以上</li>
+  <li><strong>循环写入</strong>：日志文件满了就覆盖最早的，别让日志撑爆SD卡</li>
+  <li><strong>时间戳</strong>：每条日志都带毫秒级时间，方便定位问题</li>
+</ul>
+
+<p>代码实现很简单：</p>
+
+<pre><code>// 日志写入函数
+void Log_Write(uint8_t level, const char *fmt, ...) {
+    FIL fil;
+    char buffer[256];
+    va_list args;
+    
+    // 打开日志文件（追加模式）
+    if (f_open(&fil, "0:/agv.log", FA_OPEN_ALWAYS | FA_WRITE) != FR_OK) {
+        return;
+    }
+    
+    // 定位到文件末尾
+    f_lseek(&fil, f_size(&fil));
+    
+    // 格式化日志内容
+    va_start(args, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, args);
+    va_end(args);
+    
+    // 写入文件
+    f_printf(&fil, "[%lu] %s\r\n", HAL_GetTick(), buffer);
+    
+    // 关闭文件
+    f_close(&fil);
+}
+</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧</strong>：频繁打开关闭文件会影响性能。我习惯在系统初始化时打开日志文件，运行时只写入不关闭，等系统停机前再统一关闭。但要注意异常断电可能丢失最后几条日志。</p>
+</div>
+
+<h3>16.5 配置存储：让参数可调</h3>
+
+<p>AGV的配置参数很多：最大速度、加速度、PID系数、传感器阈值……</p>
+<p>把这些参数写死在代码里？那每次调参都要重新编译烧录，太麻烦了。</p>
+
+<p>我的做法是：</p>
+
+<ol>
+  <li><strong>定义配置结构体</strong>：把所有参数打包成一个结构体</li>
+  <li><strong>存储为二进制文件</strong>：直接读写结构体内存，效率高</li>
+  <li><strong>提供默认值</strong>：如果配置文件损坏或不存在，使用代码里的默认值</li>
+</ol>
+
+<pre><code>// 配置结构体
+typedef struct {
+    uint16_t max_speed;        // 最大速度 mm/s
+    uint16_t accel;            // 加速度 mm/s²
+    float    pid_kp;           // PID比例系数
+    float    pid_ki;           // PID积分系数
+    float    pid_kd;           // PID微分系数
+    uint8_t  sensor_threshold; // 传感器阈值
+    uint16_t crc;              // 校验和
+} AGV_Config_t;
+
+// 读取配置
+AGV_Config_t g_config;
+
+void Config_Load(void) {
+    FIL fil;
+    UINT bytes_read;
+    
+    // 先加载默认值
+    Config_LoadDefault();
+    
+    // 尝试读取配置文件
+    if (f_open(&fil, "0:/config.bin", FA_READ) == FR_OK) {
+        f_read(&fil, &g_config, sizeof(g_config), &bytes_read);
+        f_close(&fil);
+        
+        // 校验CRC，防止文件损坏
+        if (g_config.crc != Config_CalcCRC(&g_config)) {
+            // CRC校验失败，使用默认值
+            Config_LoadDefault();
+        }
+    }
+}
+</code></pre>
+
+<div class="highlight">
+  <p><strong>重要</strong>：配置文件一定要加CRC校验。我遇到过SD卡文件系统损坏导致配置全乱的情况，加了CRC后至少能保证系统用默认值启动，不至于直接死机。</p>
+</div>
+
+<h3>16.6 文件系统移植的避坑指南</h3>
+
+<p>做文件系统移植这些年，我踩过的坑不少，分享几个典型的：</p>
+
+<ul>
+  <li><strong>扇区大小不匹配</strong>：SD卡物理扇区是512字节，但有些Flash模拟的磁盘是4096字节。ffconf.h里的_MAX_SS要设置正确。</li>
+  <li><strong>长文件名支持</strong>：默认只支持8.3短文件名。要支持长文件名，需要在ffconf.h里开启_USE_LFN，并分配足够的缓冲区。</li>
+  <li><strong>多任务访问</strong>：RTOS下多个任务同时读写文件会冲突。我习惯加一个互斥锁，或者用消息队列串行化文件操作。</li>
+  <li><strong>异常断电</strong>：FatFS在写入时断电可能损坏文件系统。我建议用f_sync定期刷新缓存，或者使用支持日志的文件系统变体。</li>
+</ul>
+
+<p>嗯，文件系统移植说难不难，说简单也不简单。关键是把底层驱动调稳了，上层应用就省心很多。</p>
+
+<div class="tip">
+  <p><strong>我的习惯</strong>：每次移植完文件系统，我都会做三个测试：1）反复挂载卸载100次；2）写入1MB数据然后读出校验；3）在写入过程中随机断电10次。这三个测试过了，基本就稳了。</p>
+</div>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">FatFS文件系统移植架构</text>
+  
+  <!-- 应用层 -->
+  <rect x="250" y="70" width="300" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">应用层</text>
+  <text x="400" y="122" text-anchor="middle" font-size="12" fill="white">日志记录 · 配置存储 · 数据导出</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="130" x2="400" y2="170" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="395,165 400,175 405,165" fill="#2c3e50"/>
+  
+  <!-- FatFS层 -->
+  <rect x="200" y="175" width="400" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="210" text-anchor="middle" font-size="16" fill="white" font-weight="bold">FatFS文件系统层</text>
+  <text x="400" y="227" text-anchor="middle" font-size="12" fill="white">ff.c · ff.h · ffconf.h</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="235" x2="400" y2="275" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="395,270 400,280 405,270" fill="#2c3e50"/>
+  
+  <!-- 底层接口层 -->
+  <rect x="200" y="280" width="400" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="400" y="315" text-anchor="middle" font-size="16" fill="white" font-weight="bold">底层接口层 (diskio.c)</text>
+  <text x="400" y="332" text-anchor="middle" font-size="12" fill="white">disk_initialize · disk_read · disk_write · disk_ioctl</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="340" x2="400" y2="380" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="395,375 400,385 405,375" fill="#2c3e50"/>
+  
+  <!-- 硬件驱动层 -->
+  <rect x="150" y="385" width="500" height="60" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="400" y="420" text-anchor="middle" font-size="16" fill="white" font-weight="bold">硬件驱动层</text>
+  <text x="400" y="437" text-anchor="middle" font-size="12" fill="white">SDIO驱动 · SPI驱动 · DMA控制器 · GPIO配置</text>
+  
+  <!-- 左侧标注 -->
+  <text x="80" y="105" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">用户代码</text>
+  <text x="80" y="210" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">逻辑层</text>
+  <text x="80" y="315" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">抽象层</text>
+  <text x="80" y="420" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">物理层</text>
+  
+  <!-- 虚线连接 -->
+  <line x1="140" y1="105" x2="250" y2="105" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="140" y1="210" x2="200" y2="210" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="140" y1="315" x2="200" y2="315" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="140" y1="420" x2="150" y2="420" stroke="#2c3e50" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="485" text-anchor="middle" font-size="12" fill="#7f8c8d">图：FatFS文件系统移植分层架构</text>
+</svg>
+
+<p>文件系统移植完成后，AGV控制器才算真正有了“记忆”。参数可以调，日志可以查，数据可以导出——这才是工业级产品该有的样子。</p>
+
+        <div class="footer-nav">
+            <a href="15WifiEthernet.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17SystemBootFlow.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

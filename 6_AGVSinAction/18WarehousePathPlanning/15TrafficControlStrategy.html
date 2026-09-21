@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 交通管制策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="active">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 交通管制策略：单向通行、区域锁、预留时间窗</h2>
+
+<p>各位做AGV调度的朋友，咱们今天聊一个很实在的话题——交通管制。</p>
+
+<p>你想想看，仓库里几十台AGV跑来跑去，要是没有一套靠谱的管制策略，那场面就跟早高峰的十字路口没区别。我见过一个项目，上线第一天就撞了三台车，现场经理脸都绿了。从那以后，我对交通管制这块就特别上心。</p>
+
+<p>今天讲的三种策略：单向通行、区域锁、预留时间窗。说白了，就是给AGV定规矩——谁先走、谁让路、谁等着。</p>
+
+<h3>一、单向通行：最简单的防撞方案</h3>
+
+<p>单向通行，顾名思义，就是某段路只允许一个方向的车通过。这招在窄巷道里特别好用。</p>
+
+<p><strong>适用场景：</strong></p>
+<ul>
+  <li>货架之间的通道，宽度只够一辆车通过</li>
+  <li>转弯半径小的拐角区域</li>
+  <li>高密度存储区的进出通道</li>
+</ul>
+
+<p>我个人习惯的做法是，在路径地图上给每条路段打上方向标签。比如：</p>
+
+<pre><code>// 路段方向定义
+enum LaneDirection {
+  BIDIRECTIONAL,  // 双向通行（默认）
+  FORWARD_ONLY,   // 单向正向
+  REVERSE_ONLY    // 单向反向
+}
+
+// 路径规划时检查方向
+if (segment.direction == FORWARD_ONLY && 
+    plannedDirection != FORWARD) {
+  // 这条路不能走这个方向，重新规划
+  reroute();
+}</code></pre>
+
+<p>嗯，这里要注意：单向通行虽然简单，但有个坑——如果整条路都设成单向，那对面的车就得绕远路。我建议只在瓶颈路段使用，别一刀切。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>单向通行的路段长度不要超过20米。太长了，车绕路的时间成本反而更高。
+</div>
+
+<h3>二、区域锁：给关键区域上把锁</h3>
+
+<p>区域锁，说白了就是给某块区域加个互斥锁。同一时间，只允许一台AGV进去。</p>
+
+<p>这招在哪些地方用？</p>
+<ul>
+  <li>充电站：一次只能充一台车</li>
+  <li>装卸货站台：防止多车抢位</li>
+  <li>狭窄的交叉路口：避免死锁</li>
+</ul>
+
+<p>我曾经在一个项目里遇到过这种情况：两台AGV同时要进同一个充电站，结果一台刚进去，另一台堵在门口，后面的车全堵死了。后来加了区域锁，问题就解决了。</p>
+
+<p>实现起来也不复杂：</p>
+
+<pre><code>class ZoneLock {
+  private:
+    bool isLocked = false;
+    string currentOwner = "";
+    
+  public:
+    bool tryLock(string robotId) {
+      if (!isLocked) {
+        isLocked = true;
+        currentOwner = robotId;
+        return true;
+      }
+      return false;
+    }
+    
+    void releaseLock(string robotId) {
+      if (currentOwner == robotId) {
+        isLocked = false;
+        currentOwner = "";
+      }
+    }
+}</code></pre>
+
+<div class="warning">
+  <strong>避坑指南：</strong>我曾经遇到过区域锁死锁的情况——A车占了区域，B车在等A，但A车因为故障不动了。解决方案：加一个超时机制，超过30秒自动释放锁。
+</div>
+
+<h3>三、预留时间窗：精确到秒的调度</h3>
+
+<p>预留时间窗，这是三种策略里最精细的一种。它给每台AGV分配一个时间段，在这个时间段内，某段路归它专用。</p>
+
+<p>为什么需要这个？你想想看，单向通行和区域锁都是空间上的隔离，但时间窗是时间上的隔离。对于高速运行的AGV，或者需要精确对接的工位，时间窗就派上用场了。</p>
+
+<p><strong>时间窗的核心参数：</strong></p>
+<table>
+  <tr>
+    <th>参数</th>
+    <th>说明</th>
+    <th>推荐值</th>
+  </tr>
+  <tr>
+    <td>窗口起始时间</td>
+    <td>AGV进入路段的时间</td>
+    <td>精确到0.1秒</td>
+  </tr>
+  <tr>
+    <td>窗口持续时间</td>
+    <td>AGV占用路段的时间</td>
+    <td>路段长度/速度 + 安全余量</td>
+  </tr>
+  <tr>
+    <td>安全余量</td>
+    <td>防止时间偏差的缓冲</td>
+    <td>2-5秒</td>
+  </tr>
+  <tr>
+    <td>最大等待时间</td>
+    <td>AGV最多等多久</td>
+    <td>15秒</td>
+  </tr>
+</table>
+
+<p>我建议在实现时间窗时，用优先级队列来管理。高优先级的任务（比如紧急订单）可以抢占时间窗，但低优先级的只能排队等。</p>
+
+<pre><code>// 时间窗预留逻辑
+bool reserveTimeWindow(RouteSegment seg, TimeSlot slot) {
+  // 检查该路段的时间窗是否已被占用
+  for (auto& reserved : segmentTimeSlots[seg]) {
+    if (slot.overlaps(reserved)) {
+      // 有冲突，尝试重新规划时间
+      return false;
+    }
+  }
+  // 无冲突，预留成功
+  segmentTimeSlots[seg].push_back(slot);
+  return true;
+}</code></pre>
+
+<div class="highlight">
+  <strong>核心要点：</strong>三种策略不是互斥的，可以组合使用。比如：窄巷道用单向通行，充电站用区域锁，高速对接工位用时间窗。我一般会先画一张交通管制矩阵图，把每种场景对应的策略列出来。
+</div>
+
+<h3>三种策略的对比</h3>
+
+<table>
+  <tr>
+    <th>策略</th>
+    <th>复杂度</th>
+    <th>适用场景</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>单向通行</td>
+    <td>低</td>
+    <td>窄巷道、单行道</td>
+    <td>灵活性差，绕路多</td>
+  </tr>
+  <tr>
+    <td>区域锁</td>
+    <td>中</td>
+    <td>充电站、装卸货位</td>
+    <td>可能造成排队拥堵</td>
+  </tr>
+  <tr>
+    <td>预留时间窗</td>
+    <td>高</td>
+    <td>高速对接、精密工位</td>
+    <td>实现复杂，计算量大</td>
+  </tr>
+</table>
+
+<p>我个人建议，刚开始做项目时，先从单向通行和区域锁入手。等系统稳定了，再慢慢引入时间窗。别一上来就搞最复杂的，容易翻车。</p>
+
+<p>最后说一句：交通管制没有银弹。每个仓库的布局、AGV的数量、任务的类型都不一样。我见过一个项目，用了三种策略还不够，最后加了个动态优先级调整——根据订单紧急程度，临时提升某台车的通行权。嗯，这个咱们以后有机会再聊。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">交通管制策略核心逻辑</text>
+  
+  <!-- 三个主策略框 -->
+  <!-- 单向通行 -->
+  <rect x="50" y="80" width="200" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="18" fill="white" font-weight="bold">单向通行</text>
+  
+  <!-- 区域锁 -->
+  <rect x="300" y="80" width="200" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="18" fill="white" font-weight="bold">区域锁</text>
+  
+  <!-- 预留时间窗 -->
+  <rect x="550" y="80" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="115" text-anchor="middle" font-size="18" fill="white" font-weight="bold">预留时间窗</text>
+  
+  <!-- 箭头连接 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e67e22"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+    </marker>
+  </defs>
+  
+  <!-- 适用场景 -->
+  <text x="150" y="200" text-anchor="middle" font-size="14" fill="#7f8c8d">窄巷道</text>
+  <text x="150" y="220" text-anchor="middle" font-size="14" fill="#7f8c8d">单行道</text>
+  <line x1="150" y1="140" x2="150" y2="180" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <text x="400" y="200" text-anchor="middle" font-size="14" fill="#7f8c8d">充电站</text>
+  <text x="400" y="220" text-anchor="middle" font-size="14" fill="#7f8c8d">装卸货位</text>
+  <line x1="400" y1="140" x2="400" y2="180" stroke="#e67e22" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  
+  <text x="650" y="200" text-anchor="middle" font-size="14" fill="#7f8c8d">高速对接</text>
+  <text x="650" y="220" text-anchor="middle" font-size="14" fill="#7f8c8d">精密工位</text>
+  <line x1="650" y1="140" x2="650" y2="180" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 组合使用区域 -->
+  <rect x="100" y="280" width="600" height="80" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="400" y="310" text-anchor="middle" font-size="16" fill="#2c3e50" font-weight="bold">组合使用建议</text>
+  <text x="400" y="340" text-anchor="middle" font-size="14" fill="#7f8c8d">窄巷道 → 单向通行 | 充电站 → 区域锁 | 高速对接 → 时间窗</text>
+  
+  <!-- 箭头到组合区 -->
+  <line x1="150" y1="240" x2="250" y2="280" stroke="#3498db" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="400" y1="240" x2="400" y2="280" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="650" y1="240" x2="550" y2="280" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="5,3"/>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="400" width="500" height="60" rx="8" fill="#9b59b6" opacity="0.8"/>
+  <text x="400" y="425" text-anchor="middle" font-size="15" fill="white">核心原则：空间隔离 + 时间隔离 + 优先级管理</text>
+  <text x="400" y="445" text-anchor="middle" font-size="13" fill="#f0e6f6">没有银弹，根据场景灵活组合</text>
+  
+  <!-- 连接线到总结 -->
+  <line x1="400" y1="360" x2="400" y2="400" stroke="#9b59b6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+</svg>
+
+<div class="tip">
+  <strong>我的建议：</strong>刚开始做交通管制时，先画一张路径热力图，看看哪些路段最拥堵。然后针对这些瓶颈路段，优先应用管制策略。别想着一步到位，慢慢优化。
+</div>
+
+        <div class="footer-nav">
+            <a href="14MultiAgvCooperation.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16PriorityBasedDispatch.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

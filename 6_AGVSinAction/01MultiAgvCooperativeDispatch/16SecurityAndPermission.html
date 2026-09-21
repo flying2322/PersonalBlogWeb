@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 安全与权限</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="active">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 安全与权限：用户认证、角色管理、操作审计</h2>
+
+<p>说实话，做AGV调度系统最容易被忽视的，就是安全模块。</p>
+<p>我见过不少团队，先把调度跑通了，权限什么的后面再说。结果呢？现场操作工误点了“清空任务队列”，整个仓库的AGV全停了。还有一次，一个实习生不小心删了地图数据，恢复花了两天。</p>
+<p>所以我的习惯是——<strong>安全模块，从第一天就搭进去</strong>。哪怕功能简单点，骨架要在。</p>
+
+<h3>16.1 用户认证：谁在操作？</h3>
+
+<p>认证，说白了就是确认“你是谁”。</p>
+<p>AGV调度系统里，用户认证不能只靠密码。为什么？因为现场环境复杂，操作员可能戴着脏手套，或者屏幕很小，输密码不方便。</p>
+
+<h4>16.1.1 认证方式选择</h4>
+
+<p>我个人推荐至少支持两种方式：</p>
+<ul>
+  <li><strong>密码认证</strong>：基础保障，密码要加密存储（别用MD5，用bcrypt或Argon2）</li>
+  <li><strong>扫码认证</strong>：操作员用工牌上的二维码扫一下，系统自动登录</li>
+</ul>
+
+<p>我在项目中遇到过一个问题：操作员为了省事，把密码贴在显示器上。后来我们强制要求密码+动态验证码双因素认证，才把这个问题压下去。</p>
+
+<div class="highlight">
+  <p><strong>核心原则</strong>：认证信息绝不在前端明文传输。用HTTPS + Token机制。</p>
+</div>
+
+<h4>16.1.2 Token管理</h4>
+
+<p>用户登录后，系统签发一个JWT Token。我习惯把Token的有效期设短一点（比如2小时），配合Refresh Token使用。</p>
+
+<pre><code>// 伪代码：生成Token
+function generateToken(userId, role) {
+    return jwt.sign(
+        { userId, role, exp: Math.floor(Date.now() / 1000) + 7200 },
+        SECRET_KEY
+    );
+}</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧</strong>：Token里不要存敏感信息，比如密码。只存用户ID和角色就够了。</p>
+</div>
+
+<h3>16.2 角色管理：能做什么？</h3>
+
+<p>认证完了，接下来就是授权。不同的人，权限不一样。</p>
+<p>你想想看，一个仓库管理员，需要能修改AGV的路径规划算法吗？不需要。他只需要看状态、发任务就够了。</p>
+
+<h4>16.2.1 角色设计</h4>
+
+<p>我一般把角色分成四级：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>角色</th>
+      <th>权限范围</th>
+      <th>典型用户</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>查看者</td>
+      <td>只能看实时状态、历史记录</td>
+      <td>产线班组长</td>
+    </tr>
+    <tr>
+      <td>操作员</td>
+      <td>查看 + 下发任务、暂停/恢复AGV</td>
+      <td>仓库操作工</td>
+    </tr>
+    <tr>
+      <td>调度员</td>
+      <td>操作员权限 + 修改地图、调整策略</td>
+      <td>调度主管</td>
+    </tr>
+    <tr>
+      <td>管理员</td>
+      <td>全部权限，包括用户管理、系统配置</td>
+      <td>IT运维</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>嗯，这里要注意：角色不要分得太细。我见过有人分了8个角色，结果没人记得住自己该用哪个。4个刚刚好。</p>
+
+<h4>16.2.2 权限控制粒度</h4>
+
+<p>角色是粗粒度，权限是细粒度。我习惯用“资源+操作”的方式定义权限：</p>
+
+<pre><code>// 权限定义示例
+permissions = {
+    "agv:control": ["start", "stop", "pause"],
+    "map:edit": ["add_node", "delete_node", "modify_path"],
+    "task:manage": ["create", "cancel", "reassign"],
+    "user:admin": ["add_user", "delete_user", "reset_password"]
+}</code></pre>
+
+<p>每个角色绑定一组权限。这样灵活，也容易扩展。</p>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经把权限写死在代码里，结果客户要加一个新角色，我得改代码重新部署。后来改成数据库配置，客户自己就能配了。</p>
+</div>
+
+<h3>16.3 操作审计：干了什么？</h3>
+
+<p>审计，就是记录“谁在什么时间做了什么”。</p>
+<p>为什么重要？出了事故要追责。比如AGV撞了货架，你得查出来是操作员误操作，还是系统bug。</p>
+
+<h4>16.3.1 审计日志内容</h4>
+
+<p>每条审计日志，至少包含：</p>
+<ul>
+  <li><strong>用户ID</strong>：谁操作的</li>
+  <li><strong>操作时间</strong>：精确到毫秒</li>
+  <li><strong>操作类型</strong>：登录、下发任务、修改地图、删除数据等</li>
+  <li><strong>操作对象</strong>：具体对哪个AGV、哪个任务、哪个节点</li>
+  <li><strong>操作结果</strong>：成功/失败 + 失败原因</li>
+  <li><strong>IP地址</strong>：从哪台电脑操作的</li>
+</ul>
+
+<pre><code>// 审计日志示例
+{
+    "userId": "zhangsan",
+    "timestamp": "2025-03-15 14:23:45.123",
+    "action": "TASK_CANCEL",
+    "target": "task_1024",
+    "result": "success",
+    "ip": "192.168.1.100",
+    "detail": "取消任务：从A01到B05的运输任务"
+}</code></pre>
+
+<h4>16.3.2 日志存储与查询</h4>
+
+<p>审计日志不能存在内存里，一重启就没了。我建议：</p>
+<ul>
+  <li><strong>实时写入数据库</strong>：用单独的审计表，别跟业务数据混在一起</li>
+  <li><strong>定期归档</strong>：超过3个月的日志，压缩后存到冷存储</li>
+  <li><strong>支持检索</strong>：按用户、时间、操作类型快速过滤</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的习惯</strong>：审计日志只增不删。就算要清理，也是物理归档，不能逻辑删除。否则审计就失去了意义。</p>
+</div>
+
+<h3>16.4 知识体系总览</h3>
+
+<p>下面这张图，把安全与权限的核心逻辑串起来了：</p>
+
+<svg width="800" height="400" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV调度系统安全与权限体系</text>
+  
+  <!-- 第一层：用户 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">用户操作</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：认证 -->
+  <rect x="300" y="150" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="180" text-anchor="middle" font-size="16" fill="white" font-weight="bold">用户认证</text>
+  
+  <!-- 认证分支 -->
+  <line x1="300" y1="175" x2="200" y2="175" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="500" y1="175" x2="600" y2="175" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <rect x="80" y="155" width="120" height="40" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="140" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">密码认证</text>
+  
+  <rect x="600" y="155" width="120" height="40" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="660" y="180" text-anchor="middle" font-size="13" fill="#2c3e50">扫码认证</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="200" x2="400" y2="230" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：授权 -->
+  <rect x="300" y="230" width="200" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="260" text-anchor="middle" font-size="16" fill="white" font-weight="bold">角色授权</text>
+  
+  <!-- 角色分支 -->
+  <line x1="300" y1="255" x2="200" y2="255" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="500" y1="255" x2="600" y2="255" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <rect x="60" y="240" width="140" height="30" rx="5" fill="#fdebd0" stroke="#d35400" stroke-width="1"/>
+  <text x="130" y="260" text-anchor="middle" font-size="12" fill="#2c3e50">查看者 / 操作员</text>
+  
+  <rect x="600" y="240" width="140" height="30" rx="5" fill="#fdebd0" stroke="#d35400" stroke-width="1"/>
+  <text x="670" y="260" text-anchor="middle" font-size="12" fill="#2c3e50">调度员 / 管理员</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="280" x2="400" y2="310" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：审计 -->
+  <rect x="300" y="310" width="200" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="340" text-anchor="middle" font-size="16" fill="white" font-weight="bold">操作审计</text>
+  
+  <!-- 审计分支 -->
+  <line x1="300" y1="335" x2="200" y2="335" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="500" y1="335" x2="600" y2="335" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <rect x="80" y="320" width="120" height="30" rx="5" fill="#ebdef0" stroke="#8e44ad" stroke-width="1"/>
+  <text x="140" y="340" text-anchor="middle" font-size="12" fill="#2c3e50">日志记录</text>
+  
+  <rect x="600" y="320" width="120" height="30" rx="5" fill="#ebdef0" stroke="#8e44ad" stroke-width="1"/>
+  <text x="660" y="340" text-anchor="middle" font-size="12" fill="#2c3e50">日志归档</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>从用户操作开始，经过认证、授权，最后落到审计。每一层都不可或缺。</p>
+
+<h3>16.5 落地建议</h3>
+
+<p>最后，给几个实际落地的建议：</p>
+
+<ol>
+  <li><strong>别追求完美</strong>：一开始不用把所有权限都做出来。先做“管理员”和“操作员”两个角色，后面再细化。</li>
+  <li><strong>审计日志要防篡改</strong>：我习惯用日志签名，每条日志带上上一条的哈希值。这样如果有人改日志，一眼就能看出来。</li>
+  <li><strong>权限检查要快</strong>：每次操作都查数据库太慢了。把用户的权限缓存到Redis里，过期时间设短一点（比如5分钟）。</li>
+  <li><strong>默认拒绝</strong>：没明确授权的操作，一律拒绝。别搞“默认允许”，那是给自己挖坑。</li>
+</ol>
+
+<div class="warning">
+  <p><strong>再强调一次</strong>：安全不是功能，是习惯。从第一行代码开始，就把认证、授权、审计写进去。后面再补，成本高得多。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="15DeployAndOps.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17PerformanceOptimization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

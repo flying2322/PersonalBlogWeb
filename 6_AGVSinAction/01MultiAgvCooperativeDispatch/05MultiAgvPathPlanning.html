@@ -1,0 +1,421 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 多车路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="active">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 多车路径规划：冲突检测、死锁避免、交通管制策略</h2>
+
+<p>各位同学，咱们今天聊点硬核的。多车路径规划，说白了就是让一群AGV在仓库里跑起来，还不撞车、不堵死。我刚开始做这个的时候，以为只要给每辆车算条路就行了，结果第一次联调，三台车在十字路口怼成一团，调度日志里全是"冲突！冲突！"的报警。嗯，从那以后我就明白了——多车调度，核心不在"路径"，而在"协同"。</p>
+
+<h3>5.1 冲突检测：你得知道什么时候会撞</h3>
+
+<p>冲突检测，是交通管制的前提。你连什么时候会撞都不知道，怎么管？</p>
+
+<p>我个人习惯把冲突分成两类：</p>
+
+<ul>
+  <li><strong>节点冲突</strong>：两辆车同时要占用同一个路口或站点</li>
+  <li><strong>边冲突</strong>：两辆车在同一条路段上相向而行或同向追尾</li>
+</ul>
+
+<p>我在项目中遇到过最头疼的，是那种"看起来不冲突，实际上一刹车就冲突"的情况。比如两辆车在T型路口，一辆直行，一辆左转，路径交叉点其实不在同一个格子上，但车体有长度，转弯有半径，一不留神就蹭上了。</p>
+
+<p>所以，冲突检测不能只看"路径点"，还得看"路径段"和"时间窗"。我常用的方法是：</p>
+
+<ol>
+  <li>把每辆车的路径拆成一系列<strong>路径段</strong>（起点→终点）</li>
+  <li>给每个路径段加上<strong>时间窗</strong>（进入时间、离开时间）</li>
+  <li>检查不同车辆的时间窗是否有重叠</li>
+</ol>
+
+<p>来看一个简单的冲突检测逻辑：</p>
+
+<pre><code>def detect_conflict(path_a, path_b):
+    """
+    path_a, path_b: 每辆车的路径，格式为 [(x,y,t_enter,t_exit), ...]
+    返回冲突列表
+    """
+    conflicts = []
+    for seg_a in path_a:
+        for seg_b in path_b:
+            # 检查空间重叠
+            if seg_a[0] == seg_b[0] and seg_a[1] == seg_b[1]:
+                # 检查时间重叠
+                if not (seg_a[3] &lt;= seg_b[2] or seg_a[2] &gt;= seg_b[3]):
+                    conflicts.append((seg_a, seg_b))
+    return conflicts
+</code></pre>
+
+<p>这段代码看着简单，但实际项目里要复杂得多。我曾经因为没考虑"车辆长度"导致误判——两辆车虽然路径点不同，但车头车尾已经交叉了。后来我加了一个"安全缓冲区"，每个路径段前后各延伸半米，才算稳当。</p>
+
+<div class="highlight">
+  <strong>核心要点</strong>：冲突检测不是"点对点"的碰撞检查，而是"段对段"的时间窗重叠检查。别忘了车体尺寸和转弯半径。
+</div>
+
+<h3>5.2 死锁避免：别让AGV们互相"堵死"</h3>
+
+<p>死锁，是多车调度里最让人头疼的问题。你想想看，四台车在十字路口各占一个方向，谁都想走，谁都不让，最后全停在那——这就是典型的死锁。</p>
+
+<p>死锁产生的四个必要条件（嗯，跟操作系统里的死锁是一个道理）：</p>
+
+<ul>
+  <li><strong>互斥</strong>：一个路段一次只能有一辆车</li>
+  <li><strong>持有并等待</strong>：每辆车占着当前路段，等着下一个路段</li>
+  <li><strong>不可剥夺</strong>：不能强行把车挪走</li>
+  <li><strong>循环等待</strong>：A等B的路段，B等C的路段，C等A的路段</li>
+</ul>
+
+<p>怎么避免？我总结了三种策略：</p>
+
+<h4>5.2.1 资源预留法</h4>
+<p>每辆车在出发前，就把整条路径上的所有路段"预约"好。别人不能再用。这方法简单粗暴，但缺点是——如果路径很长，资源利用率极低。我在一个3000平米的仓库里试过，预约法导致吞吐量下降了40%。</p>
+
+<h4>5.2.2 银行家算法</h4>
+<p>借鉴操作系统的思路。每辆车申请资源（路段）时，系统先模拟分配，看看会不会导致死锁。如果会，就拒绝申请。这方法靠谱，但计算量大，实时性差。我一般只在离线规划阶段用。</p>
+
+<h4>5.2.3 死锁检测+恢复</h4>
+<p>不预防，只检测。发现死锁后，强制让某辆车倒车或绕路。这方法实时性好，但需要预留"逃生路径"。我在一个汽车零部件仓库里用过，效果不错，但前提是——你得有足够的备用路径。</p>
+
+<div class="tip">
+  <strong>我的建议</strong>：实际项目中，我倾向于"资源预留+死锁检测"混合使用。关键路径（如十字路口、窄通道）用预留法，非关键路径用检测法。既保证安全，又不牺牲效率。
+</div>
+
+<h3>5.3 交通管制策略：像交警一样指挥</h3>
+
+<p>冲突检测和死锁避免，都是"被动防御"。真正高效的调度，需要主动的交通管制。说白了，就是给AGV们定规矩。</p>
+
+<p>我常用的交通管制策略有四种：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>策略名称</th>
+      <th>核心思想</th>
+      <th>适用场景</th>
+      <th>我踩过的坑</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>优先级调度</td>
+      <td>给每辆车设优先级，高优先级的先走</td>
+      <td>任务有紧急程度之分</td>
+      <td>优先级低的车辆可能永远走不了（饥饿）</td>
+    </tr>
+    <tr>
+      <td>时间窗调度</td>
+      <td>给每个路段分配时间片，车辆按时间片通行</td>
+      <td>高密度、高频率场景</td>
+      <td>时间片太短会导致频繁启停，磨损严重</td>
+    </tr>
+    <tr>
+      <td>区域管制</td>
+      <td>把地图分成若干区域，每个区域限制车辆数量</td>
+      <td>大面积仓库，分区管理</td>
+      <td>区域边界容易成为新的拥堵点</td>
+    </tr>
+    <tr>
+      <td>动态路径重规划</td>
+      <td>检测到冲突时，实时给某辆车重新算路</td>
+      <td>路径灵活、有备用路线</td>
+      <td>重规划耗时，可能导致连锁反应</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这里我重点说说<strong>时间窗调度</strong>。这是我个人比较推崇的一种策略，因为它把"冲突检测"和"交通管制"合二为一了。</p>
+
+<p>具体做法是：</p>
+<ol>
+  <li>把地图上的每个路段（包括路口）看作一个"资源"</li>
+  <li>每个资源维护一个"时间窗表"，记录已被占用的时间段</li>
+  <li>车辆申请通行时，查时间窗表，找一个空闲的时间段</li>
+  <li>如果找不到，就等待或绕路</li>
+</ol>
+
+<p>来看一个时间窗调度的核心代码：</p>
+
+<pre><code>class TrafficController:
+    def __init__(self):
+        self.resource_windows = {}  # 路段 -> [(start_time, end_time), ...]
+    
+    def request_passage(self, vehicle_id, road_segment, duration):
+        """车辆申请通行某个路段，duration为预计通行时间"""
+        if road_segment not in self.resource_windows:
+            self.resource_windows[road_segment] = []
+        
+        # 找一个空闲时间窗
+        windows = self.resource_windows[road_segment]
+        # 简单起见，从当前时间开始找
+        start_time = max(0, windows[-1][1] if windows else 0)
+        end_time = start_time + duration
+        
+        # 检查是否与其他窗口冲突
+        for w in windows:
+            if not (end_time &lt;= w[0] or start_time &gt;= w[1]):
+                # 冲突，需要等待
+                start_time = w[1]
+                end_time = start_time + duration
+        
+        # 分配时间窗
+        windows.append((start_time, end_time))
+        windows.sort(key=lambda x: x[0])
+        
+        return start_time, end_time
+</code></pre>
+
+<p>这段代码我简化了很多。实际项目中，你还要考虑：</p>
+<ul>
+  <li>车辆加减速时间（不是瞬间就能到最高速的）</li>
+  <li>路口转向耗时（转弯比直行慢）</li>
+  <li>异常情况处理（比如某辆车突然故障停在路中间）</li>
+</ul>
+
+<div class="warning">
+  <strong>注意</strong>：时间窗调度虽然好用，但有一个致命弱点——对时间同步要求极高。如果AGV的时钟不准，或者通信有延迟，时间窗就会错位。我曾经因为WiFi延迟导致两辆车的时间窗重叠了200毫秒，结果在路口撞上了。后来我换成了有线通信+本地时钟同步，才算解决。
+</div>
+
+<h3>5.4 知识体系总览</h3>
+
+<p>说了这么多，咱们来画个图，把这一章的知识体系串起来。下面这张SVG图，是我自己梳理的"多车路径规划核心逻辑"：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">多车路径规划核心逻辑</text>
+  
+  <!-- 顶层：输入 -->
+  <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">多车路径请求</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第一层：冲突检测 -->
+  <rect x="250" y="140" width="300" height="60" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="165" text-anchor="middle" font-size="16" fill="white" font-weight="bold">冲突检测</text>
+  <text x="400" y="185" text-anchor="middle" font-size="12" fill="white">节点冲突 | 边冲突 | 时间窗重叠</text>
+  
+  <!-- 箭头分叉 -->
+  <line x1="400" y1="200" x2="400" y2="230" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="230" x2="200" y2="230" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="230" x2="600" y2="230" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 第二层左：死锁避免 -->
+  <rect x="80" y="230" width="240" height="60" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="200" y="255" text-anchor="middle" font-size="16" fill="white" font-weight="bold">死锁避免</text>
+  <text x="200" y="275" text-anchor="middle" font-size="12" fill="white">资源预留 | 银行家算法 | 检测恢复</text>
+  
+  <!-- 第二层右：交通管制 -->
+  <rect x="480" y="230" width="240" height="60" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="600" y="255" text-anchor="middle" font-size="16" fill="white" font-weight="bold">交通管制</text>
+  <text x="600" y="275" text-anchor="middle" font-size="12" fill="white">优先级 | 时间窗 | 区域管制 | 重规划</text>
+  
+  <!-- 箭头汇聚 -->
+  <line x1="200" y1="290" x2="200" y2="320" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="290" x2="600" y2="320" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="200" y1="320" x2="400" y2="320" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="320" x2="400" y2="320" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="320" x2="400" y2="350" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：路径分配 -->
+  <rect x="250" y="350" width="300" height="50" rx="8" fill="#f39c12" stroke="#d68910" stroke-width="2"/>
+  <text x="400" y="380" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径分配与执行</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="300" y="430" width="200" height="50" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="460" text-anchor="middle" font-size="16" fill="white" font-weight="bold">无冲突路径集合</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把整个流程串起来了：多车路径请求进来，先做冲突检测，然后分两条路——死锁避免和交通管制，最后输出无冲突的路径集合。实际项目中，这三步是循环迭代的，不是一次性的。</p>
+
+<h3>5.5 避坑指南</h3>
+
+<p>最后，我把自己这些年踩过的坑总结一下，你们遇到了能少走弯路：</p>
+
+<ul>
+  <li><strong>我曾经</strong>以为冲突检测越精细越好，结果把每个路径点都做碰撞检测，导致计算量爆炸，调度周期从100ms变成了2秒。后来发现，只需要检测关键节点（路口、站点、窄道）就够了。</li>
+  <li><strong>我曾经</strong>在死锁恢复时，让车辆"原地等待"，结果三台车互相等了一整天。后来我加了"超时强制绕路"机制，超过5秒没动静就重新规划。</li>
+  <li><strong>我曾经</strong>在时间窗调度里，把时间片设得太短（0.5秒），结果AGV频繁启停，电机过热保护了。后来我根据车辆加减速性能，把时间片设为2~3秒，既保证了通行效率，又保护了硬件。</li>
+</ul>
+
+<p>嗯，多车路径规划这块，说白了就是"平衡"——在安全、效率、硬件寿命之间找平衡点。没有银弹，只有不断调优。</p>
+
+<div class="highlight">
+  <strong>一句话总结</strong>：冲突检测是眼睛，死锁避免是大脑，交通管制是手脚。三者配合，才能让AGV车队跑得又快又稳。
+</div>
+
+<div class="footer-nav">
+            <a href="04PathPlanningBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06TrafficControlStrategy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

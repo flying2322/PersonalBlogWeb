@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 通信接口设计（下）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02ProcessorSelection.html" class="">2 核心处理器选型</a></li>
+<li><a href="03RtosSelection.html" class="">3 实时操作系统选型</a></li>
+<li><a href="04CommInterfacePart1.html" class="">4 通信接口设计（上）</a></li>
+<li><a href="05CommInterfacePart2.html" class="active">5 通信接口设计（下）</a></li>
+<li><a href="06SensorInterface.html" class="">6 传感器接口设计</a></li>
+<li><a href="07MotorDriverInterface.html" class="">7 电机驱动接口</a></li>
+<li><a href="08PowerManagement.html" class="">8 电源管理设计</a></li>
+<li><a href="09SafetyRedundancy.html" class="">9 安全与冗余设计</a></li>
+<li><a href="10IoExpandIsolation.html" class="">10 I/O扩展与隔离</a></li>
+<li><a href="11HmiInterface.html" class="">11 人机交互接口</a></li>
+<li><a href="12StorageAndLog.html" class="">12 存储与日志设计</a></li>
+<li><a href="13StructureEnvAdapt.html" class="">13 结构与环境适应性</a></li>
+<li><a href="14EmcDesign.html" class="">14 电磁兼容性（EMC）设计</a></li>
+<li><a href="15HardwareDebugTest.html" class="">15 硬件调试与测试</a></li>
+<li><a href="16HardwareArchitecture.html" class="">16 AGV控制器硬件架构总览</a></li>
+<li><a href="17McuChipCompare.html" class="">17 主控芯片选型深度对比</a></li>
+<li><a href="18DdrFlashCircuit.html" class="">18 DDR与Flash电路设计</a></li>
+<li><a href="19EthernetTsn.html" class="">19 以太网与TSN（时间敏感网络）</a></li>
+<li><a href="20WirelessModule.html" class="">20 无线通信模块选型</a></li>
+<li><a href="21VisualSensorInterface.html" class="">21 视觉传感器接口</a></li>
+<li><a href="22UltrasonicInfrared.html" class="">22 超声波与红外传感器</a></li>
+<li><a href="23MagneticQrNavSensor.html" class="">23 磁导航与二维码导航传感器接口</a></li>
+<li><a href="24BatteryChargeManage.html" class="">24 电池充电管理</a></li>
+<li><a href="25WatchdogMonitor.html" class="">25 硬件看门狗与系统监控</a></li>
+<li><a href="26MultiControllerCoop.html" class="">26 多控制器协同</a></li>
+<li><a href="27HardwareCostControl.html" class="">27 硬件成本控制</a></li>
+<li><a href="28DesignDocVersion.html" class="">28 设计文档与版本管理</a></li>
+<li><a href="29CertificationCompliance.html" class="">29 认证与合规</a></li>
+<li><a href="30HardwarePrototypeCase.html" class="">30 实战案例</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 通信接口设计（下）：Wi-Fi 6、5G、UWB在AGV集群调度中的应用</h2>
+
+<p>上一节我们聊了以太网和CAN总线这些有线通信，说白了那是AGV的“骨架”。但集群调度真正要跑起来，还得靠无线通信这张“神经网”。今天咱们就深入聊聊Wi-Fi 6、5G和UWB这三种技术，在AGV集群里到底怎么用、怎么选。</p>
+
+<p>我个人习惯把无线通信分成两类：一类是“管调度”的，比如Wi-Fi和5G，负责传指令、报位置；另一类是“管定位”的，比如UWB，专门用来做高精度位置感知。当然，现在也有融合方案，但咱们先拆开讲。</p>
+
+<h3>5.1 Wi-Fi 6：为什么老方案不够用了？</h3>
+
+<p>很多工厂还在用Wi-Fi 4或者Wi-Fi 5。说实话，在AGV数量少于20台时，问题不大。但一旦上了50台、100台，你就会发现——丢包、延迟、掉线全来了。</p>
+
+<p>为什么会这样？因为传统Wi-Fi是“共享信道”的。你想想看，几十台AGV同时上报位置、请求任务，AP（接入点）根本忙不过来。Wi-Fi 6引入了一个关键特性：<strong>OFDMA（正交频分多址）</strong>。说白了，就是把一个信道切成多个子信道，同时服务多个设备。</p>
+
+<div class="highlight">
+  <p><strong>核心优势对比：</strong></p>
+  <table>
+    <tr>
+      <th>特性</th>
+      <th>Wi-Fi 5</th>
+      <th>Wi-Fi 6</th>
+    </tr>
+    <tr>
+      <td>调制方式</td>
+      <td>OFDM</td>
+      <td>OFDMA</td>
+    </tr>
+    <tr>
+      <td>单AP并发设备数</td>
+      <td>约20-30台</td>
+      <td>约50-100台</td>
+    </tr>
+    <tr>
+      <td>平均延迟</td>
+      <td>20-50ms</td>
+      <td>5-15ms</td>
+    </tr>
+    <tr>
+      <td>抗干扰能力</td>
+      <td>一般</td>
+      <td>强（BSS Coloring）</td>
+    </tr>
+  </table>
+</div>
+
+<p>我在项目中遇到过这样一个场景：一个仓库部署了60台AGV，用Wi-Fi 5时，每到整点换班高峰期，调度系统就收不到AGV的“任务完成”回执，导致任务堆积。后来换成Wi-Fi 6，问题直接解决了。嗯，这里要注意：<strong>AP的部署密度也很关键</strong>，我建议每200-300平米部署一个Wi-Fi 6 AP，信道规划用5GHz频段，避开2.4GHz的干扰。</p>
+
+<h3>5.2 5G：AGV的“远程驾驶”时代</h3>
+
+<p>5G在AGV上的应用，很多人觉得是“杀鸡用牛刀”。但如果你做过室外AGV或者跨车间调度，就会明白5G的价值。</p>
+
+<p>5G的三大特性——<strong>eMBB（增强移动宽带）、uRLLC（超低时延高可靠）、mMTC（海量机器类通信）</strong>——正好对应AGV的三种需求：高清地图下发、实时控制指令、大规模设备接入。</p>
+
+<p>我记得有一次做港口AGV项目，要求AGV在30km/h的速度下，控制指令延迟不超过10ms。Wi-Fi根本做不到，因为AP切换时会有100ms以上的中断。最后用了5G专网，端到端延迟稳定在5ms以内。</p>
+
+<div class="tip">
+  <p><strong>选型建议：</strong></p>
+  <ul>
+    <li>室内AGV集群（<50台）：Wi-Fi 6足够，成本低</li>
+    <li>室外/跨区域AGV（>50台）：5G专网更可靠</li>
+    <li>需要远程监控/接管：5G是唯一选择</li>
+  </ul>
+</div>
+
+<p>但5G也有坑。我曾经踩过一个：5G模组的功耗比Wi-Fi高3-5倍，AGV电池续航会明显下降。所以如果你用5G，一定要在AGV控制器上预留独立的电源管理电路，让5G模组在空闲时进入休眠模式。</p>
+
+<h3>5.3 UWB：厘米级定位的“作弊器”</h3>
+
+<p>AGV集群调度最头疼的问题是什么？不是通信，是<strong>位置感知</strong>。磁条、二维码这些方案，说白了是“被动定位”，AGV必须走到特定位置才能知道自己在哪。而UWB（超宽带）能做到实时、主动、高精度定位。</p>
+
+<p>UWB的原理很简单：通过测量信号飞行时间（TOF）来计算距离。精度可以做到10-30厘米，甚至更高。我习惯在AGV上安装两个UWB标签，一个在车头，一个在车尾，这样不仅能定位，还能算出航向角。</p>
+
+<div class="highlight">
+  <p><strong>UWB在AGV集群中的典型应用：</strong></p>
+  <ul>
+    <li><strong>避碰与交通管制：</strong>当两辆AGV距离小于1米时，UWB直接触发减速指令，比调度系统响应快得多</li>
+    <li><strong>自动充电对接：</strong>AGV靠近充电桩时，UWB提供厘米级引导，对接成功率从90%提升到99.9%</li>
+    <li><strong>动态路径规划：</strong>实时位置上报给调度系统，避免路径冲突</li>
+  </ul>
+</div>
+
+<p>这里有个避坑指南：<strong>UWB基站部署时，一定要做“视距”规划</strong>。我曾经在一个金属货架密集的仓库里部署UWB，结果定位误差直接飙到50厘米以上。后来发现是金属多径反射导致的。解决方案是：每个定位区域至少部署4个基站，且基站之间不能有金属遮挡。</p>
+
+<h3>5.4 三种技术的融合架构</h3>
+
+<p>在实际项目中，我很少只用一种无线技术。最常用的组合是：<strong>Wi-Fi 6做数据通信 + UWB做高精度定位</strong>。如果预算充足，再加5G做远程应急接管。</p>
+
+<p>下面这张图是我自己总结的融合架构，你可以参考：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="420" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">AGV集群无线通信融合架构</text>
+  
+  <!-- 调度层 -->
+  <rect x="50" y="55" width="620" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="360" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调度系统（云端/边缘）</text>
+  
+  <!-- 通信层 -->
+  <rect x="50" y="135" width="180" height="80" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="140" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Wi-Fi 6</text>
+  <text x="140" y="195" text-anchor="middle" font-size="12" fill="white">任务下发/状态上报</text>
+  
+  <rect x="270" y="135" width="180" height="80" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="360" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">5G</text>
+  <text x="360" y="195" text-anchor="middle" font-size="12" fill="white">远程接管/高清地图</text>
+  
+  <rect x="490" y="135" width="180" height="80" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="580" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">UWB</text>
+  <text x="580" y="195" text-anchor="middle" font-size="12" fill="white">实时定位/避碰</text>
+  
+  <!-- 连接线 -->
+  <line x1="140" y1="195" x2="140" y2="240" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="360" y1="195" x2="360" y2="240" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="580" y1="195" x2="580" y2="240" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- AGV层 -->
+  <rect x="50" y="240" width="620" height="60" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="360" y="275" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV集群（每台AGV集成Wi-Fi+UWB/5G）</text>
+  
+  <!-- 定位层 -->
+  <rect x="50" y="320" width="620" height="80" rx="8" fill="#e74c3c" opacity="0.8"/>
+  <text x="360" y="350" text-anchor="middle" font-size="14" fill="white" font-weight="bold">UWB定位基站（室内/室外部署）</text>
+  <text x="360" y="375" text-anchor="middle" font-size="12" fill="white">提供厘米级位置信息，反馈给调度系统做路径规划</text>
+  
+  <!-- 箭头标注 -->
+  <polygon points="360,300 355,310 365,310" fill="#2c3e50"/>
+  <text x="380" y="315" font-size="11" fill="#2c3e50">位置数据回传</text>
+</svg>
+
+<p>你看这个架构，调度系统通过Wi-Fi或5G下发任务，AGV执行任务的同时，通过UWB实时上报位置。调度系统根据位置信息做动态路径规划，避免拥堵。说白了，这就是一个“通信+感知”的双闭环系统。</p>
+
+<h3>5.5 硬件选型清单与接口设计</h3>
+
+<p>最后，我列一份实际项目中的选型清单，供你参考：</p>
+
+<table>
+  <tr>
+    <th>模块类型</th>
+    <th>推荐型号</th>
+    <th>接口</th>
+    <th>备注</th>
+  </tr>
+  <tr>
+    <td>Wi-Fi 6模块</td>
+    <td>Intel AX210 / MT7921</td>
+    <td>M.2 Key E + PCIe</td>
+    <td>支持2.4G/5G双频，160MHz带宽</td>
+  </tr>
+  <tr>
+    <td>5G模组</td>
+    <td>移远RM500Q-GL / 广和通FM150</td>
+    <td>M.2 Key B + USB 3.0</td>
+    <td>支持SA/NSA双模，功耗约3-5W</td>
+  </tr>
+  <tr>
+    <td>UWB模块</td>
+    <td>Decawave DWM1001 / Qorvo DW3000</td>
+    <td>UART / SPI</td>
+    <td>精度10-30cm，测距频率10-100Hz</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>接口设计注意事项：</strong></p>
+  <ul>
+    <li>Wi-Fi和5G的天线要分开布局，避免同频干扰。我习惯把Wi-Fi天线放在AGV前部，5G天线放在后部。</li>
+    <li>UWB模块的天线必须露出金属外壳，否则定位精度会大幅下降。我曾经吃过这个亏，后来在AGV外壳上开了个塑料窗口。</li>
+    <li>所有无线模块的电源都要加LC滤波，尤其是UWB，它对电源噪声非常敏感。</li>
+  </ul>
+</div>
+
+<p>嗯，通信接口设计这部分内容比较多，但核心就一句话：<strong>根据场景选技术，根据技术定接口，根据接口做布局</strong>。Wi-Fi 6解决并发，5G解决远距离和低延迟，UWB解决定位精度。三者配合好了，AGV集群调度才能真正跑得稳、跑得快。</p>
+
+<div class="footer-nav">
+            <a href="04CommInterfacePart1.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06SensorInterface.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

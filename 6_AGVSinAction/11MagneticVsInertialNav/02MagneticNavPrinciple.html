@@ -1,0 +1,370 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 磁条导航原理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航技术概述</a></li>
+<li><a href="02MagneticNavPrinciple.html" class="active">2 磁条导航原理</a></li>
+<li><a href="03InertialNavPrinciple.html" class="">3 惯性导航原理</a></li>
+<li><a href="04MagneticNavArchitecture.html" class="">4 磁条导航系统架构</a></li>
+<li><a href="05InertialNavArchitecture.html" class="">5 惯性导航系统架构</a></li>
+<li><a href="06AccuracyCompare.html" class="">6 定位精度对比</a></li>
+<li><a href="07PathFlexibilityCompare.html" class="">7 路径灵活性对比</a></li>
+<li><a href="08EnvAdaptCompare.html" class="">8 环境适应性对比</a></li>
+<li><a href="09CostCompare.html" class="">9 成本对比分析</a></li>
+<li><a href="10DeployMaintainCompare.html" class="">10 部署与维护对比</a></li>
+<li><a href="11ReliabilityCompare.html" class="">11 可靠性对比</a></li>
+<li><a href="12ExtensibilityCompare.html" class="">12 扩展性对比</a></li>
+<li><a href="13MagneticNavScenarios.html" class="">13 磁条导航典型应用场景</a></li>
+<li><a href="14InertialNavScenarios.html" class="">14 惯性导航典型应用场景</a></li>
+<li><a href="15HybridNavSolution.html" class="">15 混合导航方案</a></li>
+<li><a href="16MagneticNavParams.html" class="">16 磁条导航关键技术参数</a></li>
+<li><a href="17InertialNavParams.html" class="">17 惯性导航关键技术参数</a></li>
+<li><a href="18MagneticNavTuning.html" class="">18 磁条导航调试与优化</a></li>
+<li><a href="19InertialNavTuning.html" class="">19 惯性导航调试与优化</a></li>
+<li><a href="20MagneticNavIssues.html" class="">20 磁条导航常见问题与解决</a></li>
+<li><a href="21InertialNavIssues.html" class="">21 惯性导航常见问题与解决</a></li>
+<li><a href="22MagneticNavSelection.html" class="">22 磁条导航选型指南</a></li>
+<li><a href="23InertialNavSelection.html" class="">23 惯性导航选型指南</a></li>
+<li><a href="24MagneticNavCases.html" class="">24 磁条导航项目案例</a></li>
+<li><a href="25InertialNavCases.html" class="">25 惯性导航项目案例</a></li>
+<li><a href="26MagneticNavTrends.html" class="">26 磁条导航技术发展趋势</a></li>
+<li><a href="27InertialNavTrends.html" class="">27 惯性导航技术发展趋势</a></li>
+<li><a href="28NavSelectionFramework.html" class="">28 导航技术选型决策框架</a></li>
+<li><a href="29NavTestAcceptance.html" class="">29 AGV导航系统测试与验收</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 磁条导航原理</h2>
+
+<p>磁条导航，说白了就是让AGV沿着地面上贴好的磁条跑。听起来简单，但里面的门道不少。我最早接触磁条导航是在2015年，那时候刚入行，觉得这技术太“土”了，后来才发现——越简单的东西，往往越可靠。</p>
+
+<h3>2.1 磁条的物理特性</h3>
+
+<p>磁条不是普通的橡胶条。它里面掺了铁氧体粉末，经过定向充磁后形成永磁体。我常用的磁条规格是：</p>
+
+<ul>
+  <li><strong>宽度</strong>：30mm、50mm、80mm 三种</li>
+  <li><strong>厚度</strong>：1.0mm ~ 1.5mm</li>
+  <li><strong>剩磁</strong>：一般要求 ≥ 200mT</li>
+  <li><strong>矫顽力</strong>：≥ 150kA/m</li>
+</ul>
+
+<p>这里有个坑——<strong>剩磁</strong>和<strong>矫顽力</strong>是两个关键指标。剩磁决定了传感器能感应到多强的信号，矫顽力决定了磁条会不会被外部磁场消磁。我曾经在某个项目里用过一批便宜磁条，剩磁只有150mT，结果AGV跑着跑着就丢信号了。后来换了正规厂家的产品，问题才解决。</p>
+
+<div class="warning">
+  <strong>注意：</strong>磁条怕高温。超过80°C，磁性会开始衰减。车间地面如果有加热管道，铺设时要避开。
+</div>
+
+<h3>2.2 磁导航传感器工作原理</h3>
+
+<p>磁导航传感器，本质上是一排霍尔元件。每个霍尔元件能检测垂直方向的磁场强度。当磁条从传感器下方经过时，不同位置的霍尔元件会输出不同的电压值。</p>
+
+<p>我常用的传感器是16位或32位的。16位就是16个霍尔元件排成一排，间距10mm，覆盖160mm宽度。32位同理，覆盖更宽。</p>
+
+<p>工作原理可以概括为三步：</p>
+
+<ol>
+  <li><strong>磁场检测</strong>：霍尔元件感应磁条产生的垂直磁场分量</li>
+  <li><strong>信号转换</strong>：磁场强度 → 电压信号 → ADC采样 → 数字量</li>
+  <li><strong>位置解算</strong>：找出信号最强的几个点，计算磁条中心线位置</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>核心公式（简化版）：</strong></p>
+  <pre><code>偏差量 = (信号最强点索引 - 传感器中心索引) × 霍尔元件间距</code></pre>
+  <p>这个偏差量就是AGV相对于磁条的横向偏移，直接送给PID控制器做纠偏。</p>
+</div>
+
+<h3>2.3 磁条铺设规范</h3>
+
+<p>铺设磁条看起来简单，但细节决定成败。我总结了几条硬性规范：</p>
+
+<table>
+  <tr>
+    <th>项目</th>
+    <th>要求</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>地面清洁度</td>
+    <td>无油污、无灰尘</td>
+    <td>用酒精擦拭后再贴</td>
+  </tr>
+  <tr>
+    <td>铺设温度</td>
+    <td>15°C ~ 35°C</td>
+    <td>温度太低胶粘不牢</td>
+  </tr>
+  <tr>
+    <td>转弯半径</td>
+    <td>≥ 500mm</td>
+    <td>太急的弯AGV容易甩出去</td>
+  </tr>
+  <tr>
+    <td>磁条接头</td>
+    <td>对接间隙 ≤ 1mm</td>
+    <td>间隙大了传感器会跳变</td>
+  </tr>
+  <tr>
+    <td>交叉角度</td>
+    <td>≥ 30°</td>
+    <td>避免磁干扰</td>
+  </tr>
+</table>
+
+<p>嗯，这里要特别说一下转弯半径。我见过有人把磁条铺成90°直角弯，AGV根本过不去。你想想看，AGV有轴距，转弯需要内轮差。磁条转弯半径至少要大于AGV的最小转弯半径，一般取500mm以上才保险。</p>
+
+<div class="tip">
+  <strong>我的习惯：</strong>铺设前先用粉笔在地面画出路径，让AGV手动跑一遍确认没问题，再贴磁条。省得贴好了又撕，胶残留很难清理。
+</div>
+
+<h3>2.4 信号采集与处理流程</h3>
+
+<p>信号采集这块，我踩过不少坑。先看流程图：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f8f9fa" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">磁导航信号采集与处理流程</text>
+  
+  <!-- 步骤1 -->
+  <rect x="50" y="80" width="160" height="60" rx="8" fill="#4CAF50" opacity="0.9"/>
+  <text x="130" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">霍尔元件感应</text>
+  <text x="130" y="135" text-anchor="middle" font-size="11" fill="white">磁场强度 → 电压信号</text>
+  
+  <!-- 箭头1 -->
+  <line x1="210" y1="110" x2="270" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2 -->
+  <rect x="270" y="80" width="160" height="60" rx="8" fill="#2196F3" opacity="0.9"/>
+  <text x="350" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">ADC采样</text>
+  <text x="350" y="135" text-anchor="middle" font-size="11" fill="white">模拟量 → 数字量</text>
+  
+  <!-- 箭头2 -->
+  <line x1="430" y1="110" x2="490" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤3 -->
+  <rect x="490" y="80" width="160" height="60" rx="8" fill="#FF9800" opacity="0.9"/>
+  <text x="570" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">滤波处理</text>
+  <text x="570" y="135" text-anchor="middle" font-size="11" fill="white">中值滤波 / 均值滤波</text>
+  
+  <!-- 箭头3 -->
+  <line x1="650" y1="110" x2="710" y2="110" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤4 -->
+  <rect x="710" y="80" width="80" height="60" rx="8" fill="#9C27B0" opacity="0.9"/>
+  <text x="750" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">位置</text>
+  <text x="750" y="135" text-anchor="middle" font-size="14" fill="white" font-weight="bold">解算</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="750" y1="140" x2="750" y2="200" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤5 -->
+  <rect x="660" y="200" width="180" height="60" rx="8" fill="#E91E63" opacity="0.9"/>
+  <text x="750" y="235" text-anchor="middle" font-size="14" fill="white" font-weight="bold">偏差量计算</text>
+  <text x="750" y="255" text-anchor="middle" font-size="11" fill="white">输出给PID控制器</text>
+  
+  <!-- 向左箭头 -->
+  <line x1="660" y1="230" x2="570" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤6 -->
+  <rect x="390" y="200" width="180" height="60" rx="8" fill="#00BCD4" opacity="0.9"/>
+  <text x="480" y="235" text-anchor="middle" font-size="14" fill="white" font-weight="bold">PID纠偏控制</text>
+  <text x="480" y="255" text-anchor="middle" font-size="11" fill="white">调整电机转速差</text>
+  
+  <!-- 向左箭头 -->
+  <line x1="390" y1="230" x2="300" y2="230" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤7 -->
+  <rect x="120" y="200" width="180" height="60" rx="8" fill="#607D8B" opacity="0.9"/>
+  <text x="210" y="235" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AGV执行机构</text>
+  <text x="210" y="255" text-anchor="middle" font-size="11" fill="white">转向 / 速度调节</text>
+  
+  <!-- 反馈箭头 -->
+  <path d="M 210 260 L 210 320 L 750 320 L 750 260" fill="none" stroke="#999" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="480" y="340" text-anchor="middle" font-size="11" fill="#999">闭环反馈（每10ms循环一次）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>流程看起来简单，但实际处理时有很多细节。我重点说几个：</p>
+
+<h4>2.4.1 采样频率</h4>
+<p>我一般设置采样频率为100Hz，也就是每10ms采集一次。为什么是这个值？AGV最高速度1.5m/s，磁条宽度30mm，传感器覆盖160mm。算下来10ms内AGV移动15mm，足够在丢失信号前做出反应。</p>
+
+<h4>2.4.2 滤波算法</h4>
+<p>原始信号噪声很大。地面有铁屑、电机有电磁干扰，都会影响霍尔元件的输出。我常用的滤波方式：</p>
+
+<pre><code>// 中值滤波示例（取5次采样的中间值）
+uint8_t median_filter(uint8_t *data, uint8_t len) {
+    uint8_t temp[5];
+    memcpy(temp, data, 5);
+    // 冒泡排序
+    for(int i=0; i&lt;4; i++) {
+        for(int j=0; j&lt;4-i; j++) {
+            if(temp[j] &gt; temp[j+1]) {
+                uint8_t t = temp[j];
+                temp[j] = temp[j+1];
+                temp[j+1] = t;
+            }
+        }
+    }
+    return temp[2];  // 返回中间值
+}</code></pre>
+
+<p>中值滤波对脉冲噪声特别有效。有一次现场有电焊机干扰，均值滤波完全扛不住，换成中值滤波就好了。</p>
+
+<h4>2.4.3 信号丢失处理</h4>
+<p>这是最头疼的问题。磁条被叉车压坏了、被油污覆盖了，传感器就会丢信号。我的处理策略是：</p>
+
+<ul>
+  <li><strong>短时丢失（&lt; 200ms）</strong>：保持上一帧的偏差量，继续运行</li>
+  <li><strong>中时丢失（200ms ~ 1s）</strong>：减速到0.3m/s，尝试重新捕获</li>
+  <li><strong>长时丢失（&gt; 1s）</strong>：急停，报错</li>
+</ul>
+
+<div class="warning">
+  <strong>我曾经踩过的坑：</strong>一开始我把丢失阈值设得太短，AGV过磁条接头时稍微抖一下就急停。后来改成200ms的容忍窗口，问题解决了。但也不能太长，否则AGV会跑偏撞到货架。
+</div>
+
+<h3>2.5 小结</h3>
+<p>磁条导航的原理不复杂，但工程实现上有很多细节。说白了，就是传感器读数据、软件做滤波、控制器算偏差、电机做纠偏。每一步都做好了，AGV才能稳稳地沿着磁条跑。我见过太多项目因为磁条铺设不规范或者滤波没做好，导致AGV像喝醉了酒一样左右摇摆。嗯，这些坑咱们后面还会细讲。</p>
+
+        <div class="footer-nav">
+            <a href="01NavigationOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03InertialNavPrinciple.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

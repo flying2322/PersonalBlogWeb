@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 数据模型定义</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="active">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 数据模型定义：任务订单模型、AGV状态模型、位置坐标模型、异常事件模型</h2>
+
+<p>数据模型这东西，说白了就是MES和AGV调度系统之间的“共同语言”。</p>
+<p>我刚开始做集成那会儿，吃过不少亏。有一次两个系统联调，MES发过来的任务单里缺了优先级字段，AGV这边直接按默认顺序跑，结果紧急订单被堵在仓库里半小时。嗯，从那以后，我对数据模型的定义就特别较真。</p>
+
+<h3>4.1 任务订单模型：调度的“灵魂”</h3>
+
+<p>任务订单是MES发给AGV的指令。我个人习惯，把它拆成三块：<strong>任务头、任务行、任务状态</strong>。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>任务订单必须包含“谁、去哪、运什么、多紧急”这四个要素。少一个，调度系统就得猜，一猜就容易出乱子。</p>
+</div>
+
+<p>先看一个我常用的任务订单模型结构：</p>
+
+<pre><code>{
+  "taskId": "TASK20240115001",        // 任务唯一ID
+  "taskType": "TRANSPORT",            // 任务类型：搬运/充电/待命
+  "priority": 1,                      // 优先级：0-紧急，1-高，2-普通
+  "sourcePoint": "WH-01-A",           // 起点：仓库A区01货架
+  "targetPoint": "PL-03-B",           // 终点：产线3号工位B点
+  "materialCode": "MAT-88012",        // 物料编码
+  "materialQty": 10,                  // 数量
+  "deadline": "2024-01-15 14:30:00",  // 最晚完成时间
+  "createTime": "2024-01-15 14:00:00" // 创建时间
+}</code></pre>
+
+<p>这里有个坑，我提醒一下：<strong>起点和终点的编码规则，MES和AGV系统必须提前对齐</strong>。我曾经遇到一个项目，MES用“WH-01”表示仓库1区，AGV系统里却叫“WH01”，结果任务发过去，AGV直接报“位置不存在”。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>建议在MES和AGV之间加一个“位置映射表”。MES发过来的位置编码，先查表转成AGV内部编码。这样两边各改各的，互不影响。</p>
+</div>
+
+<h3>4.2 AGV状态模型：调度决策的“眼睛”</h3>
+
+<p>AGV状态模型，说白了就是告诉调度系统：<strong>你现在有几辆车？每辆车在干嘛？能不能接新活？</strong></p>
+
+<p>我一般把AGV状态分成两大类：<strong>运行状态</strong>和<strong>任务状态</strong>。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>状态类别</th>
+      <th>状态值</th>
+      <th>说明</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4">运行状态</td>
+      <td>IDLE</td>
+      <td>空闲，可接任务</td>
+    </tr>
+    <tr>
+      <td>MOVING</td>
+      <td>正在行驶</td>
+    </tr>
+    <tr>
+      <td>LOADING</td>
+      <td>正在装货/卸货</td>
+    </tr>
+    <tr>
+      <td>CHARGING</td>
+      <td>充电中</td>
+    </tr>
+    <tr>
+      <td rowspan="3">任务状态</td>
+      <td>ASSIGNED</td>
+      <td>已分配任务，前往起点</td>
+    </tr>
+    <tr>
+      <td>EXECUTING</td>
+      <td>正在执行任务（已取货）</td>
+    </tr>
+    <tr>
+      <td>COMPLETED</td>
+      <td>任务完成，等待新指令</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>你想想看，如果AGV的状态更新不及时，调度系统就会做出错误决策。我记得有个项目，AGV明明在充电，但状态还卡在“空闲”，调度系统又给它派了个任务，结果车动不了，整条产线都等着。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经要求AGV每500毫秒上报一次状态。别小看这个频率，太低了调度会滞后，太高了网络扛不住。500ms是我试出来的平衡点。</p>
+</div>
+
+<h3>4.3 位置坐标模型：导航的“地图”</h3>
+
+<p>位置坐标模型，就是AGV的“导航地图”。我习惯用<strong>节点-路径</strong>的方式建模。</p>
+
+<p>每个位置点，我定义为：</p>
+
+<pre><code>{
+  "pointId": "P-001",          // 位置点ID
+  "x": 12.5,                   // X坐标（米）
+  "y": 8.3,                    // Y坐标（米）
+  "angle": 90,                 // 朝向角度（度）
+  "type": "STATION",           // 类型：STATION/CHARGER/WAIT_POINT
+  "allowedActions": ["LOAD", "UNLOAD"]  // 允许的操作
+}</code></pre>
+
+<p>路径的话，我一般用邻接表存：</p>
+
+<pre><code>{
+  "pathId": "PATH-01",
+  "fromPoint": "P-001",
+  "toPoint": "P-002",
+  "length": 15.2,              // 路径长度（米）
+  "direction": "BIDIRECTIONAL", // 单向/双向
+  "speedLimit": 1.0            // 限速（米/秒）
+}</code></pre>
+
+<p>为什么会这样设计？因为实际项目中，AGV不是所有位置都能停、都能转弯。有些点只能卸货不能装货，有些点只能直行不能转弯。把这些信息写进模型，调度系统才能做出合理的路径规划。</p>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>坐标模型里一定要预留一个“扩展字段”。因为项目后期，客户往往会加新需求，比如“这个位置要加个RFID读取点”。有扩展字段，就不用改数据库结构了。</p>
+</div>
+
+<h3>4.4 异常事件模型：系统的“保险丝”</h3>
+
+<p>异常事件模型，说白了就是<strong>当系统出问题时，怎么告诉MES“我出事了”</strong>。</p>
+
+<p>我见过太多项目，AGV撞了、迷路了、没电了，MES那边完全不知道，还在傻等任务完成。所以，异常事件模型必须定义清楚。</p>
+
+<p>我常用的异常事件结构：</p>
+
+<pre><code>{
+  "eventId": "EVT-20240115-001",
+  "eventType": "OBSTACLE",       // 类型：OBSTACLE/LOW_BATTERY/COMM_LOST
+  "severity": "HIGH",            // 严重级别：LOW/MEDIUM/HIGH/CRITICAL
+  "agvId": "AGV-03",            // 发生异常的AGV
+  "location": "P-015",          // 异常发生位置
+  "timestamp": "2024-01-15 14:35:22",
+  "description": "AGV-03在P-015处检测到障碍物，已停止",
+  "suggestedAction": "MANUAL_INTERVENTION"  // 建议处理方式
+}</code></pre>
+
+<p>这里有个关键点：<strong>异常事件必须包含“建议处理方式”</strong>。MES收到异常后，可以根据这个字段决定是自动重试、切换AGV，还是通知人工介入。</p>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>一开始我只定义了异常类型，没定义严重级别。结果有一次AGV电量低（其实还能跑10分钟），MES那边直接停了整条产线。后来我加了严重级别，电量低只算“MEDIUM”，系统会先尝试调度它去充电，而不是直接停线。</p>
+</div>
+
+<h3>4.5 四个模型的关系：一张图看懂</h3>
+
+<p>这四个模型不是孤立的。我画了张图，帮你理清它们之间的关系：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">数据模型关系图</text>
+  
+  <!-- MES 模块 -->
+  <rect x="50" y="80" width="160" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">MES 系统</text>
+  
+  <!-- 任务订单模型 -->
+  <rect x="300" y="80" width="200" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务订单模型</text>
+  
+  <!-- AGV状态模型 -->
+  <rect x="300" y="200" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="235" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV状态模型</text>
+  
+  <!-- 位置坐标模型 -->
+  <rect x="300" y="320" width="200" height="60" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="355" text-anchor="middle" font-size="16" fill="white" font-weight="bold">位置坐标模型</text>
+  
+  <!-- 异常事件模型 -->
+  <rect x="300" y="420" width="200" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="455" text-anchor="middle" font-size="16" fill="white" font-weight="bold">异常事件模型</text>
+  
+  <!-- AGV调度系统 -->
+  <rect x="580" y="200" width="160" height="60" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="660" y="235" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV调度系统</text>
+  
+  <!-- 箭头：MES -> 任务订单 -->
+  <line x1="210" y1="110" x2="295" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="250" y="100" text-anchor="middle" font-size="12" fill="#2c3e50">下发任务</text>
+  
+  <!-- 箭头：任务订单 -> AGV状态 -->
+  <line x1="400" y1="140" x2="400" y2="195" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="420" y="170" text-anchor="start" font-size="12" fill="#2c3e50">分配AGV</text>
+  
+  <!-- 箭头：AGV状态 -> 位置坐标 -->
+  <line x1="400" y1="260" x2="400" y2="315" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="420" y="290" text-anchor="start" font-size="12" fill="#2c3e50">获取位置</text>
+  
+  <!-- 箭头：位置坐标 -> 异常事件 -->
+  <line x1="400" y1="380" x2="400" y2="415" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="420" y="400" text-anchor="start" font-size="12" fill="#2c3e50">触发异常</text>
+  
+  <!-- 箭头：异常事件 -> AGV调度系统 -->
+  <line x1="500" y1="450" x2="575" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="5,5"/>
+  <text x="540" y="350" text-anchor="middle" font-size="12" fill="#2c3e50" transform="rotate(-60, 540, 350)">上报异常</text>
+  
+  <!-- 箭头：AGV调度系统 -> AGV状态 -->
+  <line x1="580" y1="230" x2="505" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="540" y="220" text-anchor="middle" font-size="12" fill="#2c3e50">更新状态</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 图例 -->
+  <rect x="580" y="320" width="180" height="120" rx="5" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="670" y="340" text-anchor="middle" font-size="14" font-weight="bold" fill="#2c3e50">图例</text>
+  <rect x="595" y="350" width="15" height="15" fill="#e74c3c"/>
+  <text x="620" y="363" font-size="12" fill="#2c3e50">任务订单模型</text>
+  <rect x="595" y="375" width="15" height="15" fill="#2ecc71"/>
+  <text x="620" y="388" font-size="12" fill="#2c3e50">AGV状态模型</text>
+  <rect x="595" y="400" width="15" height="15" fill="#f39c12"/>
+  <text x="620" y="413" font-size="12" fill="#2c3e50">位置坐标模型</text>
+  <rect x="595" y="425" width="15" height="15" fill="#9b59b6"/>
+  <text x="620" y="438" font-size="12" fill="#2c3e50">异常事件模型</text>
+</svg>
+
+<p>从这张图你能看出来：<strong>MES下发任务订单，调度系统根据AGV状态和位置坐标来分配任务，一旦出问题，异常事件模型就负责“喊救命”</strong>。四个模型环环相扣，缺一个都不行。</p>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>任务订单模型是“要做什么”，AGV状态模型是“谁能做”，位置坐标模型是“在哪做”，异常事件模型是“做砸了怎么办”。把这四个模型定义清楚，MES和AGV的对接就成功了一半。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="03InterfaceSpecDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05MesTaskDispatch.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

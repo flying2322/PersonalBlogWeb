@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>10 实时调度与动态重规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="active">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>10 实时调度与动态重规划：动态事件处理</h2>
+
+<p>各位同学，今天我们来聊聊AGV调度系统里最刺激的部分——动态事件处理。说实话，静态调度谁都会做，但真正考验系统能力的，是当意外发生时，系统能不能快速反应。</p>
+
+<p>我在项目里见过太多这样的场景：调度员刚排好一天的运输计划，突然接到产线电话说有个急件要插单。或者更糟，一辆AGV在巷道里趴窝了，后面堵了一长串车。这时候，调度系统要是反应慢半拍，整个车间的物流就瘫痪了。</p>
+
+<h3>10.1 动态事件的三种类型</h3>
+
+<p>我个人习惯把动态事件分成三类，这样处理起来思路更清晰：</p>
+
+<table>
+  <tr>
+    <th>事件类型</th>
+    <th>典型场景</th>
+    <th>响应要求</th>
+  </tr>
+  <tr>
+    <td>新任务插入</td>
+    <td>产线临时加单、紧急物料配送</td>
+    <td>秒级响应</td>
+  </tr>
+  <tr>
+    <td>AGV故障</td>
+    <td>车辆死机、电量耗尽、机械故障</td>
+    <td>毫秒级检测，秒级重分配</td>
+  </tr>
+  <tr>
+    <td>环境变化</td>
+    <td>道路堵塞、临时障碍物、区域封锁</td>
+    <td>实时检测，动态绕行</td>
+  </tr>
+</table>
+
+<p>你想想看，这三种事件的处理逻辑其实完全不同。新任务插入，核心是找谁有空、谁离得近。AGV故障，核心是抢救任务、疏散交通。环境变化，核心是重新找路。</p>
+
+<h3>10.2 新任务插入：别让急件等太久</h3>
+
+<p>我记得有一次在汽车总装车间，突然来了个发动机紧急配送任务。调度系统如果按部就班地重新跑一遍全局优化，等算出来黄花菜都凉了。</p>
+
+<p>我的做法是分层处理：</p>
+
+<ol>
+  <li><strong>快速可行性检查</strong>：先看有没有空闲AGV，或者有没有即将完成任务的AGV</li>
+  <li><strong>局部插入评估</strong>：计算插入任务对现有任务的影响，用贪心算法快速找个可行解</li>
+  <li><strong>全局微调</strong>：如果局部插入导致某些任务延迟超标，再触发局部重调度</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>核心原则</strong>：新任务插入，优先用局部调整解决问题。只有局部搞不定时，才考虑全局重调度。这就像你排队买奶茶，插队的人如果不多，大家让一让就过去了。非要重新排一遍队，反而更慢。</p>
+</div>
+
+<h3>10.3 AGV故障处理：抢救任务第一</h3>
+
+<p>AGV故障是我最头疼的问题。曾经有一次，一辆满载物料的AGV在狭窄通道里突然死机，后面堵了5辆车。我当时的第一反应不是修车，而是先疏散交通。</p>
+
+<p>故障处理的标准流程：</p>
+
+<ul>
+  <li><strong>第一步：锁定故障车</strong>，标记为不可用状态</li>
+  <li><strong>第二步：任务抢救</strong>，把故障车上的未完成任务重新分配给其他AGV</li>
+  <li><strong>第三步：交通疏导</strong>，为堵塞区域的AGV重新规划路径</li>
+  <li><strong>第四步：系统恢复</strong>，通知维护人员处理故障车</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经犯过一个错误——故障发生后直接触发全局重调度。结果所有AGV都停下来重新算路径，整个车间停了3分钟。后来我改成只对受影响区域做局部重规划，响应时间降到了200毫秒以内。</p>
+</div>
+
+<h3>10.4 局部路径重规划：别动不动就全局重算</h3>
+
+<p>局部路径重规划，说白了就是只修受影响的那段路，而不是把整个地图重新走一遍。</p>
+
+<p>我常用的方法是<strong>时间窗+冲突检测</strong>：</p>
+
+<pre><code>// 伪代码：局部路径重规划
+function localReplan(affectedAGV, blockedArea):
+    // 1. 获取受影响AGV的当前位置和目的地
+    currentPos = affectedAGV.getPosition()
+    destination = affectedAGV.getDestination()
+    
+    // 2. 在阻塞区域周围找替代路径
+    alternativePaths = findAlternativePaths(currentPos, destination, blockedArea)
+    
+    // 3. 对每条替代路径做冲突检测
+    for path in alternativePaths:
+        conflicts = detectConflicts(path, otherAGVs)
+        if conflicts.isEmpty():
+            return path  // 找到无冲突路径
+    
+    // 4. 如果所有路径都有冲突，做时间窗调整
+    return adjustTimeWindows(alternativePaths, otherAGVs)
+</code></pre>
+
+<p>你可能会问，为什么不直接全局重算？原因很简单——全局重算的复杂度是O(n³)，而局部重规划通常只需要O(k²)，其中k是受影响AGV的数量。在100台AGV的车间里，这个差距可能是几秒和几分钟的区别。</p>
+
+<h3>10.5 全局调度更新：什么时候该动大手术？</h3>
+
+<p>全局调度更新，我把它比作给系统做一次大扫除。平时小打小闹的局部调整就够了，但有些情况必须全局重算：</p>
+
+<ul>
+  <li>系统负载发生剧烈变化（比如突然增加了50%的任务量）</li>
+  <li>多台AGV同时故障（超过总车辆数的20%）</li>
+  <li>调度策略需要切换（比如从效率优先切换到能耗优先）</li>
+  <li>定时触发（比如每30分钟做一次全局优化）</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：全局更新不要做得太频繁。我一般设置一个"脏标记"机制——只有当局部调整累积到一定程度时，才触发全局重算。这样既保证了实时性，又避免了不必要的计算开销。</p>
+</div>
+
+<h3>10.6 知识体系总览</h3>
+
+<p>下面这张图，是我梳理的实时调度与动态重规划的核心逻辑。你可以把它当作本章的思维导图：</p>
+
+<svg width="800" height="500" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">动态事件处理</text>
+  
+  <!-- 三个分支 -->
+  <!-- 新任务插入 -->
+  <rect x="50" y="120" width="180" height="40" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+  <text x="140" y="147" text-anchor="middle" fill="white" font-size="15" font-weight="bold">新任务插入</text>
+  
+  <!-- AGV故障 -->
+  <rect x="310" y="120" width="180" height="40" rx="8" fill="#f0ad4e" stroke="#c78c2d" stroke-width="2"/>
+  <text x="400" y="147" text-anchor="middle" fill="white" font-size="15" font-weight="bold">AGV故障</text>
+  
+  <!-- 环境变化 -->
+  <rect x="570" y="120" width="180" height="40" rx="8" fill="#d9534f" stroke="#b52b27" stroke-width="2"/>
+  <text x="660" y="147" text-anchor="middle" fill="white" font-size="15" font-weight="bold">环境变化</text>
+  
+  <!-- 连线：中心到三个分支 -->
+  <line x1="350" y1="70" x2="140" y2="120" stroke="#666" stroke-width="2"/>
+  <line x1="400" y1="70" x2="400" y2="120" stroke="#666" stroke-width="2"/>
+  <line x1="450" y1="70" x2="660" y2="120" stroke="#666" stroke-width="2"/>
+  
+  <!-- 新任务插入的子节点 -->
+  <rect x="30" y="200" width="220" height="35" rx="5" fill="#d4edda" stroke="#5cb85c" stroke-width="1"/>
+  <text x="140" y="223" text-anchor="middle" fill="#333" font-size="13">快速可行性检查</text>
+  
+  <rect x="30" y="250" width="220" height="35" rx="5" fill="#d4edda" stroke="#5cb85c" stroke-width="1"/>
+  <text x="140" y="273" text-anchor="middle" fill="#333" font-size="13">局部插入评估（贪心）</text>
+  
+  <rect x="30" y="300" width="220" height="35" rx="5" fill="#d4edda" stroke="#5cb85c" stroke-width="1"/>
+  <text x="140" y="323" text-anchor="middle" fill="#333" font-size="13">全局微调（必要时）</text>
+  
+  <!-- AGV故障的子节点 -->
+  <rect x="290" y="200" width="220" height="35" rx="5" fill="#fff3cd" stroke="#f0ad4e" stroke-width="1"/>
+  <text x="400" y="223" text-anchor="middle" fill="#333" font-size="13">锁定故障车</text>
+  
+  <rect x="290" y="250" width="220" height="35" rx="5" fill="#fff3cd" stroke="#f0ad4e" stroke-width="1"/>
+  <text x="400" y="273" text-anchor="middle" fill="#333" font-size="13">任务抢救与重分配</text>
+  
+  <rect x="290" y="300" width="220" height="35" rx="5" fill="#fff3cd" stroke="#f0ad4e" stroke-width="1"/>
+  <text x="400" y="323" text-anchor="middle" fill="#333" font-size="13">交通疏导（局部重规划）</text>
+  
+  <!-- 环境变化的子节点 -->
+  <rect x="550" y="200" width="220" height="35" rx="5" fill="#f8d7da" stroke="#d9534f" stroke-width="1"/>
+  <text x="660" y="223" text-anchor="middle" fill="#333" font-size="13">障碍物检测与标记</text>
+  
+  <rect x="550" y="250" width="220" height="35" rx="5" fill="#f8d7da" stroke="#d9534f" stroke-width="1"/>
+  <text x="660" y="273" text-anchor="middle" fill="#333" font-size="13">替代路径搜索</text>
+  
+  <rect x="550" y="300" width="220" height="35" rx="5" fill="#f8d7da" stroke="#d9534f" stroke-width="1"/>
+  <text x="660" y="323" text-anchor="middle" fill="#333" font-size="13">时间窗冲突消解</text>
+  
+  <!-- 底部：响应策略 -->
+  <rect x="200" y="390" width="400" height="45" rx="10" fill="#6f42c1" stroke="#5a32a3" stroke-width="2"/>
+  <text x="400" y="420" text-anchor="middle" fill="white" font-size="16" font-weight="bold">响应策略：局部优先 → 全局兜底</text>
+  
+  <!-- 连线到策略 -->
+  <line x1="140" y1="335" x2="300" y2="390" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="400" y1="335" x2="400" y2="390" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <line x1="660" y1="335" x2="500" y2="390" stroke="#999" stroke-width="1.5" stroke-dasharray="5,3"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="470" text-anchor="middle" fill="#666" font-size="12">图：动态事件处理的三类场景与响应策略</text>
+</svg>
+
+<h3>10.7 实战中的几个关键点</h3>
+
+<p>最后，分享几个我在实战中总结的经验：</p>
+
+<ul>
+  <li><strong>事件优先级</strong>：AGV故障的优先级永远高于新任务插入。先救火，再添柴。</li>
+  <li><strong>超时机制</strong>：局部重规划如果超过500毫秒还没找到解，立即切换到全局重算。别死磕。</li>
+  <li><strong>日志记录</strong>：每次动态事件处理都要记录详细日志。我吃过亏——有一次系统莫名其妙地频繁触发全局重算，查了三天才发现是某个传感器误报。</li>
+  <li><strong>人工干预接口</strong>：再智能的系统也有搞不定的时候。保留一个手动调度接口，关键时刻让操作员介入。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>总结一下</strong>：实时调度与动态重规划，核心就八个字——局部优先，全局兜底。别动不动就全局重算，也别死撑着不更新。把握好这个度，你的调度系统就能在动态环境中游刃有余。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="09DeadlockDetectRelease.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="11PerformanceEvaluation.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

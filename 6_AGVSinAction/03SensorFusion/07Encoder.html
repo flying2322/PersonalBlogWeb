@@ -1,0 +1,482 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 编码器</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="active">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 编码器：增量式与绝对式编码器、脉冲计数、速度与位置计算</h2>
+
+<p>编码器这东西，说白了就是AGV的「眼睛」和「腿」之间的传感器。没有它，电机转了多少圈、轮子走了多远，你完全不知道。我在做第一个AGV项目时，就吃过编码器的亏——选型没选对，结果定位精度差得一塌糊涂。</p>
+
+<p>今天咱们就把编码器彻底聊透。从原理到实战，从选型到避坑，一步到位。</p>
+
+<h3>7.1 增量式编码器 vs 绝对式编码器</h3>
+
+<p>先搞清楚这两个最基础的概念。我习惯这么理解：</p>
+
+<ul>
+<li><strong>增量式</strong>：只告诉你「动了多少」，不告诉你「在哪儿」</li>
+<li><strong>绝对式</strong>：直接告诉你「当前位置是哪儿」</li>
+</ul>
+
+<p>你想想看，这区别有多大？</p>
+
+<h4>增量式编码器</h4>
+
+<p>原理很简单：码盘上刻了一圈黑白相间的条纹，光耦透过条纹产生脉冲信号。每转一圈，输出固定数量的脉冲。</p>
+
+<p>它的核心输出是两路信号：<strong>A相</strong>和<strong>B相</strong>，相位差90°。通过判断A相和B相的先后顺序，就能知道电机是正转还是反转。</p>
+
+<div class="highlight">
+<p><strong>关键点</strong>：增量式编码器断电后位置信息丢失。重新上电必须回零。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：AGV在充电站断电后，重新启动时不知道自己在哪里。后来加了磁条回零方案才解决。嗯，这个坑踩得值。</p>
+
+<h4>绝对式编码器</h4>
+
+<p>绝对式编码器就高级多了。它每个位置都有唯一的编码值，断电后位置信息不丢失。上电就知道自己在哪儿。</p>
+
+<p>常见的有两种：</p>
+<ul>
+<li><strong>单圈绝对式</strong>：一圈内有唯一编码，超过一圈就重复</li>
+<li><strong>多圈绝对式</strong>：不仅记录圈内位置，还记录圈数，理论上可以记录几十甚至上百圈</li>
+</ul>
+
+<p>AGV导航中，我建议优先考虑多圈绝对式。为什么？因为AGV经常需要长距离移动，单圈绝对式根本不够用。</p>
+
+<table>
+<tr>
+<th>特性</th>
+<th>增量式</th>
+<th>绝对式</th>
+</tr>
+<tr>
+<td>断电记忆</td>
+<td>无</td>
+<td>有</td>
+</tr>
+<tr>
+<td>成本</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>精度</td>
+<td>取决于线数</td>
+<td>取决于位数</td>
+</tr>
+<tr>
+<td>接线</td>
+<td>简单（A/B/Z）</td>
+<td>复杂（并行/SSI/BiSS）</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>低成本AGV</td>
+<td>高精度、高可靠性AGV</td>
+</tr>
+</table>
+
+<h3>7.2 脉冲计数——从硬件到软件</h3>
+
+<p>脉冲计数听起来简单，但做起来有不少门道。</p>
+
+<h4>硬件层面</h4>
+
+<p>编码器输出的脉冲信号，需要接入MCU的定时器或专用的编码器接口。我常用的方案：</p>
+
+<ul>
+<li><strong>STM32定时器编码器模式</strong>：直接硬件解码，自动计数，CPU零负担</li>
+<li><strong>外部中断+GPIO</strong>：低成本方案，但CPU负担重，容易丢脉冲</li>
+<li><strong>专用编码器芯片</strong>：如LS7366，适合高精度场景</li>
+</ul>
+
+<p>我个人习惯用STM32的定时器编码器模式。它内部有硬件滤波器，能有效抑制毛刺信号。我曾经用外部中断方案，结果电机一震动，脉冲数就乱跳。换成定时器模式后，问题直接解决。</p>
+
+<h4>软件层面</h4>
+
+<p>脉冲计数的核心代码其实不长：</p>
+
+<pre><code>// 定时器编码器模式初始化
+void encoder_init(void) {
+    TIM-&gt;SMCR = TIM_SMCR_SMS_3;  // 编码器模式3（A/B双边沿触发）
+    TIM-&gt;CCMR1 = TIM_CCMR1_CC1S_0 | TIM_CCMR1_CC2S_0;  // 输入捕获
+    TIM-&gt;CCER = 0x0011;  // 使能捕获，不反相
+    TIM-&gt;ARR = 0xFFFF;   // 自动重装载值
+    TIM-&gt;CR1 |= TIM_CR1_CEN;  // 启动定时器
+}
+
+// 读取脉冲数
+int32_t encoder_get_pulse(void) {
+    return (int32_t)TIM-&gt;CNT;
+}
+
+// 清零
+void encoder_clear(void) {
+    TIM-&gt;CNT = 0;
+}
+</code></pre>
+
+<div class="tip">
+<p><strong>小技巧</strong>：读取脉冲数时，建议连续读两次，如果两次值相同再使用。这样可以避免在读取过程中定时器溢出导致的错误值。</p>
+</div>
+
+<h3>7.3 速度计算——三种常用方法</h3>
+
+<p>有了脉冲数，怎么算速度？我常用的方法有三种：</p>
+
+<h4>方法一：M法（测频法）</h4>
+
+<p>固定时间窗口，统计这个窗口内的脉冲数。</p>
+
+<pre><code>速度 = 脉冲数 / (时间窗口 × 编码器线数 × 减速比) × 轮周长
+</code></pre>
+
+<p><strong>优点</strong>：高速时精度高<br>
+<strong>缺点</strong>：低速时脉冲少，误差大</p>
+
+<h4>方法二：T法（测周法）</h4>
+
+<p>测量两个脉冲之间的时间间隔。</p>
+
+<pre><code>速度 = 1 / (脉冲间隔时间 × 编码器线数 × 减速比) × 轮周长
+</code></pre>
+
+<p><strong>优点</strong>：低速时精度高<br>
+<strong>缺点</strong>：高速时时间间隔太短，误差大</p>
+
+<h4>方法三：M/T法（综合法）</h4>
+
+<p>结合M法和T法的优点。高速用M法，低速用T法，中间区域平滑切换。</p>
+
+<p>我在实际项目中，<strong>强烈推荐M/T法</strong>。它覆盖了全速范围，精度最稳定。我曾经在AGV上只用M法，结果低速时速度波动特别大，导致定位抖动。换成M/T法后，问题迎刃而解。</p>
+
+<div class="warning">
+<p><strong>注意</strong>：速度计算一定要做低通滤波。原始速度数据噪声很大，直接用于控制会导致电机抖动。我习惯用一阶低通滤波，截止频率设在5-10Hz。</p>
+</div>
+
+<h3>7.4 位置计算——从脉冲到坐标</h3>
+
+<p>位置计算是编码器数据融合的核心。说白了，就是把脉冲数转换成AGV在空间中的位置。</p>
+
+<h4>单轮位置计算</h4>
+
+<pre><code>位置 = 脉冲数 / (编码器线数 × 减速比) × 轮周长
+</code></pre>
+
+<p>举个例子：编码器线数1000，减速比10:1，轮周长0.5m，脉冲数5000。</p>
+
+<pre><code>位置 = 5000 / (1000 × 10) × 0.5 = 0.25m
+</code></pre>
+
+<h4>双轮差速模型</h4>
+
+<p>AGV常用双轮差速驱动。左右轮各有一个编码器，通过它们的差值可以计算出AGV的航向角。</p>
+
+<pre><code>左轮位移 = 左轮脉冲数 × 脉冲当量
+右轮位移 = 右轮脉冲数 × 脉冲当量
+
+AGV位移 = (左轮位移 + 右轮位移) / 2
+航向变化 = (右轮位移 - 左轮位移) / 轮距
+</code></pre>
+
+<p>这个模型在直道上很准，但转弯时会有误差。为什么？因为轮胎会打滑。我做过测试，急转弯时航向误差能达到5°以上。</p>
+
+<h4>航位推算法（Dead Reckoning）</h4>
+
+<p>有了位移和航向，就可以做航位推算了：</p>
+
+<pre><code>x += 位移 × cos(航向)
+y += 位移 × sin(航向)
+</code></pre>
+
+<p>但注意，航位推算的误差会累积。走10米可能误差只有1cm，走100米误差可能就到10cm了。所以编码器必须配合其他传感器（IMU、激光雷达）做融合。</p>
+
+<div class="highlight">
+<p><strong>核心结论</strong>：编码器在短距离内精度很高，但长距离必须融合其他传感器。单独用编码器做导航，AGV跑不了多远就会偏。</p>
+</div>
+
+<h3>7.5 避坑指南——我踩过的那些坑</h3>
+
+<p>做编码器相关项目，有几个坑我印象特别深：</p>
+
+<ul>
+<li><strong>脉冲丢失</strong>：电机高速运行时，如果MCU中断响应不及时，会丢脉冲。解决方案是使用硬件计数器。</li>
+<li><strong>信号毛刺</strong>：电机启停时，编码器信号会有毛刺。硬件上要加RC滤波，软件上要做去抖。</li>
+<li><strong>零位漂移</strong>：增量式编码器长时间运行后，零位会漂移。定期回零是必须的。</li>
+<li><strong>温度影响</strong>：编码器内部的光电器件受温度影响，脉冲宽度会变化。高精度场景要考虑温度补偿。</li>
+</ul>
+
+<p>我曾经在一个项目中，AGV运行半小时后定位误差越来越大。排查了两天才发现，是编码器线缆屏蔽层没接地，电机产生的电磁干扰导致脉冲计数错误。接地后问题立刻解决。嗯，这个教训让我养成了「先查接地」的习惯。</p>
+
+<h3>7.6 知识体系总览</h3>
+
+<p>下面这张图，是我对编码器知识体系的总结。你可以把它当作一个快速索引：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="780" height="480" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">编码器知识体系</text>
+  
+  <!-- 两大分支 -->
+  <rect x="100" y="70" width="250" height="40" fill="#3498db" rx="8"/>
+  <text x="225" y="96" text-anchor="middle" font-size="16" fill="white" font-weight="bold">增量式编码器</text>
+  
+  <rect x="450" y="70" width="250" height="40" fill="#e74c3c" rx="8"/>
+  <text x="575" y="96" text-anchor="middle" font-size="16" fill="white" font-weight="bold">绝对式编码器</text>
+  
+  <!-- 增量式子项 -->
+  <rect x="50" y="140" width="180" height="35" fill="#85c1e9" rx="6"/>
+  <text x="140" y="163" text-anchor="middle" font-size="13" fill="#2c3e50">A/B相脉冲输出</text>
+  
+  <rect x="250" y="140" width="180" height="35" fill="#85c1e9" rx="6"/>
+  <text x="340" y="163" text-anchor="middle" font-size="13" fill="#2c3e50">Z相零位信号</text>
+  
+  <rect x="50" y="195" width="180" height="35" fill="#85c1e9" rx="6"/>
+  <text x="140" y="218" text-anchor="middle" font-size="13" fill="#2c3e50">断电丢失位置</text>
+  
+  <rect x="250" y="195" width="180" height="35" fill="#85c1e9" rx="6"/>
+  <text x="340" y="218" text-anchor="middle" font-size="13" fill="#2c3e50">需回零操作</text>
+  
+  <!-- 绝对式子项 -->
+  <rect x="450" y="140" width="180" height="35" fill="#f1948a" rx="6"/>
+  <text x="540" y="163" text-anchor="middle" font-size="13" fill="#2c3e50">单圈/多圈</text>
+  
+  <rect x="650" y="140" width="180" height="35" fill="#f1948a" rx="6"/>
+  <text x="740" y="163" text-anchor="middle" font-size="13" fill="#2c3e50">SSI/BiSS协议</text>
+  
+  <rect x="450" y="195" width="180" height="35" fill="#f1948a" rx="6"/>
+  <text x="540" y="218" text-anchor="middle" font-size="13" fill="#2c3e50">断电记忆位置</text>
+  
+  <rect x="650" y="195" width="180" height="35" fill="#f1948a" rx="6"/>
+  <text x="740" y="218" text-anchor="middle" font-size="13" fill="#2c3e50">上电即用</text>
+  
+  <!-- 脉冲计数 -->
+  <rect x="100" y="270" width="600" height="40" fill="#27ae60" rx="8"/>
+  <text x="400" y="296" text-anchor="middle" font-size="16" fill="white" font-weight="bold">脉冲计数</text>
+  
+  <rect x="50" y="330" width="180" height="35" fill="#82e0aa" rx="6"/>
+  <text x="140" y="353" text-anchor="middle" font-size="13" fill="#2c3e50">硬件计数器</text>
+  
+  <rect x="250" y="330" width="180" height="35" fill="#82e0aa" rx="6"/>
+  <text x="340" y="353" text-anchor="middle" font-size="13" fill="#2c3e50">软件滤波</text>
+  
+  <rect x="450" y="330" width="180" height="35" fill="#82e0aa" rx="6"/>
+  <text x="540" y="353" text-anchor="middle" font-size="13" fill="#2c3e50">去毛刺处理</text>
+  
+  <rect x="650" y="330" width="180" height="35" fill="#82e0aa" rx="6"/>
+  <text x="740" y="353" text-anchor="middle" font-size="13" fill="#2c3e50">溢出处理</text>
+  
+  <!-- 速度与位置 -->
+  <rect x="100" y="400" width="600" height="40" fill="#8e44ad" rx="8"/>
+  <text x="400" y="426" text-anchor="middle" font-size="16" fill="white" font-weight="bold">速度与位置计算</text>
+  
+  <rect x="50" y="455" width="140" height="30" fill="#d2b4de" rx="5"/>
+  <text x="120" y="475" text-anchor="middle" font-size="12" fill="#2c3e50">M法（测频）</text>
+  
+  <rect x="210" y="455" width="140" height="30" fill="#d2b4de" rx="5"/>
+  <text x="280" y="475" text-anchor="middle" font-size="12" fill="#2c3e50">T法（测周）</text>
+  
+  <rect x="370" y="455" width="140" height="30" fill="#d2b4de" rx="5"/>
+  <text x="440" y="475" text-anchor="middle" font-size="12" fill="#2c3e50">M/T综合法</text>
+  
+  <rect x="530" y="455" width="140" height="30" fill="#d2b4de" rx="5"/>
+  <text x="600" y="475" text-anchor="middle" font-size="12" fill="#2c3e50">航位推算</text>
+  
+  <rect x="690" y="455" width="100" height="30" fill="#d2b4de" rx="5"/>
+  <text x="740" y="475" text-anchor="middle" font-size="12" fill="#2c3e50">传感器融合</text>
+  
+  <!-- 连接线 -->
+  <line x1="225" y1="110" x2="140" y2="140" stroke="#3498db" stroke-width="2"/>
+  <line x1="225" y1="110" x2="340" y2="140" stroke="#3498db" stroke-width="2"/>
+  <line x1="225" y1="110" x2="140" y2="195" stroke="#3498db" stroke-width="2"/>
+  <line x1="225" y1="110" x2="340" y2="195" stroke="#3498db" stroke-width="2"/>
+  
+  <line x1="575" y1="110" x2="540" y2="140" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="575" y1="110" x2="740" y2="140" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="575" y1="110" x2="540" y2="195" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="575" y1="110" x2="740" y2="195" stroke="#e74c3c" stroke-width="2"/>
+  
+  <line x1="400" y1="230" x2="400" y2="270" stroke="#27ae60" stroke-width="2"/>
+  
+  <line x1="400" y1="310" x2="140" y2="330" stroke="#27ae60" stroke-width="2"/>
+  <line x1="400" y1="310" x2="340" y2="330" stroke="#27ae60" stroke-width="2"/>
+  <line x1="400" y1="310" x2="540" y2="330" stroke="#27ae60" stroke-width="2"/>
+  <line x1="400" y1="310" x2="740" y2="330" stroke="#27ae60" stroke-width="2"/>
+  
+  <line x1="400" y1="365" x2="400" y2="400" stroke="#8e44ad" stroke-width="2"/>
+  
+  <line x1="400" y1="440" x2="120" y2="455" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="400" y1="440" x2="280" y2="455" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="400" y1="440" x2="440" y2="455" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="400" y1="440" x2="600" y2="455" stroke="#8e44ad" stroke-width="2"/>
+  <line x1="400" y1="440" x2="740" y2="455" stroke="#8e44ad" stroke-width="2"/>
+</svg>
+
+<p>这张图把编码器的核心知识点串起来了。从选型到脉冲计数，再到速度和位置计算，每一步都有对应的技术方案。你可以在实际项目中对照这张图，看看自己卡在哪一步。</p>
+
+<p>好了，编码器这部分就聊到这儿。记住一句话：<strong>编码器是AGV导航的基石，但基石也需要和其他砖块（IMU、激光雷达）一起才能盖起高楼</strong>。</p>
+
+<div class="footer-nav">
+            <a href="06VisualSensor.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08UltrasonicInfrared.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

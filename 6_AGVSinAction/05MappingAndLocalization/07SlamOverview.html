@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 SLAM技术概论</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="active">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 SLAM技术概论：SLAM定义、发展历程、主流框架</h2>
+
+<p>各位同学，今天我们来聊聊AGV导航里最核心、也最让人头疼的一个话题——SLAM。</p>
+<p>说实话，我刚开始接触AGV那会儿，觉得导航嘛，不就是装个GPS或者在地上贴磁条就完事了？后来真正做项目才发现，室内环境哪有那么理想。工厂里金属架子多，信号遮挡严重；仓库里货架经常变动，磁条根本没法用。这时候，SLAM就成了唯一的出路。</p>
+
+<h3>7.1 SLAM到底是什么？</h3>
+
+<p>SLAM，全称是Simultaneous Localization and Mapping，中文叫「同步定位与地图构建」。说白了，就是让一台机器人进入一个完全陌生的环境，它一边往前走，一边回答两个问题：</p>
+<ul>
+    <li><strong>我在哪儿？</strong>（定位）</li>
+    <li><strong>周围长什么样？</strong>（建图）</li>
+</ul>
+<p>而且这两个问题是互相依赖的。你想知道自己在哪儿，得先有地图；你想建地图，又得先知道自己在哪儿。这就像「先有鸡还是先有蛋」的难题。</p>
+
+<div class="highlight">
+    <p><strong>核心定义：</strong>SLAM是指机器人在未知环境中，利用自身携带的传感器（如激光雷达、摄像头、IMU等），在运动过程中同时估计自身位姿并构建环境地图的过程。</p>
+</div>
+
+<p>我当年第一次看这个定义，觉得挺绕的。后来在项目里调试一台AGV，它在一个10米×10米的空房间里转圈，结果地图越建越歪，定位越来越偏。那一刻我才真正理解——SLAM本质上是一个状态估计问题，你要从带噪声的传感器数据里，把机器人的轨迹和地图特征点一起算出来。</p>
+
+<h3>7.2 发展历程：从理论到落地</h3>
+
+<p>SLAM这个概念最早是1986年在旧金山的一次IEEE机器人会议上提出来的。那时候大家还在用概率论的方法做机器人定位，有人突然意识到：定位和建图其实是一回事。</p>
+
+<p>我大致把SLAM的发展分成三个阶段：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>阶段</th>
+            <th>时间</th>
+            <th>核心方法</th>
+            <th>特点</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>古典时代</td>
+            <td>1986-2004</td>
+            <td>扩展卡尔曼滤波（EKF）、粒子滤波</td>
+            <td>理论奠基，计算量小但精度有限</td>
+        </tr>
+        <tr>
+            <td>算法分析时代</td>
+            <td>2004-2015</td>
+            <td>稀疏性利用、图优化、闭环检测</td>
+            <td>可处理大规模场景，精度大幅提升</td>
+        </tr>
+        <tr>
+            <td>鲁棒感知时代</td>
+            <td>2015-至今</td>
+            <td>深度学习、语义SLAM、多传感器融合</td>
+            <td>应对动态环境，理解场景语义</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>嗯，这里有个小故事。我记得2012年那会儿，我在做一个仓储AGV项目，用的还是EKF-SLAM。当时觉得挺先进的，结果在200米长的走廊里跑了一圈，地图误差直接到了半米。后来换了图优化框架，同样的传感器，误差降到了5厘米以内。所以你看，选对框架有多重要。</p>
+
+<h3>7.3 主流框架：基于滤波 vs 基于图优化</h3>
+
+<p>现在主流的SLAM框架就两大派：<strong>基于滤波</strong>和<strong>基于图优化</strong>。我分别说说。</p>
+
+<h4>7.3.1 基于滤波的方法</h4>
+
+<p>这类方法的核心思想是：把SLAM看作一个在线状态估计问题。每一帧传感器数据来了，我就更新一次状态。</p>
+
+<p>最经典的是<strong>扩展卡尔曼滤波（EKF-SLAM）</strong>。它的流程大致是：</p>
+<ol>
+    <li>预测：根据运动模型，预测机器人下一时刻的位姿和地图特征</li>
+    <li>观测：传感器测量到环境特征</li>
+    <li>更新：用观测值修正预测结果</li>
+</ol>
+
+<p>说白了，就是「猜一下，看一眼，改一下」的循环。</p>
+
+<div class="tip">
+    <p><strong>我的经验：</strong>EKF-SLAM适合小场景（比如几十平方米），特征点少的情况。我曾经在一个只有10个路标点的实验室里跑EKF-SLAM，效果还不错。但一旦特征点超过几百个，协方差矩阵就膨胀得厉害，计算量直接爆炸。</p>
+</div>
+
+<p>除了EKF，还有<strong>粒子滤波（FastSLAM）</strong>。它用一堆粒子来近似机器人的位姿分布，每个粒子维护自己的地图。好处是可以处理非线性、非高斯的情况。坏处是——粒子数量不够的话，很容易发散。</p>
+
+<div class="warning">
+    <p><strong>避坑指南：</strong>我曾经在一个项目里用FastSLAM，粒子数设了100个，结果机器人过个门就丢了。后来把粒子数加到1000，才勉强稳住。但1000个粒子意味着每帧要更新1000张地图，实时性又成了问题。所以，粒子滤波的粒子数是个需要仔细权衡的参数。</p>
+</div>
+
+<h4>7.3.2 基于图优化的方法</h4>
+
+<p>这是目前的主流，也是我个人最推荐的方法。它的思路完全不同——不是在线一步步更新，而是把整个轨迹和地图建成一张图，然后一次性优化。</p>
+
+<p>图优化SLAM的核心是：</p>
+<ul>
+    <li><strong>节点：</strong>机器人在不同时刻的位姿，以及地图中的路标点</li>
+    <li><strong>边：</strong>节点之间的约束关系（比如里程计约束、观测约束、闭环约束）</li>
+</ul>
+
+<p>你想想看，机器人走了一圈，回到原点，发现地图没对上。这时候图优化就会调整所有节点的位置，让整个图「拧」回一致的状态。</p>
+
+<p>我画了一张图，帮你理解这个结构：</p>
+
+<svg width="700" height="350" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect x="0" y="0" width="700" height="350" fill="#f8f9fa" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="350" y="30" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">图优化SLAM框架示意图</text>
+    
+    <!-- 节点（位姿） -->
+    <circle cx="100" cy="150" r="20" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+    <text x="100" y="155" text-anchor="middle" font-size="12" fill="white">x₁</text>
+    
+    <circle cx="220" cy="120" r="20" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+    <text x="220" y="125" text-anchor="middle" font-size="12" fill="white">x₂</text>
+    
+    <circle cx="340" cy="100" r="20" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+    <text x="340" y="105" text-anchor="middle" font-size="12" fill="white">x₃</text>
+    
+    <circle cx="460" cy="120" r="20" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+    <text x="460" y="125" text-anchor="middle" font-size="12" fill="white">x₄</text>
+    
+    <circle cx="580" cy="150" r="20" fill="#4CAF50" stroke="#388E3C" stroke-width="2"/>
+    <text x="580" y="155" text-anchor="middle" font-size="12" fill="white">x₅</text>
+    
+    <!-- 里程计边 -->
+    <line x1="120" y1="145" x2="200" y2="125" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="240" y1="115" x2="320" y2="105" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="360" y1="95" x2="440" y2="115" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="480" y1="125" x2="560" y2="145" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,3"/>
+    
+    <!-- 闭环边 -->
+    <path d="M 580 170 Q 350 280 100 170" fill="none" stroke="#E53935" stroke-width="2" stroke-dasharray="8,4"/>
+    <text x="350" y="260" text-anchor="middle" font-size="11" fill="#E53935">闭环约束</text>
+    
+    <!-- 路标点 -->
+    <circle cx="180" cy="250" r="12" fill="#2196F3" stroke="#1565C0" stroke-width="2"/>
+    <text x="180" y="255" text-anchor="middle" font-size="10" fill="white">L₁</text>
+    
+    <circle cx="350" cy="220" r="12" fill="#2196F3" stroke="#1565C0" stroke-width="2"/>
+    <text x="350" y="225" text-anchor="middle" font-size="10" fill="white">L₂</text>
+    
+    <circle cx="520" cy="250" r="12" fill="#2196F3" stroke="#1565C0" stroke-width="2"/>
+    <text x="520" y="255" text-anchor="middle" font-size="10" fill="white">L₃</text>
+    
+    <!-- 观测边 -->
+    <line x1="100" y1="170" x2="175" y2="240" stroke="#9C27B0" stroke-width="1.5"/>
+    <line x1="220" y1="140" x2="180" y2="240" stroke="#9C27B0" stroke-width="1.5"/>
+    <line x1="340" y1="120" x2="345" y2="210" stroke="#9C27B0" stroke-width="1.5"/>
+    <line x1="460" y1="140" x2="515" y2="240" stroke="#9C27B0" stroke-width="1.5"/>
+    <line x1="580" y1="170" x2="525" y2="240" stroke="#9C27B0" stroke-width="1.5"/>
+    
+    <!-- 图例 -->
+    <rect x="30" y="300" width="640" height="40" fill="white" rx="5" stroke="#ddd" stroke-width="1"/>
+    <line x1="50" y1="320" x2="90" y2="320" stroke="#FF9800" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="95" y="325" font-size="11" fill="#666">里程计约束</text>
+    <line x1="200" y1="320" x2="240" y2="320" stroke="#E53935" stroke-width="2" stroke-dasharray="8,4"/>
+    <text x="245" y="325" font-size="11" fill="#666">闭环约束</text>
+    <line x1="350" y1="320" x2="390" y2="320" stroke="#9C27B0" stroke-width="1.5"/>
+    <text x="395" y="325" font-size="11" fill="#666">观测约束</text>
+    <circle cx="510" cy="320" r="6" fill="#4CAF50"/>
+    <text x="520" y="325" font-size="11" fill="#666">位姿节点</text>
+    <circle cx="610" cy="320" r="6" fill="#2196F3"/>
+    <text x="620" y="325" font-size="11" fill="#666">路标节点</text>
+</svg>
+
+<p>图优化的流程一般分两步：</p>
+<ol>
+    <li><strong>前端：</strong>处理传感器数据，构建图结构（包括位姿估计、特征匹配、闭环检测）</li>
+    <li><strong>后端：</strong>对图进行优化，调整所有节点的位置，使所有约束的误差最小</li>
+</ol>
+
+<p>目前最流行的图优化库是<strong>g2o</strong>和<strong>Ceres Solver</strong>。我自己项目里一直用g2o，上手快，文档也全。</p>
+
+<div class="highlight">
+    <p><strong>核心对比：</strong></p>
+    <ul>
+        <li><strong>基于滤波：</strong>只维护当前状态，计算量小，但无法修正历史错误。适合小场景、实时性要求高的场景。</li>
+        <li><strong>基于图优化：</strong>维护整个轨迹，可以全局优化，精度高。适合大场景、需要高精度地图的场景。</li>
+    </ul>
+</div>
+
+<h3>7.4 我的建议</h3>
+
+<p>如果你刚开始学SLAM，我个人建议直接从图优化入手。为什么？</p>
+<ul>
+    <li>图优化的思路更直观，容易理解</li>
+    <li>开源工具成熟，g2o、Ceres、GTSAM随便选</li>
+    <li>精度高，适合实际工程项目</li>
+</ul>
+<p>当然，滤波方法也不是完全没用。在一些资源受限的嵌入式平台上，EKF-SLAM仍然有它的用武之地。但如果你问我未来趋势——图优化绝对是主流。</p>
+
+<p>好了，这一章的内容就到这里。SLAM是个大话题，后面我们会深入讲激光SLAM和视觉SLAM的具体实现。到时候再结合代码，带你们一步步跑通一个完整的SLAM系统。</p>
+
+<div class="footer-nav">
+            <a href="06PerceptionFeatureExtract.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08LaserSlamPart1.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

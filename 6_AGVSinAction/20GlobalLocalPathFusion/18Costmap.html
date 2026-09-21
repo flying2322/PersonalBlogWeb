@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 代价地图（Costmap）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="active">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 代价地图（Costmap）：静态层、障碍物层、膨胀层、代价更新策略、多图层融合</h2>
+
+<p>各位同学，今天我们来聊聊代价地图。说实话，这是AGV路径规划里最“接地气”的一个模块。你想想看，全局规划算出一条路径，但机器人能不能真的沿着走？靠的就是代价地图。</p>
+
+<p>我刚开始做AGV那会儿，以为路径规划就是A*算法跑一跑。结果第一次上路，机器人直接怼上了墙。为什么？因为地图里没有“代价”这个概念。后来我才明白——<strong>代价地图，就是给机器人一张“哪里能走、哪里危险”的评分表</strong>。</p>
+
+<h3>18.1 什么是代价地图？</h3>
+
+<p>代价地图本质上是一张栅格图，每个格子（cell）存一个0~255的数值。0代表完全自由，255代表绝对障碍。中间值呢？比如50、100，代表“最好别走，但实在没办法也能凑合”。</p>
+
+<p>我个人习惯把代价地图比作“热力图”。红色区域是障碍，绿色区域是安全区。机器人规划路径时，会尽量绕开高代价区域，实在绕不开，就挑代价最低的路线走。</p>
+
+<div class="highlight">
+  <strong>核心概念：</strong> 代价地图 = 静态地图 + 动态障碍 + 安全膨胀 + 实时更新
+</div>
+
+<h3>18.2 静态层（Static Layer）</h3>
+
+<p>静态层是最基础的一层。它来自我们事先建好的地图，比如激光SLAM生成的栅格地图。这层数据基本不变——墙就是墙，柱子就是柱子。</p>
+
+<p>我在项目中遇到过一个问题：静态地图的分辨率太高，导致代价地图更新特别慢。后来我学乖了，<strong>静态层用较低分辨率（比如0.05m/像素），动态层用高分辨率</strong>。这样既保证精度，又兼顾实时性。</p>
+
+<pre><code># 静态层配置示例
+static_layer:
+  enabled: true
+  map_topic: "/map"           # 订阅静态地图话题
+  subscribe_to_updates: true  # 是否接收地图更新
+  map_type: "occupancy"       # 占用网格地图
+  track_unknown_space: true   # 是否跟踪未知区域
+</code></pre>
+
+<div class="tip">
+  <strong>小技巧：</strong> 静态层里的“未知区域”（unknown）代价默认设为255。但如果你想让机器人探索未知区域，可以手动改成0。我做过一个仓储AGV项目，就是这么干的。
+</div>
+
+<h3>18.3 障碍物层（Obstacle Layer）</h3>
+
+<p>障碍物层负责处理动态障碍。比如突然跑过来的人、临时堆放的货物、另一台AGV。这层数据更新频率很高，通常10Hz以上。</p>
+
+<p>障碍物层的数据来源很多：激光雷达、深度相机、超声波、甚至碰撞传感器。我个人建议<strong>优先用激光雷达</strong>，因为它精度高、视野广。但要注意——激光雷达有盲区，比如机器人正前方半米内可能扫不到。</p>
+
+<pre><code># 障碍物层配置示例
+obstacle_layer:
+  enabled: true
+  observation_sources: ["laser_scan", "point_cloud"]
+  laser_scan:
+    topic: "/scan"
+    sensor_frame: "laser_frame"
+    data_type: "LaserScan"
+    clearing: true    # 是否清除障碍物（当障碍物消失时）
+    marking: true     # 是否标记障碍物
+    obstacle_range: 2.5   # 障碍物检测范围（米）
+    raytrace_range: 3.0   # 光线追踪范围（米）
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong> obstacle_range和raytrace_range要设置合理。我见过有人把obstacle_range设成10米，结果远处一个纸箱让机器人绕了半栋楼。一般室内AGV设2~3米就够了。
+</div>
+
+<h3>18.4 膨胀层（Inflation Layer）</h3>
+
+<p>膨胀层，说白了就是给障碍物“加一圈安全距离”。为什么需要？因为机器人有尺寸，不能贴着墙走。膨胀层会把障碍物周围的格子也标上代价，越靠近障碍物代价越高。</p>
+
+<p>膨胀层的核心参数有两个：</p>
+
+<ul>
+  <li><strong>膨胀半径（inflation_radius）</strong>：障碍物向外膨胀的距离。一般设为机器人半径+安全余量。</li>
+  <li><strong>代价缩放因子（cost_scaling_factor）</strong>：控制代价随距离衰减的速度。值越大，衰减越快。</li>
+</ul>
+
+<p>我记得有一次调试AGV，机器人总是卡在走廊拐角。后来发现是膨胀半径设太大了，机器人觉得两边都是“危险区”，不敢走。调小一点，问题就解决了。</p>
+
+<pre><code># 膨胀层配置示例
+inflation_layer:
+  enabled: true
+  inflation_radius: 0.55     # 膨胀半径（米）
+  cost_scaling_factor: 10.0  # 代价缩放因子
+</code></pre>
+
+<div class="highlight">
+  <strong>经验值：</strong> 对于1米宽、0.6米长的AGV，我一般设inflation_radius=0.5~0.6米，cost_scaling_factor=8~12。具体要实测调整。
+</div>
+
+<h3>18.5 代价更新策略</h3>
+
+<p>代价地图不是一成不变的。机器人每走一步，障碍物层都要更新。更新策略主要有两种：</p>
+
+<ol>
+  <li><strong>标记（Marking）</strong>：传感器检测到障碍物，就把对应格子代价设为255。</li>
+  <li><strong>清除（Clearing）</strong>：传感器没检测到障碍物（比如障碍物移走了），就把格子代价恢复为0。</li>
+</ol>
+
+<p>这里有个坑：<strong>清除策略依赖光线追踪（raytrace）</strong>。激光雷达发射一束光，如果光路上没有障碍，就把沿途格子都清掉。但如果传感器有噪声，可能会误清。我遇到过一台AGV，因为激光雷达抖动，把墙都“清”掉了，结果机器人直接穿墙而过……</p>
+
+<pre><code># 代价更新策略伪代码
+def update_costmap(scan_data):
+    for point in scan_data:
+        if point.distance &lt; obstacle_range:
+            mark_obstacle(point.x, point.y)  # 标记障碍
+        if point.distance &lt; raytrace_range:
+            clear_raytrace(point.x, point.y) # 清除光路
+</code></pre>
+
+<div class="tip">
+  <strong>避坑指南：</strong> 我曾经在工厂里调试，发现AGV总是莫名其妙急停。查了半天，原来是地面上的反光条被激光雷达当成障碍物了。解决方案：在障碍物层里加一个“高度过滤”，只标记一定高度以上的障碍。
+</div>
+
+<h3>18.6 多图层融合</h3>
+
+<p>现在我们把静态层、障碍物层、膨胀层都准备好了。怎么把它们合在一起？<strong>多图层融合</strong>就是干这个的。</p>
+
+<p>融合策略很简单：<strong>取各层对应格子的最大值</strong>。比如静态层格子代价是0，障碍物层是255，膨胀层是100，那最终代价就是255（取最大）。</p>
+
+<p>但这里有个细节：<strong>不同层的优先级可以调整</strong>。比如你希望障碍物层永远覆盖静态层，那就在融合时给障碍物层加权。我一般用默认的“最大值策略”，简单可靠。</p>
+
+<pre><code># 多图层融合伪代码
+def fuse_layers(layers):
+    # layers = [static_layer, obstacle_layer, inflation_layer]
+    costmap = np.zeros_like(layers[0])
+    for layer in layers:
+        costmap = np.maximum(costmap, layer)  # 取最大值
+    return costmap
+</code></pre>
+
+<div class="highlight">
+  <strong>核心原则：</strong> 安全第一。任何一层标记为障碍（255），最终代价地图就是障碍。宁可让机器人绕路，也不能让它撞墙。
+</div>
+
+<h3>18.7 实战中的常见问题</h3>
+
+<p>最后分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>地图漂移</strong>：静态地图和实际位置对不上。解决方案：定期用AMCL重定位，或者用二维码/反光板做辅助定位。</li>
+  <li><strong>障碍物残留</strong>：人走过去了，但代价地图上还留着障碍。检查clearing参数是否开启，以及raytrace_range是否够大。</li>
+  <li><strong>膨胀层过大</strong>：导致窄通道无法通行。我建议在狭窄区域（比如门、走廊）临时降低膨胀半径。</li>
+  <li><strong>多图层冲突</strong>：静态层说这里是墙，障碍物层说这里是空地。检查传感器数据是否正常，或者调整图层优先级。</li>
+</ul>
+
+<div class="tip">
+  <strong>调试小工具：</strong> 我习惯用rviz实时查看代价地图。把各个图层分别显示出来，一眼就能看出问题出在哪一层。比如机器人明明看到障碍，但代价地图没更新，那八成是障碍物层配置有问题。
+</div>
+
+<h3>18.8 本章小结</h3>
+
+<p>代价地图是AGV路径规划的“眼睛”。静态层提供基础地图，障碍物层处理动态变化，膨胀层保证安全距离。三层融合后，机器人才能做出合理的路径决策。</p>
+
+<p>嗯，这里要注意：<strong>代价地图不是越精细越好</strong>。分辨率太高，计算量爆炸；分辨率太低，路径不精确。我一般用0.05米/像素，对于大多数室内AGV足够了。</p>
+
+<p>最后送大家一句话：<strong>代价地图调好了，路径规划就成功了一半</strong>。别急着调A*参数，先把代价地图搞明白。</p>
+
+<div class="footer-nav">
+            <a href="17FusionKeyIssues.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19BehaviorPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

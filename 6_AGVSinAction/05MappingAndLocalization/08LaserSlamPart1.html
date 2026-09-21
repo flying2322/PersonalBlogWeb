@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 激光SLAM（上）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="active">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 激光SLAM（上）：Gmapping算法原理、代码实现与参数调优</h2>
+
+<p>聊到激光SLAM，Gmapping绝对是个绕不开的名字。我记得2010年左右刚接触机器人导航那会儿，Gmapping几乎是入门必备。说白了，它就是那个年代最靠谱的2D激光SLAM方案之一。虽然现在有Cartographer、Karto这些后起之秀，但Gmapping的粒子滤波思想，依然是理解SLAM底层逻辑的最好切入点。</p>
+
+<p>今天我们就把它拆开揉碎了讲。从原理到代码，再到我踩过的那些坑，一次性说清楚。</p>
+
+<h3>8.1 Gmapping的核心思想：粒子滤波</h3>
+
+<p>Gmapping本质上是一个基于粒子滤波的SLAM算法。你想想看，机器人一边移动一边建图，它怎么知道自己在哪里？</p>
+
+<p>答案是：用一堆粒子去猜。</p>
+
+<p>每个粒子代表机器人可能的一个位姿（位置+朝向），以及对应的地图。一开始粒子均匀撒开，随着机器人移动，粒子会根据激光观测数据和里程计数据不断更新权重。权重高的粒子存活下来，权重低的被淘汰。这就是所谓的“重要性重采样”。</p>
+
+<p>我个人习惯把粒子滤波理解成“优胜劣汰的进化算法”。每一代粒子都在试图解释“我看到的激光数据和地图匹配得上吗？”。匹配得好的，就多生几个后代；匹配得差的，就淘汰掉。</p>
+
+<div class="highlight">
+  <strong>核心公式（简化版）：</strong><br>
+  <code>P(x_t | z_{1:t}, u_{1:t}) ∝ P(z_t | x_t, m) * P(x_t | x_{t-1}, u_t) * P(x_{t-1} | z_{1:t-1}, u_{1:t-1})</code><br>
+  其中：<br>
+  <ul>
+    <li><code>x_t</code>：t时刻的位姿</li>
+    <li><code>z_t</code>：t时刻的激光观测</li>
+    <li><code>u_t</code>：t时刻的里程计控制</li>
+    <li><code>m</code>：地图</li>
+  </ul>
+</div>
+
+<p>嗯，这里要注意：Gmapping之所以比早期的粒子滤波SLAM效果好，是因为它引入了“改进的提议分布”和“自适应重采样”。这两个改进，说白了就是让粒子更聪明地集中在高概率区域，而不是盲目撒网。</p>
+
+<h3>8.2 改进的提议分布</h3>
+
+<p>传统的粒子滤波直接用里程计模型作为提议分布。但里程计有累积误差，时间一长粒子就飘得没边了。</p>
+
+<p>Gmapping的做法是：把最近的激光观测也考虑进来。具体来说，它会在当前粒子附近，根据激光匹配得分，生成一个高斯分布。然后从这个高斯分布里采样新的粒子。</p>
+
+<p>我在项目中遇到过这样的情况：在长走廊里，里程计漂移很严重，但激光能看到两侧墙壁。Gmapping利用激光信息修正了提议分布，粒子收敛得非常好。换成纯里程计提议分布的话，粒子早就散成一锅粥了。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong> 提议分布的改进是Gmapping的精髓。如果你自己写粒子滤波SLAM，一定要把激光观测融合到提议分布里，别只用里程计。效果天差地别。
+</div>
+
+<h3>8.3 自适应重采样</h3>
+
+<p>重采样是粒子滤波的标配。但Gmapping做了一个很聪明的改进：它不会每帧都重采样。</p>
+
+<p>为什么？因为重采样会丢失粒子的多样性。如果频繁重采样，所有粒子都集中在几个高权重粒子的附近，一旦这些粒子是错的，整个系统就崩了。</p>
+
+<p>Gmapping的做法是：计算粒子的“有效粒子数”（Neff）。当Neff低于某个阈值（通常是粒子数的一半）时，才触发重采样。这样既保证了粒子的多样性，又避免了粒子退化。</p>
+
+<pre><code>// 伪代码：自适应重采样逻辑
+if (neff &lt; particle_num * 0.5) {
+    resample_particles();  // 执行重采样
+} else {
+    // 保持当前粒子集不变，只更新权重
+    update_weights_only();
+}</code></pre>
+
+<p>我曾经调试过一个场景：机器人原地旋转时，激光数据变化剧烈，Neff值骤降。如果不加这个自适应阈值，粒子每帧都在重采样，地图越建越模糊。加了之后，地图清晰度明显提升。</p>
+
+<h3>8.4 代码实现：ROS中的Gmapping</h3>
+
+<p>ROS里集成了Gmapping的现成包，叫<code>gmapping</code>。但如果你想真正理解它，我建议你读一读源码。核心文件就几个：</p>
+
+<ul>
+  <li><code>gridslamprocessor.h/.cpp</code>：粒子滤波主循环</li>
+  <li><code>gridslamprocessor_tree.cpp</code>：粒子树的维护</li>
+  <li><code>scanmatcher.cpp</code>：激光扫描匹配</li>
+</ul>
+
+<p>启动一个Gmapping节点的典型launch文件如下：</p>
+
+<pre><code>&lt;launch&gt;
+  &lt;node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen"&gt;
+    &lt;param name="base_frame" value="base_footprint"/&gt;
+    &lt;param name="odom_frame" value="odom"/&gt;
+    &lt;param name="map_frame" value="map"/&gt;
+    &lt;param name="map_update_interval" value="5.0"/&gt;
+    &lt;param name="maxUrange" value="5.0"/&gt;
+    &lt;param name="particles" value="30"/&gt;
+    &lt;param name="srr" value="0.01"/&gt;
+    &lt;param name="srt" value="0.02"/&gt;
+    &lt;param name="str" value="0.01"/&gt;
+    &lt;param name="stt" value="0.02"/&gt;
+    &lt;param name="linearUpdate" value="1.0"/&gt;
+    &lt;param name="angularUpdate" value="0.5"/&gt;
+    &lt;param name="temporalUpdate" value="3.0"/&gt;
+    &lt;param name="resampleThreshold" value="0.5"/&gt;
+  &lt;/node&gt;
+&lt;/launch&gt;</code></pre>
+
+<p>这里我重点说几个参数：</p>
+
+<table>
+  <tr>
+    <th>参数名</th>
+    <th>作用</th>
+    <th>我的建议值</th>
+  </tr>
+  <tr>
+    <td><code>particles</code></td>
+    <td>粒子数量</td>
+    <td>30~80。室内小场景30够用，大场景建议50以上</td>
+  </tr>
+  <tr>
+    <td><code>linearUpdate</code></td>
+    <td>机器人移动多少米触发一次更新</td>
+    <td>0.5~1.0。太小了计算量大，太大了地图更新滞后</td>
+  </tr>
+  <tr>
+    <td><code>angularUpdate</code></td>
+    <td>机器人旋转多少弧度触发一次更新</td>
+    <td>0.3~0.5。转弯时建议小一点</td>
+  </tr>
+  <tr>
+    <td><code>srr/srt/str/stt</code></td>
+    <td>里程计噪声模型参数</td>
+    <td>根据实际机器人调。轮式机器人通常0.01~0.05</td>
+  </tr>
+  <tr>
+    <td><code>maxUrange</code></td>
+    <td>激光最大有效距离</td>
+    <td>比激光雷达实际量程小0.5米，避免边缘噪声</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经把<code>particles</code>设到200，以为粒子越多越准。结果地图是准了，但CPU跑满，实时性完全跟不上。后来发现对于2D室内场景，30~50个粒子完全够用。别盲目堆粒子数。
+</div>
+
+<h3>8.5 参数调优实战经验</h3>
+
+<p>调参是门手艺活。我总结了一套“三步走”的方法：</p>
+
+<ol>
+  <li><strong>先调里程计噪声</strong>：让机器人走直线，看地图有没有弯曲。如果有，增大<code>srr</code>和<code>srt</code>。</li>
+  <li><strong>再调更新频率</strong>：<code>linearUpdate</code>和<code>angularUpdate</code>设小一点，观察地图是否抖动。抖动就调大。</li>
+  <li><strong>最后调粒子数</strong>：从30开始，逐步增加，直到地图质量不再明显提升为止。</li>
+</ol>
+
+<p>我记得有一次在工厂里调试AGV，地面是环氧树脂，反光很严重。激光打到地面上的点全是噪声。我一开始怎么调参数都不行，后来把<code>maxUrange</code>从10米降到4米，把地面反射点过滤掉，地图瞬间就干净了。</p>
+
+<p>你想想看，有时候问题不在算法本身，而在数据质量。Gmapping再强，也架不住烂数据。</p>
+
+<h3>8.6 Gmapping的局限性</h3>
+
+<p>虽然Gmapping经典，但它不是万能的。我简单列几个痛点：</p>
+
+<ul>
+  <li><strong>不擅长闭环检测</strong>：Gmapping没有显式的闭环优化模块。如果机器人走大圈，累积误差会越来越大。</li>
+  <li><strong>对计算资源敏感</strong>：粒子数一多，CPU就扛不住。不适合超大规模地图。</li>
+  <li><strong>依赖里程计</strong>：如果里程计质量太差（比如打滑严重的轮式机器人），Gmapping效果会大打折扣。</li>
+</ul>
+
+<p>所以现在很多项目开始转向Cartographer或Karto。但话说回来，理解Gmapping依然是理解现代SLAM的基石。你把它吃透了，再看其他算法，会发现很多思想都是相通的。</p>
+
+<div class="highlight">
+  <strong>一句话总结：</strong> Gmapping用粒子滤波解决了“我在哪”和“周围长啥样”两个问题。改进的提议分布和自适应重采样是它的两大杀器。调参时，先调里程计噪声，再调更新频率，最后调粒子数。
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Gmapping算法核心逻辑流程图</text>
+  
+  <!-- 输入 -->
+  <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" fill="white" font-size="14">激光数据 + 里程计</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤1：提议分布 -->
+  <rect x="250" y="140" width="300" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" fill="white" font-size="14">步骤1：改进的提议分布（融合激光观测）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2：权重更新 -->
+  <rect x="250" y="220" width="300" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" fill="white" font-size="14">步骤2：计算粒子权重（激光匹配得分）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="270" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断：是否重采样 -->
+  <polygon points="400,300 480,330 400,360 320,330" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="335" text-anchor="middle" fill="white" font-size="12">Neff &lt; 阈值？</text>
+  
+  <!-- 是 -->
+  <line x1="480" y1="330" x2="550" y2="330" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="550" y="310" width="150" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="625" y="335" text-anchor="middle" fill="white" font-size="12">执行重采样</text>
+  
+  <!-- 否 -->
+  <line x1="320" y1="330" x2="250" y2="330" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="100" y="310" width="150" height="40" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="175" y="335" text-anchor="middle" fill="white" font-size="12">保持粒子集不变</text>
+  
+  <!-- 汇聚箭头 -->
+  <line x1="175" y1="350" x2="175" y2="380" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="625" y1="350" x2="625" y2="380" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="175" y1="380" x2="625" y2="380" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="400" y1="380" x2="400" y2="390" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="300" y="390" width="200" height="40" rx="8" fill="#34495e" stroke="#2c3e50" stroke-width="2"/>
+  <text x="400" y="415" text-anchor="middle" fill="white" font-size="14">输出：更新后的地图与位姿</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把Gmapping的核心流程串起来了。你从激光和里程计输入开始，经过改进的提议分布、权重更新，再到自适应重采样的判断，最后输出地图和位姿。每一步都环环相扣。</p>
+
+<p>好了，Gmapping的原理和实战就聊到这儿。下一节我们继续讲激光SLAM的下半部分——Cartographer，看看它是怎么解决Gmapping那些痛点的。</p>
+
+<div class="footer-nav">
+            <a href="07SlamOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09LaserSlamPart2.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

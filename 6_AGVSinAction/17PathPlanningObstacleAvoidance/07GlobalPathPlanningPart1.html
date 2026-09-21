@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 全局路径规划算法（一）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="active">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 全局路径规划算法（一）：Dijkstra算法原理、伪代码、优缺点分析</h2>
+
+<p>各位做AGV的朋友，今天我们来聊聊路径规划里最经典的一个算法——Dijkstra。说实话，我入行那会儿，第一个认真啃下来的算法就是它。那时候还在做仓储机器人，导航地图就几十个节点，用Dijkstra跑起来绰绰有余。现在回想起来，这个算法虽然简单，但它的思想贯穿了整个路径规划领域。</p>
+
+<p>你想想看，一个算法能活六十多年，至今还在各种导航系统里被广泛使用，肯定有它的独到之处。今天我就带大家把Dijkstra的底裤扒干净，从原理到实现，再到实际项目中的坑，一次性说透。</p>
+
+<h3>7.1 算法核心思想</h3>
+
+<p>Dijkstra算法要解决什么问题？说白了就是：<strong>在带权图中，找到从起点到所有其他节点的最短路径</strong>。</p>
+
+<p>它的核心逻辑其实特别朴素——像水波一样，从起点一圈一圈往外扩散，每次只走当前已知最短的路径。嗯，这里要注意，它要求图中所有边的权重不能为负数。为什么？我后面会讲。</p>
+
+<p>我个人习惯把Dijkstra理解成「贪心+动态规划」的混合体。贪心体现在每次选当前最优的节点，动态规划体现在用子问题的最优解来构造全局最优解。</p>
+
+<div class="highlight">
+  <p><strong>核心思想一句话：</strong>每次从未访问的节点中，选择距离起点最近的节点，然后通过它去更新邻居节点的距离。</p>
+</div>
+
+<h3>7.2 算法详细步骤</h3>
+
+<p>咱们一步步拆解，我尽量用大白话讲清楚：</p>
+
+<ol>
+  <li><strong>初始化</strong>：把起点到自己的距离设为0，到其他所有节点的距离设为无穷大。所有节点标记为「未访问」。</li>
+  <li><strong>选当前节点</strong>：从所有未访问的节点中，挑出距离起点最近的那个。第一次选到的肯定是起点本身。</li>
+  <li><strong>更新邻居</strong>：遍历当前节点的所有邻居，计算「起点到当前节点的距离 + 当前节点到邻居的边的权重」。如果这个值比之前记录的邻居距离小，就更新它。</li>
+  <li><strong>标记已访问</strong>：当前节点标记为「已访问」，以后不再考虑它。</li>
+  <li><strong>重复</strong>：重复步骤2-4，直到所有节点都被访问过，或者目标节点被访问到（可以提前终止）。</li>
+</ol>
+
+<p>我在项目中遇到过一个问题：当图特别大时，每次都从所有未访问节点里找最小值，效率会非常低。所以实际工程中，我们一般用优先队列（最小堆）来优化这一步。</p>
+
+<h3>7.3 伪代码实现</h3>
+
+<p>下面是我手写的伪代码风格，跟实际C++/Python实现很接近。你可以直接照着这个思路去写代码：</p>
+
+<pre><code>function Dijkstra(Graph, source):
+    // 初始化
+    dist[source] = 0
+    for each vertex v in Graph:
+        if v != source:
+            dist[v] = INFINITY
+        visited[v] = false
+        prev[v] = null  // 记录前驱节点，用于回溯路径
+    
+    // 创建优先队列，按距离排序
+    pq = new MinHeap()
+    pq.push((0, source))
+    
+    while pq is not empty:
+        // 取出距离最小的节点
+        (d, u) = pq.pop()
+        
+        // 如果节点已访问，跳过（防止重复处理）
+        if visited[u] == true:
+            continue
+        visited[u] = true
+        
+        // 遍历邻居
+        for each neighbor v of u:
+            if visited[v] == false:
+                newDist = dist[u] + weight(u, v)
+                if newDist &lt; dist[v]:
+                    dist[v] = newDist
+                    prev[v] = u
+                    pq.push((newDist, v))
+    
+    return dist, prev</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>实际编码时，我建议用 <code>std::priority_queue</code>（C++）或 <code>heapq</code>（Python）来实现优先队列。但要注意，这些库默认是大顶堆，需要自定义比较器或者存负值来模拟小顶堆。</p>
+</div>
+
+<h3>7.4 图解算法流程</h3>
+
+<p>光说理论太枯燥，我画了一张流程图，帮你把整个逻辑串起来。这张图是我做课程时反复修改过的，力求清晰直观：</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f9fafb; border-radius:8px;">
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">Dijkstra算法流程图</text>
+  
+  <!-- 开始 -->
+  <rect x="280" y="55" width="160" height="40" rx="20" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="80" text-anchor="middle" fill="white" font-size="14" font-weight="bold">开始</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="95" x2="360" y2="120" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 初始化 -->
+  <rect x="260" y="120" width="200" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="140" text-anchor="middle" fill="#2c3e50" font-size="13">初始化dist数组</text>
+  <text x="360" y="157" text-anchor="middle" fill="#2c3e50" font-size="13">起点dist=0，其余INF</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="165" x2="360" y2="190" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断队列是否为空 -->
+  <polygon points="360,195 480,230 360,265 240,230" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="360" y="225" text-anchor="middle" fill="white" font-size="13" font-weight="bold">优先队列</text>
+  <text x="360" y="242" text-anchor="middle" fill="white" font-size="13" font-weight="bold">为空？</text>
+  
+  <!-- 是 - 结束 -->
+  <line x1="240" y1="230" x2="120" y2="230" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="40" y="210" width="80" height="40" rx="20" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="80" y="235" text-anchor="middle" fill="white" font-size="14" font-weight="bold">结束</text>
+  
+  <!-- 否 - 取出最小节点 -->
+  <line x1="480" y1="230" x2="560" y2="230" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="560" y="210" width="140" height="40" rx="6" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="630" y="235" text-anchor="middle" fill="white" font-size="13" font-weight="bold">取出dist最小节点u</text>
+  
+  <!-- 箭头 -->
+  <line x1="630" y1="250" x2="630" y2="290" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断是否已访问 -->
+  <polygon points="630,295 720,325 630,355 540,325" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="630" y="320" text-anchor="middle" fill="white" font-size="13" font-weight="bold">节点u</text>
+  <text x="630" y="337" text-anchor="middle" fill="white" font-size="13" font-weight="bold">已访问？</text>
+  
+  <!-- 是 - 回到循环 -->
+  <line x1="540" y1="325" x2="480" y2="325" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="480" y1="325" x2="480" y2="230" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="500" y="315" fill="#7f8c8d" font-size="11">是，跳过</text>
+  
+  <!-- 否 - 标记已访问 -->
+  <line x1="720" y1="325" x2="760" y2="325" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="760" y="305" width="120" height="40" rx="6" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="820" y="330" text-anchor="middle" fill="white" font-size="13" font-weight="bold">标记u为已访问</text>
+  
+  <!-- 箭头 -->
+  <line x1="820" y1="345" x2="820" y2="390" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 遍历邻居 -->
+  <rect x="740" y="390" width="160" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="820" y="410" text-anchor="middle" fill="#2c3e50" font-size="13">遍历u的所有邻居v</text>
+  <text x="820" y="427" text-anchor="middle" fill="#2c3e50" font-size="13">计算newDist = dist[u] + w</text>
+  
+  <!-- 箭头 -->
+  <line x1="820" y1="435" x2="820" y2="465" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断是否更新 -->
+  <polygon points="820,470 900,495 820,520 740,495" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="820" y="492" text-anchor="middle" fill="white" font-size="12" font-weight="bold">newDist &lt; dist[v]？</text>
+  
+  <!-- 是 - 更新 -->
+  <line x1="900" y1="495" x2="960" y2="495" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="960" y="475" width="120" height="40" rx="6" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="1020" y="500" text-anchor="middle" fill="white" font-size="13" font-weight="bold">更新dist[v]和prev[v]</text>
+  
+  <!-- 箭头 -->
+  <line x1="1020" y1="515" x2="1020" y2="545" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 入队 -->
+  <rect x="960" y="545" width="120" height="40" rx="6" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="1020" y="570" text-anchor="middle" fill="white" font-size="13" font-weight="bold">将v加入优先队列</text>
+  
+  <!-- 回到循环 -->
+  <line x1="960" y1="565" x2="630" y2="565" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="630" y1="565" x2="630" y2="355" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  
+  <!-- 否 - 跳过 -->
+  <line x1="740" y1="495" x2="630" y2="495" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="630" y1="495" x2="630" y2="355" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="680" y="485" fill="#7f8c8d" font-size="11">否，不更新</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3>7.5 时间复杂度分析</h3>
+
+<p>这个必须搞清楚，不然你选型的时候会吃亏。我整理了一张表，方便你对比不同实现方式：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>实现方式</th>
+      <th>时间复杂度</th>
+      <th>适用场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>朴素实现（数组遍历找最小）</td>
+      <td>O(V²)</td>
+      <td>节点数少（V &lt; 1000）</td>
+    </tr>
+    <tr>
+      <td>二叉堆优化（优先队列）</td>
+      <td>O((V+E)logV)</td>
+      <td>稀疏图（E ≈ V）</td>
+    </tr>
+    <tr>
+      <td>斐波那契堆优化</td>
+      <td>O(VlogV + E)</td>
+      <td>稠密图（E ≈ V²）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>实际项目中，我99%的情况都用二叉堆实现。斐波那契堆虽然理论更快，但常数大、实现复杂，性价比不高。你想想看，谁会为了省那点时间，去维护一个容易出bug的数据结构？</p>
+
+<h3>7.6 优缺点分析</h3>
+
+<p>做了这么多年AGV，我对Dijkstra的感情很复杂。它可靠，但有时候又让人又爱又恨。</p>
+
+<h4>优点</h4>
+<ul>
+  <li><strong>保证最优解</strong>：只要图里没有负权边，它一定能找到最短路径。这一点在工业场景里非常重要——我们做AGV导航，安全性和可靠性是第一位的。</li>
+  <li><strong>实现简单</strong>：代码量少，逻辑清晰，团队里的新人也能快速上手维护。</li>
+  <li><strong>稳定性好</strong>：不会出现震荡或者不收敛的情况。我曾经在一个项目里用A*算法，启发式函数没调好，路径老是跳变，最后换回Dijkstra才稳定下来。</li>
+</ul>
+
+<h4>缺点</h4>
+<ul>
+  <li><strong>效率偏低</strong>：没有目标导向，会向所有方向扩散。在大型地图上，它可能会探索很多无关区域。</li>
+  <li><strong>不支持负权边</strong>：这是硬伤。如果图里有负权边，Dijkstra会给出错误结果。这时候得用Bellman-Ford算法。</li>
+  <li><strong>内存占用</strong>：需要维护dist数组和visited数组，对于超大规模图（比如上百万节点），内存压力不小。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中，地图里有一条「下坡路」被建模成了负权边。结果Dijkstra跑出来的路径完全不对，排查了半天才发现问题。所以，<strong>建图的时候一定要确保所有边的权重非负</strong>。如果业务上确实需要负权，那就换算法吧。</p>
+</div>
+
+<h3>7.7 在AGV中的应用场景</h3>
+
+<p>Dijkstra在AGV领域最常见的用法，就是<strong>静态环境下的全局路径规划</strong>。比如：</p>
+
+<ul>
+  <li><strong>仓储地图预计算</strong>：仓库的布局相对固定，我们可以提前用Dijkstra算出所有节点对之间的最短路径，存成查找表。AGV运行时直接查表，速度飞快。</li>
+  <li><strong>多AGV协同</strong>：在调度系统中，用Dijkstra为每台AGV规划初始路径，然后再做冲突解决。</li>
+  <li><strong>拓扑地图导航</strong>：当AGV的工作区域被抽象成拓扑图（节点代表关键位置，边代表可行路径）时，Dijkstra是首选算法。</li>
+</ul>
+
+<p>不过要注意，如果环境是动态变化的（比如有临时障碍物），Dijkstra就不太合适了。这时候需要结合局部规划器，或者用D* Lite这类增量式算法。</p>
+
+<h3>7.8 个人经验总结</h3>
+
+<p>讲了这么多，最后分享几点我的实战心得：</p>
+
+<ul>
+  <li><strong>优先队列的重复节点问题</strong>：用二叉堆实现时，同一个节点可能会被多次加入队列。一定要在弹出时检查visited标记，否则会多出很多无效计算。</li>
+  <li><strong>路径回溯</strong>：Dijkstra只给出距离值，要得到具体路径，需要维护prev数组。回溯时从目标节点反向走到起点，然后反转一下。</li>
+  <li><strong>提前终止</strong>：如果只需要起点到某个目标点的路径，可以在目标节点被访问到时立即停止。这样能节省大量计算。</li>
+  <li><strong>地图预处理</strong>：对于超大图，建议先用连通分量分析，把不可达的区域排除掉。不然Dijkstra会在死胡同里浪费很多时间。</li>
+</ul>
+
+<p>好了，关于Dijkstra算法，今天就聊到这里。这个算法虽然基础，但吃透了它，后面学A*、D*、RRT*都会轻松很多。下一章我们会讲A*算法，看看它是怎么在Dijkstra的基础上加入启发式信息，让搜索更有方向感的。</p>
+
+<hr style="border:1px solid #eee; margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="06SlamMappingBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08GlobalPathPlanningPart2.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

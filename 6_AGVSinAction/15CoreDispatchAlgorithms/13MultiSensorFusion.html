@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 多传感器融合</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="active">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 多传感器融合——让AGV真正“看清”世界</h2>
+
+<p>各位同学，今天我们来聊一个非常核心的话题——多传感器融合。说实话，我做了这么多年AGV调度系统，见过太多“单传感器翻车”的案例了。你想想看，如果只靠激光雷达，遇到玻璃墙怎么办？只靠编码器，轮子打滑了怎么办？所以，多传感器融合不是“锦上添花”，而是“雪中送炭”。</p>
+
+<h3>13.1 传感器类型：各有各的脾气</h3>
+
+<p>先说说我们常用的三种传感器。我个人习惯把它们比作“三兄弟”——各有长处，也各有短板。</p>
+
+<h4>13.1.1 激光雷达（LiDAR）</h4>
+
+<p>激光雷达是AGV的“眼睛”。它通过发射激光束并测量反射时间，来获取周围环境的点云数据。精度高、范围广，但遇到透明物体（比如玻璃）或者强光环境，就容易“瞎掉”。</p>
+
+<p><strong>我在项目中遇到过</strong>：有一次在仓库里，AGV对着玻璃门直接撞了上去。后来一查，激光雷达把玻璃当成了“不存在”。从那以后，我坚持必须加IMU做辅助。</p>
+
+<div class="highlight">
+  <strong>关键参数：</strong>
+  <ul>
+    <li>测量范围：通常10-50米</li>
+    <li>角度分辨率：0.1°-1°</li>
+    <li>更新频率：10-20Hz</li>
+  </ul>
+</div>
+
+<h4>13.1.2 IMU（惯性测量单元）</h4>
+
+<p>IMU是AGV的“内耳”。它测量加速度和角速度，用来推算姿态和位置。优点是更新频率高（100-400Hz），不受外界环境影响。但缺点也很明显——误差会随时间累积，也就是“漂移”。</p>
+
+<p><strong>我曾经</strong>做过一个测试：只用IMU跑30秒，位置误差就超过了1米。所以IMU必须和其他传感器配合使用。</p>
+
+<h4>13.1.3 编码器</h4>
+
+<p>编码器装在电机或轮子上，测量旋转角度和速度。它是最“老实”的传感器，成本低、可靠性高。但问题在于——轮子打滑、地面不平都会导致误差。</p>
+
+<p>你想想看，如果AGV在湿滑地面上行驶，编码器告诉你“走了1米”，实际上可能只走了0.8米。这就是所谓的“滑移误差”。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>传感器</th>
+      <th>优点</th>
+      <th>缺点</th>
+      <th>典型频率</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>激光雷达</td>
+      <td>精度高、范围广</td>
+      <td>受环境光影响、无法检测透明物体</td>
+      <td>10-20Hz</td>
+    </tr>
+    <tr>
+      <td>IMU</td>
+      <td>高频、不受外界干扰</td>
+      <td>漂移严重</td>
+      <td>100-400Hz</td>
+    </tr>
+    <tr>
+      <td>编码器</td>
+      <td>成本低、可靠</td>
+      <td>滑移误差、累积误差</td>
+      <td>50-200Hz</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>13.2 卡尔曼滤波原理：从“猜”到“信”</h3>
+
+<p>好了，传感器数据都有了，怎么融合呢？这里就要请出我们的主角——卡尔曼滤波。</p>
+
+<p>说白了，卡尔曼滤波就是“用数学方法做最优估计”。它不依赖历史数据，只根据当前观测和上一时刻的估计，就能算出当前最可能的状态。</p>
+
+<h4>13.2.1 核心思想：预测+更新</h4>
+
+<p>卡尔曼滤波就两步：</p>
+<ol>
+  <li><strong>预测</strong>：根据上一时刻的状态和控制输入，猜一下当前状态。</li>
+  <li><strong>更新</strong>：用当前传感器的观测值，修正这个猜测。</li>
+</ol>
+
+<p>嗯，这里要注意：预测和更新之间有个“权重”问题。如果传感器很准，就多信观测；如果模型很准，就多信预测。这个权重就是卡尔曼增益。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>卡尔曼增益的调参是门手艺活。我一般先让系统跑几圈，记录下误差特性，再反推噪声协方差矩阵。千万别拍脑袋设参数，否则会“发散”。
+</div>
+
+<h4>13.2.2 数学公式（简化版）</h4>
+
+<p>我知道有些同学看到公式就头疼。没关系，我们只讲核心：</p>
+
+<pre><code>预测阶段：
+  x_pred = A * x_prev + B * u
+  P_pred = A * P_prev * A^T + Q
+
+更新阶段：
+  K = P_pred * H^T * (H * P_pred * H^T + R)^(-1)
+  x_est = x_pred + K * (z - H * x_pred)
+  P_est = (I - K * H) * P_pred</code></pre>
+
+<p>其中：</p>
+<ul>
+  <li><code>x</code>：状态向量（位置、速度等）</li>
+  <li><code>P</code>：误差协方差矩阵</li>
+  <li><code>Q</code>：过程噪声（模型不准的程度）</li>
+  <li><code>R</code>：观测噪声（传感器不准的程度）</li>
+  <li><code>K</code>：卡尔曼增益</li>
+</ul>
+
+<p><strong>为什么会这样？</strong>因为卡尔曼滤波本质上是在最小化估计误差的方差。你想想看，如果传感器噪声R很大，K就会变小，系统更相信预测；反之亦然。</p>
+
+<h3>13.3 融合定位实现：把理论变成代码</h3>
+
+<p>理论讲完了，我们来点实际的。下面是我在项目中用过的融合定位框架。</p>
+
+<h4>13.3.1 系统架构</h4>
+
+<p>先画个图，让大家有个整体认识：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 传感器输入 -->
+  <rect x="50" y="50" width="120" height="50" rx="8" fill="#87ceeb" stroke="#4682b4" stroke-width="2"/>
+  <text x="110" y="80" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">激光雷达</text>
+  
+  <rect x="50" y="130" width="120" height="50" rx="8" fill="#98fb98" stroke="#3cb371" stroke-width="2"/>
+  <text x="110" y="160" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">IMU</text>
+  
+  <rect x="50" y="210" width="120" height="50" rx="8" fill="#ffd700" stroke="#daa520" stroke-width="2"/>
+  <text x="110" y="240" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">编码器</text>
+  
+  <!-- 箭头 -->
+  <line x1="170" y1="75" x2="250" y2="75" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="170" y1="155" x2="250" y2="155" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="170" y1="235" x2="250" y2="235" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- 数据预处理 -->
+  <rect x="250" y="50" width="140" height="200" rx="8" fill="#ffe4b5" stroke="#d2691e" stroke-width="2"/>
+  <text x="320" y="100" text-anchor="middle" fill="#8b4513" font-size="13" font-weight="bold">数据预处理</text>
+  <text x="320" y="130" text-anchor="middle" fill="#8b4513" font-size="11">时间戳对齐</text>
+  <text x="320" y="155" text-anchor="middle" fill="#8b4513" font-size="11">坐标系统一</text>
+  <text x="320" y="180" text-anchor="middle" fill="#8b4513" font-size="11">异常值剔除</text>
+  <text x="320" y="205" text-anchor="middle" fill="#8b4513" font-size="11">降采样</text>
+  
+  <!-- 箭头 -->
+  <line x1="390" y1="150" x2="460" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 卡尔曼滤波 -->
+  <rect x="460" y="50" width="160" height="200" rx="8" fill="#dda0dd" stroke="#9932cc" stroke-width="2"/>
+  <text x="540" y="100" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">卡尔曼滤波</text>
+  <text x="540" y="130" text-anchor="middle" fill="#fff" font-size="11">状态预测</text>
+  <text x="540" y="155" text-anchor="middle" fill="#fff" font-size="11">观测更新</text>
+  <text x="540" y="180" text-anchor="middle" fill="#fff" font-size="11">协方差更新</text>
+  <text x="540" y="205" text-anchor="middle" fill="#fff" font-size="11">输出最优估计</text>
+  
+  <!-- 箭头 -->
+  <line x1="620" y1="150" x2="690" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="690" y="100" width="100" height="100" rx="8" fill="#ff6347" stroke="#dc143c" stroke-width="2"/>
+  <text x="740" y="140" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">融合位置</text>
+  <text x="740" y="165" text-anchor="middle" fill="#fff" font-size="11">(x, y, θ)</text>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" text-anchor="middle" fill="#333" font-size="18" font-weight="bold">多传感器融合定位系统架构</text>
+</svg>
+
+<h4>13.3.2 代码实现（Python伪代码）</h4>
+
+<p>下面是我常用的一个简化版融合定位类。注意，这里只展示核心逻辑：</p>
+
+<pre><code>class MultiSensorFusion:
+    def __init__(self):
+        # 状态向量: [x, y, theta, vx, vy, omega]
+        self.x = np.zeros(6)
+        # 误差协方差
+        self.P = np.eye(6) * 0.1
+        # 过程噪声
+        self.Q = np.diag([0.05, 0.05, 0.01, 0.1, 0.1, 0.02])
+        # 观测噪声（不同传感器不同）
+        self.R_lidar = np.diag([0.1, 0.1, 0.02])
+        self.R_imu = np.diag([0.5, 0.5, 0.1])
+        self.R_encoder = np.diag([0.2, 0.2, 0.05])
+        
+    def predict(self, dt, u):
+        """预测阶段：根据控制输入u和dt更新状态"""
+        # 运动模型（简化版）
+        self.x[0] += self.x[3] * dt  # x位置
+        self.x[1] += self.x[4] * dt  # y位置
+        self.x[2] += self.x[5] * dt  # 朝向角
+        # 更新协方差
+        F = np.eye(6)  # 雅可比矩阵（简化）
+        self.P = F @ self.P @ F.T + self.Q
+        
+    def update(self, z, sensor_type):
+        """更新阶段：根据传感器观测值z修正状态"""
+        if sensor_type == 'lidar':
+            R = self.R_lidar
+            H = self._get_H_lidar()  # 观测矩阵
+        elif sensor_type == 'imu':
+            R = self.R_imu
+            H = self._get_H_imu()
+        else:  # encoder
+            R = self.R_encoder
+            H = self._get_H_encoder()
+            
+        # 卡尔曼增益
+        K = self.P @ H.T @ np.linalg.inv(H @ self.P @ H.T + R)
+        # 状态更新
+        self.x = self.x + K @ (z - H @ self.x)
+        # 协方差更新
+        self.P = (np.eye(6) - K @ H) @ self.P
+        
+    def get_pose(self):
+        """获取融合后的位姿"""
+        return self.x[0:3]  # 返回 (x, y, theta)</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong>实际项目中，运动模型和观测模型都是非线性的，需要用扩展卡尔曼滤波（EKF）或无迹卡尔曼滤波（UKF）。上面的代码只是教学演示，千万别直接用在产品里！
+</div>
+
+<h4>13.3.3 时间同步问题</h4>
+
+<p>嗯，这里有个坑——不同传感器的采样频率不一样。激光雷达10Hz，IMU 200Hz，编码器100Hz。如果不做时间同步，融合出来的结果会“串味”。</p>
+
+<p><strong>我的做法是：</strong></p>
+<ul>
+  <li>以IMU为基准，因为它频率最高</li>
+  <li>每次收到激光雷达数据时，先做一次预测，再用激光数据更新</li>
+  <li>编码器数据则作为“控制输入”的一部分，参与预测阶段</li>
+</ul>
+
+<p>说白了，就是“高频预测，低频更新”。这样既保证了实时性，又保证了精度。</p>
+
+<h3>13.4 避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<div class="tip">
+  <strong>我曾经</strong>在一个项目中，把激光雷达的观测噪声设得太小，结果卡尔曼滤波完全跟着激光走，IMU和编码器等于没用。后来发现，激光雷达在仓库角落有严重的多路径效应，导致定位跳变。解决办法是：根据激光点的置信度动态调整R矩阵。
+</div>
+
+<div class="warning">
+  <strong>另一个坑：</strong>IMU的零偏校准。如果IMU没有做零偏补偿，积分出来的位置会漂移得很快。我建议每次AGV启动时，先静止5秒，采集IMU的零偏值。
+</div>
+
+<p>好了，这一章的内容就到这里。多传感器融合是个系统工程，需要理论、代码和现场调试的配合。希望今天的分享能帮到你。</p>
+
+<div class="footer-nav">
+            <a href="12LocalizationNav.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14KinematicModel.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

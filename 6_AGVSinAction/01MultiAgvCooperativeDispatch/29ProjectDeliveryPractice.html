@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 项目实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="active">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 项目实战——从需求分析到系统交付全流程</h2>
+
+<p>终于走到这一步了。</p>
+<p>前面28章，我们把AGV调度系统的每个零件都拆开讲了一遍。从单车控制到多车协同，从路径规划到死锁避免，从仿真到真车调试。说实话，能坚持到这里的同学，已经具备了独立搭建一套调度系统的能力。</p>
+<p>但有个问题——<strong>会做零件，不等于会造车</strong>。</p>
+<p>这一章，我们就来走一遍完整的项目流程。从客户说“我要一套AGV调度系统”开始，到系统上线跑起来为止。我会用我亲身经历的一个项目做蓝本，把每个阶段的坑、经验、套路都抖出来。</p>
+
+<hr />
+
+<h3>29.1 需求分析：别急着写代码</h3>
+
+<p>我记得第一次带项目时，客户说“你们先做，需求我们边做边提”。结果呢？三个月后需求翻了三倍，代码重写了四遍。从那以后，我养成了一个习惯——<strong>需求阶段花多少时间，开发阶段就能省多少时间</strong>。</p>
+
+<h4>29.1.1 搞清楚三个核心问题</h4>
+
+<p>每次接项目，我都会先问自己三个问题：</p>
+<ul>
+    <li><strong>运什么？</strong>——物料类型、重量、尺寸、是否易碎</li>
+    <li><strong>从哪到哪？</strong>——地图布局、站点数量、路径拓扑</li>
+    <li><strong>多快多密？</strong>——节拍要求、同时运行车辆数、峰值流量</li>
+</ul>
+
+<p>这三个问题搞不清楚，后面全是白干。我曾经遇到一个客户，说“就运点小零件”，结果到现场一看，是两米长的钢轴，AGV的货架根本放不下。嗯，那项目最后改方案改了一个月。</p>
+
+<h4>29.1.2 输出需求文档</h4>
+
+<p>需求分析完成后，我会输出一份《AGV调度系统需求规格说明书》。里面至少包含：</p>
+<ul>
+    <li>系统功能列表（必须、可选、未来）</li>
+    <li>接口定义（与MES/WMS对接方式）</li>
+    <li>性能指标（单机效率、系统吞吐量）</li>
+    <li>异常处理场景（没电了、撞人了、网络断了）</li>
+</ul>
+
+<div class="tip">
+    <strong>我的经验：</strong>需求文档一定要让客户签字确认。不是不信任，而是防止后面扯皮。白纸黑字，大家都省心。
+</div>
+
+<hr />
+
+<h3>29.2 系统设计：画图比写代码更重要</h3>
+
+<p>需求明确了，接下来就是设计阶段。我个人习惯先画架构图，再写代码。架构图就像房子的设计图，你总不能边砌墙边想房间怎么布局吧？</p>
+
+<h4>29.2.1 整体架构设计</h4>
+
+<p>下面这张图，是我做项目时常用的调度系统架构。你可以直接拿来用，根据实际情况调整。</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:20px auto;background:#f9fafb;border-radius:8px;">
+    <rect x="10" y="10" width="700" height="400" fill="none" stroke="#4a90d9" stroke-width="2" rx="8"/>
+    
+    <!-- 顶层：业务系统 -->
+    <rect x="60" y="30" width="600" height="60" rx="6" fill="#e3f2fd" stroke="#1e88e5" stroke-width="1.5"/>
+    <text x="360" y="65" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">业务系统层（MES / WMS / ERP）</text>
+    
+    <!-- 箭头 -->
+    <line x1="360" y1="90" x2="360" y2="120" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 第二层：调度核心 -->
+    <rect x="60" y="120" width="600" height="100" rx="6" fill="#fff3e0" stroke="#fb8c00" stroke-width="1.5"/>
+    <text x="360" y="145" text-anchor="middle" font-size="15" font-weight="bold" fill="#e65100">调度核心层</text>
+    <text x="140" y="175" text-anchor="middle" font-size="13" fill="#bf360c">任务管理</text>
+    <text x="280" y="175" text-anchor="middle" font-size="13" fill="#bf360c">路径规划</text>
+    <text x="420" y="175" text-anchor="middle" font-size="13" fill="#bf360c">交通管制</text>
+    <text x="560" y="175" text-anchor="middle" font-size="13" fill="#bf360c">状态监控</text>
+    <text x="200" y="200" text-anchor="middle" font-size="13" fill="#bf360c">充电管理</text>
+    <text x="360" y="200" text-anchor="middle" font-size="13" fill="#bf360c">异常处理</text>
+    <text x="520" y="200" text-anchor="middle" font-size="13" fill="#bf360c">数据统计</text>
+    
+    <!-- 箭头 -->
+    <line x1="360" y1="220" x2="360" y2="250" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 第三层：通信层 -->
+    <rect x="60" y="250" width="600" height="50" rx="6" fill="#e8f5e9" stroke="#43a047" stroke-width="1.5"/>
+    <text x="360" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="#2e7d32">通信层（TCP / MQTT / HTTP）</text>
+    
+    <!-- 箭头 -->
+    <line x1="360" y1="300" x2="360" y2="330" stroke="#666" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 第四层：设备层 -->
+    <rect x="60" y="330" width="600" height="60" rx="6" fill="#fce4ec" stroke="#e91e63" stroke-width="1.5"/>
+    <text x="360" y="358" text-anchor="middle" font-size="15" font-weight="bold" fill="#c2185b">设备层（AGV本体 / 充电桩 / 呼叫器）</text>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>说白了，这个架构就是四层结构：业务系统发指令，调度核心做决策，通信层传数据，设备层干活。每一层各司其职，互不干扰。</p>
+
+<h4>29.2.2 关键模块设计</h4>
+
+<p>设计阶段，有几个模块我会特别关注：</p>
+<ul>
+    <li><strong>任务队列</strong>：用优先级队列还是FIFO？我建议用优先级+时间戳组合，紧急任务能插队，普通任务按顺序来</li>
+    <li><strong>路径规划</strong>：静态地图还是动态地图？静态的简单，但遇到障碍物就傻眼。动态的复杂，但更实用</li>
+    <li><strong>死锁检测</strong>：这个必须做。我见过一个项目，10台车在交叉口堵成一锅粥，最后只能人工去搬车</li>
+</ul>
+
+<div class="warning">
+    <strong>注意：</strong>设计阶段最容易犯的错误是“过度设计”。别想着一次把所有功能都做全。先跑通核心流程，再迭代优化。我见过太多项目死在“想太多”上。
+</div>
+
+<hr />
+
+<h3>29.3 开发实现：从原型到可运行</h3>
+
+<p>设计文档评审通过后，就进入开发阶段了。我的习惯是<strong>先做原型，再做完整功能</strong>。</p>
+
+<h4>29.3.1 搭建开发环境</h4>
+
+<p>开发环境我一般这样配：</p>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse;width:100%;margin:10px 0;">
+    <tr style="background:#e3f2fd;">
+        <th>组件</th>
+        <th>选型</th>
+        <th>说明</th>
+    </tr>
+    <tr>
+        <td>开发语言</td>
+        <td>Python / Java</td>
+        <td>Python适合快速原型，Java适合生产环境</td>
+    </tr>
+    <tr>
+        <td>数据库</td>
+        <td>PostgreSQL + Redis</td>
+        <td>PostgreSQL存持久数据，Redis做缓存和队列</td>
+    </tr>
+    <tr>
+        <td>通信中间件</td>
+        <td>RabbitMQ / MQTT</td>
+        <td>RabbitMQ适合内部通信，MQTT适合与设备通信</td>
+    </tr>
+    <tr>
+        <td>仿真工具</td>
+        <td>自建仿真器</td>
+        <td>先跑仿真，再上真车</td>
+    </tr>
+</table>
+
+<h4>29.3.2 核心代码示例</h4>
+
+<p>这里我贴一段任务调度的核心逻辑。说白了就是：从队列里拿任务，分配给空闲的AGV，然后监控执行状态。</p>
+
+<pre><code>class TaskScheduler:
+    def __init__(self):
+        self.task_queue = PriorityQueue()
+        self.agv_pool = {}  # agv_id -> AGV对象
+        self.running_tasks = {}  # task_id -> 状态
+    
+    def assign_task(self, task):
+        """分配任务给最合适的AGV"""
+        # 1. 找空闲AGV
+        idle_agvs = [agv for agv in self.agv_pool.values() 
+                     if agv.status == 'idle']
+        if not idle_agvs:
+            # 没空闲的，就排队等着
+            self.task_queue.put(task)
+            return False
+        
+        # 2. 选最近的AGV（贪心策略）
+        best_agv = min(idle_agvs, 
+                       key=lambda agv: self.calc_distance(agv, task.start))
+        
+        # 3. 下发任务
+        best_agv.execute(task)
+        self.running_tasks[task.id] = 'running'
+        return True
+    
+    def calc_distance(self, agv, target):
+        """计算AGV到目标点的距离（简化版）"""
+        # 实际项目中用A*算法算路径长度
+        return abs(agv.x - target.x) + abs(agv.y - target.y)</code></pre>
+
+<p>这段代码看着简单，但实际项目中要考虑的东西多得多。比如：AGV电量不够怎么办？任务执行超时怎么办？多台AGV同时抢一个任务怎么办？</p>
+
+<div class="tip">
+    <strong>避坑指南：</strong>我曾经在任务分配时只考虑了距离最近，结果导致某台AGV一直在干活，其他AGV闲着。后来加了“负载均衡”策略，每台AGV的任务数不能超过阈值。这才解决了问题。
+</div>
+
+<hr />
+
+<h3>29.4 测试验证：仿真先行，真车后上</h3>
+
+<p>代码写完了，别急着上真车。我见过太多人，代码没测就直接跑真车，结果AGV撞墙、撞人、撞货架。嗯，那场面，惨不忍睹。</p>
+
+<h4>29.4.1 仿真测试</h4>
+
+<p>我会先搭一个仿真环境，模拟真实场景：</p>
+<ul>
+    <li><strong>地图仿真</strong>：把真实地图导入，包括站点、路径、障碍物</li>
+    <li><strong>车辆仿真</strong>：模拟AGV的运动学模型，包括加减速、转弯半径</li>
+    <li><strong>任务仿真</strong>：按真实节拍生成任务，看系统能不能扛住</li>
+</ul>
+
+<p>仿真跑个几百轮，把各种异常场景都覆盖到。比如：突然加车、突然减车、网络延迟、任务取消。这些在仿真里跑通了，才能上真车。</p>
+
+<h4>29.4.2 真车调试</h4>
+
+<p>真车调试我一般分三步走：</p>
+<ol>
+    <li><strong>单车调试</strong>：先让一台AGV跑通所有路径，确认导航、定位、通信都没问题</li>
+    <li><strong>双车调试</strong>：两台车在交叉口交互，测试交通管制和避让逻辑</li>
+    <li><strong>多车压力测试</strong>：逐步增加车辆数量，直到达到设计容量</li>
+</ol>
+
+<div class="warning">
+    <strong>注意：</strong>真车调试时，一定要有急停按钮。我有个同事，调试时AGV突然失控，直接冲向货架。还好急停按得快，不然货架倒了，损失几十万。
+</div>
+
+<hr />
+
+<h3>29.5 系统交付：不是代码跑起来就完事了</h3>
+
+<p>系统能跑了，但交付工作才刚刚开始。我总结了一个交付清单，每次照着做：</p>
+
+<h4>29.5.1 交付物清单</h4>
+<ul>
+    <li><strong>可执行程序</strong>：打包好的调度系统，包括安装包和配置文件</li>
+    <li><strong>操作手册</strong>：图文并茂，告诉客户怎么用、怎么配、怎么排查问题</li>
+    <li><strong>运维手册</strong>：系统架构、日志位置、常见故障处理</li>
+    <li><strong>测试报告</strong>：仿真测试和真车测试的结果，证明系统满足需求</li>
+    <li><strong>源代码</strong>：如果合同要求，提供完整源码和编译说明</li>
+</ul>
+
+<h4>29.5.2 现场部署</h4>
+
+<p>部署到客户现场时，我会特别注意：</p>
+<ul>
+    <li><strong>网络环境</strong>：确认WiFi覆盖无死角，延迟在可接受范围内</li>
+    <li><strong>地图校准</strong>：现场地图和设计地图可能有偏差，需要微调</li>
+    <li><strong>人员培训</strong>：教会客户的操作员怎么使用系统，怎么处理常见异常</li>
+</ul>
+
+<p>我记得有一次，系统部署完第二天就出问题了。客户说“AGV不动了”。我远程一看，原来是操作员把急停按钮按下去忘了复位。嗯，从那以后，我在培训时专门强调：<strong>急停按钮按了要复位，不然车不会动</strong>。</p>
+
+<hr />
+
+<h3>29.6 项目复盘：每次交付都是一次成长</h3>
+
+<p>项目交付后，我会做一次复盘。不是走形式，是真的把经验教训记下来。</p>
+
+<p>复盘我会问自己几个问题：</p>
+<ul>
+    <li>需求分析阶段，有没有遗漏关键场景？</li>
+    <li>设计阶段，有没有过度设计或设计不足？</li>
+    <li>开发阶段，有没有走弯路？代码质量如何？</li>
+    <li>测试阶段，有没有漏测的异常场景？</li>
+    <li>交付阶段，客户满意度如何？有没有遗留问题？</li>
+</ul>
+
+<p>这些复盘结果，我会整理成文档，作为下一个项目的参考。说白了，<strong>经验就是这么一点点积累起来的</strong>。</p>
+
+<div class="highlight">
+    <p><strong>总结一下：</strong></p>
+    <p>从需求分析到系统交付，每个阶段都有它的坑。需求阶段别急着写代码，设计阶段别过度设计，开发阶段先做原型再迭代，测试阶段仿真先行真车后上，交付阶段培训到位文档齐全。</p>
+    <p>这套流程，我用了好几年，踩过坑也填过坑。希望能帮你少走一些弯路。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="28OpensourcePractice.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30FutureTrends.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

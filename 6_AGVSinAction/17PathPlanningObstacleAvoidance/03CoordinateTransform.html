@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 坐标变换与空间描述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="active">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 坐标变换与空间描述</h2>
+
+<p>各位同学，大家好。这一章我们聊聊坐标变换。说实话，这是AGV导航里最基础也最容易出错的地方。我见过不少新手，代码写得飞起，结果车跑偏了，最后发现是坐标系搞反了。嗯，咱们今天就把这块彻底理清楚。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>坐标变换的本质，就是用数学语言描述“我在哪，我看哪，我怎么动”。</p>
+</div>
+
+<h3>3.1 二维与三维坐标：从平面到立体</h3>
+
+<p>先说说二维坐标。AGV在工厂里跑，很多时候就是二维平面运动。一个点(x, y)就能定位。但注意，AGV是有朝向的，所以除了位置，还得有个角度θ。这就是我们常说的位姿(x, y, θ)。</p>
+
+<p>到了三维空间，就复杂了。除了x、y、z，还有三个旋转自由度：俯仰、偏航、横滚。我个人习惯把三维坐标想象成“你站在AGV上，看前方、看左右、看上下”。</p>
+
+<p>举个例子。我在项目里调试一台叉车AGV，它要举升货架。二维坐标只能管地面跑，但举升高度、货叉倾斜，这些都得用三维坐标。当时有个坑——传感器装在车顶，但控制点在货叉上，坐标不统一，车差点把货架怼翻。后来怎么解决的？就是老老实实做坐标变换。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>做AGV项目，先画一张坐标系关系图。把车体、传感器、执行器、地图原点都标出来。这一步省不了。</p>
+</div>
+
+<h3>3.2 齐次坐标：为什么需要多一个维度？</h3>
+
+<p>你可能会问：明明三维坐标就够了，为什么搞个四维的齐次坐标？</p>
+
+<p>说白了，就是为了把旋转和平移统一成一个矩阵运算。你想，一个点先旋转再平移，如果用普通坐标，你得先乘旋转矩阵，再加平移向量。两步操作，麻烦。齐次坐标下，一个4x4矩阵搞定一切。</p>
+
+<p>齐次坐标的形式是(x, y, z, w)，其中w通常为1。当w=0时，表示方向向量（无穷远点），这个在表示光线或无穷远方向时很有用。</p>
+
+<pre><code>// 齐次坐标示例：二维点(2,3)的齐次表示为(2,3,1)
+// 变换矩阵 T = [R t; 0 1]
+// 变换后点 = T * 齐次坐标
+
+// 实际代码中，我常用Eigen库：
+Eigen::Vector3d p_homogeneous(2, 3, 1);
+Eigen::Matrix3d T;
+T &lt;&lt; cos(theta), -sin(theta), tx,
+      sin(theta),  cos(theta), ty,
+      0,           0,           1;
+Eigen::Vector3d p_transformed = T * p_homogeneous;
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>齐次坐标的w分量，千万别搞错。w=0和w=1意义完全不同。我曾经在代码里把方向向量当位置向量用，结果AGV定位直接飞了。</p>
+</div>
+
+<h3>3.3 旋转矩阵：最直观的旋转表达</h3>
+
+<p>旋转矩阵，说白了就是一个3x3的正交矩阵，行列式为+1。它描述了一个坐标系相对于另一个坐标系的旋转关系。</p>
+
+<p>二维旋转矩阵很简单：</p>
+<pre><code>R(θ) = [cosθ  -sinθ]
+       [sinθ   cosθ]</code></pre>
+
+<p>三维就复杂了。绕x轴、y轴、z轴的旋转矩阵，分别对应roll、pitch、yaw。我建议你记住一个规律：绕哪个轴转，哪个轴对应的行和列不变，其他四个元素是三角函数。</p>
+
+<p>我记得有一次，团队里新来的同事把绕x轴和绕y轴的矩阵搞混了，结果机械臂抓取时角度全错。排查了一下午，最后发现就是矩阵写反了。从那以后，我要求所有代码里必须注释清楚“绕哪个轴旋转”。</p>
+
+<h3>3.4 欧拉角与四元数：两种旋转的优缺点</h3>
+
+<p>欧拉角直观，但有个致命问题——万向锁。当俯仰角达到±90°时，偏航和横滚会耦合，丢失一个自由度。我在做AGV爬坡时遇到过这个问题，车在陡坡上姿态突然乱跳，就是因为欧拉角在奇异点附近不稳定。</p>
+
+<p>四元数就没有这个问题。它用四个数(q0, q1, q2, q3)表示旋转，没有奇异点，插值也平滑。缺点是直观性差，你没法一眼看出它代表什么角度。</p>
+
+<table>
+  <tr>
+    <th>表达方式</th>
+    <th>优点</th>
+    <th>缺点</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>旋转矩阵</td>
+    <td>计算稳定，可组合</td>
+    <td>9个参数，冗余</td>
+    <td>底层运算</td>
+  </tr>
+  <tr>
+    <td>欧拉角</td>
+    <td>直观，易理解</td>
+    <td>万向锁，插值不平滑</td>
+    <td>人机交互、显示</td>
+  </tr>
+  <tr>
+    <td>四元数</td>
+    <td>无奇异点，插值平滑</td>
+    <td>不直观</td>
+    <td>姿态控制、SLAM</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>内部计算用四元数，显示和调试用欧拉角。ROS里tf默认用四元数，但你可以用<code>tf::getYaw()</code>转成偏航角来看。</p>
+</div>
+
+<h3>3.5 TF树基础：坐标变换的骨架</h3>
+
+<p>TF树，说白了就是一张坐标系关系网。每个坐标系是一个节点，变换关系是边。AGV上可能有十几个坐标系：车体、激光雷达、IMU、轮子、地图原点……它们之间的关系，就是TF树。</p>
+
+<p>TF树有两个核心概念：</p>
+<ul>
+  <li><strong>广播（Broadcaster）：</strong>发布坐标系之间的变换关系</li>
+  <li><strong>监听（Listener）：</strong>查询任意两个坐标系之间的变换</li>
+</ul>
+
+<p>我在项目里遇到过最典型的坑：TF树断链。比如激光雷达的坐标系没连到车体上，那激光数据就没法和地图对齐。排查方法很简单——用<code>tf2_tools</code>里的<code>view_frames</code>命令，生成TF树图，一眼就能看出哪里断了。</p>
+
+<pre><code># 查看TF树的命令
+rosrun tf2_tools view_frames.py
+# 会生成frames.pdf，显示所有坐标系和变换关系
+
+# 代码中监听变换
+tf2_ros::Buffer tf_buffer;
+tf2_ros::TransformListener listener(tf_buffer);
+geometry_msgs::TransformStamped transform;
+try {
+  transform = tf_buffer.lookupTransform("map", "base_link", ros::Time(0));
+} catch (tf2::TransformException &ex) {
+  ROS_WARN("TF lookup failed: %s", ex.what());
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在调试时，发现TF树一直在报“Lookup would require extrapolation into the past”。原因是时间戳没对齐。记住：<code>ros::Time(0)</code>表示取最新数据，但如果你用具体时间戳，一定要确保数据已经到达。</p>
+</div>
+
+<h3>3.6 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的坐标变换知识体系。你可以把它当作本章的思维导图。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="50" text-anchor="middle" fill="white" font-size="18" font-weight="bold">坐标变换与空间描述</text>
+  
+  <!-- 分支线 -->
+  <line x1="400" y1="70" x2="400" y2="100" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="100" x2="130" y2="100" stroke="#4a90d9" stroke-width="2"/>
+  <line x1="400" y1="100" x2="670" y2="100" stroke="#4a90d9" stroke-width="2"/>
+  
+  <!-- 左分支：坐标系统 -->
+  <rect x="30" y="100" width="200" height="40" rx="10" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="130" y="125" text-anchor="middle" fill="#2c5f8a" font-size="14" font-weight="bold">坐标系统</text>
+  
+  <line x1="130" y1="140" x2="130" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="170" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="130" y="190" text-anchor="middle" fill="#333" font-size="12">二维坐标 (x, y, θ)</text>
+  
+  <line x1="130" y1="200" x2="130" y2="220" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="220" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="130" y="240" text-anchor="middle" fill="#333" font-size="12">三维坐标 (x, y, z, roll, pitch, yaw)</text>
+  
+  <line x1="130" y1="250" x2="130" y2="270" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="270" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="130" y="290" text-anchor="middle" fill="#333" font-size="12">齐次坐标 (x, y, z, w)</text>
+  
+  <!-- 中分支：旋转表达 -->
+  <rect x="300" y="100" width="200" height="40" rx="10" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="125" text-anchor="middle" fill="#2c5f8a" font-size="14" font-weight="bold">旋转表达方式</text>
+  
+  <line x1="400" y1="140" x2="400" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="300" y="170" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="400" y="190" text-anchor="middle" fill="#333" font-size="12">旋转矩阵 (3x3)</text>
+  
+  <line x1="400" y1="200" x2="400" y2="220" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="300" y="220" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="400" y="240" text-anchor="middle" fill="#333" font-size="12">欧拉角 (roll, pitch, yaw)</text>
+  
+  <line x1="400" y1="250" x2="400" y2="270" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="300" y="270" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="400" y="290" text-anchor="middle" fill="#333" font-size="12">四元数 (q0, q1, q2, q3)</text>
+  
+  <!-- 右分支：TF树 -->
+  <rect x="570" y="100" width="200" height="40" rx="10" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="670" y="125" text-anchor="middle" fill="#2c5f8a" font-size="14" font-weight="bold">TF树</text>
+  
+  <line x1="670" y1="140" x2="670" y2="170" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="570" y="170" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="670" y="190" text-anchor="middle" fill="#333" font-size="12">广播 (Broadcaster)</text>
+  
+  <line x1="670" y1="200" x2="670" y2="220" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="570" y="220" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="670" y="240" text-anchor="middle" fill="#333" font-size="12">监听 (Listener)</text>
+  
+  <line x1="670" y1="250" x2="670" y2="270" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="570" y="270" width="200" height="30" rx="5" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="1"/>
+  <text x="670" y="290" text-anchor="middle" fill="#333" font-size="12">时间戳同步</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="350" width="400" height="40" rx="10" fill="#fff3cd" stroke="#ffc107" stroke-width="1.5"/>
+  <text x="400" y="375" text-anchor="middle" fill="#856404" font-size="14">核心：统一坐标系 → 正确变换 → 稳定导航</text>
+  
+  <!-- 连接线 -->
+  <line x1="130" y1="300" x2="130" y2="350" stroke="#4a90d9" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="400" y1="300" x2="400" y2="350" stroke="#4a90d9" stroke-width="1" stroke-dasharray="5,5"/>
+  <line x1="670" y1="300" x2="670" y2="350" stroke="#4a90d9" stroke-width="1" stroke-dasharray="5,5"/>
+</svg>
+
+<p>这张图把本章内容串起来了。左边是坐标系统，中间是旋转表达，右边是TF树。三者缺一不可。你想想看，如果坐标系统没搞对，旋转表达再漂亮也没用；如果TF树断了，所有变换都白搭。</p>
+
+<div class="highlight">
+  <p><strong>本章小结：</strong>坐标变换不是纯数学，它是AGV导航的骨架。我建议你每做一个项目，先把TF树画出来，再写代码。这样能避免80%的定位问题。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="02SystemArchitecture.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04SensorDataPreprocess.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

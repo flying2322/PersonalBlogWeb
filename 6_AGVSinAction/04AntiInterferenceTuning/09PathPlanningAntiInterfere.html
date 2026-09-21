@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>9 路径规划抗干扰</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="active">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>9 路径规划抗干扰：动态窗口法（DWA）参数调优</h2>
+
+<p>路径规划这事儿，说白了就是让AGV在复杂环境里找到一条能走的路。但现实往往很骨感——传感器有噪声、地面有油污、行人突然窜出来……这些干扰会让规划器“犯迷糊”。</p>
+
+<p>我做了这么多年AGV，最头疼的就是局部路径规划被干扰带偏。今天咱们重点聊聊动态窗口法（DWA）的参数调优，以及局部避障、重规划、全局路径平滑这些实战技巧。</p>
+
+<h3>9.1 DWA的核心思想：速度空间采样</h3>
+
+<p>DWA的原理其实不复杂。它把AGV的运动限制在一个“动态窗口”里——这个窗口由当前速度、加速度极限、刹车距离共同决定。然后在这个窗口内采样多组速度组合，用评价函数打分，选最优的那组。</p>
+
+<p>嗯，这里要注意：窗口的大小直接影响规划质量。窗口太大，采样点太多，计算慢；窗口太小，可能找不到可行路径。</p>
+
+<div class="highlight">
+  <p><strong>关键参数速查表：</strong></p>
+  <table>
+    <tr>
+      <th>参数</th>
+      <th>含义</th>
+      <th>典型范围</th>
+      <th>抗干扰调优方向</th>
+    </tr>
+    <tr>
+      <td>v_max</td>
+      <td>最大线速度</td>
+      <td>0.5~2.0 m/s</td>
+      <td>干扰大时适当降低</td>
+    </tr>
+    <tr>
+      <td>w_max</td>
+      <td>最大角速度</td>
+      <td>0.5~2.0 rad/s</td>
+      <td>窄通道需增大</td>
+    </tr>
+    <tr>
+      <td>acc_lim</td>
+      <td>加速度极限</td>
+      <td>0.2~1.0 m/s²</td>
+      <td>地面湿滑时减小</td>
+    </tr>
+    <tr>
+      <td>dt</td>
+      <td>模拟时间步长</td>
+      <td>0.1~0.5 s</td>
+      <td>动态障碍物多时减小</td>
+    </tr>
+    <tr>
+      <td>predict_time</td>
+      <td>轨迹预测时长</td>
+      <td>1.0~4.0 s</td>
+      <td>高速场景适当延长</td>
+    </tr>
+  </table>
+</div>
+
+<h3>9.2 评价函数权重调优：避障与目标导向的平衡</h3>
+
+<p>DWA的评价函数通常包含三个分量：<strong>方位角代价</strong>（朝向目标）、<strong>障碍物代价</strong>（远离障碍）、<strong>速度代价</strong>（保持高速）。权重设置不合理，AGV就会“抽风”。</p>
+
+<p>我遇到过最典型的案例：有个项目把障碍物代价权重设得太高，结果AGV在空旷区域也疯狂绕路，明明直走就能到，它非要画个弧线。后来我把权重从0.5降到0.2，问题立刻解决。</p>
+
+<div class="tip">
+  <p><strong>我的调优习惯：</strong></p>
+  <ul>
+    <li>先固定障碍物权重为0.3，调方位角权重到0.6</li>
+    <li>观察AGV在狭窄通道的表现，再微调</li>
+    <li>速度权重一般保持0.1~0.2，别让它太“贪快”</li>
+  </ul>
+</div>
+
+<h3>9.3 局部避障与重规划策略</h3>
+
+<p>DWA本质上是局部规划器，它只关心眼前几米的路。但遇到动态障碍物（比如突然出现的人），就需要触发重规划。</p>
+
+<p>我个人建议采用<strong>分层触发机制</strong>：</p>
+
+<ol>
+  <li><strong>轻微偏离</strong>：只调整DWA参数，不重新规划全局路径</li>
+  <li><strong>中等阻塞</strong>：局部路径重规划，保留全局路径的起点和终点</li>
+  <li><strong>严重死锁</strong>：完全重新规划全局路径</li>
+</ol>
+
+<p>为什么会这样设计？因为频繁重规划会消耗大量算力，而且可能导致路径抖动。我曾经见过一个项目，AGV每遇到一个人就重规划一次，结果在原地转圈——这就是典型的“过度反应”。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把重规划触发阈值设得太敏感，结果AGV在仓库里像喝醉了酒一样左右摇摆。后来我加了“连续3次采样都失败才触发重规划”的逻辑，才稳定下来。</p>
+</div>
+
+<h3>9.4 全局路径的平滑与曲率约束</h3>
+
+<p>全局路径规划（比如A*算法）生成的路径往往是折线。直接让AGV沿着折线走，会出现两个问题：</p>
+
+<ul>
+  <li>在拐角处急转弯，容易侧翻或打滑</li>
+  <li>频繁加减速，降低运输效率</li>
+</ul>
+
+<p>所以必须做<strong>路径平滑</strong>。我常用的方法是<strong>三次样条插值</strong>，加上<strong>曲率约束</strong>。</p>
+
+<pre><code>// 伪代码：曲率约束检查
+bool checkCurvature(PathPoint p1, PathPoint p2, PathPoint p3, float maxCurvature) {
+    // 计算三点确定的圆的曲率
+    float curvature = calculateCurvature(p1, p2, p3);
+    if (curvature > maxCurvature) {
+        // 插入中间点，降低曲率
+        insertWaypoint(p1, p3);
+        return false;
+    }
+    return true;
+}</code></pre>
+
+<p>你想想看，如果AGV的转弯半径是1米，但路径上有个曲率半径0.5米的弯，它肯定过不去。所以曲率约束必须小于AGV的最小转弯半径。</p>
+
+<h3>9.5 实战调优流程</h3>
+
+<p>说了这么多理论，咱们来点实际的。我总结了一套调优流程：</p>
+
+<ol>
+  <li><strong>跑一次基准测试</strong>：用默认参数跑一圈，记录失败场景</li>
+  <li><strong>调整DWA窗口</strong>：根据失败场景缩小或扩大窗口</li>
+  <li><strong>微调评价权重</strong>：先调方位角，再调障碍物，最后调速度</li>
+  <li><strong>测试动态障碍物</strong>：让人在AGV前方横穿，观察反应</li>
+  <li><strong>检查路径平滑度</strong>：导出路径数据，计算曲率分布</li>
+  <li><strong>迭代优化</strong>：重复2~5步，直到满意</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>记住：</strong>没有一套参数能适应所有场景。我通常会在不同区域加载不同的参数集——比如仓库通道用“窄通道模式”，开阔区域用“高速模式”。</p>
+</div>
+
+<h3>9.6 知识体系图：DWA抗干扰调优全景</h3>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">DWA抗干扰调优知识体系</text>
+  
+  <!-- 核心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动态窗口法(DWA)</text>
+  
+  <!-- 三个分支 -->
+  <!-- 分支1：参数调优 -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#3498db" stroke-width="2"/>
+  <rect x="60" y="180" width="180" height="40" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="150" y="205" text-anchor="middle" font-size="14" fill="#2c3e50">参数调优</text>
+  
+  <line x1="150" y1="220" x2="150" y2="260" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="40" y="260" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="150" y="280" text-anchor="middle" font-size="12" fill="#7f8c8d">速度窗口大小</text>
+  
+  <line x1="150" y1="290" x2="150" y2="310" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="40" y="310" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="150" y="330" text-anchor="middle" font-size="12" fill="#7f8c8d">加速度极限</text>
+  
+  <line x1="150" y1="340" x2="150" y2="360" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="40" y="360" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="150" y="380" text-anchor="middle" font-size="12" fill="#7f8c8d">预测时间长度</text>
+  
+  <!-- 分支2：评价函数 -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#3498db" stroke-width="2"/>
+  <rect x="310" y="180" width="180" height="40" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="400" y="205" text-anchor="middle" font-size="14" fill="#2c3e50">评价函数权重</text>
+  
+  <line x1="400" y1="220" x2="400" y2="260" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="290" y="260" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="280" text-anchor="middle" font-size="12" fill="#7f8c8d">方位角代价</text>
+  
+  <line x1="400" y1="290" x2="400" y2="310" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="290" y="310" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="330" text-anchor="middle" font-size="12" fill="#7f8c8d">障碍物代价</text>
+  
+  <line x1="400" y1="340" x2="400" y2="360" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="290" y="360" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="380" text-anchor="middle" font-size="12" fill="#7f8c8d">速度代价</text>
+  
+  <!-- 分支3：路径平滑 -->
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#3498db" stroke-width="2"/>
+  <rect x="560" y="180" width="180" height="40" rx="8" fill="#e8f4f8" stroke="#3498db" stroke-width="1.5"/>
+  <text x="650" y="205" text-anchor="middle" font-size="14" fill="#2c3e50">路径平滑与曲率</text>
+  
+  <line x1="650" y1="220" x2="650" y2="260" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="540" y="260" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="650" y="280" text-anchor="middle" font-size="12" fill="#7f8c8d">三次样条插值</text>
+  
+  <line x1="650" y1="290" x2="650" y2="310" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="540" y="310" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="650" y="330" text-anchor="middle" font-size="12" fill="#7f8c8d">曲率约束检查</text>
+  
+  <line x1="650" y1="340" x2="650" y2="360" stroke="#3498db" stroke-width="1.5"/>
+  <rect x="540" y="360" width="220" height="30" rx="5" fill="#f0f8ff" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="650" y="380" text-anchor="middle" font-size="12" fill="#7f8c8d">转弯半径限制</text>
+  
+  <!-- 底部：重规划策略 -->
+  <line x1="400" y1="400" x2="400" y2="430" stroke="#3498db" stroke-width="2"/>
+  <rect x="250" y="430" width="300" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="1.5"/>
+  <text x="400" y="455" text-anchor="middle" font-size="14" fill="white" font-weight="bold">分层重规划触发机制</text>
+</svg>
+
+<p>这张图把DWA抗干扰调优的核心要素串起来了。左边是参数调优，中间是评价函数，右边是路径平滑，底部是重规划策略。调优时，这四个方面要协同考虑。</p>
+
+<div class="tip">
+  <p><strong>最后说句实在话：</strong>DWA调优没有银弹。我见过有人花了两周调参数，最后发现是传感器安装角度偏了2度。所以，遇到问题先检查硬件，别一上来就调参数。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="08LocalizationRobustness.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="10MotionControlAntiInterfere.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

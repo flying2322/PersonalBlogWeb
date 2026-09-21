@@ -1,0 +1,396 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 数据持久化与日志模块</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="active">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 数据持久化与日志模块：SQLite数据库设计、运行日志记录（CSV/JSON）、关键数据备份与恢复</h2>
+
+<p>各位同学，今天我们来聊聊AGV控制器里一个看似不起眼，但关键时刻能救命的东西——数据持久化与日志模块。</p>
+
+<p>说实话，我早年做AGV项目时，最怕的就是半夜接到现场电话：“车撞了，但不知道为啥撞的。” 那时候日志系统做得稀烂，连个像样的记录都没有。后来我痛定思痛，把数据持久化和日志模块重新设计了一遍。今天就把这些经验分享给你们。</p>
+
+<h3>14.1 为什么需要数据持久化？</h3>
+
+<p>AGV跑起来，会产生大量数据。比如：</p>
+<ul>
+  <li><strong>配置参数</strong>：地图信息、站点坐标、速度限制等</li>
+  <li><strong>运行状态</strong>：当前电量、位置、任务ID等</li>
+  <li><strong>历史轨迹</strong>：过去24小时的行驶路径</li>
+  <li><strong>故障记录</strong>：什么时候报了什么错</li>
+</ul>
+
+<p>这些数据，掉电就丢？那肯定不行。所以我们需要一个可靠的存储方案。</p>
+
+<div class="highlight">
+  <p><strong>核心原则</strong>：关键数据必须持久化，非关键数据可以按策略清理。</p>
+</div>
+
+<h3>14.2 SQLite数据库设计</h3>
+
+<p>我个人习惯在嵌入式AGV上用SQLite。为什么？因为它轻量、零配置、单文件存储，而且SQL语法大家都会用。</p>
+
+<p>我设计数据库时，一般会分这么几张表：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>表名</th>
+      <th>用途</th>
+      <th>关键字段</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>config</code></td>
+      <td>系统配置参数</td>
+      <td>key, value, updated_at</td>
+    </tr>
+    <tr>
+      <td><code>task_log</code></td>
+      <td>任务执行记录</td>
+      <td>task_id, status, start_time, end_time</td>
+    </tr>
+    <tr>
+      <td><code>fault_record</code></td>
+      <td>故障报警记录</td>
+      <td>fault_code, description, timestamp</td>
+    </tr>
+    <tr>
+      <td><code>position_history</code></td>
+      <td>位置历史轨迹</td>
+      <td>x, y, theta, timestamp</td>
+    </tr>
+</tbody>
+</table>
+
+<p>嗯，这里要注意：<code>position_history</code> 表的数据量会非常大。我曾经有个项目，AGV一天跑下来，位置记录能到几十万条。所以一定要加索引，并且定期清理。</p>
+
+<p>建表SQL示例：</p>
+
+<pre><code>CREATE TABLE IF NOT EXISTS config (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS task_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id TEXT NOT NULL,
+    status INTEGER NOT NULL,
+    start_time INTEGER,
+    end_time INTEGER
+);
+
+CREATE INDEX idx_task_log_task_id ON task_log(task_id);
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的小技巧</strong>：时间字段我习惯用Unix时间戳（INTEGER），而不是TEXT。排序快，跨平台也方便。</p>
+</div>
+
+<h3>14.3 运行日志记录（CSV/JSON）</h3>
+
+<p>数据库存的是结构化数据。但有些场景，我们需要更灵活的日志格式。比如调试时，我想看每一帧的传感器原始数据。这时候CSV和JSON就派上用场了。</p>
+
+<h4>14.3.1 CSV日志</h4>
+
+<p>CSV适合记录时序数据，比如：</p>
+<ul>
+  <li>电机转速、电流</li>
+  <li>激光雷达扫描数据</li>
+  <li>IMU加速度、角速度</li>
+</ul>
+
+<p>我一般会按天生成文件，文件名带上日期。比如 <code>motor_log_2025-01-15.csv</code>。</p>
+
+<pre><code>timestamp,left_motor_rpm,right_motor_rpm,left_current,right_current
+1705305600,1200,1180,2.3,2.1
+1705305601,1210,1190,2.4,2.2
+</code></pre>
+
+<p>CSV的好处是，用Excel或者Python的pandas直接就能分析。我曾经在现场调试时，把CSV拖进Excel，画个折线图，电机抖动问题一眼就看出来了。</p>
+
+<h4>14.3.2 JSON日志</h4>
+
+<p>JSON适合记录结构复杂的数据。比如：</p>
+<ul>
+  <li>任务调度信息</li>
+  <li>路径规划结果</li>
+  <li>多传感器融合后的位姿</li>
+</ul>
+
+<pre><code>{
+  "timestamp": 1705305600,
+  "event": "TASK_START",
+  "data": {
+    "task_id": "TASK-001",
+    "from": "A01",
+    "to": "B03",
+    "priority": 1
+  }
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经在日志文件里写JSON时，没处理好换行符。结果日志文件里一行JSON几万字符，用文本编辑器打开直接卡死。后来我强制每条JSON日志只占一行，并且限制单条日志大小不超过4KB。</p>
+</div>
+
+<h3>14.4 关键数据备份与恢复</h3>
+
+<p>数据存好了，但万一存储介质坏了呢？或者系统崩溃导致数据库损坏呢？所以备份机制必不可少。</p>
+
+<p>我一般会设计三级备份策略：</p>
+
+<ol>
+  <li><strong>实时备份</strong>：关键配置参数，每次修改后立即写入备份区</li>
+  <li><strong>定时备份</strong>：每天凌晨3点，自动备份整个数据库到另一个分区</li>
+  <li><strong>手动备份</strong>：提供接口，运维人员可以随时触发备份</li>
+</ol>
+
+<p>备份文件命名规则：<code>agv_data_backup_20250115_030000.db</code></p>
+
+<p>恢复流程也很重要。我见过有人备份做得很好，但恢复时发现备份文件也是坏的。所以：</p>
+
+<ul>
+  <li>每次备份后，要校验文件完整性（比如计算MD5）</li>
+  <li>定期做恢复演练，确保备份真的能用</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验</strong>：在AGV上，我还会保留最近3次备份。万一最新的备份有问题，还能回退到前一个版本。这个习惯救过我一次——有一次数据库升级脚本写错了，导致所有配置丢失。还好有前一天的备份，10分钟就恢复了。</p>
+</div>
+
+<h3>14.5 知识体系结构图</h3>
+
+<p>下面这张图，把数据持久化与日志模块的核心逻辑串起来了。你们可以对照着看，理解各个模块之间的关系。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">数据持久化与日志模块架构</text>
+  
+  <!-- 顶层：数据来源 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AGV运行时数据</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 中间层：三大存储方式 -->
+  <rect x="50" y="160" width="200" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="150" y="185" text-anchor="middle" font-size="14" fill="white" font-weight="bold">SQLite数据库</text>
+  <text x="150" y="205" text-anchor="middle" font-size="11" fill="white">配置/任务/故障/轨迹</text>
+  
+  <rect x="300" y="160" width="200" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="400" y="185" text-anchor="middle" font-size="14" fill="white" font-weight="bold">CSV日志文件</text>
+  <text x="400" y="205" text-anchor="middle" font-size="11" fill="white">电机/传感器时序数据</text>
+  
+  <rect x="550" y="160" width="200" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="650" y="185" text-anchor="middle" font-size="14" fill="white" font-weight="bold">JSON日志文件</text>
+  <text x="650" y="205" text-anchor="middle" font-size="11" fill="white">任务/事件/位姿数据</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="150" y1="220" x2="150" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="220" x2="400" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="220" x2="650" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底层：备份与恢复 -->
+  <rect x="100" y="280" width="600" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="310" text-anchor="middle" font-size="14" fill="white" font-weight="bold">备份与恢复机制</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="400" y1="330" x2="400" y2="370" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底部：备份策略 -->
+  <rect x="50" y="370" width="200" height="50" rx="8" fill="#1abc9c" opacity="0.8"/>
+  <text x="150" y="400" text-anchor="middle" font-size="13" fill="white">实时备份</text>
+  
+  <rect x="300" y="370" width="200" height="50" rx="8" fill="#1abc9c" opacity="0.8"/>
+  <text x="400" y="400" text-anchor="middle" font-size="13" fill="white">定时备份（每日）</text>
+  
+  <rect x="550" y="370" width="200" height="50" rx="8" fill="#1abc9c" opacity="0.8"/>
+  <text x="650" y="400" text-anchor="middle" font-size="13" fill="white">手动备份</text>
+  
+  <!-- 箭头 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="470" text-anchor="middle" font-size="12" fill="#7f8c8d">保留最近3次备份 · 校验文件完整性 · 定期恢复演练</text>
+</svg>
+
+<h3>14.6 总结</h3>
+
+<p>数据持久化与日志模块，说白了就是AGV的“黑匣子”。平时你可能感觉不到它的存在，但一旦出问题，它就是你的救命稻草。</p>
+
+<p>我个人建议，在设计阶段就把这个模块考虑进去。不要等到现场出了问题再补，那时候代价就大了。</p>
+
+<p>好了，这一章就到这里。记住：数据无价，备份先行。</p>
+
+<div class="footer-nav">
+            <a href="13ChargingManageModule.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15OtaUpgradeModule.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

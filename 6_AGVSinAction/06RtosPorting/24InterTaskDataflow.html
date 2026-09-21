@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>24 任务间数据流设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="active">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>24 任务间数据流设计：全局数据结构体、发布-订阅模式、数据一致性保护</h2>
+
+<p>各位同学，今天我们来聊聊任务间数据流设计。说实话，这是RTOS移植里最容易出问题的地方之一。我在项目里见过太多因为数据流没设计好，导致整个系统跑飞的情况。</p>
+
+<p>你想想看，AGV控制器里同时跑着好几个任务：传感器采集、路径规划、电机控制、通信上报。这些任务之间怎么交换数据？用全局变量？用消息队列？还是用共享内存？每种方式都有它的适用场景，也有它的坑。</p>
+
+<h3>24.1 全局数据结构体：最直接的方式</h3>
+
+<p>先说说全局数据结构体。这是最原始、最直接的方式。我早期做的一个AGV项目，就是用一个大结构体来存放所有共享数据。</p>
+
+<pre><code>/* 全局数据共享结构体 */
+typedef struct {
+    /* 传感器数据 */
+    float    left_wheel_speed;      /* 左轮速度 */
+    float    right_wheel_speed;     /* 右轮速度 */
+    uint16_t battery_voltage;       /* 电池电压 */
+    uint8_t  obstacle_distance;     /* 障碍物距离 */
+    
+    /* 控制指令 */
+    float    target_speed;          /* 目标速度 */
+    float    target_angle;          /* 目标转向角 */
+    
+    /* 系统状态 */
+    uint32_t system_tick;           /* 系统滴答 */
+    uint8_t  error_code;            /* 错误码 */
+    uint8_t  run_mode;              /* 运行模式 */
+    
+    /* 互斥保护 */
+    osMutexId_t mutex;              /* 互斥锁 */
+} AGV_SharedData_t;
+
+AGV_SharedData_t g_agv_data;        /* 全局实例 */</code></pre>
+
+<p>嗯，这里要注意。全局结构体虽然简单，但有个致命问题——<strong>数据一致性</strong>。我遇到过这样一个场景：传感器任务正在更新障碍物距离，写到一半，控制任务突然读取了这个半成品数据，结果AGV直接撞墙了。</p>
+
+<div class="warning">
+    <strong>警告：</strong>全局数据结构体必须配合互斥锁使用。不要以为单核MCU就不需要锁，任务切换随时可能发生。
+</div>
+
+<h3>24.2 发布-订阅模式：解耦的艺术</h3>
+
+<p>后来我学乖了。在第二个AGV项目里，我引入了发布-订阅模式。说白了，就是数据生产者只管发布，数据消费者只管订阅，两者互不关心对方是谁。</p>
+
+<p>为什么会这样设计？因为AGV的功能越来越多，任务之间的依赖关系越来越复杂。如果用全局结构体，改一个字段就要改所有相关的任务，维护成本太高了。</p>
+
+<pre><code>/* 发布-订阅核心结构 */
+typedef struct {
+    uint32_t    topic_id;           /* 主题ID */
+    void*       data_ptr;           /* 数据指针 */
+    uint16_t    data_size;          /* 数据大小 */
+    uint32_t    timestamp;          /* 时间戳 */
+    uint8_t     checksum;           /* 校验和 */
+} PubSub_Message_t;
+
+/* 订阅者回调类型 */
+typedef void (*Subscriber_Callback)(PubSub_Message_t* msg);
+
+/* 发布函数 */
+void PubSub_Publish(uint32_t topic_id, void* data, uint16_t size) {
+    PubSub_Message_t msg;
+    msg.topic_id  = topic_id;
+    msg.data_ptr  = data;
+    msg.data_size = size;
+    msg.timestamp = osKernelGetTickCount();
+    msg.checksum  = calculate_checksum(data, size);
+    
+    /* 遍历订阅者列表，分发消息 */
+    for (int i = 0; i &lt; MAX_SUBSCRIBERS; i++) {
+        if (subscriber_list[i].topic_id == topic_id) {
+            subscriber_list[i].callback(&amp;msg);
+        }
+    }
+}</code></pre>
+
+<div class="tip">
+    <strong>我的经验：</strong>发布-订阅模式里，时间戳和校验和很重要。我曾经因为没加时间戳，导致控制任务用了过期的传感器数据，AGV在转弯时反应慢了半拍。加了时间戳后，消费者可以判断数据是否新鲜。
+</div>
+
+<h3>24.3 数据一致性保护：三种武器</h3>
+
+<p>数据一致性保护，说白了就是防止数据被撕成两半。我总结了三种武器，你们可以根据场景选用。</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>保护方式</th>
+            <th>适用场景</th>
+            <th>性能开销</th>
+            <th>实现复杂度</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>互斥锁（Mutex）</td>
+            <td>大块数据、写操作频繁</td>
+            <td>中</td>
+            <td>低</td>
+        </tr>
+        <tr>
+            <td>临界区（Critical Section）</td>
+            <td>小数据、实时性要求高</td>
+            <td>低</td>
+            <td>低</td>
+        </tr>
+        <tr>
+            <td>无锁数据结构（Lock-Free）</td>
+            <td>高频读写、不能阻塞</td>
+            <td>高（但无阻塞）</td>
+            <td>高</td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>互斥锁</strong>是最常用的。但要注意，不要在中断服务函数里用互斥锁，会死锁。我有个同事就犯过这个错，查了两天才找到原因。</p>
+
+<pre><code>/* 互斥锁保护示例 */
+void SensorTask(void* argument) {
+    while (1) {
+        /* 采集传感器数据 */
+        float distance = read_obstacle_sensor();
+        
+        /* 加锁保护 */
+        osMutexAcquire(g_agv_data.mutex, osWaitForever);
+        g_agv_data.obstacle_distance = (uint8_t)distance;
+        osMutexRelease(g_agv_data.mutex);
+        
+        osDelay(10);  /* 10ms采集一次 */
+    }
+}</code></pre>
+
+<p><strong>临界区</strong>适合保护非常小的数据。比如一个标志位、一个计数值。它的好处是快，坏处是不能嵌套，也不能在里面做耗时操作。</p>
+
+<pre><code>/* 临界区保护示例 */
+void ControlTask(void* argument) {
+    uint8_t local_distance;
+    
+    while (1) {
+        /* 进入临界区 */
+        taskENTER_CRITICAL();
+        local_distance = g_agv_data.obstacle_distance;
+        taskEXIT_CRITICAL();
+        
+        /* 根据距离做控制决策 */
+        if (local_distance &lt; 20) {
+            emergency_brake();
+        }
+        
+        osDelay(5);
+    }
+}</code></pre>
+
+<p><strong>无锁数据结构</strong>是高级玩法。我建议新手先别碰，容易翻车。但如果你做的是高频数据采集，比如IMU数据每秒1000次更新，用互斥锁会导致任务频繁阻塞，这时候无锁设计就派上用场了。</p>
+
+<div class="highlight">
+    <strong>核心原则：</strong>数据一致性保护不是越强越好。过度的保护会降低系统实时性。我的做法是：先分析数据流，找出真正的竞争条件，然后针对性地加保护。不要一上来就给所有共享数据加锁。
+</div>
+
+<h3>24.4 实战中的选择策略</h3>
+
+<p>说了这么多，到底怎么选？我给你们一个决策流程：</p>
+
+<ol>
+    <li><strong>数据量大小</strong>：小于4字节？用临界区或原子操作。大于4字节？用互斥锁或发布-订阅。</li>
+    <li><strong>访问频率</strong>：低频（&lt;100Hz）用互斥锁。高频（&gt;1000Hz）考虑无锁设计。</li>
+    <li><strong>任务数量</strong>：2-3个任务共享数据，用全局结构体+互斥锁。超过5个任务，用发布-订阅模式。</li>
+    <li><strong>实时性要求</strong>：硬实时任务（如电机控制）尽量用临界区，避免被高优先级任务抢占。</li>
+</ol>
+
+<p>我记得有一次，一个AGV项目在调试阶段频繁死机。查了三天，最后发现是传感器任务和控制任务共用一个全局变量，但没有加任何保护。传感器任务在更新数据时被中断，控制任务读到一半的数据，直接算出了一个荒谬的控制量，电机瞬间反转，AGV原地打转。</p>
+
+<p>嗯，从那以后，我养成了一个习惯：<strong>每个共享数据都要问自己三个问题</strong>——谁在写？谁在读？写和读会不会同时发生？如果会，就必须加保护。</p>
+
+<p>最后说一句，数据流设计没有银弹。全局结构体简单但脆弱，发布-订阅灵活但复杂，无锁设计高效但难调试。我的建议是：从简单的开始，随着系统复杂度增加，逐步演进。不要一开始就搞个大而全的框架，容易把自己绕进去。</p>
+
+<div class="footer-nav">
+            <a href="23PathPlanningTask.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="25SystemIntegrationTest.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

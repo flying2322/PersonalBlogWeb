@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 通信协议实现</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="active">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 通信协议实现——CAN总线基础与CANopen协议栈移植、UART自定义协议（Modbus RTU）、Wi-Fi TCP/UDP通信</h2>
+
+<p>各位同学，大家好。这一章我们聊聊AGV的“神经系统”——通信协议。说白了，AGV要能跑起来，控制器和电机、传感器、上位机之间必须能“说上话”。我见过不少项目，硬件选型都挺好，结果死在通信不稳定上。嗯，这一章我们就来把这些坑填上。</p>
+
+<h3>7.1 CAN总线基础：为什么AGV离不开它？</h3>
+
+<p>先问大家一个问题：AGV上那么多电机、编码器、IO模块，如果用传统的RS485轮询，会怎样？</p>
+
+<p>答案很简单：实时性跟不上。你想想看，一个电机急停指令，如果等上位机轮询一圈才发下去，车早就撞上了。</p>
+
+<p>CAN总线（Controller Area Network）的优势就在这里：</p>
+
+<ul>
+  <li><strong>多主通信</strong>：任何节点都可以主动发消息，不用等主机问</li>
+  <li><strong>实时性高</strong>：优先级仲裁机制，紧急指令插队发送</li>
+  <li><strong>错误处理强</strong>：5种错误检测机制，自动重发</li>
+  <li><strong>差分信号</strong>：抗干扰能力强，适合工业现场</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心参数速查表</strong></p>
+  <table>
+    <tr><th>参数</th><th>典型值</th><th>说明</th></tr>
+    <tr><td>波特率</td><td>125kbps ~ 1Mbps</td><td>AGV常用250k或500k</td></tr>
+    <tr><td>帧类型</td><td>标准帧(11位ID) / 扩展帧(29位ID)</td><td>AGV一般用标准帧就够了</td></tr>
+    <tr><td>最大节点数</td><td>理论110个，实际建议不超过40个</td><td>跟收发器驱动能力有关</td></tr>
+    <tr><td>总线长度</td><td>@250kbps最长250m</td><td>AGV车体内部完全够用</td></tr>
+  </table>
+</div>
+
+<p>我个人习惯，在AGV项目中把CAN总线分成两路：一路给驱动电机和转向电机，另一路给传感器和IO模块。这样即使传感器那路出问题，电机还能安全停车。</p>
+
+<h3>7.2 CANopen协议栈移植——从零到跑起来</h3>
+
+<p>光有CAN硬件还不够，你得有协议。CANopen就是工业领域最常用的高层协议。我最早接触CANopen时，觉得这东西好复杂——对象字典、PDO、SDO、NMT……后来发现，其实核心就几个概念。</p>
+
+<h4>7.2.1 对象字典（Object Dictionary）</h4>
+
+<p>说白了，就是一张大表。每个设备把自己的参数、状态、命令都放在这张表里。比如电机驱动器的目标转速，索引是0x6040，子索引0x00。</p>
+
+<p>我曾经在一个项目中，发现电机死活转不起来。查了半天，原来是对象字典里0x6040的默认值写错了。嗯，这种低级错误，犯过一次就记住了。</p>
+
+<h4>7.2.2 PDO与SDO</h4>
+
+<ul>
+  <li><strong>PDO（过程数据对象）</strong>：实时性高，1个PDO最多传8字节。适合传转速、电流、位置这些周期性数据。</li>
+  <li><strong>SDO（服务数据对象）</strong>：用于配置参数，有应答机制。适合初始化时设置参数。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>实战建议</strong>：</p>
+  <p>把电机控制指令映射到PDO1，把状态反馈映射到PDO2。这样一个CAN帧就能搞定控制和反馈，延迟控制在1ms以内。</p>
+</div>
+
+<h4>7.2.3 协议栈移植步骤</h4>
+
+<p>我常用的是CANfestival开源协议栈。移植步骤其实不复杂：</p>
+
+<ol>
+  <li><strong>驱动层适配</strong>：实现CAN收发函数（发送、接收、中断处理）</li>
+  <li><strong>定时器适配</strong>：提供1ms和1us的定时基准</li>
+  <li><strong>对象字典配置</strong>：用EDS文件生成，或者手动定义</li>
+  <li><strong>NMT状态机</strong>：实现初始化、预操作、操作、停止四个状态</li>
+  <li><strong>心跳/节点守护</strong>：检测节点是否在线</li>
+</ol>
+
+<pre><code>// 伪代码示例：CANopen初始化流程
+void CANopen_Init(void)
+{
+    // 1. 初始化CAN硬件
+    CAN_Init(500000);  // 500kbps
+    
+    // 2. 启动CANopen协议栈
+    canopen_node_t *node = canopen_init(0x01);  // 节点ID=1
+    
+    // 3. 配置PDO映射
+    PDO_Map_Input(node, 0x180, 0x6040, 0x00);  // 控制字
+    
+    // 4. 进入操作状态
+    NMT_SendCommand(node, NMT_START_REMOTE_NODE);
+}</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：</p>
+  <p>我曾经在移植时忽略了CAN控制器的FIFO深度。如果发送频率太高，FIFO溢出会导致丢帧。解决办法：在发送前检查FIFO剩余空间，或者用DMA传输。</p>
+</div>
+
+<h3>7.3 UART自定义协议——Modbus RTU实战</h3>
+
+<p>CAN虽好，但不是所有传感器都支持。很多激光雷达、超声波模块还是走UART。这时候Modbus RTU就是最稳妥的选择。</p>
+
+<p>Modbus RTU的核心就三点：</p>
+
+<ul>
+  <li><strong>主从模式</strong>：AGV控制器做主站，传感器做从站</li>
+  <li><strong>功能码</strong>：03读保持寄存器、06写单个寄存器、16写多个寄存器</li>
+  <li><strong>CRC校验</strong>：16位循环冗余校验，保证数据完整性</li>
+</ul>
+
+<h4>7.3.1 帧结构</h4>
+
+<table>
+  <tr><th>字段</th><th>长度</th><th>说明</th></tr>
+  <tr><td>地址码</td><td>1字节</td><td>从站地址，1~247</td></tr>
+  <tr><td>功能码</td><td>1字节</td><td>03/06/16等</td></tr>
+  <tr><td>数据区</td><td>N字节</td><td>寄存器地址+数据</td></tr>
+  <tr><td>CRC校验</td><td>2字节</td><td>低字节在前</td></tr>
+</table>
+
+<pre><code>// Modbus RTU 读取保持寄存器示例
+// 发送：01 03 00 00 00 01 84 0A
+// 含义：从站1，读寄存器，起始地址0x0000，读1个寄存器
+
+// 接收：01 03 02 00 64 79 85
+// 含义：从站1，功能码03，2字节数据，数值0x0064=100</code></pre>
+
+<p>我个人习惯，在AGV上把Modbus的波特率固定为115200，8数据位，1停止位，无校验。这样兼容性最好，而且115200在1米以内的线缆上基本不会出错。</p>
+
+<h4>7.3.2 自定义协议扩展</h4>
+
+<p>有时候Modbus RTU不够灵活，比如要传浮点数、字符串。我的做法是在Modbus基础上做一层封装：</p>
+
+<ul>
+  <li>用功能码0x64（自定义）传浮点数</li>
+  <li>用功能码0x65传字符串</li>
+  <li>数据区前加一个类型标识符</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>注意</strong>：自定义功能码一定要跟标准Modbus不冲突。我见过有人用0x10（标准写多个寄存器）来传浮点数，结果跟标准设备冲突，调试了三天才发现。</p>
+</div>
+
+<h3>7.4 Wi-Fi TCP/UDP通信——远程监控与调度</h3>
+
+<p>AGV不能总在本地跑，得跟调度系统通信。Wi-Fi是最常见的选择。这里有两个选择：TCP和UDP。</p>
+
+<h4>7.4.1 TCP vs UDP 怎么选？</h4>
+
+<table>
+  <tr><th>特性</th><th>TCP</th><th>UDP</th></tr>
+  <tr><td>可靠性</td><td>有确认重传，可靠</td><td>无确认，可能丢包</td></tr>
+  <tr><td>实时性</td><td>稍差，有握手延迟</td><td>好，无连接</td></tr>
+  <tr><td>适用场景</td><td>任务下发、状态上报</td><td>实时位置广播、心跳</td></tr>
+</table>
+
+<p>我的做法是：</p>
+<ul>
+  <li><strong>控制指令</strong>：走TCP，确保指令不丢失</li>
+  <li><strong>位置广播</strong>：走UDP，每秒发10次，丢几帧无所谓</li>
+  <li><strong>心跳包</strong>：TCP和UDP各发一份，双重保险</li>
+</ul>
+
+<h4>7.4.2 实战代码片段</h4>
+
+<pre><code>// TCP客户端连接示例（基于lwIP）
+int tcp_connect_to_server(ip_addr_t *server_ip, uint16_t port)
+{
+    struct tcp_pcb *pcb = tcp_new();
+    if (pcb == NULL) return -1;
+    
+    // 注册回调函数
+    tcp_recv(pcb, tcp_recv_callback);
+    tcp_err(pcb, tcp_err_callback);
+    
+    // 连接服务器
+    err_t err = tcp_connect(pcb, server_ip, port, tcp_connected_callback);
+    if (err != ERR_OK) return -1;
+    
+    return 0;
+}
+
+// UDP发送广播
+void udp_broadcast_position(float x, float y, float angle)
+{
+    struct udp_pcb *pcb = udp_new();
+    ip_addr_t broadcast_ip = IPADDR_BROADCAST;
+    
+    // 打包数据
+    uint8_t buffer[12];
+    memcpy(buffer, &x, 4);
+    memcpy(buffer+4, &y, 4);
+    memcpy(buffer+8, &angle, 4);
+    
+    // 发送
+    udp_sendto(pcb, buffer, 12, &broadcast_ip, 5000);
+    udp_remove(pcb);
+}</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：</p>
+  <p>Wi-Fi在AGV上有个大问题——漫游切换。AGV移动时，如果从一个AP切换到另一个AP，TCP连接会断开。我曾经遇到过AGV跑到仓库角落，Wi-Fi信号弱，调度指令发不过去，车直接停在原地。</p>
+  <p>解决办法：</p>
+  <ul>
+    <li>使用快速漫游协议（802.11r）</li>
+    <li>在AGV上做断线重连机制，超时3秒自动重连</li>
+    <li>关键指令走CAN总线备份</li>
+  </ul>
+</div>
+
+<h3>7.5 本章知识体系总览</h3>
+
+<p>说了这么多，我画了一张图帮大家理清思路。三种通信方式各司其职，共同构成AGV的通信骨架。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV通信协议架构</text>
+  
+  <!-- 中心：AGV控制器 -->
+  <rect x="300" y="70" width="200" height="60" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="105" text-anchor="middle" font-size="18" fill="white" font-weight="bold">AGV控制器</text>
+  
+  <!-- 三条通信链路 -->
+  <!-- CAN总线 -->
+  <line x1="400" y1="130" x2="400" y2="180" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="400" y1="180" x2="150" y2="180" stroke="#e74c3c" stroke-width="3"/>
+  <line x1="150" y1="180" x2="150" y2="220" stroke="#e74c3c" stroke-width="3"/>
+  
+  <!-- UART -->
+  <line x1="400" y1="130" x2="400" y2="180" stroke="#27ae60" stroke-width="3"/>
+  <line x1="400" y1="180" x2="400" y2="220" stroke="#27ae60" stroke-width="3"/>
+  
+  <!-- Wi-Fi -->
+  <line x1="400" y1="130" x2="400" y2="180" stroke="#8e44ad" stroke-width="3"/>
+  <line x1="400" y1="180" x2="650" y2="180" stroke="#8e44ad" stroke-width="3"/>
+  <line x1="650" y1="180" x2="650" y2="220" stroke="#8e44ad" stroke-width="3"/>
+  
+  <!-- CAN节点 -->
+  <rect x="80" y="220" width="140" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="150" y="250" text-anchor="middle" font-size="14" fill="white">CANopen 电机驱动</text>
+  
+  <rect x="80" y="290" width="140" height="50" rx="8" fill="#e74c3c" opacity="0.7"/>
+  <text x="150" y="320" text-anchor="middle" font-size="14" fill="white">CANopen IO模块</text>
+  
+  <rect x="80" y="360" width="140" height="50" rx="8" fill="#e74c3c" opacity="0.5"/>
+  <text x="150" y="390" text-anchor="middle" font-size="14" fill="white">CANopen 编码器</text>
+  
+  <!-- UART节点 -->
+  <rect x="330" y="220" width="140" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="400" y="250" text-anchor="middle" font-size="14" fill="white">Modbus RTU 激光雷达</text>
+  
+  <rect x="330" y="290" width="140" height="50" rx="8" fill="#27ae60" opacity="0.7"/>
+  <text x="400" y="320" text-anchor="middle" font-size="14" fill="white">Modbus RTU 超声波</text>
+  
+  <!-- Wi-Fi节点 -->
+  <rect x="580" y="220" width="140" height="50" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="650" y="250" text-anchor="middle" font-size="14" fill="white">TCP 调度系统</text>
+  
+  <rect x="580" y="290" width="140" height="50" rx="8" fill="#8e44ad" opacity="0.7"/>
+  <text x="650" y="320" text-anchor="middle" font-size="14" fill="white">UDP 位置广播</text>
+  
+  <!-- 图例 -->
+  <rect x="100" y="440" width="20" height="15" fill="#e74c3c"/>
+  <text x="130" y="453" font-size="13" fill="#333">CAN总线 (实时控制)</text>
+  
+  <rect x="300" y="440" width="20" height="15" fill="#27ae60"/>
+  <text x="330" y="453" font-size="13" fill="#333">UART (传感器数据)</text>
+  
+  <rect x="500" y="440" width="20" height="15" fill="#8e44ad"/>
+  <text x="530" y="453" font-size="13" fill="#333">Wi-Fi (远程通信)</text>
+</svg>
+
+<p>从这张图可以看出来，AGV的通信不是单一方案，而是分层组合。CAN负责实时控制，UART负责传感器采集，Wi-Fi负责远程调度。三者缺一不可。</p>
+
+<div class="tip">
+  <p><strong>我的个人经验总结</strong>：</p>
+  <p>做AGV通信，最忌讳的就是“一把抓”。我见过有人想用Wi-Fi把所有数据都传了，结果延迟大到电机都抖。记住：实时性要求高的走CAN，数据量大的走UART，远程交互的走Wi-Fi。各司其职，系统才稳定。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。三种通信方式，每一种都有它的脾气。CAN要小心终端电阻和波特率，Modbus要注意超时和重试，Wi-Fi要处理断线重连。把这些细节都处理好，你的AGV通信系统才算真正“靠谱”。</p>
+
+        <div class="footer-nav">
+            <a href="06SensorDataAcquire.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08TaskSchedulingRealtime.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 运动学模型与约束</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="active">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 运动学模型与约束：差速驱动、阿克曼驱动模型、最大速度/加速度约束</h2>
+
+<p>各位同学，今天我们来聊聊移动机器人的“腿脚”——运动学模型。说白了，就是机器人怎么动起来，以及它受哪些限制。</p>
+
+<p>我在做AGV项目时，发现很多新手一上来就写路径规划算法，结果规划出来的路径机器人根本走不了。为什么？因为没考虑运动学约束。你想想看，让一个差速驱动的机器人原地转个弯，跟让一辆汽车原地掉头，那能一样吗？</p>
+
+<p>所以这一章，我们就把这两个最主流的驱动模型讲透。嗯，开始吧。</p>
+
+<h3>16.1 差速驱动模型</h3>
+
+<p>差速驱动，说白了就是两个轮子各自独立驱动，靠速度差来实现转向。这是AGV里最常见的方案，成本低、结构简单、灵活性高。</p>
+
+<h4>16.1.1 运动学方程</h4>
+
+<p>先看最基本的模型。假设左右轮速度分别为 \(v_L\) 和 \(v_R\)，轮距为 \(L\)，那么机器人的线速度 \(v\) 和角速度 \(\omega\) 为：</p>
+
+<pre><code>v = (v_R + v_L) / 2
+ω = (v_R - v_L) / L</code></pre>
+
+<p>这个公式我建议你背下来。我在调试第一个AGV时，就是因为搞反了正负号，机器人原地打转了半天。后来才发现，左右轮速度差的方向决定了转向方向。</p>
+
+<p>有了 \(v\) 和 \(\omega\)，我们就可以得到机器人在全局坐标系下的位姿更新：</p>
+
+<pre><code>x' = x + v * cos(θ) * dt
+y' = y + v * sin(θ) * dt
+θ' = θ + ω * dt</code></pre>
+
+<p>这就是经典的航迹推算公式。嗯，这里要注意，dt 不能太大，否则误差会累积得很快。</p>
+
+<h4>16.1.2 约束与限制</h4>
+
+<p>差速驱动虽然灵活，但也有它的脾气：</p>
+
+<ul>
+  <li><strong>纯滚动约束</strong>：轮子不能侧滑。也就是说，机器人只能沿着轮子朝向的方向运动。</li>
+  <li><strong>瞬时旋转中心（ICR）</strong>：当 \(v_R = -v_L\) 时，机器人原地旋转，ICR 在车体中心。</li>
+  <li><strong>最大速度/加速度</strong>：每个轮子都有物理极限，不能无限加速。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>重要</strong>：差速驱动的路径规划中，曲率半径不能小于轮距的一半。否则，机器人会打滑。</p>
+</div>
+
+<h3>16.2 阿克曼驱动模型</h3>
+
+<p>阿克曼模型，就是汽车那种转向方式。前轮转向，后轮驱动。这种模型在室外AGV、无人驾驶里很常见。</p>
+
+<h4>16.2.1 运动学方程</h4>
+
+<p>阿克曼模型的关键是：所有轮子的转向中心必须交于一点。这个点就是瞬时旋转中心（ICR）。</p>
+
+<p>假设前轮转向角为 \(\delta\)，轴距为 \(W\)，那么转弯半径 \(R\) 为：</p>
+
+<pre><code>R = W / tan(δ)</code></pre>
+
+<p>角速度 \(\omega\) 和线速度 \(v\) 的关系：</p>
+
+<pre><code>ω = v / R = v * tan(δ) / W</code></pre>
+
+<p>位姿更新跟差速驱动一样，但注意，阿克曼模型不能原地旋转。它的最小转弯半径由最大转向角决定。</p>
+
+<div class="tip">
+  <p><strong>个人经验</strong>：我在做园区物流AGV时，发现阿克曼模型在低速时转向误差很大。后来加了前馈补偿，才把轨迹跟踪精度提上去。</p>
+</div>
+
+<h4>16.2.2 约束与限制</h4>
+
+<p>阿克曼模型的约束比差速驱动多：</p>
+
+<ul>
+  <li><strong>非完整性约束</strong>：不能横向移动，只能前进/后退。</li>
+  <li><strong>转向角限制</strong>：一般最大转向角在30°~40°之间。</li>
+  <li><strong>速度与转向耦合</strong>：高速时转向角不能太大，否则会侧翻。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意</strong>：阿克曼模型在倒车时，转向方向会反向。很多新手在这里踩坑，我曾经调试时也忘了这个，结果倒车入库时直接撞墙。</p>
+</div>
+
+<h3>16.3 最大速度/加速度约束</h3>
+
+<p>不管是差速还是阿克曼，都有物理极限。这些约束直接影响路径规划的可行性。</p>
+
+<h4>16.3.1 速度约束</h4>
+
+<p>速度约束主要来自：</p>
+
+<ul>
+  <li><strong>电机额定转速</strong>：决定了最大线速度。</li>
+  <li><strong>地面摩擦系数</strong>：湿滑地面要降速。</li>
+  <li><strong>负载重量</strong>：重载时速度要降低。</li>
+</ul>
+
+<p>我一般会在配置文件中设置一个速度映射表：</p>
+
+<pre><code>// 速度约束示例
+struct SpeedConstraints {
+    double max_linear_velocity;   // 最大线速度 (m/s)
+    double max_angular_velocity;  // 最大角速度 (rad/s)
+    double max_linear_acceleration;  // 最大线加速度 (m/s²)
+    double max_angular_acceleration; // 最大角加速度 (rad/s²)
+};</code></pre>
+
+<h4>16.3.2 加速度约束</h4>
+
+<p>加速度约束更关键。为什么？因为加速度决定了机器人启动和停止的平顺性。</p>
+
+<p>我曾经遇到过一个问题：AGV在满载时急刹车，货物直接飞出去了。后来加了加速度限制，才解决。</p>
+
+<p>加速度约束通常用梯形速度曲线或S形速度曲线来建模：</p>
+
+<pre><code>// 梯形速度曲线
+if (当前速度 &lt; 目标速度) {
+    加速度 = 最大加速度;
+} else {
+    减速度 = 最大减速度;
+}</code></pre>
+
+<h3>16.4 两种模型的对比</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>特性</th>
+      <th>差速驱动</th>
+      <th>阿克曼驱动</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>灵活性</td>
+      <td>高（可原地旋转）</td>
+      <td>低（需要转弯半径）</td>
+    </tr>
+    <tr>
+      <td>结构复杂度</td>
+      <td>低</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>路径规划难度</td>
+      <td>中等</td>
+      <td>较高</td>
+    </tr>
+    <tr>
+      <td>适用场景</td>
+      <td>室内、狭窄空间</td>
+      <td>室外、高速场景</td>
+    </tr>
+    <tr>
+      <td>最大速度</td>
+      <td>一般较低</td>
+      <td>可以较高</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>16.5 知识体系图</h3>
+
+<p>下面这张图总结了本章的核心逻辑，我建议你保存下来，以后做项目时对照着看。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">运动学模型与约束知识体系</text>
+  
+  <!-- 两个大分支 -->
+  <!-- 差速驱动 -->
+  <rect x="50" y="80" width="320" height="50" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="210" y="112" text-anchor="middle" font-size="18" font-weight="bold" fill="white">差速驱动模型</text>
+  
+  <!-- 阿克曼驱动 -->
+  <rect x="430" y="80" width="320" height="50" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="590" y="112" text-anchor="middle" font-size="18" font-weight="bold" fill="white">阿克曼驱动模型</text>
+  
+  <!-- 差速子项 -->
+  <rect x="50" y="160" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="125" y="186" text-anchor="middle" font-size="14" fill="#2c3e50">运动学方程</text>
+  
+  <rect x="220" y="160" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="295" y="186" text-anchor="middle" font-size="14" fill="#2c3e50">纯滚动约束</text>
+  
+  <rect x="50" y="220" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="125" y="246" text-anchor="middle" font-size="14" fill="#2c3e50">ICR计算</text>
+  
+  <rect x="220" y="220" width="150" height="40" rx="8" fill="#85c1e9"/>
+  <text x="295" y="246" text-anchor="middle" font-size="14" fill="#2c3e50">速度/加速度约束</text>
+  
+  <!-- 阿克曼子项 -->
+  <rect x="430" y="160" width="150" height="40" rx="8" fill="#f1948a"/>
+  <text x="505" y="186" text-anchor="middle" font-size="14" fill="#2c3e50">运动学方程</text>
+  
+  <rect x="600" y="160" width="150" height="40" rx="8" fill="#f1948a"/>
+  <text x="675" y="186" text-anchor="middle" font-size="14" fill="#2c3e50">非完整性约束</text>
+  
+  <rect x="430" y="220" width="150" height="40" rx="8" fill="#f1948a"/>
+  <text x="505" y="246" text-anchor="middle" font-size="14" fill="#2c3e50">转向角限制</text>
+  
+  <rect x="600" y="220" width="150" height="40" rx="8" fill="#f1948a"/>
+  <text x="675" y="246" text-anchor="middle" font-size="14" fill="#2c3e50">速度-转向耦合</text>
+  
+  <!-- 连接线 -->
+  <line x1="210" y1="130" x2="125" y2="160" stroke="#3498db" stroke-width="2"/>
+  <line x1="210" y1="130" x2="295" y2="160" stroke="#3498db" stroke-width="2"/>
+  <line x1="125" y1="200" x2="125" y2="220" stroke="#3498db" stroke-width="2"/>
+  <line x1="295" y1="200" x2="295" y2="220" stroke="#3498db" stroke-width="2"/>
+  
+  <line x1="590" y1="130" x2="505" y2="160" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="590" y1="130" x2="675" y2="160" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="505" y1="200" x2="505" y2="220" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="675" y1="200" x2="675" y2="220" stroke="#e74c3c" stroke-width="2"/>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="300" width="500" height="50" rx="10" fill="#2ecc71" opacity="0.8"/>
+  <text x="400" y="332" text-anchor="middle" font-size="16" font-weight="bold" fill="white">路径规划必须考虑运动学约束，否则规划不可执行</text>
+  
+  <!-- 箭头指向 -->
+  <line x1="210" y1="260" x2="210" y2="300" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="590" y1="260" x2="590" y2="300" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2ecc71"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部约束 -->
+  <rect x="100" y="380" width="600" height="80" rx="10" fill="#f9e79f" opacity="0.7"/>
+  <text x="400" y="410" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">共同约束：最大速度 / 最大加速度</text>
+  <text x="400" y="440" text-anchor="middle" font-size="14" fill="#2c3e50">电机限制 | 地面摩擦 | 负载重量 | 安全要求</text>
+</svg>
+
+<div class="tip">
+  <p><strong>我的建议</strong>：在实际项目中，先把运动学模型写成一个独立的模块。这样换车型时，只需要换这个模块，路径规划算法不用动。我现在的项目就是这么做的，省了很多事。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。运动学模型是路径规划的基础，你想想看，如果连机器人怎么动都不知道，规划出来的路径怎么可能走得通？</p>
+
+<p>嗯，记住一句话：<strong>约束不是限制，而是保证安全的前提</strong>。</p>
+
+        <div class="footer-nav">
+            <a href="15TrajectorySmoothInterp.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17RosNavStack.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

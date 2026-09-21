@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV激光SLAM导航技术实战 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV激光SLAM导航技术实战</h1>
+    <div class="subhead">
+        <span>🔐 从零到一 · 系统级实战</span>
+        <span>v3.0 · 30章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV/AMR 研发工程师</strong> — 深入SLAM建图与导航栈</li>
+                <li><strong>机器人算法工程师</strong> — 掌握激光SLAM核心算法与调优</li>
+                <li><strong>自动驾驶/移动机器人开发者</strong> — 多传感器融合与路径规划</li>
+                <li><strong>高校学生/研究者</strong> — 系统学习SLAM理论与工程实践</li>
+                <li><strong>工业自动化工程师</strong> — 仓储物流、产线AGV导航方案设计</li>
+                <li><strong>底层架构师</strong> — 从驱动到决策，构建完整导航系统</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握SLAM全栈技术</strong> — 从Gmapping到Cartographer，从建图到定位</li>
+                <li><strong>独立搭建AGV导航系统</strong> — ROS环境、激光雷达、里程计、传感器融合</li>
+                <li><strong>精通路径规划与避障</strong> — A*/DWA/TEB算法实战与参数调优</li>
+                <li><strong>工业级实战经验</strong> — 多AGV协同、室外导航、安全机制设计</li>
+                <li><strong>SLAM算法选型能力</strong> — 精度/鲁棒性/资源对比，场景适配决策</li>
+                <li><strong>前沿技术视野</strong> — NeRF-SLAM、语义SLAM、端到端导航</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>SLAM技术概述：</strong>AGV导航需求分析、SLAM技术发展史、激光SLAM vs 视觉SLAM、课程项目总览。</li>
+        <li data-index="2"><strong>ROS环境搭建：</strong>ROS Melodic/Noetic安装、工作空间创建、Catkin编译系统、ROS常用命令行工具。</li>
+        <li data-index="3"><strong>激光雷达选型与驱动：</strong>单线/多线激光雷达原理、主流品牌对比、ROS驱动配置、点云数据可视化。</li>
+        <li data-index="4"><strong>坐标变换基础：</strong>TF坐标树、静态/动态变换、TF广播与监听、Eigen库基础操作。</li>
+        <li data-index="5"><strong>里程计模型：</strong>两轮差速模型、阿克曼模型、轮式编码器数据处理、里程计标定方法。</li>
+        <li data-index="6"><strong>传感器融合基础：</strong>扩展卡尔曼滤波(EKF)、粒子滤波原理、robot_pose_ekf包使用。</li>
+        <li data-index="7"><strong>Gmapping算法原理：</strong>RBPF粒子滤波、提议分布优化、自适应重采样、参数调优实战。</li>
+        <li data-index="8"><strong>Gmapping建图实战：</strong>bag包回放、launch文件编写、地图保存与格式转换、建图质量评估。</li>
+        <li data-index="9"><strong>Cartographer算法原理：</strong>Ceres优化、子图(Submap)概念、回环检测、分支定界搜索。</li>
+        <li data-index="10"><strong>Cartographer建图实战：</strong>配置文件详解、3D/2D模式切换、纯定位模式、性能调优。</li>
+        <li data-index="11"><strong>Hector SLAM原理：</strong>高斯牛顿法、扫描匹配、多分辨率地图、无里程计模式。</li>
+        <li data-index="12"><strong>Karto SLAM原理：</strong>图优化框架、SPA(稀疏位姿调整)、SLAM前端与后端分离。</li>
+        <li data-index="13"><strong>多传感器融合SLAM：</strong>IMU+激光雷达融合、GPS+激光雷达融合、LIO-SAM原理简介。</li>
+        <li data-index="14"><strong>地图表示方法：</strong>占据栅格地图、TSDF地图、ESDF地图、OctoMap八叉树地图。</li>
+        <li data-index="15"><strong>地图处理与优化：</strong>OpenCV图像处理、地图膨胀、地图裁剪、多地图拼接。</li>
+        <li data-index="16"><strong>全局路径规划：</strong>Dijkstra算法、A*算法、Hybrid A*算法、路径平滑处理。</li>
+        <li data-index="17"><strong>局部路径规划：</strong>DWA算法、TEB算法、MPC控制、动态窗口参数调优。</li>
+        <li data-index="18"><strong>move_base框架：</strong>actionlib通信、全局/局部规划器配置、代价地图层、恢复行为。</li>
+        <li data-index="19"><strong>AMCL定位原理：</strong>自适应蒙特卡洛定位、KLD采样、粒子收敛与发散、重定位机制。</li>
+        <li data-index="20"><strong>AMCL实战调优：</strong>激光模型选择、粒子数量优化、初始位姿设置、定位精度评估。</li>
+        <li data-index="21"><strong>导航栈综合实战：</strong>完整导航流程搭建、多目标点导航、导航性能测试。</li>
+        <li data-index="22"><strong>动态障碍物避障：</strong>costmap层更新、VFH+算法、社会力模型、动态窗口避障。</li>
+        <li data-index="23"><strong>多AGV协同导航：</strong>通信机制、交通管制、路径冲突解决、编队控制基础。</li>
+        <li data-index="24"><strong>导航性能评估：</strong>定位精度(ATE/RPE)、建图精度、路径规划成功率、实时性分析。</li>
+        <li data-index="25"><strong>SLAM算法对比选型：</strong>精度/鲁棒性/计算资源对比、场景适配性分析、选型决策树。</li>
+        <li data-index="26"><strong>工业AGV实战案例：</strong>仓储物流场景、产线物料搬运、叉车AGV导航、安全机制设计。</li>
+        <li data-index="27"><strong>服务机器人导航案例：</strong>酒店配送、医院物流、商场导览、人机交互导航。</li>
+        <li data-index="28"><strong>室外AGV导航：</strong>RTK-GPS融合、3D激光雷达应用、越野场景导航、多传感器冗余。</li>
+        <li data-index="29"><strong>SLAM前沿技术：</strong>NeRF-SLAM、语义SLAM、主动SLAM、端到端导航。</li>
+        <li data-index="30"><strong>课程总结与项目答辩：</strong>知识体系回顾、常见面试题解析、项目展示模板、学习路径规划。</li>
+    </ul>
+    
+</div>
+</body>
+</html>

@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 代码规范与单元测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="active">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 代码规范与单元测试：命名规范、注释规范、Google Test框架、Mock测试与覆盖率</h2>
+
+<p>说实话，代码规范这件事，我年轻的时候也觉得是「形式主义」。那时候觉得，代码能跑就行，管它命名好不好看？直到有一次，我接手了一个AGV项目，前任工程师离职了，留下了一堆变量名叫 <code>a</code>、<code>b</code>、<code>temp1</code>、<code>temp2</code> 的代码。我花了整整两周才理清楚一个电机控制模块的逻辑。嗯，从那以后，我再也不敢小看代码规范了。</p>
+
+<p>今天我们就来聊聊，在AGV控制器开发中，怎么把代码写得既漂亮又可靠。说白了，就是两件事：<strong>让人看得懂</strong>，和<strong>让机器测得过</strong>。</p>
+
+<h3>命名规范：名字起得好，Bug少一半</h3>
+
+<p>我个人习惯，命名要遵循「<strong>自文档化</strong>」原则。什么意思？就是看名字就知道它干嘛的，不需要再翻注释。</p>
+
+<h4>变量命名</h4>
+<ul>
+  <li><strong>局部变量</strong>：小驼峰，比如 <code>motorSpeed</code>、<code>batteryVoltage</code></li>
+  <li><strong>全局变量</strong>：加前缀 <code>g_</code>，比如 <code>g_systemState</code></li>
+  <li><strong>静态变量</strong>：加前缀 <code>s_</code>，比如 <code>s_instanceCount</code></li>
+  <li><strong>常量</strong>：全大写加下划线，比如 <code>MAX_WHEEL_SPEED</code></li>
+</ul>
+
+<h4>函数命名</h4>
+<ul>
+  <li><strong>动作型函数</strong>：动词+名词，比如 <code>calculatePath()</code>、<code>stopMotor()</code></li>
+  <li><strong>查询型函数</strong>：用 <code>get</code> 或 <code>is</code> 开头，比如 <code>getBatteryLevel()</code>、<code>isObstacleDetected()</code></li>
+  <li><strong>回调函数</strong>：加 <code>on</code> 前缀，比如 <code>onOdometryUpdate()</code></li>
+</ul>
+
+<div class="highlight">
+  <strong>避坑指南</strong>：我曾经见过一个项目，变量名叫 <code>data</code>、<code>data1</code>、<code>data2</code>……你想想看，三个月后你自己都分不清哪个是哪个。所以，<strong>宁可名字长一点，也不要模糊</strong>。
+</div>
+
+<h3>注释规范：写给人看的，不是写给编译器看的</h3>
+
+<p>注释这件事，我有个原则：<strong>注释应该解释「为什么」，而不是「是什么」</strong>。代码本身已经说明了「是什么」，你再写一遍就是废话。</p>
+
+<h4>文件头注释</h4>
+<pre><code>/**
+ * @file motor_controller.cpp
+ * @brief AGV电机控制模块，负责速度闭环与电流限幅
+ * @author Zhang San
+ * @date 2024-01-15
+ */</code></pre>
+
+<h4>函数注释</h4>
+<pre><code>/**
+ * @brief 计算AGV从当前位置到目标点的路径
+ * @param start 起始坐标
+ * @param goal 目标坐标
+ * @param map 环境地图
+ * @return 路径点列表，若无法到达则返回空列表
+ * @note 使用A*算法，启发函数采用欧几里得距离
+ */
+std::vector&lt;Point&gt; planPath(const Point&amp; start, const Point&amp; goal, const Map&amp; map);</code></pre>
+
+<h4>行内注释</h4>
+<p>行内注释要少而精。我只在以下情况加注释：</p>
+<ul>
+  <li>算法有特殊处理（比如边界条件）</li>
+  <li>代码有历史原因（比如「这里先这样写，后续要优化」）</li>
+  <li>有潜在的陷阱（比如「这个函数不是线程安全的」）</li>
+</ul>
+
+<div class="tip">
+  <strong>我的小技巧</strong>：如果你发现需要写一大段注释来解释一段代码，那说明这段代码本身太复杂了。不如重构它。
+</div>
+
+<h3>Google Test框架：让测试成为习惯</h3>
+
+<p>在AGV开发中，我最怕的就是「改了一行代码，整个系统跑偏了」。Google Test（简称GTest）就是来解决这个问题的。它让单元测试变得简单、高效。</p>
+
+<h4>基本用法</h4>
+<pre><code>#include &lt;gtest/gtest.h&gt;
+
+// 测试电机速度计算
+TEST(MotorTest, SpeedCalculation) {
+    MotorController motor;
+    motor.setTargetSpeed(1.5);  // 目标速度 1.5 m/s
+    motor.update(0.1);          // 模拟 100ms 控制周期
+    
+    EXPECT_NEAR(motor.getCurrentSpeed(), 1.5, 0.01);
+    // 预期速度接近 1.5，误差不超过 0.01
+}
+
+// 测试急停功能
+TEST(MotorTest, EmergencyStop) {
+    MotorController motor;
+    motor.setTargetSpeed(2.0);
+    motor.emergencyStop();
+    
+    EXPECT_EQ(motor.getCurrentSpeed(), 0.0);
+    EXPECT_TRUE(motor.isStopped());
+}</code></pre>
+
+<h4>测试夹具（Test Fixture）</h4>
+<p>当多个测试需要相同的初始化时，用 <code>SetUp</code> 和 <code>TearDown</code>：</p>
+<pre><code>class PathPlannerTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        planner = new PathPlanner();
+        map.loadFromFile("test_map.yaml");
+    }
+    
+    void TearDown() override {
+        delete planner;
+    }
+    
+    PathPlanner* planner;
+    Map map;
+};
+
+TEST_F(PathPlannerTest, SimplePath) {
+    auto path = planner-&gt;planPath({0, 0}, {10, 10}, map);
+    EXPECT_FALSE(path.empty());
+    EXPECT_EQ(path.back(), Point(10, 10));
+}</code></pre>
+
+<div class="highlight">
+  <strong>经验之谈</strong>：我在项目中遇到过，测试夹具里忘了清理动态内存，结果内存泄漏导致测试跑着跑着就崩了。所以，<strong>记得在 TearDown 里释放资源</strong>。
+</div>
+
+<h3>Mock测试：隔离依赖，专注逻辑</h3>
+
+<p>AGV系统里，很多模块依赖硬件。比如路径规划依赖激光雷达数据，但你总不能每次跑测试都搬个激光雷达吧？这时候就需要 Mock 了。</p>
+
+<p>Google Mock 是 GTest 的搭档，专门用来模拟那些「不好测」的依赖。</p>
+
+<h4>Mock 示例</h4>
+<pre><code>// 假设有一个 Lidar 接口
+class LidarInterface {
+public:
+    virtual ~LidarInterface() = default;
+    virtual std::vector&lt;Point&gt; scan() = 0;
+};
+
+// 创建 Mock 类
+class MockLidar : public LidarInterface {
+public:
+    MOCK_METHOD(std::vector&lt;Point&gt;, scan, (), (override));
+};
+
+// 测试路径规划在遇到障碍物时的行为
+TEST(PathPlannerTest, AvoidObstacle) {
+    MockLidar mockLidar;
+    PathPlanner planner(&amp;mockLidar);
+    
+    // 模拟激光雷达返回障碍物数据
+    std::vector&lt;Point&gt; obstacleData = {{5, 5}, {5, 6}, {6, 5}};
+    EXPECT_CALL(mockLidar, scan())
+        .WillOnce(::testing::Return(obstacleData));
+    
+    auto path = planner.planPath({0, 0}, {10, 10});
+    // 验证路径绕过了障碍物
+    EXPECT_TRUE(pathDoesNotIntersect(path, obstacleData));
+}</code></pre>
+
+<div class="warning">
+  <strong>注意</strong>：Mock 测试容易犯的一个错误是「过度模拟」。你想想看，如果所有东西都 Mock 了，那测试就变成了「自己测自己」，失去了意义。我的建议是：<strong>只 Mock 外部依赖（硬件、网络、文件系统），核心逻辑不要 Mock</strong>。
+</div>
+
+<h3>覆盖率：不是越高越好，但太低肯定不行</h3>
+
+<p>覆盖率是个双刃剑。我见过团队把覆盖率目标定到 90%，结果大家为了凑覆盖率，写了一堆「测了等于没测」的测试用例。也见过覆盖率只有 20% 的项目，一上线就出 Bug。</p>
+
+<h4>常用的覆盖率指标</h4>
+<table>
+  <tr>
+    <th>指标</th>
+    <th>含义</th>
+    <th>AGV开发中的建议</th>
+  </tr>
+  <tr>
+    <td>行覆盖率</td>
+    <td>代码中有多少行被执行过</td>
+    <td>核心模块 ≥ 80%，非核心 ≥ 50%</td>
+  </tr>
+  <tr>
+    <td>分支覆盖率</td>
+    <td>if/else、switch 等分支是否都覆盖</td>
+    <td>安全相关模块 ≥ 90%</td>
+  </tr>
+  <tr>
+    <td>函数覆盖率</td>
+    <td>有多少函数被调用过</td>
+    <td>所有公开函数 ≥ 100%</td>
+  </tr>
+  <tr>
+    <td>条件覆盖率</td>
+    <td>布尔表达式的每个条件是否都测到</td>
+    <td>建议 ≥ 70%</td>
+  </tr>
+</table>
+
+<h4>如何生成覆盖率报告</h4>
+<p>在 CMake 项目中，配合 <code>gcov</code> 和 <code>lcov</code> 可以生成漂亮的 HTML 报告：</p>
+<pre><code># 编译时开启覆盖率
+cmake -DCMAKE_CXX_FLAGS="--coverage" ..
+make
+
+# 运行测试
+./run_tests
+
+# 生成报告
+lcov --capture --directory . --output-file coverage.info
+genhtml coverage.info --output-directory coverage_report</code></pre>
+
+<div class="tip">
+  <strong>我的建议</strong>：别盯着覆盖率数字看。先保证核心逻辑（比如路径规划、安全急停、电机控制）的覆盖率。这些模块出问题，AGV 可是会撞墙的。
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我梳理的本章核心逻辑。你可以把它当作一个检查清单：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:800px; height:auto;">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心标题 -->
+  <rect x="250" y="20" width="300" height="50" rx="25" fill="#4a90d9"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">代码规范与单元测试</text>
+  
+  <!-- 左侧：代码规范 -->
+  <rect x="50" y="100" width="300" height="40" rx="8" fill="#5cb85c"/>
+  <text x="200" y="126" text-anchor="middle" fill="white" font-size="16" font-weight="bold">代码规范</text>
+  
+  <rect x="50" y="160" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="120" y="183" text-anchor="middle" fill="#2e7d32" font-size="13">命名规范</text>
+  
+  <rect x="210" y="160" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="280" y="183" text-anchor="middle" fill="#2e7d32" font-size="13">注释规范</text>
+  
+  <rect x="50" y="210" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="120" y="233" text-anchor="middle" fill="#2e7d32" font-size="13">变量命名</text>
+  
+  <rect x="210" y="210" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="280" y="233" text-anchor="middle" fill="#2e7d32" font-size="13">函数命名</text>
+  
+  <rect x="50" y="260" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="120" y="283" text-anchor="middle" fill="#2e7d32" font-size="13">文件头注释</text>
+  
+  <rect x="210" y="260" width="140" height="35" rx="5" fill="#e8f5e9"/>
+  <text x="280" y="283" text-anchor="middle" fill="#2e7d32" font-size="13">行内注释</text>
+  
+  <!-- 右侧：单元测试 -->
+  <rect x="450" y="100" width="300" height="40" rx="8" fill="#d9534f"/>
+  <text x="600" y="126" text-anchor="middle" fill="white" font-size="16" font-weight="bold">单元测试</text>
+  
+  <rect x="450" y="160" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="520" y="183" text-anchor="middle" fill="#c62828" font-size="13">Google Test</text>
+  
+  <rect x="610" y="160" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="680" y="183" text-anchor="middle" fill="#c62828" font-size="13">Mock测试</text>
+  
+  <rect x="450" y="210" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="520" y="233" text-anchor="middle" fill="#c62828" font-size="13">TEST宏</text>
+  
+  <rect x="610" y="210" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="680" y="233" text-anchor="middle" fill="#c62828" font-size="13">Test Fixture</text>
+  
+  <rect x="450" y="260" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="520" y="283" text-anchor="middle" fill="#c62828" font-size="13">EXPECT_*</text>
+  
+  <rect x="610" y="260" width="140" height="35" rx="5" fill="#fce4ec"/>
+  <text x="680" y="283" text-anchor="middle" fill="#c62828" font-size="13">MOCK_METHOD</text>
+  
+  <!-- 底部：覆盖率 -->
+  <rect x="250" y="340" width="300" height="40" rx="8" fill="#f0ad4e"/>
+  <text x="400" y="366" text-anchor="middle" fill="white" font-size="16" font-weight="bold">覆盖率</text>
+  
+  <rect x="100" y="400" width="140" height="35" rx="5" fill="#fff3e0"/>
+  <text x="170" y="423" text-anchor="middle" fill="#e65100" font-size="13">行覆盖率</text>
+  
+  <rect x="260" y="400" width="140" height="35" rx="5" fill="#fff3e0"/>
+  <text x="330" y="423" text-anchor="middle" fill="#e65100" font-size="13">分支覆盖率</text>
+  
+  <rect x="420" y="400" width="140" height="35" rx="5" fill="#fff3e0"/>
+  <text x="490" y="423" text-anchor="middle" fill="#e65100" font-size="13">函数覆盖率</text>
+  
+  <rect x="580" y="400" width="140" height="35" rx="5" fill="#fff3e0"/>
+  <text x="650" y="423" text-anchor="middle" fill="#e65100" font-size="13">条件覆盖率</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="140" x2="120" y2="160" stroke="#5cb85c" stroke-width="2"/>
+  <line x1="200" y1="140" x2="280" y2="160" stroke="#5cb85c" stroke-width="2"/>
+  <line x1="200" y1="140" x2="200" y2="340" stroke="#888" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <line x1="600" y1="140" x2="520" y2="160" stroke="#d9534f" stroke-width="2"/>
+  <line x1="600" y1="140" x2="680" y2="160" stroke="#d9534f" stroke-width="2"/>
+  <line x1="600" y1="140" x2="600" y2="340" stroke="#888" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <line x1="400" y1="380" x2="170" y2="400" stroke="#f0ad4e" stroke-width="2"/>
+  <line x1="400" y1="380" x2="330" y2="400" stroke="#f0ad4e" stroke-width="2"/>
+  <line x1="400" y1="380" x2="490" y2="400" stroke="#f0ad4e" stroke-width="2"/>
+  <line x1="400" y1="380" x2="650" y2="400" stroke="#f0ad4e" stroke-width="2"/>
+</svg>
+
+<p>这张图把本章内容分成了三大块：<strong>代码规范</strong>（左侧）、<strong>单元测试</strong>（右侧）、<strong>覆盖率</strong>（底部）。三者相辅相成，缺一不可。代码规范让测试用例更容易写，单元测试反过来也会倒逼你写出更规范的代码。覆盖率则是衡量测试质量的尺子。</p>
+
+<p>好了，这一章就聊到这里。记住一句话：<strong>规范的代码是给同事看的，可靠的测试是给未来的自己看的</strong>。别偷懒，该写的测试一个都不能少。</p>
+
+<div class="footer-nav">
+            <a href="18StateMachineDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20PerformanceRealtime.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

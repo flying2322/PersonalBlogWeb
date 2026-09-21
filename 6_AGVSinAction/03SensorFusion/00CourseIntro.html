@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV导航系统传感器融合方案 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV导航系统传感器融合方案</h1>
+    <div class="subhead">
+        <span>🔐 硬核实战 · 系统级融合</span>
+        <span>v3.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV/AMR 开发工程师</strong> — 深入多传感器融合定位</li>
+                <li><strong>机器人导航算法工程师</strong> — 掌握卡尔曼/粒子滤波与SLAM</li>
+                <li><strong>自动驾驶决策层开发者</strong> — 理解里程计、IMU、LiDAR融合</li>
+                <li><strong>嵌入式系统工程师</strong> — 传感器标定、时间同步、实时优化</li>
+                <li><strong>高校机器人/自动化专业</strong> — 从理论到完整项目落地</li>
+                <li><strong>技术经理/架构师</strong> — 评估融合方案、系统集成与容错</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>精通6+传感器原理</strong> — 激光雷达、IMU、编码器、视觉、超声波、红外</li>
+                <li><strong>掌握四大滤波算法</strong> — KF/EKF/UKF/粒子滤波，手写实现</li>
+                <li><strong>独立搭建融合定位系统</strong> — GPS+IMU+编码器，因子图优化</li>
+                <li><strong>工业级SLAM实战</strong> — ORB-SLAM3、Cartographer 深度拆解</li>
+                <li><strong>完整项目经验</strong> — 从零搭建AGV导航系统，现场部署调试</li>
+                <li><strong>性能评估与调优</strong> — ATE/RPE、实时性、故障诊断与容错</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>AGV导航概述</strong> <span class="syllabus-desc">AGV定义、导航技术分类、传感器融合的必要性。</span></li>
+        <li data-index="2"><strong>坐标系与位姿表示</strong> <span class="syllabus-desc">世界坐标系、机器人坐标系、欧拉角与四元数。</span></li>
+        <li data-index="3"><strong>里程计模型</strong> <span class="syllabus-desc">两轮差速模型、阿克曼模型、航迹推演算法。</span></li>
+        <li data-index="4"><strong>惯性测量单元(IMU)</strong> <span class="syllabus-desc">加速度计与陀螺仪原理、IMU标定、零偏补偿。</span></li>
+        <li data-index="5"><strong>激光雷达(LiDAR)</strong> <span class="syllabus-desc">单线与多线激光雷达原理、点云数据格式、测距原理。</span></li>
+        <li data-index="6"><strong>视觉传感器</strong> <span class="syllabus-desc">单目与双目相机、深度相机、视觉里程计初步。</span></li>
+        <li data-index="7"><strong>编码器</strong> <span class="syllabus-desc">增量式与绝对式编码器、脉冲计数、速度与位置计算。</span></li>
+        <li data-index="8"><strong>超声波与红外传感器</strong> <span class="syllabus-desc">测距原理、适用场景、局限性分析。</span></li>
+        <li data-index="9"><strong>卡尔曼滤波基础</strong> <span class="syllabus-desc">状态空间模型、预测与更新步骤、一维卡尔曼滤波实现。</span></li>
+        <li data-index="10"><strong>扩展卡尔曼滤波(EKF)</strong> <span class="syllabus-desc">非线性系统线性化、雅可比矩阵、EKF融合IMU+编码器。</span></li>
+        <li data-index="11"><strong>无迹卡尔曼滤波(UKF)</strong> <span class="syllabus-desc">无迹变换、Sigma点选取、UKF与EKF对比。</span></li>
+        <li data-index="12"><strong>粒子滤波(PF)</strong> <span class="syllabus-desc">蒙特卡洛方法、重要性采样、重采样、粒子滤波定位。</span></li>
+        <li data-index="13"><strong>多传感器时间同步</strong> <span class="syllabus-desc">硬件同步与软件同步、时间戳管理、插值对齐方法。</span></li>
+        <li data-index="14"><strong>传感器标定</strong> <span class="syllabus-desc">IMU-相机标定、LiDAR-相机标定、手眼标定。</span></li>
+        <li data-index="15"><strong>数据预处理</strong> <span class="syllabus-desc">点云滤波(体素滤波、统计滤波)、图像去畸变、异常值剔除。</span></li>
+        <li data-index="16"><strong>特征提取</strong> <span class="syllabus-desc">点云特征(FPFH、SHOT)、图像特征(SIFT、ORB)、特征匹配。</span></li>
+        <li data-index="17"><strong>扫描匹配</strong> <span class="syllabus-desc">ICP算法、NDT算法、PL-ICP算法、性能对比。</span></li>
+        <li data-index="18"><strong>视觉SLAM</strong> <span class="syllabus-desc">ORB-SLAM3框架、关键帧、回环检测、图优化。</span></li>
+        <li data-index="19"><strong>激光SLAM</strong> <span class="syllabus-desc">Cartographer框架、子图构建、闭环约束、栅格地图。</span></li>
+        <li data-index="20"><strong>多传感器融合定位</strong> <span class="syllabus-desc">EKF融合GPS+IMU+编码器、因子图优化。</span></li>
+        <li data-index="21"><strong>地图构建</strong> <span class="syllabus-desc">占据栅格地图、TSDF地图、语义地图。</span></li>
+        <li data-index="22"><strong>路径规划基础</strong> <span class="syllabus-desc">Dijkstra算法、A*算法、DWA算法。</span></li>
+        <li data-index="23"><strong>运动控制</strong> <span class="syllabus-desc">PID控制器、纯追踪模型、Stanley控制器。</span></li>
+        <li data-index="24"><strong>ROS系统集成</strong> <span class="syllabus-desc">ROS节点通信、Bag包录制与回放、Rviz可视化。</span></li>
+        <li data-index="25"><strong>仿真环境搭建</strong> <span class="syllabus-desc">Gazebo仿真、传感器模型配置、场景设计。</span></li>
+        <li data-index="26"><strong>硬件平台搭建</strong> <span class="syllabus-desc">工控机选型、传感器选型、通信接口设计。</span></li>
+        <li data-index="27"><strong>实时性优化</strong> <span class="syllabus-desc">多线程架构、零拷贝传输、FPGA加速。</span></li>
+        <li data-index="28"><strong>故障诊断与容错</strong> <span class="syllabus-desc">传感器故障检测、冗余设计、降级策略。</span></li>
+        <li data-index="29"><strong>性能评估指标</strong> <span class="syllabus-desc">定位精度(ATE、RPE)、建图质量、实时性指标。</span></li>
+        <li data-index="30"><strong>综合项目实战</strong> <span class="syllabus-desc">从零搭建AGV导航系统、传感器融合调试、现场部署经验。</span></li>
+    </ul>
+    
+</div>
+</body>
+</html>

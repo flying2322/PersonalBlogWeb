@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 环境地图表示</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="active">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 环境地图表示：栅格地图、拓扑地图、特征地图、占据栅格地图构建原理</h2>
+
+<p>做AGV导航这么多年，我遇到过不少新手一上来就问：「老师，到底该用哪种地图？」说实话，这个问题没有标准答案。不同的场景、不同的传感器、不同的算力，决定了你该选哪种地图。今天我就把这几种主流地图掰开揉碎了讲清楚。</p>
+
+<h3>5.1 栅格地图（Grid Map）—— 最直观的表示方式</h3>
+
+<p>栅格地图，说白了就是把环境切成一个个小格子。每个格子要么是障碍物，要么是空地。就像你玩扫雷游戏一样，每个格子都有状态。</p>
+
+<p><strong>核心思想：</strong> 将连续空间离散化，用二维数组存储每个格子的状态。</p>
+
+<div class="highlight">
+  <p><strong>栅格地图的三种状态：</strong></p>
+  <ul>
+    <li><strong>空闲（Free）</strong>：机器人可以安全通过的区域</li>
+    <li><strong>占据（Occupied）</strong>：有障碍物，不能通过</li>
+    <li><strong>未知（Unknown）</strong>：还没探测到的区域</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过一个问题：栅格大小怎么选？选大了，地图模糊，路径规划容易撞墙；选小了，内存爆炸，计算慢得像蜗牛。我个人习惯是：室内场景用5cm分辨率，室外场景用10-20cm分辨率。你想想看，一个100m×100m的仓库，用5cm栅格，就是400万个格子，内存占用大概16MB，还算能接受。</p>
+
+<div class="tip">
+  <p><strong>实战小技巧：</strong> 栅格地图的存储可以用「游程编码」压缩。我做过一个项目，压缩后内存占用直接降到原来的1/5。尤其是大面积空地，效果特别明显。</p>
+</div>
+
+<h3>5.2 拓扑地图（Topological Map）—— 轻量级的路径表示</h3>
+
+<p>拓扑地图不关心具体尺寸，只关心「节点」和「边」。节点代表关键位置（比如路口、房间门口），边代表连通关系。说白了，它就像地铁线路图——你不需要知道站台的具体经纬度，只需要知道怎么换乘。</p>
+
+<p><strong>拓扑地图的构建步骤：</strong></p>
+<ol>
+  <li>提取环境中的关键点（拐角、门、岔路口）</li>
+  <li>建立节点之间的连通关系</li>
+  <li>存储为图结构（邻接表或邻接矩阵）</li>
+</ol>
+
+<p>我记得有一次做园区物流AGV，客户要求地图必须能在低算力单片机上运行。栅格地图根本跑不动，最后用了拓扑地图，整个地图就几十个节点，路径规划用Dijkstra算法，毫秒级出结果。嗯，这里要注意：拓扑地图的精度取决于节点提取的质量。节点提取不准，路径规划就会出错。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong> 我曾经在拓扑地图里犯过一个低级错误——节点之间的边没有考虑方向。结果AGV在单行道上逆行，差点撞到人。后来我强制要求：每条边必须标注「可通行方向」和「通行代价」。</p>
+</div>
+
+<h3>5.3 特征地图（Feature Map）—— 稀疏但高效</h3>
+
+<p>特征地图只存储环境中的显著特征，比如墙角的直线、柱子的圆形、路标等。它不像栅格地图那样存所有格子，而是只存「有用的信息」。</p>
+
+<p><strong>常见的特征类型：</strong></p>
+<table>
+  <tr>
+    <th>特征类型</th>
+    <th>描述</th>
+    <th>提取方法</th>
+  </tr>
+  <tr>
+    <td>点特征</td>
+    <td>角点、交点</td>
+    <td>Harris角点检测、SIFT</td>
+  </tr>
+  <tr>
+    <td>线特征</td>
+    <td>墙壁、走廊边缘</td>
+    <td>Hough变换、RANSAC</td>
+  </tr>
+  <tr>
+    <td>面特征</td>
+    <td>地面、墙面</td>
+    <td>平面拟合（RANSAC）</td>
+  </tr>
+</table>
+
+<p>特征地图最大的优势是内存占用小。一个100m×100m的仓库，特征地图可能只需要几百KB。但缺点也很明显——特征提取受环境影响大。我在一个光线昏暗的仓库里做过测试，激光雷达的特征提取效果还行，但视觉特征基本全废了。</p>
+
+<h3>5.4 占据栅格地图构建原理 —— 从传感器数据到地图</h3>
+
+<p>这是本章的重头戏。占据栅格地图（Occupancy Grid Map）是怎么从传感器数据构建出来的？我一步步讲清楚。</p>
+
+<p><strong>核心公式（贝叶斯更新）：</strong></p>
+<pre><code>// 对数几率形式的贝叶斯更新
+l(m_i | z_{1:t}, x_{1:t}) = l(m_i | z_{1:t-1}, x_{1:t-1}) + l(m_i | z_t, x_t) - l(m_i)
+
+其中：
+- l(m_i) 是栅格i的先验概率（通常为0，即50%占据概率）
+- l(m_i | z_t, x_t) 是逆传感器模型
+- 最终通过 sigmoid 函数转回概率值</code></pre>
+
+<p>为什么会用对数几率？因为概率相乘会变成加法，计算效率高很多。我刚开始学的时候也觉得绕，后来自己手写了一遍代码，才真正理解。</p>
+
+<p><strong>构建流程：</strong></p>
+<ol>
+  <li><strong>初始化</strong>：所有栅格概率设为0.5（未知状态）</li>
+  <li><strong>传感器数据输入</strong>：激光雷达扫描点或声纳数据</li>
+  <li><strong>逆传感器模型</strong>：根据测量值更新栅格概率
+    <ul>
+      <li>测量点所在的栅格：概率增加（占据）</li>
+      <li>测量点与传感器之间的栅格：概率降低（空闲）</li>
+    </ul>
+  </li>
+  <li><strong>贝叶斯更新</strong>：用上述公式迭代更新</li>
+  <li><strong>阈值判断</strong>：概率 > 0.7 标记为占据，< 0.3 标记为空闲</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>关键参数：</strong></p>
+  <ul>
+    <li><strong>栅格分辨率</strong>：通常0.05m~0.2m</li>
+    <li><strong>更新步长</strong>：每次移动多少距离更新一次地图</li>
+    <li><strong>传感器最大距离</strong>：超过此距离的测量值不信任</li>
+    <li><strong>占据阈值</strong>：建议0.7~0.8，太低了容易误判</li>
+  </ul>
+</div>
+
+<p>我曾经在一个项目里踩过坑：激光雷达的测量噪声没处理好，导致地图上出现大量「鬼影」障碍物。后来加了高斯滤波和时序一致性检查，才把地图质量提上来。你想想看，如果地图本身就有问题，后面的路径规划再牛也没用。</p>
+
+<h3>5.5 四种地图的对比与选型建议</h3>
+
+<table>
+  <tr>
+    <th>地图类型</th>
+    <th>内存占用</th>
+    <th>构建难度</th>
+    <th>定位精度</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>栅格地图</td>
+    <td>高</td>
+    <td>低</td>
+    <td>高</td>
+    <td>室内、结构化环境</td>
+  </tr>
+  <tr>
+    <td>拓扑地图</td>
+    <td>极低</td>
+    <td>中</td>
+    <td>低</td>
+    <td>大范围、低算力场景</td>
+  </tr>
+  <tr>
+    <td>特征地图</td>
+    <td>低</td>
+    <td>高</td>
+    <td>中</td>
+    <td>视觉SLAM、室外场景</td>
+  </tr>
+  <tr>
+    <td>占据栅格地图</td>
+    <td>中</td>
+    <td>中</td>
+    <td>高</td>
+    <td>动态环境、实时建图</td>
+  </tr>
+</table>
+
+<p>我个人习惯是：<strong>室内AGV首选占据栅格地图</strong>，因为它能处理动态障碍物，而且构建简单。如果是室外园区，我会用拓扑地图+局部栅格地图的混合方案——全局规划用拓扑，局部避障用栅格。</p>
+
+<div class="tip">
+  <p><strong>混合地图实战经验：</strong> 我在一个物流仓库项目里，用了三层地图：顶层是拓扑地图（全局路径），中间层是栅格地图（静态障碍物），底层是局部代价地图（动态障碍物）。这样既保证了规划效率，又兼顾了避障精度。</p>
+</div>
+
+<h3>5.6 本章知识体系总览</h3>
+
+<p>下面这张图总结了四种地图的核心逻辑和关系，我建议你保存下来，以后做选型时直接对照。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">环境地图表示知识体系</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">环境地图表示</text>
+  
+  <!-- 四个分支 -->
+  <!-- 栅格地图 -->
+  <rect x="50" y="180" width="160" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="130" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">栅格地图</text>
+  
+  <!-- 拓扑地图 -->
+  <rect x="240" y="180" width="160" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="320" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">拓扑地图</text>
+  
+  <!-- 特征地图 -->
+  <rect x="430" y="180" width="160" height="50" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="510" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">特征地图</text>
+  
+  <!-- 占据栅格地图 -->
+  <rect x="620" y="180" width="160" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="700" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">占据栅格地图</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="120" x2="130" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="400" y1="120" x2="320" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="400" y1="120" x2="510" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+  <line x1="400" y1="120" x2="700" y2="180" stroke="#bdc3c7" stroke-width="2"/>
+  
+  <!-- 特性说明 -->
+  <!-- 栅格地图特性 -->
+  <rect x="30" y="260" width="200" height="100" rx="5" fill="#fff" stroke="#e74c3c" stroke-width="1"/>
+  <text x="130" y="285" text-anchor="middle" font-size="12" fill="#e74c3c" font-weight="bold">特性</text>
+  <text x="40" y="305" font-size="11" fill="#333">• 离散化空间</text>
+  <text x="40" y="322" font-size="11" fill="#333">• 内存占用高</text>
+  <text x="40" y="339" font-size="11" fill="#333">• 构建简单直观</text>
+  
+  <!-- 拓扑地图特性 -->
+  <rect x="240" y="260" width="160" height="100" rx="5" fill="#fff" stroke="#2ecc71" stroke-width="1"/>
+  <text x="320" y="285" text-anchor="middle" font-size="12" fill="#2ecc71" font-weight="bold">特性</text>
+  <text x="250" y="305" font-size="11" fill="#333">• 节点+边结构</text>
+  <text x="250" y="322" font-size="11" fill="#333">• 内存占用极低</text>
+  <text x="250" y="339" font-size="11" fill="#333">• 适合大范围</text>
+  
+  <!-- 特征地图特性 -->
+  <rect x="430" y="260" width="160" height="100" rx="5" fill="#fff" stroke="#f39c12" stroke-width="1"/>
+  <text x="510" y="285" text-anchor="middle" font-size="12" fill="#f39c12" font-weight="bold">特性</text>
+  <text x="440" y="305" font-size="11" fill="#333">• 稀疏存储</text>
+  <text x="440" y="322" font-size="11" fill="#333">• 提取难度高</text>
+  <text x="440" y="339" font-size="11" fill="#333">• 适合视觉SLAM</text>
+  
+  <!-- 占据栅格地图特性 -->
+  <rect x="620" y="260" width="180" height="100" rx="5" fill="#fff" stroke="#9b59b6" stroke-width="1"/>
+  <text x="710" y="285" text-anchor="middle" font-size="12" fill="#9b59b6" font-weight="bold">特性</text>
+  <text x="630" y="305" font-size="11" fill="#333">• 概率更新机制</text>
+  <text x="630" y="322" font-size="11" fill="#333">• 贝叶斯滤波</text>
+  <text x="630" y="339" font-size="11" fill="#333">• 适合动态环境</text>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="400" width="500" height="60" rx="10" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="425" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">选型建议</text>
+  <text x="400" y="445" text-anchor="middle" font-size="11" fill="#555">室内AGV → 占据栅格地图 | 室外园区 → 拓扑+栅格混合 | 视觉SLAM → 特征地图</text>
+</svg>
+
+<p>嗯，地图表示这块内容确实不少，但它是整个AGV导航系统的地基。地基不稳，上层建筑再漂亮也没用。我建议你动手写一个简单的占据栅格地图构建程序，用激光雷达数据跑一遍，比看十遍理论都管用。</p>
+
+<div class="footer-nav">
+            <a href="04SensorDataPreprocess.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06SlamMappingBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

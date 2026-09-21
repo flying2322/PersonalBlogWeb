@@ -1,0 +1,397 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 地图与路径规划基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="active">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 地图与路径规划基础：地图表示与搜索算法</h2>
+
+<p>各位同学好，我是老张。今天咱们聊聊AGV调度系统里最基础、也最核心的一块——地图表示和路径搜索。说实话，我见过不少团队，算法调得天花乱坠，结果地图建模没做好，车跑起来各种撞墙。嗯，这章咱们就把地基打牢。</p>
+
+<h3>地图表示方法</h3>
+
+<p>AGV要跑，首先得知道“世界长什么样”。地图怎么存，直接决定了后续所有算法的效率和可行性。我个人习惯把地图表示分成两大类：栅格图和拓扑图。</p>
+
+<h4>栅格图（Grid Map）</h4>
+
+<p>栅格图，说白了就是把真实环境切成一个个小格子。每个格子要么是空地（可通行），要么是障碍物（不可通行）。就像你玩扫雷游戏那个棋盘。</p>
+
+<div class="highlight">
+  <p><strong>核心特点：</strong></p>
+  <ul>
+    <li>精度取决于栅格大小。1米一格？还是0.1米一格？</li>
+    <li>存储简单，就是一个二维数组</li>
+    <li>搜索时直接操作格子坐标</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过一个问题：工厂车间有200米长、100米宽，如果用0.1米的栅格，那就是2000×1000=200万个格子。每次路径搜索都要遍历这么多格子，性能扛不住。所以实际项目中，我建议栅格大小取0.5米到1米之间，够用就行。</p>
+
+<pre><code>// 栅格图的数据结构示例
+struct GridMap {
+    int width;          // 宽度（格子数）
+    int height;         // 高度（格子数）
+    double resolution;  // 分辨率（米/格）
+    int** cells;        // 0=空地, 1=障碍物
+};
+</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把栅格分辨率设成0.05米，结果地图文件直接爆了内存。后来才意识到，AGV本身有0.5米的转弯半径，你搞那么精细的栅格，纯属浪费。</p>
+</div>
+
+<h4>拓扑图（Topological Map）</h4>
+
+<p>拓扑图就聪明多了。它只关心“关键点”和“关键点之间的连接关系”。你想想看，AGV在工厂里跑，其实不需要知道每个角落长什么样，它只需要知道：从A点到B点，走哪条路最近。</p>
+
+<p>拓扑图由两部分组成：</p>
+<ul>
+  <li><strong>节点（Node）：</strong>代表关键位置，比如工位、充电站、路口</li>
+  <li><strong>边（Edge）：</strong>代表可通行的路径，边上可以带权重（距离、时间、能耗）</li>
+</ul>
+
+<p>我个人更偏爱拓扑图，原因很简单：搜索速度快。一个工厂可能只需要几百个节点，比几百万个栅格快太多了。</p>
+
+<pre><code>// 拓扑图的数据结构示例
+struct TopoNode {
+    int id;
+    double x, y;        // 实际坐标
+    vector&lt;int&gt; neighbors;  // 邻居节点ID列表
+};
+
+struct TopoEdge {
+    int from, to;
+    double weight;      // 距离或时间成本
+};
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>实际项目中，我通常把栅格图和拓扑图结合使用。栅格图用于全局规划，拓扑图用于局部调度。两者互补，效果最好。</p>
+</div>
+
+<h3>路径搜索算法</h3>
+
+<p>地图建好了，接下来就是找路。AGV从A点到B点，怎么走最短？怎么走最快？这里我重点讲两个算法：Dijkstra和A*。</p>
+
+<h4>Dijkstra算法</h4>
+
+<p>Dijkstra是个经典算法，它的核心思想就一句话：<strong>从起点开始，一层层往外扩散，直到找到终点</strong>。它保证找到的是最短路径，但代价是——慢。</p>
+
+<p>为什么慢？因为它像个无头苍蝇，四面八方都搜。你想想看，如果起点和终点在一条直线上，Dijkstra还是会去搜反方向的路。</p>
+
+<pre><code>// Dijkstra算法伪代码
+function Dijkstra(graph, start, end):
+    dist[start] = 0
+    queue = priority_queue()
+    queue.push((0, start))
+    
+    while queue not empty:
+        (d, u) = queue.pop()
+        if u == end: break
+        for v in graph.neighbors(u):
+            if dist[u] + weight(u,v) &lt; dist[v]:
+                dist[v] = dist[u] + weight(u,v)
+                queue.push((dist[v], v))
+    return dist[end]
+</code></pre>
+
+<div class="highlight">
+  <p><strong>适用场景：</strong>地图小、节点少、对最优性要求极高的情况。比如AGV在充电站和工位之间来回跑，路径固定，用Dijkstra一次算好，后面直接复用。</p>
+</div>
+
+<h4>A*算法</h4>
+
+<p>A*算法是Dijkstra的升级版。它加了一个“启发式函数”，说白了就是给算法一个方向感。它知道终点在哪个方向，就不会往反方向瞎搜了。</p>
+
+<p>A*的核心公式：</p>
+<pre><code>f(n) = g(n) + h(n)
+</code></pre>
+<ul>
+  <li><strong>g(n)：</strong>从起点到当前节点n的实际代价</li>
+  <li><strong>h(n)：</strong>从当前节点n到终点的估计代价（启发式函数）</li>
+  <li><strong>f(n)：</strong>总代价估计值</li>
+</ul>
+
+<p>启发式函数h(n)怎么选？我常用的有两种：</p>
+<ul>
+  <li><strong>曼哈顿距离：</strong>适合只能上下左右移动的场景（比如仓库货架间）</li>
+  <li><strong>欧几里得距离：</strong>适合可以任意方向移动的场景（比如开阔车间）</li>
+</ul>
+
+<pre><code>// A*算法伪代码
+function AStar(graph, start, end):
+    openSet = priority_queue()
+    openSet.push((f(start), start))
+    g[start] = 0
+    
+    while openSet not empty:
+        current = openSet.pop()
+        if current == end: break
+        for neighbor in graph.neighbors(current):
+            tentative_g = g[current] + weight(current, neighbor)
+            if tentative_g &lt; g[neighbor]:
+                g[neighbor] = tentative_g
+                f[neighbor] = g[neighbor] + heuristic(neighbor, end)
+                openSet.push((f[neighbor], neighbor))
+    return reconstruct_path(cameFrom, end)
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>实际项目中，90%的情况用A*就够了。Dijkstra虽然保证最优，但A*在大多数情况下也能找到最优路径，而且快得多。我曾经在一个200节点的拓扑图上测试，A*比Dijkstra快了将近10倍。</p>
+</div>
+
+<h3>两种算法的对比</h3>
+
+<table>
+  <tr>
+    <th>特性</th>
+    <th>Dijkstra</th>
+    <th>A*</th>
+  </tr>
+  <tr>
+    <td>搜索方向</td>
+    <td>全方位扩散</td>
+    <td>有方向性</td>
+  </tr>
+  <tr>
+    <td>最优性</td>
+    <td>保证最优</td>
+    <td>取决于启发式函数</td>
+  </tr>
+  <tr>
+    <td>速度</td>
+    <td>慢（节点数多时明显）</td>
+    <td>快（有方向引导）</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>小地图、静态路径</td>
+    <td>大地图、动态调度</td>
+  </tr>
+</table>
+
+<h3>知识体系结构图</h3>
+
+<p>下面这张图，是我自己画的，把本章的核心知识点串起来了。你看一眼就能明白地图表示和路径搜索之间的关系。</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">地图与路径规划知识体系</text>
+  
+  <!-- 地图表示 -->
+  <rect x="50" y="70" width="300" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="200" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图表示方法</text>
+  
+  <!-- 栅格图 -->
+  <rect x="50" y="140" width="130" height="40" rx="5" fill="#85c1e9"/>
+  <text x="115" y="165" text-anchor="middle" font-size="14" fill="#2c3e50">栅格图</text>
+  
+  <!-- 拓扑图 -->
+  <rect x="220" y="140" width="130" height="40" rx="5" fill="#85c1e9"/>
+  <text x="285" y="165" text-anchor="middle" font-size="14" fill="#2c3e50">拓扑图</text>
+  
+  <!-- 路径搜索 -->
+  <rect x="450" y="70" width="300" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="600" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径搜索算法</text>
+  
+  <!-- Dijkstra -->
+  <rect x="450" y="140" width="130" height="40" rx="5" fill="#f1948a"/>
+  <text x="515" y="165" text-anchor="middle" font-size="14" fill="#2c3e50">Dijkstra</text>
+  
+  <!-- A* -->
+  <rect x="620" y="140" width="130" height="40" rx="5" fill="#f1948a"/>
+  <text x="685" y="165" text-anchor="middle" font-size="14" fill="#2c3e50">A*</text>
+  
+  <!-- 连接线 -->
+  <line x1="200" y1="120" x2="115" y2="140" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="200" y1="120" x2="285" y2="140" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="120" x2="515" y2="140" stroke="#2c3e50" stroke-width="2"/>
+  <line x1="600" y1="120" x2="685" y2="140" stroke="#2c3e50" stroke-width="2"/>
+  
+  <!-- 特性说明 -->
+  <rect x="50" y="210" width="700" height="160" rx="8" fill="#eaf2f8" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="70" y="240" font-size="14" font-weight="bold" fill="#2c3e50">关键特性：</text>
+  <text x="70" y="265" font-size="13" fill="#34495e">• 栅格图：精度可控，存储简单，适合精细环境建模</text>
+  <text x="70" y="290" font-size="13" fill="#34495e">• 拓扑图：节点少，搜索快，适合大规模场景</text>
+  <text x="70" y="315" font-size="13" fill="#34495e">• Dijkstra：保证最优，但搜索范围大，速度慢</text>
+  <text x="70" y="340" font-size="13" fill="#34495e">• A*：有方向引导，速度快，实际项目首选</text>
+  
+  <!-- 箭头连接 -->
+  <line x1="350" y1="95" x2="450" y2="95" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="warning">
+  <p><strong>重要提醒：</strong>别以为学了算法就万事大吉。我曾经在一个项目里，A*算法跑得飞快，结果AGV走到一半发现路被堵了。为什么？因为地图是静态的，但环境是动态的。所以实际调度系统里，路径搜索只是第一步，后面还要做冲突检测和动态重规划。</p>
+</div>
+
+<p>好了，这一章的内容就到这儿。地图表示和路径搜索是AGV调度系统的地基，地基不牢，上面盖再多算法都是白搭。下一章咱们聊聊多AGV调度中的冲突解决策略，那才是真正考验架构能力的地方。</p>
+
+<div class="footer-nav">
+            <a href="02DispatchArchitecture.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04AStarAlgorithm.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>15 局部路径避障</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="active">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>15 局部路径避障：VFH算法、动态窗口避障、社会力模型、行人预测与交互</h2>
+
+<p>各位，局部避障这个话题，说实话是AGV真正从实验室走向工厂的「最后一公里」。全局路径规划给你画了一条大路，但路上突然冒出个纸箱、叉车、或者一个低头看手机的行人——这时候全局路径就废了。局部避障就是干这个的：在毫秒级时间内，重新算出一条能走的路。</p>
+
+<p>我这些年调试过的AGV，十有八九的「撞墙」事故都出在局部避障参数没调好。今天咱们就把VFH、DWA、社会力模型这几个主流方法掰开揉碎了讲，顺便聊聊行人预测——嗯，这部分我踩过的坑最多。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>局部避障不是「躲开就完事」，而是在「安全」和「效率」之间找平衡。躲得太远，AGV像个醉汉；躲得太近，容易急刹导致货物倾倒。</p>
+</div>
+
+<h3>15.1 VFH算法：向量场直方图</h3>
+
+<p>VFH（Vector Field Histogram）是我个人最早接触的局部避障算法。它的思路很直接：把周围环境用极坐标网格表示，每个扇区统计障碍物密度，然后选一个「最空旷」的方向走。</p>
+
+<p>说白了，就是给机器人装了个「雷达眼」，然后问它：哪个方向障碍物最少？就往那走。</p>
+
+<h4>算法核心步骤</h4>
+<ol>
+  <li><strong>构建极坐标直方图</strong>：以机器人当前位置为圆心，将360°划分为n个扇区（通常72个，每5°一个）。</li>
+  <li><strong>计算障碍物密度</strong>：每个扇区内，根据激光雷达数据计算障碍物占据的「密度值」。</li>
+  <li><strong>设定阈值</strong>：密度高于阈值的扇区标记为「不可通行」，低于阈值的为「候选方向」。</li>
+  <li><strong>选择最优方向</strong>：在候选方向中，选一个最接近目标方向的角度。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>阈值设定很关键。阈值设高了，AGV会贴着障碍物走，容易刮蹭；设低了，AGV会绕大圈。我一般先用仿真跑一遍，观察最窄通道的密度值，然后取那个值的80%作为阈值。</p>
+</div>
+
+<p>VFH的优点是计算快，适合嵌入式平台。但缺点也很明显——它只考虑「当前时刻」的障碍物分布，没有速度信息。遇到动态障碍物（比如行人），容易「急刹车」或者「来回摆动」。</p>
+
+<h3>15.2 动态窗口避障（DWA）</h3>
+
+<p>DWA（Dynamic Window Approach）是我现在项目里用得最多的方法。它比VFH聪明的地方在于：它考虑了机器人的运动学约束。</p>
+
+<p>你想想看，AGV不是全向移动的，它有最小转弯半径、最大加速度。VFH告诉你「往左30°走」，但AGV可能根本转不过去。DWA就解决了这个问题——它只在「机器人当前能实现的运动范围」内搜索。</p>
+
+<h4>DWA的工作流程</h4>
+<ol>
+  <li><strong>采样速度空间</strong>：在(v, ω)空间内采样，v是线速度，ω是角速度。采样范围受限于最大加速度和最大减速度。</li>
+  <li><strong>轨迹预测</strong>：对每组(v, ω)模拟一段短时间内的运动轨迹（通常1-2秒）。</li>
+  <li><strong>轨迹评价</strong>：用三个指标打分——朝向目标的程度、距离障碍物的远近、速度大小。</li>
+  <li><strong>选择最优轨迹</strong>：加权求和，选得分最高的轨迹执行。</li>
+</ol>
+
+<pre><code>// DWA评价函数伪代码
+float evaluateTrajectory(float v, float w) {
+    float headingCost = calcHeadingCost(v, w);   // 朝向目标
+    float obstacleCost = calcObstacleCost(v, w); // 避障
+    float velocityCost = calcVelocityCost(v, w); // 速度奖励
+    return alpha * headingCost + beta * obstacleCost + gamma * velocityCost;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>三个权重的调参是个玄学。alpha太大，AGV会直冲障碍物；beta太大，AGV会原地打转。我习惯先固定gamma=0.1，然后调alpha和beta的比例，让它们在「走廊场景」下能稳定通过。</p>
+</div>
+
+<h3>15.3 社会力模型</h3>
+
+<p>社会力模型（Social Force Model）最早是研究行人运动的，后来被引入到机器人领域。它的核心思想是：把人和障碍物都看作「力场源」，机器人受到「吸引力」（目标方向）和「排斥力」（障碍物、行人）的共同作用。</p>
+
+<p>我个人觉得，社会力模型最妙的地方在于它很「自然」。你想想看，人走路的时候不会刻意去算路径，而是凭感觉——离障碍物近了就躲远点，离目标近了就加速。社会力模型模拟的就是这种直觉。</p>
+
+<h4>力的构成</h4>
+<table>
+  <tr>
+    <th>力的类型</th>
+    <th>来源</th>
+    <th>作用</th>
+  </tr>
+  <tr>
+    <td>吸引力</td>
+    <td>目标点</td>
+    <td>引导机器人向目标移动</td>
+  </tr>
+  <tr>
+    <td>排斥力</td>
+    <td>静态障碍物</td>
+    <td>避免碰撞墙壁、货架等</td>
+  </tr>
+  <tr>
+    <td>社会力</td>
+    <td>行人/其他AGV</td>
+    <td>保持社交距离，避免拥挤</td>
+  </tr>
+  <tr>
+    <td>波动力</td>
+    <td>随机扰动</td>
+    <td>模拟不确定性，防止死锁</td>
+  </tr>
+</table>
+
+<p>社会力模型的优点是轨迹平滑，看起来像「人」在走路。但缺点也很明显——参数多，调起来费劲。而且它没有显式的「避障保证」，在狭窄通道里容易卡住。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一个仓库项目里用社会力模型，结果AGV在门口来回「抖动」就是出不去。后来发现是排斥力衰减太快，导致AGV一靠近门框就被弹回来。解决办法是把排斥力的作用范围从0.5米扩大到1.2米，同时降低峰值力的大小。</p>
+</div>
+
+<h3>15.4 行人预测与交互</h3>
+
+<p>这部分是我觉得最有意思的。行人不是静态障碍物，他们会动、会转弯、甚至会停下来看手机。如果你只把行人当作「移动的圆柱体」来处理，那AGV的表现会非常「愣」。</p>
+
+<p>我记得有一次在商场测试，一个小孩突然从货架后面跑出来，AGV急刹停住了，但小孩也吓到了，站在原地不动。AGV等了两秒，发现「障碍物」还在，就开始绕行——结果小孩又往同一个方向跑，AGV又急刹。就这么僵持了十几秒。</p>
+
+<p>后来我意识到：<strong>行人预测的核心不是「预测轨迹」，而是「预测意图」</strong>。</p>
+
+<h4>常用的行人预测方法</h4>
+<ul>
+  <li><strong>恒定速度模型（CVM）</strong>：假设行人保持当前速度和方向。简单但有效，适合短时间预测（<1秒）。</li>
+  <li><strong>社会力模型预测</strong>：用社会力模型模拟行人的未来轨迹。计算量大，但更准确。</li>
+  <li><strong>LSTM/RNN</strong>：基于历史轨迹预测未来轨迹。需要大量训练数据，适合复杂场景。</li>
+  <li><strong>交互感知模型</strong>：考虑行人与机器人之间的相互影响。比如行人看到AGV过来，可能会主动让路。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的建议：</strong>实际项目中，别一上来就上深度学习。先用恒定速度模型+社会力模型做基础，跑通了再考虑升级。我见过太多团队花三个月训练LSTM，结果部署后发现行人轨迹根本不符合训练集的分布。</p>
+</div>
+
+<h4>人机交互策略</h4>
+<p>行人预测的最终目的是「交互」。AGV不能只躲着行人走，还要「读懂」行人的意图。比如：</p>
+<ul>
+  <li>行人朝AGV走来，但视线在看手机——大概率不会让路，AGV应该主动避让。</li>
+  <li>行人站在通道中间，但身体侧向一边——可能在让路，AGV可以尝试通过。</li>
+  <li>行人突然加速——可能有急事，AGV应该减速等待。</li>
+</ul>
+
+<p>这些「潜规则」很难用公式表达，我一般用有限状态机来处理：把行人的行为分为「静止、慢走、快走、转向」等状态，每个状态对应不同的避障策略。</p>
+
+<h3>15.5 四种方法的对比与选择</h3>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>计算速度</th>
+    <th>轨迹平滑度</th>
+    <th>动态障碍物处理</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>VFH</td>
+    <td>极快</td>
+    <td>一般</td>
+    <td>差</td>
+    <td>静态环境、低速度AGV</td>
+  </tr>
+  <tr>
+    <td>DWA</td>
+    <td>快</td>
+    <td>好</td>
+    <td>中等</td>
+    <td>动态环境、中高速AGV</td>
+  </tr>
+  <tr>
+    <td>社会力模型</td>
+    <td>中等</td>
+    <td>极好</td>
+    <td>好</td>
+    <td>人机混行、低速场景</td>
+  </tr>
+  <tr>
+    <td>行人预测+交互</td>
+    <td>慢</td>
+    <td>好</td>
+    <td>极好</td>
+    <td>高密度行人、商场/医院</td>
+  </tr>
+</table>
+
+<p>实际项目中，我通常的做法是：<strong>DWA做主力，社会力模型做辅助，行人预测做上层决策</strong>。DWA负责底层的运动控制，社会力模型用来平滑轨迹，行人预测用来调整DWA的权重参数。</p>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>在DWA的评价函数里，把「行人预测的碰撞概率」作为一个额外的惩罚项。这样AGV在靠近行人时会自动减速，而不是等到距离很近了才急刹。</p>
+</div>
+
+<h3>15.6 知识体系总览</h3>
+
+<p>下面这张图是我自己整理的局部避障知识体系，你可以把它当作一个「思维导图」来用。每次调参遇到问题，就回来看看——到底是哪个环节出了问题。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="50" text-anchor="middle" fill="white" font-size="16" font-weight="bold">局部路径避障</text>
+  
+  <!-- 四个分支 -->
+  <!-- VFH -->
+  <rect x="50" y="120" width="160" height="40" rx="8" fill="#e8f4e8" stroke="#4caf50" stroke-width="2"/>
+  <text x="130" y="145" text-anchor="middle" fill="#2e7d32" font-size="14" font-weight="bold">VFH算法</text>
+  <text x="130" y="175" text-anchor="middle" fill="#555" font-size="11">极坐标直方图</text>
+  <text x="130" y="195" text-anchor="middle" fill="#555" font-size="11">阈值分割</text>
+  <text x="130" y="215" text-anchor="middle" fill="#555" font-size="11">候选方向选择</text>
+  
+  <!-- DWA -->
+  <rect x="290" y="120" width="160" height="40" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="370" y="145" text-anchor="middle" fill="#e65100" font-size="14" font-weight="bold">动态窗口DWA</text>
+  <text x="370" y="175" text-anchor="middle" fill="#555" font-size="11">速度空间采样</text>
+  <text x="370" y="195" text-anchor="middle" fill="#555" font-size="11">轨迹预测</text>
+  <text x="370" y="215" text-anchor="middle" fill="#555" font-size="11">加权评价函数</text>
+  
+  <!-- 社会力模型 -->
+  <rect x="530" y="120" width="160" height="40" rx="8" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="610" y="145" text-anchor="middle" fill="#880e4f" font-size="14" font-weight="bold">社会力模型</text>
+  <text x="610" y="175" text-anchor="middle" fill="#555" font-size="11">吸引力/排斥力</text>
+  <text x="610" y="195" text-anchor="middle" fill="#555" font-size="11">社会力场</text>
+  <text x="610" y="215" text-anchor="middle" fill="#555" font-size="11">波动力</text>
+  
+  <!-- 行人预测 -->
+  <rect x="290" y="280" width="160" height="40" rx="8" fill="#e8eaf6" stroke="#3f51b5" stroke-width="2"/>
+  <text x="370" y="305" text-anchor="middle" fill="#1a237e" font-size="14" font-weight="bold">行人预测与交互</text>
+  <text x="370" y="335" text-anchor="middle" fill="#555" font-size="11">CVM/LSTM预测</text>
+  <text x="370" y="355" text-anchor="middle" fill="#555" font-size="11">意图识别</text>
+  <text x="370" y="375" text-anchor="middle" fill="#555" font-size="11">交互策略</text>
+  
+  <!-- 连接线 -->
+  <line x1="400" y1="70" x2="130" y2="120" stroke="#4caf50" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="400" y1="70" x2="370" y2="120" stroke="#ff9800" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="400" y1="70" x2="610" y2="120" stroke="#e91e63" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="400" y1="70" x2="370" y2="280" stroke="#3f51b5" stroke-width="2" stroke-dasharray="5,3"/>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="420" width="400" height="50" rx="10" fill="#fff9c4" stroke="#fdd835" stroke-width="2"/>
+  <text x="400" y="440" text-anchor="middle" fill="#f57f17" font-size="13" font-weight="bold">实际项目推荐：DWA为主 + 社会力辅助 + 行人预测决策</text>
+  <text x="400" y="458" text-anchor="middle" fill="#888" font-size="11">安全与效率的平衡，才是局部避障的精髓</text>
+</svg>
+
+<p>好了，以上就是局部避障的四个核心方法。说实话，没有哪个方法是万能的，关键看你的场景。仓库里货架密集，VFH就够用；商场里人来人往，就得把行人预测加上。调参是个慢功夫，别急，多跑几趟仿真，多去现场看看，慢慢就有感觉了。</p>
+
+        <div class="footer-nav">
+            <a href="14PurePursuitStanley.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="16GlobalLocalFusionArch.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

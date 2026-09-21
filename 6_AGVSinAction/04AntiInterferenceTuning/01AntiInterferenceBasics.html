@@ -1,0 +1,378 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 抗干扰基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="active">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 抗干扰基础：AGV导航系统干扰源分类</h2>
+
+<p>各位工程师朋友，咱们直接进入正题。AGV导航这事儿，说白了就是「在噪声中找信号」。我做了十几年AGV系统，见过太多因为干扰导致定位漂移、撞货架甚至原地打转的案例。今天咱们就把干扰源这事儿彻底捋清楚。</p>
+
+<h3>1.1 干扰源分类：四大「捣乱分子」</h3>
+
+<p>我个人习惯把干扰源分成四类。你想想看，AGV在工厂里跑，环境多复杂？电磁、机械、光学、地面，每个环节都可能出问题。</p>
+
+<table>
+  <tr>
+    <th>干扰类型</th>
+    <th>典型来源</th>
+    <th>影响对象</th>
+    <th>严重程度</th>
+  </tr>
+  <tr>
+    <td>电磁干扰</td>
+    <td>变频器、电机、大功率电缆</td>
+    <td>磁导航传感器、激光雷达</td>
+    <td>高</td>
+  </tr>
+  <tr>
+    <td>机械振动</td>
+    <td>地面不平、轮胎磨损、急停</td>
+    <td>IMU、里程计、编码器</td>
+    <td>中高</td>
+  </tr>
+  <tr>
+    <td>环境光噪</td>
+    <td>阳光直射、焊接弧光、反光地面</td>
+    <td>视觉导航、激光雷达</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>地面纹理</td>
+    <td>油污、水渍、新旧地面拼接</td>
+    <td>磁条、二维码、SLAM</td>
+    <td>中低</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>干扰不是「有或没有」的问题，而是「多大程度」的问题。我见过一个项目，AGV在变频器旁边定位误差直接飙到15cm，但换个方向走就正常——这就是典型的电磁干扰。</p>
+</div>
+
+<h3>1.2 干扰对定位精度的影响分析</h3>
+
+<p>咱们一个一个说。</p>
+
+<h4>电磁干扰</h4>
+<p>嗯，这个最头疼。变频器启动瞬间，电流冲击能直接把磁导航传感器的信号淹没。我记得有一次在汽车焊装车间调试，AGV走到焊接工位附近，定位数据直接跳变。后来一查，焊接电缆和导航线缆走了一个线槽，耦合干扰。</p>
+<ul>
+  <li><strong>磁导航：</strong>信号幅值波动超过30%，定位偏差可达±5cm</li>
+  <li><strong>激光雷达：</strong>电机电刷火花产生高频噪声，导致误检测</li>
+  <li><strong>视觉导航：</strong>电磁场干扰摄像头数据传输，图像丢帧</li>
+</ul>
+
+<h4>机械振动</h4>
+<p>说白了就是「抖」。AGV过接缝、过减速带，IMU的加速度计数据会瞬间爆表。我做过测试，一个0.5cm高的地面接缝，能让IMU积分误差在10秒内累积到3cm。</p>
+<ul>
+  <li><strong>IMU：</strong>振动导致角速度噪声增大，航向角漂移</li>
+  <li><strong>里程计：</strong>轮胎打滑或弹跳，编码器脉冲丢失</li>
+  <li><strong>激光SLAM：</strong>点云畸变，匹配失败</li>
+</ul>
+
+<h4>环境光噪</h4>
+<p>这个在视觉导航里特别明显。AGV从室内开到室外，光照从500lux突然变成50000lux，摄像头直接过曝。我见过一个仓储项目，AGV在窗户旁边定位精度从±1cm掉到±8cm，就是因为阳光斜射造成反光。</p>
+<ul>
+  <li><strong>视觉二维码：</strong>反光导致二维码识别失败</li>
+  <li><strong>激光雷达：</strong>强光干扰接收器，测距误差增大</li>
+  <li><strong>自然导航：</strong>光照变化导致特征点匹配错误</li>
+</ul>
+
+<h4>地面纹理</h4>
+<p>这个容易被忽略。AGV跑久了，地面会有油污、磨损、新旧拼接。磁条导航的话，磁条被油污覆盖后信号衰减；二维码导航的话，二维码被磨损后识别率下降。</p>
+<ul>
+  <li><strong>磁条：</strong>信号强度衰减20%-50%</li>
+  <li><strong>二维码：</strong>污损面积超过30%即失效</li>
+  <li><strong>SLAM：</strong>地面纹理变化导致特征点丢失</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>做抗干扰调优，第一步不是调参数，而是「识别干扰源」。我曾经花了两周调一个定位抖动问题，最后发现是AGV轮胎气压不一致导致的——这种低级错误，排查起来最费时间。</p>
+</div>
+
+<h3>1.3 抗干扰调优的总体思路与原则</h3>
+
+<p>好，干扰源搞清楚了，咱们聊聊怎么干。我总结了三句话：</p>
+
+<ol>
+  <li><strong>先物理，后算法</strong>——能加屏蔽罩就别指望滤波</li>
+  <li><strong>先隔离，后补偿</strong>——能走线分开就别做软件补偿</li>
+  <li><strong>先诊断，后优化</strong>——没搞清楚干扰特征就调参数，那是瞎调</li>
+</ol>
+
+<p>具体来说，我建议按这个流程走：</p>
+
+<pre><code>1. 现场勘查：记录干扰源位置、强度、频率
+2. 数据采集：在干扰条件下采集定位数据
+3. 特征分析：识别干扰的时域/频域特征
+4. 方案设计：选择物理隔离或算法补偿
+5. 验证测试：在典型工况下验证效果
+6. 持续监控：部署在线监测，发现新干扰及时处理</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里，上来就调卡尔曼滤波参数，结果越调越差。后来发现是激光雷达安装支架松动导致的振动干扰——你想想看，算法再牛也扛不住硬件松动啊。所以，先检查物理安装，再动软件。</p>
+</div>
+
+<h3>1.4 知识体系框架</h3>
+
+<p>下面这张图，是我做抗干扰调优的核心逻辑。你把它记在心里，后面每个章节都会用到。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV导航系统抗干扰调优知识体系</text>
+  
+  <!-- 干扰源分类 -->
+  <rect x="50" y="70" width="160" height="40" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="130" y="95" text-anchor="middle" font-size="14" fill="white" font-weight="bold">干扰源分类</text>
+  
+  <rect x="50" y="120" width="160" height="30" rx="5" fill="#85c1e9"/>
+  <text x="130" y="140" text-anchor="middle" font-size="12" fill="#2c3e50">电磁干扰</text>
+  
+  <rect x="50" y="155" width="160" height="30" rx="5" fill="#85c1e9"/>
+  <text x="130" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">机械振动</text>
+  
+  <rect x="50" y="190" width="160" height="30" rx="5" fill="#85c1e9"/>
+  <text x="130" y="210" text-anchor="middle" font-size="12" fill="#2c3e50">环境光噪</text>
+  
+  <rect x="50" y="225" width="160" height="30" rx="5" fill="#85c1e9"/>
+  <text x="130" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">地面纹理</text>
+  
+  <!-- 箭头1 -->
+  <line x1="210" y1="150" x2="280" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 影响分析 -->
+  <rect x="280" y="70" width="160" height="40" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="360" y="95" text-anchor="middle" font-size="14" fill="white" font-weight="bold">影响分析</text>
+  
+  <rect x="280" y="120" width="160" height="30" rx="5" fill="#f1948a"/>
+  <text x="360" y="140" text-anchor="middle" font-size="12" fill="#2c3e50">定位精度下降</text>
+  
+  <rect x="280" y="155" width="160" height="30" rx="5" fill="#f1948a"/>
+  <text x="360" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">数据跳变/丢帧</text>
+  
+  <rect x="280" y="190" width="160" height="30" rx="5" fill="#f1948a"/>
+  <text x="360" y="210" text-anchor="middle" font-size="12" fill="#2c3e50">传感器失效</text>
+  
+  <rect x="280" y="225" width="160" height="30" rx="5" fill="#f1948a"/>
+  <text x="360" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">系统不稳定</text>
+  
+  <!-- 箭头2 -->
+  <line x1="440" y1="150" x2="510" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 调优原则 -->
+  <rect x="510" y="70" width="160" height="40" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="590" y="95" text-anchor="middle" font-size="14" fill="white" font-weight="bold">调优原则</text>
+  
+  <rect x="510" y="120" width="160" height="30" rx="5" fill="#82e0aa"/>
+  <text x="590" y="140" text-anchor="middle" font-size="12" fill="#2c3e50">先物理后算法</text>
+  
+  <rect x="510" y="155" width="160" height="30" rx="5" fill="#82e0aa"/>
+  <text x="590" y="175" text-anchor="middle" font-size="12" fill="#2c3e50">先隔离后补偿</text>
+  
+  <rect x="510" y="190" width="160" height="30" rx="5" fill="#82e0aa"/>
+  <text x="590" y="210" text-anchor="middle" font-size="12" fill="#2c3e50">先诊断后优化</text>
+  
+  <rect x="510" y="225" width="160" height="30" rx="5" fill="#82e0aa"/>
+  <text x="590" y="245" text-anchor="middle" font-size="12" fill="#2c3e50">持续监控</text>
+  
+  <!-- 箭头3 -->
+  <line x1="670" y1="150" x2="740" y2="150" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 调优方法 -->
+  <rect x="740" y="70" width="50" height="40" rx="8" fill="#8e44ad" opacity="0.9"/>
+  <text x="765" y="95" text-anchor="middle" font-size="10" fill="white" font-weight="bold">方法</text>
+  
+  <rect x="740" y="120" width="50" height="30" rx="5" fill="#c39bd3"/>
+  <text x="765" y="140" text-anchor="middle" font-size="10" fill="#2c3e50">滤波</text>
+  
+  <rect x="740" y="155" width="50" height="30" rx="5" fill="#c39bd3"/>
+  <text x="765" y="175" text-anchor="middle" font-size="10" fill="#2c3e50">融合</text>
+  
+  <rect x="740" y="190" width="50" height="30" rx="5" fill="#c39bd3"/>
+  <text x="765" y="210" text-anchor="middle" font-size="10" fill="#2c3e50">校准</text>
+  
+  <rect x="740" y="225" width="50" height="30" rx="5" fill="#c39bd3"/>
+  <text x="765" y="245" text-anchor="middle" font-size="10" fill="#2c3e50">冗余</text>
+  
+  <!-- 底部总结 -->
+  <rect x="50" y="300" width="740" height="80" rx="10" fill="#2c3e50" opacity="0.8"/>
+  <text x="420" y="330" text-anchor="middle" font-size="16" fill="white" font-weight="bold">核心逻辑：识别干扰 → 量化影响 → 选择策略 → 验证效果</text>
+  <text x="420" y="360" text-anchor="middle" font-size="13" fill="#bdc3c7">每个环节都需要现场数据支撑，切忌「拍脑袋」调参</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图的核心逻辑很简单：先搞清楚干扰是什么，再分析它怎么影响定位，然后按照「先物理后算法」的原则去调优。每一步都需要现场数据支撑，切忌「拍脑袋」调参。</p>
+
+<div class="highlight">
+  <p><strong>最后说一句：</strong>抗干扰调优不是一锤子买卖。AGV跑的环境会变，干扰源也会变。我建议每个项目都建立干扰台账，记录每次调优的参数和效果。这样下次遇到类似问题，直接翻台账就行，不用从头再来。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02SensorSelectionLayout.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

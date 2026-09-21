@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV导航系统传感器融合方案 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 0.8rem;
+            font-size: 0.95rem;
+            color: #2b5a4a;
+            background: #f0f7e6;
+            display: inline-block;
+            padding: 0.3rem 2rem;
+            border-radius: 40px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            border: 1px solid #b7d7b0;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV导航系统传感器融合方案</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01NavigationOverview.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">AGV导航概述</div>
+            <div class="chapter-desc">AGV定义、导航技术分类、传感器融合的必要性</div>
+            <div class="card-tags"><span class="tag">基础</span><span class="tag">概念</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02CoordinateAndPose.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">坐标系与位姿表示</div>
+            <div class="chapter-desc">世界坐标系、机器人坐标系、欧拉角与四元数</div>
+            <div class="card-tags"><span class="tag">数学</span><span class="tag">坐标</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03OdometerModel.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">里程计模型</div>
+            <div class="chapter-desc">两轮差速模型、阿克曼模型、航迹推演算法</div>
+            <div class="card-tags"><span class="tag">运动学</span><span class="tag">模型</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04Imu.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">惯性测量单元(IMU)</div>
+            <div class="chapter-desc">加速度计与陀螺仪原理、IMU标定、零偏补偿</div>
+            <div class="card-tags"><span class="tag">IMU</span><span class="tag">标定</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05Lidar.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">激光雷达(LiDAR)</div>
+            <div class="chapter-desc">单线与多线激光雷达原理、点云数据格式、测距原理</div>
+            <div class="card-tags"><span class="tag">LiDAR</span><span class="tag">点云</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06VisualSensor.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">视觉传感器</div>
+            <div class="chapter-desc">单目与双目相机、深度相机、视觉里程计初步</div>
+            <div class="card-tags"><span class="tag">视觉</span><span class="tag">相机</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07Encoder.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">编码器</div>
+            <div class="chapter-desc">增量式与绝对式编码器、脉冲计数、速度与位置计算</div>
+            <div class="card-tags"><span class="tag">编码器</span><span class="tag">感知</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08UltrasonicInfrared.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">超声波与红外传感器</div>
+            <div class="chapter-desc">测距原理、适用场景、局限性分析</div>
+            <div class="card-tags"><span class="tag">超声</span><span class="tag">红外</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09KalmanFilterBasics.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">卡尔曼滤波基础</div>
+            <div class="chapter-desc">状态空间模型、预测与更新步骤、一维卡尔曼滤波实现</div>
+            <div class="card-tags"><span class="tag">滤波</span><span class="tag">KF</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10ExtendedKalmanFilter.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">扩展卡尔曼滤波(EKF)</div>
+            <div class="chapter-desc">非线性系统线性化、雅可比矩阵、EKF融合IMU+编码器</div>
+            <div class="card-tags"><span class="tag">EKF</span><span class="tag">融合</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11UnscentedKalmanFilter.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">无迹卡尔曼滤波(UKF)</div>
+            <div class="chapter-desc">无迹变换、Sigma点选取、UKF与EKF对比</div>
+            <div class="card-tags"><span class="tag">UKF</span><span class="tag">无迹</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12ParticleFilter.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">粒子滤波(PF)</div>
+            <div class="chapter-desc">蒙特卡洛方法、重要性采样、重采样、粒子滤波定位</div>
+            <div class="card-tags"><span class="tag">粒子滤波</span><span class="tag">定位</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13MultiSensorTimeSync.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">多传感器时间同步</div>
+            <div class="chapter-desc">硬件同步与软件同步、时间戳管理、插值对齐方法</div>
+            <div class="card-tags"><span class="tag">同步</span><span class="tag">时间</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14SensorCalibration.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">传感器标定</div>
+            <div class="chapter-desc">IMU-相机标定、LiDAR-相机标定、手眼标定</div>
+            <div class="card-tags"><span class="tag">标定</span><span class="tag">外参</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15DataPreprocessing.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">数据预处理</div>
+            <div class="chapter-desc">点云滤波(体素滤波、统计滤波)、图像去畸变、异常值剔除</div>
+            <div class="card-tags"><span class="tag">预处理</span><span class="tag">滤波</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16FeatureExtraction.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">特征提取</div>
+            <div class="chapter-desc">点云特征(FPFH、SHOT)、图像特征(SIFT、ORB)、特征匹配</div>
+            <div class="card-tags"><span class="tag">特征</span><span class="tag">匹配</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17ScanMatching.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">扫描匹配</div>
+            <div class="chapter-desc">ICP算法、NDT算法、PL-ICP算法、性能对比</div>
+            <div class="card-tags"><span class="tag">配准</span><span class="tag">点云</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18VisualSlam.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">视觉SLAM</div>
+            <div class="chapter-desc">ORB-SLAM3框架、关键帧、回环检测、图优化</div>
+            <div class="card-tags"><span class="tag">SLAM</span><span class="tag">视觉</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19LaserSlam.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">激光SLAM</div>
+            <div class="chapter-desc">Cartographer框架、子图构建、闭环约束、栅格地图</div>
+            <div class="card-tags"><span class="tag">激光SLAM</span><span class="tag">栅格</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20MultiSensorFusionLocalization.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">多传感器融合定位</div>
+            <div class="chapter-desc">EKF融合GPS+IMU+编码器、因子图优化</div>
+            <div class="card-tags"><span class="tag">融合</span><span class="tag">GPS</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21MapBuilding.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">地图构建</div>
+            <div class="chapter-desc">占据栅格地图、TSDF地图、语义地图</div>
+            <div class="card-tags"><span class="tag">建图</span><span class="tag">语义</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22PathPlanningBasics.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">路径规划基础</div>
+            <div class="chapter-desc">Dijkstra算法、A*算法、DWA算法</div>
+            <div class="card-tags"><span class="tag">规划</span><span class="tag">A*</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23MotionControl.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">运动控制</div>
+            <div class="chapter-desc">PID控制器、纯追踪模型、Stanley控制器</div>
+            <div class="card-tags"><span class="tag">控制</span><span class="tag">PID</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24RosIntegration.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">ROS系统集成</div>
+            <div class="chapter-desc">ROS节点通信、Bag包录制与回放、Rviz可视化</div>
+            <div class="card-tags"><span class="tag">ROS</span><span class="tag">可视化</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25SimulationEnvironment.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">仿真环境搭建</div>
+            <div class="chapter-desc">Gazebo仿真、传感器模型配置、场景设计</div>
+            <div class="card-tags"><span class="tag">仿真</span><span class="tag">Gazebo</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26HardwarePlatform.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">硬件平台搭建</div>
+            <div class="chapter-desc">工控机选型、传感器选型、通信接口设计</div>
+            <div class="card-tags"><span class="tag">硬件</span><span class="tag">选型</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27RealtimeOptimization.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">实时性优化</div>
+            <div class="chapter-desc">多线程架构、零拷贝传输、FPGA加速</div>
+            <div class="card-tags"><span class="tag">优化</span><span class="tag">实时</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28FaultDiagnosisTolerance.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">故障诊断与容错</div>
+            <div class="chapter-desc">传感器故障检测、冗余设计、降级策略</div>
+            <div class="card-tags"><span class="tag">容错</span><span class="tag">诊断</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29PerformanceMetrics.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">性能评估指标</div>
+            <div class="chapter-desc">定位精度(ATE、RPE)、建图质量、实时性指标</div>
+            <div class="card-tags"><span class="tag">评估</span><span class="tag">指标</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30NavigationFusionProject.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">综合项目实战</div>
+            <div class="chapter-desc">从零搭建AGV导航系统、传感器融合调试、现场部署经验</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">部署</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

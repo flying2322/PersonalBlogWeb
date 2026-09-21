@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 动态避障基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="active">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 动态避障基础：障碍物检测、速度障碍法（VO）、互惠速度障碍法（RVO）</h2>
+
+<p>各位同学，欢迎来到动态避障这一章。</p>
+<p>说实话，做AGV导航这么多年，我觉得最刺激的就是动态避障。静态地图规划，说白了就是解一道几何题。但动态环境不一样——行人突然横穿、其他机器人迎面而来、叉车从侧面窜出来……这些才是真正考验算法功底的地方。</p>
+<p>今天咱们就聊聊动态避障的三个核心概念：障碍物检测、速度障碍法（VO）和互惠速度障碍法（RVO）。</p>
+
+<h3>13.1 障碍物检测：你得先知道“谁”在动</h3>
+
+<p>动态避障的第一步，不是怎么躲，而是怎么知道有东西在动。</p>
+<p>我个人习惯把障碍物检测分成两个层面：</p>
+<ul>
+  <li><strong>感知层面</strong>：用传感器获取环境数据</li>
+  <li><strong>跟踪层面</strong>：判断哪些是静态的，哪些是动态的</li>
+</ul>
+
+<p>我在项目中遇到过最头疼的问题，就是激光雷达把墙上的反光条当成了移动物体。嗯，这里要注意——传感器数据一定要做滤波和聚类。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>动态障碍物检测 = 传感器数据 + 运动状态估计</p>
+</div>
+
+<p>常用的传感器组合：</p>
+<table>
+  <tr>
+    <th>传感器</th>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>2D激光雷达</td>
+    <td>精度高、速度快</td>
+    <td>只能检测同一平面</td>
+  </tr>
+  <tr>
+    <td>3D激光雷达</td>
+    <td>三维信息完整</td>
+    <td>成本高、数据量大</td>
+  </tr>
+  <tr>
+    <td>深度相机</td>
+    <td>成本低、信息丰富</td>
+    <td>受光照影响大</td>
+  </tr>
+  <tr>
+    <td>超声波</td>
+    <td>近距离可靠</td>
+    <td>分辨率低</td>
+  </tr>
+</table>
+
+<p>你想想看，如果传感器数据都不靠谱，后面再牛的避障算法也是白搭。所以我的建议是：<strong>先花70%的精力搞定感知，再花30%的精力做规划</strong>。</p>
+
+<h3>13.2 速度障碍法（VO）：一个很直观的想法</h3>
+
+<p>速度障碍法，英文叫Velocity Obstacle，简称VO。这玩意儿是1998年由Fiorini和Shiller提出的，到现在快30年了，依然是动态避障的基石。</p>
+
+<p>VO的核心思想是什么？说白了就是一句话：<strong>找出那些会让你撞车的速度，然后避开它们</strong>。</p>
+
+<p>怎么找？咱们一步步来：</p>
+
+<ol>
+  <li><strong>计算相对速度</strong>：把机器人和障碍物的速度放到同一个坐标系里</li>
+  <li><strong>构建碰撞锥</strong>：如果相对速度指向障碍物，就会撞上</li>
+  <li><strong>映射到速度空间</strong>：把所有会导致碰撞的速度标出来，这就是VO区域</li>
+  <li><strong>选择安全速度</strong>：在VO区域之外选一个速度</li>
+</ol>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>实际工程中，我们通常会把机器人膨胀成一个圆，障碍物也膨胀成一个圆。这样碰撞检测就变成了圆与圆之间的相交判断，计算量小很多。</p>
+</div>
+
+<p>我曾经在一个仓储项目里直接用VO，结果发现机器人经常“犹豫不决”——因为VO只考虑当前时刻，没有考虑未来。后来我加了一个预测窗口，效果就好多了。</p>
+
+<p>下面是一个简化的VO实现思路：</p>
+
+<pre><code>// 伪代码：速度障碍法核心逻辑
+function computeVO(robot, obstacle):
+    // 1. 计算相对位置和速度
+    relPos = obstacle.pos - robot.pos
+    relVel = obstacle.vel - robot.vel
+    
+    // 2. 构建碰撞锥
+    collisionCone = buildCone(relPos, robot.radius + obstacle.radius)
+    
+    // 3. 判断当前相对速度是否在碰撞锥内
+    if isInside(relVel, collisionCone):
+        // 4. 如果会撞，找安全速度
+        safeVel = findSafeVelocity(robot.vel, collisionCone)
+        return safeVel
+    else:
+        return robot.vel  // 安全，保持原速</code></pre>
+
+<h3>13.3 互惠速度障碍法（RVO）：让双方都动起来</h3>
+
+<p>VO有个大问题——它假设障碍物不会主动避让。这在多机器人场景下就尴尬了：两个机器人都用VO，结果互相让来让去，最后卡在原地不动。</p>
+
+<p>这就是所谓的“振荡”现象。你想想看，两个人在走廊里迎面走来，都往左边让，结果又撞上了，再同时往右边让……是不是很熟悉？</p>
+
+<p>互惠速度障碍法（Reciprocal Velocity Obstacle，RVO）就是来解决这个问题的。它的核心思想是：<strong>每个机器人承担一半的避让责任</strong>。</p>
+
+<div class="highlight">
+  <p><strong>RVO vs VO 的关键区别：</strong></p>
+  <ul>
+    <li>VO：我躲你，你不动</li>
+    <li>RVO：我躲一半，你躲一半</li>
+  </ul>
+</div>
+
+<p>具体怎么做？RVO把VO区域平移了一半。也就是说，每个机器人只需要避开一半的碰撞速度，剩下的另一半由对方负责。</p>
+
+<p>我曾经在一个多AGV协同的项目里测试过：</p>
+<ul>
+  <li>用VO：4台机器人就开始振荡，8台直接死锁</li>
+  <li>用RVO：8台机器人流畅运行，16台才出现轻微拥堵</li>
+</ul>
+
+<p>嗯，这就是互惠的魅力。</p>
+
+<p>RVO的伪代码：</p>
+
+<pre><code>// 伪代码：互惠速度障碍法核心逻辑
+function computeRVO(robot, obstacle):
+    // 1. 计算VO（和之前一样）
+    vo = computeVO(robot, obstacle)
+    
+    // 2. 关键步骤：将VO平移一半
+    // 每个机器人只承担一半的避让责任
+    rvo = translate(vo, (robot.vel + obstacle.vel) / 2)
+    
+    // 3. 在RVO区域外选择速度
+    safeVel = findSafeVelocity(robot.vel, rvo)
+    
+    return safeVel</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>RVO虽然解决了振荡问题，但它假设所有机器人都在使用相同的避让策略。如果遇到不按套路出牌的行人，RVO的效果会打折扣。这时候需要结合预测模型或者学习算法。</p>
+</div>
+
+<h3>13.4 本章知识体系总览</h3>
+
+<p>为了让大家更直观地理解这三者的关系，我画了一张图：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">动态避障知识体系</text>
+  
+  <!-- 第一层：障碍物检测 -->
+  <rect x="250" y="70" width="300" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="105" text-anchor="middle" font-size="18" fill="white" font-weight="bold">障碍物检测</text>
+  
+  <!-- 箭头1 -->
+  <line x1="400" y1="130" x2="400" y2="170" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：VO -->
+  <rect x="100" y="180" width="250" height="60" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="225" y="215" text-anchor="middle" font-size="18" fill="white" font-weight="bold">速度障碍法（VO）</text>
+  
+  <!-- 箭头2 -->
+  <line x1="350" y1="210" x2="440" y2="210" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：RVO -->
+  <rect x="450" y="180" width="250" height="60" rx="10" fill="#27ae60" opacity="0.9"/>
+  <text x="575" y="215" text-anchor="middle" font-size="18" fill="white" font-weight="bold">互惠速度障碍法（RVO）</text>
+  
+  <!-- 箭头3 -->
+  <line x1="225" y1="240" x2="225" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头4 -->
+  <line x1="575" y1="240" x2="575" y2="290" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：应用场景 -->
+  <rect x="50" y="300" width="200" height="80" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="150" y="335" text-anchor="middle" font-size="16" fill="white">单机器人避障</text>
+  <text x="150" y="360" text-anchor="middle" font-size="14" fill="white">（障碍物不主动避让）</text>
+  
+  <rect x="300" y="300" width="200" height="80" rx="10" fill="#9b59b6" opacity="0.8"/>
+  <text x="400" y="335" text-anchor="middle" font-size="16" fill="white">多机器人协同</text>
+  <text x="400" y="360" text-anchor="middle" font-size="14" fill="white">（双方共同避让）</text>
+  
+  <rect x="550" y="300" width="200" height="80" rx="10" fill="#1abc9c" opacity="0.8"/>
+  <text x="650" y="335" text-anchor="middle" font-size="16" fill="white">人机混合场景</text>
+  <text x="650" y="360" text-anchor="middle" font-size="14" fill="white">（需结合预测模型）</text>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="420" width="500" height="50" rx="10" fill="#34495e" opacity="0.9"/>
+  <text x="400" y="450" text-anchor="middle" font-size="16" fill="white">核心逻辑：检测 → 判断 → 避让（VO/RVO）→ 执行</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>从这张图可以看得很清楚：障碍物检测是基础，VO和RVO是两种不同的避让策略，它们适用于不同的场景。我个人建议：<strong>如果场景里只有一台机器人，用VO就够了；如果是多机器人系统，一定要上RVO</strong>。</p>
+
+<h3>13.5 实战中的几个坑</h3>
+
+<p>最后，分享几个我在实际项目中踩过的坑：</p>
+
+<ul>
+  <li><strong>传感器延迟</strong>：激光雷达扫描一圈要50ms，这50ms里障碍物可能已经移动了。一定要做运动补偿。</li>
+  <li><strong>速度突变</strong>：VO/RVO算出来的速度可能变化很大，直接发给电机的话，机器人会“抽搐”。加个速度平滑滤波器会好很多。</li>
+  <li><strong>局部最优</strong>：VO/RVO都是局部方法，可能会陷入死胡同。需要和全局规划器配合使用。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>在实际部署时，我会把VO/RVO的输出作为“建议速度”，然后加一个安全校验层。如果建议速度会导致碰撞，就降速或者停车。安全第一，效率第二。</p>
+</div>
+
+<p>好了，动态避障的基础就讲到这里。记住一句话：<strong>避障不是目的，安全高效地到达目的地才是</strong>。</p>
+
+<div class="footer-nav">
+            <a href="12LocalPathPlanningPart3.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14DynamicAvoidAdvanced.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

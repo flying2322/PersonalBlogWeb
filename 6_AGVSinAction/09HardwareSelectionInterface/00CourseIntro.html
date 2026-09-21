@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV控制器硬件选型与接口设计实战 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV控制器硬件选型与接口设计实战</h1>
+    <div class="subhead">
+        <span>🔐 安全开发 · 系统级实战</span>
+        <span>v2.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV/移动机器人硬件工程师</strong> — 掌握控制器选型与接口设计全流程</li>
+                <li><strong>嵌入式系统开发工程师</strong> — 深入ARM/x86/RISC-V平台实战</li>
+                <li><strong>自动化与机电一体化工程师</strong> — 电机驱动、传感器与通信系统设计</li>
+                <li><strong>产品经理/项目经理</strong> — 理解硬件架构与成本控制，提升决策力</li>
+                <li><strong>高校学生/研究者</strong> — 系统学习AGV控制器从理论到打样</li>
+                <li><strong>技术创业者</strong> — 掌握国产化替代与供应链风险管理</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握AGV控制器完整架构</strong> — 从传感器到执行器的数据流与信号流</li>
+                <li><strong>独立完成核心器件选型</strong> — 主控、通信、传感器、电源、电机驱动</li>
+                <li><strong>设计工业级接口电路</strong> — CAN/EtherCAT/5G/UWB/LiDAR等实战</li>
+                <li><strong>具备EMC与安全设计能力</strong> — 防护、冗余、认证与合规</li>
+                <li><strong>精通硬件调试与测试</strong> — 示波器、逻辑分析仪、电源纹波测试</li>
+                <li><strong>获得完整项目经验</strong> — 从需求分析到原型打样的30章体系化实战</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>AGV控制器概述：</strong>AGV系统组成、控制器角色定位、主流控制器类型对比（PLC/工控机/嵌入式）</li>
+        <li data-index="2"><strong>核心处理器选型：</strong>ARM Cortex-A系列、x86架构、RISC-V架构的性能与功耗分析</li>
+        <li data-index="3"><strong>实时操作系统选型：</strong>FreeRTOS、RT-Linux、VxWorks在AGV场景下的适用性</li>
+        <li data-index="4"><strong>通信接口设计（上）：</strong>CAN总线、RS485/RS232、EtherCAT的选型与布线要点</li>
+        <li data-index="5"><strong>通信接口设计（下）：</strong>Wi-Fi 6、5G、UWB在AGV集群调度中的应用</li>
+        <li data-index="6"><strong>传感器接口设计：</strong>激光雷达（LiDAR）、IMU、编码器的接口协议与数据同步</li>
+        <li data-index="7"><strong>电机驱动接口：</strong>直流无刷电机（BLDC）与伺服电机的驱动器选型与PWM接口</li>
+        <li data-index="8"><strong>电源管理设计：</strong>电池选型（铅酸/锂电池）、BMS通信、电源轨设计与功耗估算</li>
+        <li data-index="9"><strong>安全与冗余设计：</strong>急停电路、双通道安全继电器、STO（安全转矩关闭）功能实现</li>
+        <li data-index="10"><strong>I/O扩展与隔离：</strong>数字量输入输出、模拟量采集、光耦隔离与TVS保护</li>
+        <li data-index="11"><strong>人机交互接口：</strong>触摸屏选型、按键矩阵、状态指示灯与蜂鸣器驱动</li>
+        <li data-index="12"><strong>存储与日志设计：</strong>eMMC、SD卡、NAND Flash的选型与文件系统选择（FAT32/EXT4）</li>
+        <li data-index="13"><strong>结构与环境适应性：</strong>防护等级（IP等级）、散热设计、振动与冲击测试标准</li>
+        <li data-index="14"><strong>电磁兼容性（EMC）设计：</strong>PCB布局、屏蔽、滤波与接地策略</li>
+        <li data-index="15"><strong>硬件调试与测试：</strong>示波器使用、逻辑分析仪抓取总线数据、电源纹波测试</li>
+        <li data-index="16"><strong>AGV控制器硬件架构总览：</strong>从传感器到执行器的数据流与信号流</li>
+        <li data-index="17"><strong>主控芯片选型深度对比：</strong>STM32MP1 vs i.MX8M vs Jetson Nano</li>
+        <li data-index="18"><strong>DDR与Flash电路设计：</strong>DDR3/DDR4布线规则、NAND Flash的ECC校验</li>
+        <li data-index="19"><strong>以太网与TSN（时间敏感网络）：</strong>在AGV多机协同中的同步作用</li>
+        <li data-index="20"><strong>无线通信模块选型：</strong>Zigbee、LoRa、蓝牙Mesh在仓储场景下的取舍</li>
+        <li data-index="21"><strong>视觉传感器接口：</strong>USB3.0 Camera、GigE Vision、MIPI CSI-2接口设计</li>
+        <li data-index="22"><strong>超声波与红外传感器：</strong>避障与辅助定位中的低成本方案</li>
+        <li data-index="23"><strong>磁导航与二维码导航传感器接口：</strong>I2C/SPI/UART的典型应用</li>
+        <li data-index="24"><strong>电池充电管理：</strong>无线充电、接触式充电的硬件接口与协议</li>
+        <li data-index="25"><strong>硬件看门狗与系统监控：</strong>独立看门狗芯片、电压监控与复位电路</li>
+        <li data-index="26"><strong>多控制器协同：</strong>主从控制器通信、心跳机制与故障切换</li>
+        <li data-index="27"><strong>硬件成本控制：</strong>BOM优化、国产化替代方案与供应链风险</li>
+        <li data-index="28"><strong>设计文档与版本管理：</strong>原理图、PCB、BOM的规范化管理工具（Git/Altium）</li>
+        <li data-index="29"><strong>认证与合规：</strong>CE、FCC、UL认证对AGV控制器的硬件要求</li>
+        <li data-index="30"><strong>实战案例：</strong>从需求分析到原型打样的完整硬件设计流程</li>
+    </ul>
+    
+</div>
+</body>
+</html>

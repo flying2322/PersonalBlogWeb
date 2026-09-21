@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 视觉传感器</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="active">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 视觉传感器——单目与双目相机、深度相机、视觉里程计初步</h2>
+
+<p>各位同学，大家好。今天我们聊聊视觉传感器。</p>
+
+<p>说实话，在AGV导航里，视觉传感器是个让人又爱又恨的东西。爱的是它信息量大，能认路标、能避障、还能做定位；恨的是它数据量太大，处理起来费劲，而且光照一变就容易掉链子。我自己做项目时，没少被视觉折腾过。</p>
+
+<p>好，咱们直接进入正题。</p>
+
+<h3>6.1 单目相机：最基础的“一只眼”</h3>
+
+<p>单目相机，说白了就是一个摄像头。它拍出来的图像是二维的，没有深度信息。</p>
+
+<p><strong>单目相机能做什么？</strong></p>
+<ul>
+  <li><strong>特征点提取与匹配</strong>：比如ORB、SIFT、SURF这些算法，能从图像里找到角点、边缘，然后在不同帧之间匹配它们。</li>
+  <li><strong>视觉里程计（VO）</strong>：通过连续帧的特征点运动，估算相机的位姿变化。</li>
+  <li><strong>路标识别</strong>：比如识别二维码、AprilTag，或者特定的地面标记。</li>
+</ul>
+
+<div class="warning">
+  <strong>注意：</strong>单目相机无法直接测量深度。它只能通过运动恢复结构（SFM）来估计深度，而且存在尺度不确定性。什么意思呢？就是它不知道物体到底离你1米还是10米，只知道相对比例。
+</div>
+
+<p>我在项目里遇到过一个问题：单目VO在纯旋转时容易漂移。因为纯旋转时，特征点没有视差，深度估计会失效。嗯，这个坑大家要记住。</p>
+
+<h3>6.2 双目相机：两只眼，看出深度</h3>
+
+<p>双目相机模仿人眼，用两个摄像头同时拍摄。通过左右图像的视差，可以直接计算出深度。</p>
+
+<p><strong>双目测距的原理</strong>：</p>
+<ul>
+  <li>左眼和右眼看到同一个点，在图像上的位置不同。</li>
+  <li>这个位置差叫“视差”。</li>
+  <li>深度 = (基线长度 × 焦距) / 视差。</li>
+</ul>
+
+<p>公式很简单，但实际做起来坑不少。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong>双目相机的基线长度很关键。基线越长，测距精度越高，但视野重叠区域越小。我一般选基线在10-20cm之间，适合室内AGV。
+</div>
+
+<p><strong>双目相机的优缺点：</strong></p>
+<table>
+  <tr>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>直接获取深度，无需运动</td>
+    <td>计算量大（立体匹配很费资源）</td>
+  </tr>
+  <tr>
+    <td>不受光照影响（红外双目除外）</td>
+    <td>基线固定，远距离精度差</td>
+  </tr>
+  <tr>
+    <td>硬件成本适中</td>
+    <td>标定复杂，需要左右相机联合标定</td>
+  </tr>
+</table>
+
+<p>我曾经在AGV上用过双目做避障。效果还行，但一到纹理稀疏的墙面，立体匹配就崩了。后来我加了结构光辅助，才算稳定下来。</p>
+
+<h3>6.3 深度相机：直接给你深度图</h3>
+
+<p>深度相机，比如Intel RealSense、Microsoft Kinect、Orbbec，它们能直接输出深度图像。每个像素的值就是距离。</p>
+
+<p><strong>主流技术方案：</strong></p>
+<ul>
+  <li><strong>结构光</strong>：投射红外点阵，通过变形计算深度。适合室内，受环境光影响大。</li>
+  <li><strong>ToF（飞行时间）</strong>：发射红外光，测量反射时间。速度快，但分辨率低。</li>
+  <li><strong>双目立体</strong>：前面讲的双目，但这里指集成化的深度相机。</li>
+</ul>
+
+<div class="highlight">
+  <strong>我的建议：</strong>如果AGV在室内、光照可控，用结构光深度相机性价比最高。如果要在室外用，ToF更靠谱，但价格贵一些。
+</div>
+
+<p>深度相机最大的问题是：<strong>容易受干扰</strong>。比如阳光里的红外成分，会让结构光失效。还有多台深度相机同时工作时，会互相干扰。我踩过这个坑，后来加了同步信号才解决。</p>
+
+<h3>6.4 视觉里程计初步：从图像到运动</h3>
+
+<p>视觉里程计（Visual Odometry，VO），就是通过图像序列估算相机运动。它是视觉SLAM的核心模块。</p>
+
+<p><strong>VO的基本流程：</strong></p>
+<ol>
+  <li><strong>图像获取</strong>：从相机拿到帧。</li>
+  <li><strong>特征提取</strong>：找角点、边缘等。</li>
+  <li><strong>特征匹配</strong>：找前后帧的对应点。</li>
+  <li><strong>运动估计</strong>：用对极几何或PnP算位姿。</li>
+  <li><strong>局部优化</strong>：用BA（光束法平差）减少误差。</li>
+</ol>
+
+<p>下面是一个简单的单目VO代码示例（使用OpenCV）：</p>
+
+<pre><code>// 伪代码，实际项目要复杂得多
+Mat prevImg, currImg;
+vector&lt;Point2f&gt; prevPts, currPts;
+
+// 1. 提取特征
+goodFeaturesToTrack(prevImg, prevPts, 200, 0.01, 10);
+
+// 2. 光流跟踪
+calcOpticalFlowPyrLK(prevImg, currImg, prevPts, currPts, status, err);
+
+// 3. 本质矩阵估计
+Mat E = findEssentialMat(currPts, prevPts, focal, pp);
+
+// 4. 恢复位姿
+recoverPose(E, currPts, prevPts, R, t, focal, pp);
+</code></pre>
+
+<div class="warning">
+  <strong>注意：</strong>单目VO恢复的平移向量t只有方向，没有尺度。你需要IMU或轮速计来提供尺度信息。这就是为什么纯视觉VO在AGV上很少单独用。
+</div>
+
+<p>我个人习惯在VO里加一个关键帧筛选。不是每一帧都处理，而是只选那些运动足够大的帧。这样能减少计算量，还能避免退化。</p>
+
+<h3>6.5 三种视觉传感器的对比与选型</h3>
+
+<p>咱们做个总结，方便你选型时参考：</p>
+
+<table>
+  <tr>
+    <th>传感器类型</th>
+    <th>深度获取</th>
+    <th>计算量</th>
+    <th>适用场景</th>
+    <th>典型成本</th>
+  </tr>
+  <tr>
+    <td>单目相机</td>
+    <td>间接（需运动）</td>
+    <td>低</td>
+    <td>室内、有纹理、配合IMU</td>
+    <td>低</td>
+  </tr>
+  <tr>
+    <td>双目相机</td>
+    <td>直接（立体匹配）</td>
+    <td>中高</td>
+    <td>室内外、纹理丰富</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>深度相机</td>
+    <td>直接（结构光/ToF）</td>
+    <td>低</td>
+    <td>室内、近距离</td>
+    <td>中高</td>
+  </tr>
+</table>
+
+<p>你想想看，如果AGV在仓库里跑，地面有二维码，用单目就够了。但如果要避障，最好加个深度相机。要是室外环境，双目更靠谱。</p>
+
+<h3>6.6 本章知识体系图</h3>
+
+<p>下面我用一张SVG图，把本章的核心逻辑串起来：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">视觉传感器知识体系</text>
+  
+  <!-- 三个传感器节点 -->
+  <rect x="50" y="80" width="180" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="140" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">单目相机</text>
+  
+  <rect x="310" y="80" width="180" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">双目相机</text>
+  
+  <rect x="570" y="80" width="180" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="660" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">深度相机</text>
+  
+  <!-- 箭头指向 -->
+  <line x1="230" y1="110" x2="310" y2="110" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="490" y1="110" x2="570" y2="110" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头标记 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 核心输出 -->
+  <rect x="200" y="200" width="400" height="50" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="230" text-anchor="middle" font-size="16" fill="white" font-weight="bold">核心输出：深度信息 + 图像特征</text>
+  
+  <line x1="140" y1="140" x2="300" y2="200" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="400" y1="140" x2="400" y2="200" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="660" y1="140" x2="500" y2="200" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 应用层 -->
+  <rect x="150" y="300" width="200" height="50" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="250" y="330" text-anchor="middle" font-size="14" fill="white">视觉里程计（VO）</text>
+  
+  <rect x="450" y="300" width="200" height="50" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="550" y="330" text-anchor="middle" font-size="14" fill="white">路标识别 / 避障</text>
+  
+  <line x1="250" y1="250" x2="250" y2="300" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="550" y1="250" x2="550" y2="300" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="380" text-anchor="middle" font-size="12" fill="#7f8c8d">选型建议：室内单目+深度，室外双目，低成本单目+IMU</text>
+</svg>
+
+<p>这张图很直观：三种传感器都能提供图像特征，但深度获取方式不同。VO和路标识别是上层应用，依赖底层的传感器数据。</p>
+
+<div class="tip">
+  <strong>避坑指南：</strong>我曾经在AGV上只用单目VO，结果在长直走廊里跑偏了。因为走廊纹理重复，特征匹配容易出错。后来我加了IMU做融合，才稳住。所以，视觉传感器最好别单打独斗，融合才是王道。
+</div>
+
+<p>好了，这一讲就到这里。视觉传感器是AGV的“眼睛”，但光有眼睛不够，还得有“小脑”来处理信息。下一讲我们会聊传感器融合，把视觉和激光、IMU结合起来。</p>
+
+<div class="footer-nav">
+            <a href="05Lidar.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07Encoder.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

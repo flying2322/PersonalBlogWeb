@@ -1,0 +1,360 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>20 多AGV路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="active">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>20 多AGV路径规划：冲突检测、优先级规划、交通管制</h2>
+
+<p>各位同学，欢迎来到第20章。</p>
+<p>前面我们聊了很多单台AGV怎么找路，A*算法怎么优化。但说实话，那都是「理想状态」。真实工厂里，十几台甚至几十台AGV同时跑，那场面，跟早高峰的十字路口差不多。你想想看，如果每台车都只想着自己走最短路径，那结果就是——堵死。</p>
+<p>所以这一章，我们来解决多AGV协同的核心问题：<strong>冲突检测、优先级规划、交通管制</strong>。这三个词，说白了就是「发现堵点、谁先走、怎么管」。我在项目里吃过不少亏，今天把这些坑都给你摆出来。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>多AGV调度不是路径规划的简单叠加，而是一个分布式约束满足问题。单台车的最优解，往往是全局的灾难。</p>
+</div>
+
+<h3>20.1 冲突检测：先要知道「撞没撞」</h3>
+
+<p>冲突检测听起来简单，但实际做起来，细节很多。我刚开始做多车调度时，以为只要检查两车坐标是否重合就行。结果呢？有一次在仓库里，两台AGV在十字路口「擦肩而过」，坐标没重合，但车身刮到了。嗯，这就是典型的「检测盲区」。</p>
+
+<p>常见的冲突类型有三种：</p>
+<ul>
+  <li><strong>节点冲突：</strong>两台车同时要占用同一个网格点。比如十字路口中心。</li>
+  <li><strong>边冲突：</strong>两台车相向而行，要经过同一条路径段。这是最常见的。</li>
+  <li><strong>跟随冲突：</strong>前车慢，后车快，后车被堵住。虽然没撞上，但效率没了。</li>
+</ul>
+
+<p>我个人习惯用<strong>时空占用表</strong>来做冲突检测。简单说，就是给每台AGV规划路径时，把每个时间点它占用的网格坐标记录下来。然后查表，看有没有重叠。</p>
+
+<pre><code># 伪代码：时空占用表冲突检测
+def detect_conflict(path_a, path_b):
+    # path_a: [(x1,y1,t1), (x2,y2,t2), ...]
+    # path_b: [(x1,y1,t1), (x2,y2,t2), ...]
+    for step_a, step_b in zip(path_a, path_b):
+        if step_a[0] == step_b[0] and step_a[1] == step_b[1]:
+            return True  # 节点冲突
+        # 边冲突检测：检查相邻时间步的交换
+        if step_a[0] == step_b[0] and step_a[1] == step_b[1]:
+            # 这里简化了，实际要检查前后两步
+            pass
+    return False
+</code></pre>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经犯过一个错——只检测了节点冲突，没检测边冲突。结果两台车在一条直道上面对面开，各自规划路径时都没占用同一个节点，但到了中间段就卡住了。所以，<strong>边冲突一定要检测相邻时间步的路径段交换</strong>。</p>
+</div>
+
+<h3>20.2 优先级规划：谁先走，谁让路</h3>
+
+<p>检测到冲突之后，怎么办？总得有个规则来决定谁先走。这就是优先级规划。</p>
+
+<p>优先级怎么定？我见过几种做法：</p>
+<ol>
+  <li><strong>任务紧急度：</strong>比如产线急停的物料，优先级最高。</li>
+  <li><strong>距离终点远近：</strong>快到的车优先，避免它绕路。</li>
+  <li><strong>固定优先级：</strong>给每台AGV编号，编号小的先走。简单粗暴，但公平性差。</li>
+  <li><strong>动态优先级：</strong>根据当前负载、电量、任务状态实时调整。这是最灵活的。</li>
+</ol>
+
+<p>我个人比较推荐<strong>混合优先级</strong>。举个例子：先按任务紧急度分大等级（紧急、普通、空闲），同等级内再按距离终点远近排序。这样既保证了关键任务不耽误，又避免了低优先级车永远等不到的情况。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>优先级不是一成不变的。我见过一个项目，一台AGV因为优先级低，在路口等了3分钟。后来我们加了「等待超时提升优先级」的机制，问题就解决了。</p>
+</div>
+
+<h3>20.3 交通管制：像红绿灯一样管理</h3>
+
+<p>冲突检测和优先级规划是「事后处理」——发现冲突了再解决。但交通管制是「事前预防」。说白了，就是在关键路口设置管制区，一次只让一台车通过。</p>
+
+<p>交通管制通常分两种：</p>
+<ul>
+  <li><strong>路口管制：</strong>在十字路口、丁字路口设置管制区。AGV进入前要申请，获得许可后才能进入。</li>
+  <li><strong>路段管制：</strong>在狭窄通道、单行道设置管制。一次只允许一个方向的车通过。</li>
+</ul>
+
+<p>实现方式上，我习惯用<strong>资源锁</strong>的概念。每个管制区就是一个资源，AGV要占用时先加锁，离开时释放。如果锁被占用，AGV就在入口处等待。</p>
+
+<pre><code># 伪代码：交通管制资源锁
+class TrafficControl:
+    def __init__(self):
+        self.zones = {}  # zone_id -> owner_agv_id
+    
+    def request_entry(self, agv_id, zone_id):
+        if zone_id not in self.zones:
+            self.zones[zone_id] = agv_id
+            return True  # 获得许可
+        else:
+            return False  # 等待
+    
+    def release_zone(self, agv_id, zone_id):
+        if self.zones.get(zone_id) == agv_id:
+            del self.zones[zone_id]
+</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>交通管制要小心死锁。比如两台AGV在十字路口互相等待对方让路，结果谁都不动。我遇到过这种情况，后来加了<strong>超时强制释放</strong>机制——如果一台车在管制区入口等待超过5秒，就强制降低它的优先级，让另一台车先走。</p>
+</div>
+
+<h3>20.4 知识体系：一张图看懂</h3>
+
+<p>下面这张图，是我自己总结的多AGV路径规划核心逻辑。你看完应该能明白这三个模块是怎么配合的。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">多AGV路径规划核心流程</text>
+  
+  <!-- 三个主模块 -->
+  <!-- 冲突检测 -->
+  <rect x="50" y="80" width="200" height="120" rx="10" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">冲突检测</text>
+  <text x="150" y="140" text-anchor="middle" font-size="13" fill="#555">节点冲突</text>
+  <text x="150" y="160" text-anchor="middle" font-size="13" fill="#555">边冲突</text>
+  <text x="150" y="180" text-anchor="middle" font-size="13" fill="#555">跟随冲突</text>
+  
+  <!-- 优先级规划 -->
+  <rect x="300" y="80" width="200" height="120" rx="10" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">优先级规划</text>
+  <text x="400" y="140" text-anchor="middle" font-size="13" fill="#555">任务紧急度</text>
+  <text x="400" y="160" text-anchor="middle" font-size="13" fill="#555">距离终点</text>
+  <text x="400" y="180" text-anchor="middle" font-size="13" fill="#555">动态调整</text>
+  
+  <!-- 交通管制 -->
+  <rect x="550" y="80" width="200" height="120" rx="10" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">交通管制</text>
+  <text x="650" y="140" text-anchor="middle" font-size="13" fill="#555">路口管制</text>
+  <text x="650" y="160" text-anchor="middle" font-size="13" fill="#555">路段管制</text>
+  <text x="650" y="180" text-anchor="middle" font-size="13" fill="#555">资源锁</text>
+  
+  <!-- 箭头：冲突检测 -> 优先级规划 -->
+  <defs>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50"/>
+    </marker>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff9800"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2196f3"/>
+    </marker>
+  </defs>
+  
+  <line x1="250" y1="140" x2="295" y2="140" stroke="#4caf50" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="500" y1="140" x2="545" y2="140" stroke="#ff9800" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  
+  <!-- 输入输出 -->
+  <rect x="50" y="260" width="700" height="60" rx="10" fill="#fce4ec" stroke="#e91e63" stroke-width="2"/>
+  <text x="400" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="#c2185b">输入：多台AGV的初始路径（A*规划结果）</text>
+  <text x="400" y="305" text-anchor="middle" font-size="13" fill="#555">输出：无冲突、有序通行的最终路径</text>
+  
+  <!-- 箭头：输入到三个模块 -->
+  <line x1="150" y1="260" x2="150" y2="205" stroke="#e91e63" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="400" y1="260" x2="400" y2="205" stroke="#e91e63" stroke-width="2" marker-end="url(#arrowOrange)"/>
+  <line x1="650" y1="260" x2="650" y2="205" stroke="#e91e63" stroke-width="2" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 反馈循环 -->
+  <path d="M 650 200 Q 750 200 750 300 Q 750 400 400 400 Q 50 400 50 300 Q 50 200 150 200" fill="none" stroke="#9c27b0" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowBlue)"/>
+  <text x="750" y="320" text-anchor="middle" font-size="12" fill="#9c27b0" transform="rotate(90, 750, 320)">反馈调整</text>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="460" text-anchor="middle" font-size="13" fill="#777">三个模块协同工作：冲突检测发现问题 → 优先级规划决定谁先走 → 交通管制执行通行规则</text>
+  <text x="400" y="480" text-anchor="middle" font-size="12" fill="#999">虚线表示反馈：如果交通管制导致等待超时，会触发优先级重新调整</text>
+</svg>
+
+<h3>20.5 实战经验：三个常见坑</h3>
+
+<p>最后，分享三个我在项目中踩过的坑，希望能帮你少走弯路。</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e3f2fd;">
+    <th style="width:20%;">坑</th>
+    <th style="width:40%;">现象</th>
+    <th style="width:40%;">解决方案</th>
+  </tr>
+  <tr>
+    <td><strong>死锁</strong></td>
+    <td>两台AGV在路口互相等待，谁都不动</td>
+    <td>加超时机制，等待超过阈值就强制让一台车后退或绕路</td>
+  </tr>
+  <tr>
+    <td><strong>优先级饥饿</strong></td>
+    <td>低优先级AGV永远等不到通行机会</td>
+    <td>动态提升等待时间过长的AGV优先级</td>
+  </tr>
+  <tr>
+    <td><strong>检测盲区</strong></td>
+    <td>只检测节点冲突，没检测边冲突，导致刮擦</td>
+    <td>时空占用表必须包含路径段信息，不能只看节点</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>刚开始做多AGV调度时，别想着一步到位。先实现基础的冲突检测+优先级规划，跑通后再加交通管制。我见过有人一上来就搞复杂的分布式算法，结果调试了两个月还没跑起来。嗯，稳扎稳打才是正道。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。冲突检测、优先级规划、交通管制，这三个东西是绑在一起的。你想想看，没有检测，就不知道谁撞了谁；没有优先级，就不知道谁该让谁；没有管制，就算知道了也执行不下去。三者缺一不可。</p>
+
+<div class="footer-nav">
+            <a href="19PathSmoothing.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="21AStarOptimization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 环境建模与地图优化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AntiInterferenceBasics.html" class="">1 抗干扰基础</a></li>
+<li><a href="02SensorSelectionLayout.html" class="">2 传感器选型与布局</a></li>
+<li><a href="03EmcShieldingFilter.html" class="">3 电磁屏蔽与滤波</a></li>
+<li><a href="04VibrationDamping.html" class="">4 机械减振与结构优化</a></li>
+<li><a href="05AmbientLightNoise.html" class="">5 环境光噪抑制</a></li>
+<li><a href="06GroundTextureAdapt.html" class="">6 地面纹理适应性</a></li>
+<li><a href="07MultiSensorFusionAntiInterfere.html" class="">7 多传感器融合抗干扰</a></li>
+<li><a href="08LocalizationRobustness.html" class="">8 定位算法鲁棒性增强</a></li>
+<li><a href="09PathPlanningAntiInterfere.html" class="">9 路径规划抗干扰</a></li>
+<li><a href="10MotionControlAntiInterfere.html" class="">10 运动控制抗干扰</a></li>
+<li><a href="11CommunicationAntiInterfere.html" class="">11 通信抗干扰</a></li>
+<li><a href="12SoftwareFilterData.html" class="">12 软件滤波与数据处理</a></li>
+<li><a href="13Calibration.html" class="">13 标定与校准</a></li>
+<li><a href="14MapModelingOptimize.html" class="active">14 环境建模与地图优化</a></li>
+<li><a href="15FaultDiagnosisRecovery.html" class="">15 故障诊断与自恢复</a></li>
+<li><a href="16AntiInterfereTestMethod.html" class="">16 抗干扰测试方法论</a></li>
+<li><a href="17InterferenceCaseStudy.html" class="">17 案例实战</a></li>
+<li><a href="18TuningToolchain.html" class="">18 抗干扰调优工具链</a></li>
+<li><a href="19AutoParameterTuning.html" class="">19 参数调优自动化</a></li>
+<li><a href="20AntiInterfereDesignSpec.html" class="">20 抗干扰设计规范</a></li>
+<li><a href="21LidarAntiInterfereAdvanced.html" class="">21 激光雷达抗干扰进阶</a></li>
+<li><a href="22ImuAntiInterfereAdvanced.html" class="">22 IMU抗干扰进阶</a></li>
+<li><a href="23VisualNavAntiInterfere.html" class="">23 视觉导航抗干扰</a></li>
+<li><a href="24MultiAgvCoopAntiInterfere.html" class="">24 多AGV协同抗干扰</a></li>
+<li><a href="25DeepLearningAntiInterfere.html" class="">25 深度学习抗干扰</a></li>
+<li><a href="26RealtimeVsRobustness.html" class="">26 实时性与抗干扰平衡</a></li>
+<li><a href="27TuningPracticeFlow.html" class="">27 抗干扰调优实战流程</a></li>
+<li><a href="28IndustryStandards.html" class="">28 行业标准与认证</a></li>
+<li><a href="29FrontierAntiInterfere.html" class="">29 前沿抗干扰技术</a></li>
+<li><a href="30CourseSummaryPath.html" class="">30 课程总结与进阶路径</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 环境建模与地图优化：栅格地图与特征地图的抗干扰更新策略，动态障碍物地图剔除，多时相地图融合与更新</h2>
+
+<p>做AGV导航这么多年，我越来越觉得——地图不是建完就完事的。它得“活着”。</p>
+
+<p>什么叫活着？就是能抗干扰、能剔除动态障碍物、能融合多时相的数据。说白了，地图得自己会进化。今天咱们就聊聊这个。</p>
+
+<h3>14.1 栅格地图的抗干扰更新策略</h3>
+
+<p>栅格地图，大家都不陌生。每个格子存一个概率值，表示“这里有没有障碍物”。但问题来了——传感器总有噪声，激光偶尔打偏，超声波可能被干扰。怎么更新才靠谱？</p>
+
+<p>我个人习惯用<b>贝叶斯更新</b>。不是简单地把新观测值覆盖旧值，而是把新旧信息做概率融合。</p>
+
+<pre><code>// 贝叶斯栅格更新伪代码
+float updateCell(float prior, float measurement, float p_hit, float p_miss) {
+    // prior: 先验概率
+    // measurement: 当前观测 (0=空闲, 1=占用)
+    // p_hit: 传感器检测到障碍物的准确率
+    // p_miss: 传感器漏检的概率
+    
+    float likelihood = (measurement == 1) ? p_hit : p_miss;
+    float posterior = (likelihood * prior) / 
+                      (likelihood * prior + (1 - likelihood) * (1 - prior));
+    return posterior;
+}
+</code></pre>
+
+<p>嗯，这里要注意——<b>不要直接用0和1</b>。我见过不少项目，直接把栅格值设成0或1，结果一帧噪声数据就把地图毁了。用概率值，慢慢收敛，才是正道。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>栅格更新要“慢进快出”。障碍物出现要多次确认，障碍物消失要快速响应。</p>
+</div>
+
+<h3>14.2 特征地图的抗干扰更新</h3>
+
+<p>特征地图，比如点云特征、角点、线段，比栅格地图更“娇气”。为什么？因为特征一旦匹配错，整个位姿估计就偏了。</p>
+
+<p>我在项目中遇到过一个问题：仓库里有一排货架，激光扫描到的角点特征，跟另一排货架的角点几乎一模一样。结果地图更新时，特征匹配错了，AGV直接“迷路”。</p>
+
+<p>怎么解决？我建议用<b>RANSAC + 局部一致性检查</b>。</p>
+
+<pre><code>// 特征匹配抗干扰策略
+bool matchFeature(Feature observed, Feature map_feature, float threshold) {
+    // 1. 几何距离检查
+    float dist = euclideanDistance(observed.position, map_feature.position);
+    if (dist > threshold) return false;
+    
+    // 2. 描述子相似度检查
+    float sim = descriptorSimilarity(observed.descriptor, map_feature.descriptor);
+    if (sim < 0.7) return false;  // 相似度阈值
+    
+    // 3. 局部拓扑一致性检查
+    // 检查该特征周围的其他特征是否也匹配
+    int consistent_neighbors = checkNeighborConsistency(observed, map_feature);
+    if (consistent_neighbors < 3) return false;  // 至少3个邻居一致
+    
+    return true;
+}
+</code></pre>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>特征地图更新时，给每个特征加一个“置信度计数器”。连续匹配成功就加1，匹配失败就减1。低于阈值就剔除。这样能有效过滤掉临时出现的干扰特征。</p>
+</div>
+
+<h3>14.3 动态障碍物地图剔除</h3>
+
+<p>动态障碍物——行人、叉车、托盘——是AGV导航的“头号公敌”。</p>
+
+<p>你想想看，如果地图里永远保留着刚才那个行人站的位置，AGV下次路过时就会绕一个大弯。多傻啊。</p>
+
+<p>我常用的策略是<b>时间戳差分法</b>：</p>
+
+<ol>
+  <li>每个栅格或特征都记录最后一次更新时间</li>
+  <li>如果某个区域在短时间内“出现又消失”，标记为动态</li>
+  <li>动态区域不参与全局路径规划，只做局部避障</li>
+</ol>
+
+<pre><code>// 动态障碍物剔除逻辑
+void updateDynamicMap(GridMap&amp; map, ScanData&amp; scan, float time_now) {
+    for (auto&amp; cell : map.cells) {
+        // 检查该栅格是否被当前扫描覆盖
+        if (scan.isCovered(cell.position)) {
+            bool occupied = scan.isOccupied(cell.position);
+            
+            if (occupied) {
+                cell.last_observed_occupied = time_now;
+                cell.occupancy = min(1.0f, cell.occupancy + 0.3f);
+            } else {
+                // 如果之前是占用，但现在是空闲
+                if (cell.occupancy > 0.5f) {
+                    float duration = time_now - cell.last_observed_occupied;
+                    if (duration < 2.0f) {
+                        // 短时间内变化，可能是动态障碍物
+                        cell.is_dynamic = true;
+                        cell.occupancy = 0.0f;  // 立即清除
+                    } else {
+                        cell.occupancy = max(0.0f, cell.occupancy - 0.1f);
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre>
+
+<div class="warning">
+  <p><strong>警告：</strong>千万别把动态障碍物直接删掉就完事了。我曾经吃过这个亏——动态障碍物虽然要剔除，但它的位置信息要保留到局部代价地图里，用于实时避障。否则AGV会直接撞上去。</p>
+</div>
+
+<h3>14.4 多时相地图融合与更新</h3>
+
+<p>什么叫多时相？就是不同时间采集的地图数据。早上、中午、晚上，仓库的布局可能不一样——货架被移动了，通道被堵了。</p>
+
+<p>我建议用<b>加权滑动窗口</b>来做融合：</p>
+
+<table>
+  <tr>
+    <th>时间窗口</th>
+    <th>权重</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>最近1小时</td>
+    <td>0.6</td>
+    <td>最新数据，权重最高</td>
+  </tr>
+  <tr>
+    <td>1~24小时</td>
+    <td>0.3</td>
+    <td>短期历史，辅助判断</td>
+  </tr>
+  <tr>
+    <td>24小时以上</td>
+    <td>0.1</td>
+    <td>长期背景，防止误删</td>
+  </tr>
+</table>
+
+<pre><code>// 多时相地图融合
+void fuseMultiTemporalMap(GridMap&amp; fused_map, 
+                          vector&lt;GridMap&gt;&amp; temporal_maps) {
+    // temporal_maps[0] = 最新, temporal_maps[1] = 1小时前, ...
+    vector&lt;float&gt; weights = {0.6, 0.3, 0.1};
+    
+    for (int i = 0; i &lt; fused_map.cells.size(); i++) {
+        float fused_value = 0.0f;
+        float weight_sum = 0.0f;
+        
+        for (int t = 0; t &lt; temporal_maps.size() &amp;&amp; t &lt; weights.size(); t++) {
+            if (temporal_maps[t].cells[i].is_valid) {
+                fused_value += temporal_maps[t].cells[i].occupancy * weights[t];
+                weight_sum += weights[t];
+            }
+        }
+        
+        if (weight_sum > 0) {
+            fused_map.cells[i].occupancy = fused_value / weight_sum;
+        }
+    }
+}
+</code></pre>
+
+<p>这里有个坑——<b>时间窗口不能太短</b>。我记得有一次，客户说“地图更新太慢了”，我把窗口改成15分钟。结果呢？AGV在货架通道里来回晃，因为地图一直在变。后来改成2小时窗口，稳了。</p>
+
+<h3>14.5 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的地图抗干扰更新框架。你一看就明白：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">地图抗干扰更新知识体系</text>
+  
+  <!-- 顶层：输入 -->
+  <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" fill="white" font-size="14" font-weight="bold">传感器数据输入</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：三种地图类型 -->
+  <rect x="50" y="140" width="200" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="170" text-anchor="middle" fill="white" font-size="13" font-weight="bold">栅格地图</text>
+  
+  <rect x="300" y="140" width="200" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" fill="white" font-size="13" font-weight="bold">特征地图</text>
+  
+  <rect x="550" y="140" width="200" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="650" y="170" text-anchor="middle" fill="white" font-size="13" font-weight="bold">动态障碍物地图</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="190" x2="150" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="650" y1="190" x2="650" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 第三层：核心策略 -->
+  <rect x="50" y="220" width="200" height="80" rx="8" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2"/>
+  <text x="150" y="250" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">贝叶斯概率更新</text>
+  <text x="150" y="270" text-anchor="middle" fill="#2c3e50" font-size="11">慢进快出原则</text>
+  <text x="150" y="288" text-anchor="middle" fill="#2c3e50" font-size="11">置信度计数器</text>
+  
+  <rect x="300" y="220" width="200" height="80" rx="8" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">RANSAC + 一致性检查</text>
+  <text x="400" y="270" text-anchor="middle" fill="#2c3e50" font-size="11">几何距离 + 描述子</text>
+  <text x="400" y="288" text-anchor="middle" fill="#2c3e50" font-size="11">局部拓扑验证</text>
+  
+  <rect x="550" y="220" width="200" height="80" rx="8" fill="#ffeaa7" stroke="#fdcb6e" stroke-width="2"/>
+  <text x="650" y="250" text-anchor="middle" fill="#2c3e50" font-size="12" font-weight="bold">时间戳差分法</text>
+  <text x="650" y="270" text-anchor="middle" fill="#2c3e50" font-size="11">短时变化标记动态</text>
+  <text x="650" y="288" text-anchor="middle" fill="#2c3e50" font-size="11">保留到局部代价地图</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="300" x2="150" y2="330" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="300" x2="400" y2="330" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="650" y1="300" x2="650" y2="330" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 第四层：多时相融合 -->
+  <rect x="200" y="330" width="400" height="60" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="355" text-anchor="middle" fill="white" font-size="14" font-weight="bold">多时相地图融合</text>
+  <text x="400" y="375" text-anchor="middle" fill="white" font-size="12">加权滑动窗口（0.6 / 0.3 / 0.1）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="390" x2="400" y2="420" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 第五层：输出 -->
+  <rect x="250" y="420" width="300" height="50" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="450" text-anchor="middle" fill="white" font-size="14" font-weight="bold">稳定、抗干扰的导航地图</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="highlight">
+  <p><strong>总结一句话：</strong>地图优化不是一锤子买卖。栅格地图要概率更新，特征地图要一致性检查，动态障碍物要时间戳剔除，多时相数据要加权融合。四管齐下，你的AGV才能在各种干扰下稳如老狗。</p>
+</div>
+
+<p>嗯，今天就聊到这儿。这些策略我都在实际项目中验证过，效果不错。你回去试试，有问题随时交流。</p>
+
+<div class="footer-nav">
+            <a href="13Calibration.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15FaultDiagnosisRecovery.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 异常处理与容错机制</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="active">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 异常处理与容错机制：AGV故障检测、任务超时处理、降级运行模式</h2>
+
+<p>各位同学，今天我们来聊聊调度系统里最「烧脑」的部分——异常处理与容错机制。</p>
+<p>说实话，我见过太多系统在演示时跑得飞起，一到现场就各种「翻车」。为什么？因为异常处理没做好。AGV这东西，说白了就是在不确定的环境中干活。地面不平、网络波动、电池老化……你永远猜不到下一秒会发生什么。</p>
+<p>我个人习惯，在设计调度系统时，会把异常处理当作「一等公民」来对待。不是先写正常流程再补异常，而是反过来——先想清楚「如果这里出错了怎么办」。</p>
+
+<h3>16.1 AGV故障检测：别等撞墙了才发现</h3>
+
+<p>故障检测，核心就一句话：<strong>尽早发现，快速定位</strong>。</p>
+<p>我在项目中遇到过一台AGV，明明轮子卡住了，系统还一直给它派任务。结果呢？它原地空转了半小时，电池耗光，还把地面磨出一道沟。嗯，从那以后，我就在检测机制上下了狠功夫。</p>
+
+<h4>16.1.1 心跳检测</h4>
+<p>这是最基础的手段。AGV每隔一段时间（比如1秒）向调度系统发送一个「我还活着」的信号。</p>
+<ul>
+    <li><strong>正常情况</strong>：心跳稳定，延迟在50ms以内</li>
+    <li><strong>异常情况</strong>：连续3次心跳丢失，触发告警</li>
+    <li><strong>严重情况</strong>：连续10次心跳丢失，系统自动将该AGV标记为「离线」</li>
+</ul>
+
+<div class="tip">
+    <strong>我的经验</strong>：心跳间隔别设太短，也别太长。1秒是个不错的起点。太短了网络负担重，太长了故障发现不及时。我曾经见过有人设了10秒的心跳，结果AGV撞了墙，系统过了半分钟才知道。
+</div>
+
+<h4>16.1.2 状态自检</h4>
+<p>AGV自身也要有「体检」能力。每次任务执行前后，都应该做一次快速自检：</p>
+<pre><code>// 伪代码：AGV自检流程
+function selfCheck() {
+    checkMotorStatus();      // 电机状态
+    checkBatteryLevel();     // 电量
+    checkLidarSensor();      // 激光雷达
+    checkWheelEncoder();     // 轮子编码器
+    checkCommunication();    // 通信链路
+    
+    if (anyCheckFailed()) {
+        reportFault(faultCode);
+        enterSafeMode();
+    }
+}</code></pre>
+
+<h4>16.1.3 异常行为检测</h4>
+<p>有些故障不是「死」的，而是「抽风」。比如AGV走着走着突然偏航，或者速度忽快忽慢。这时候就需要行为检测了。</p>
+<p>我常用的方法是：<strong>轨迹偏差检测</strong>。AGV实际走的路径和规划路径一对比，偏差超过阈值（比如20cm），立刻报警。</p>
+
+<div class="warning">
+    <strong>注意</strong>：偏差阈值不能设得太死。AGV在转弯、过坎时，偏差会自然增大。我一般会根据不同路段设置动态阈值——直道严格，弯道宽松。
+</div>
+
+<h3>16.2 任务超时处理：别让系统死等</h3>
+
+<p>任务超时，说白了就是「活干不完了」。原因很多：AGV堵在路上、货架被挪走了、二维码被磨花了……</p>
+<p>你想想看，如果一个任务超时了，系统还在那傻等，后面的任务全堵住了。这就像高速公路上一辆车抛锚了，后面的车全停下来等——这不合理。</p>
+
+<h4>16.2.1 超时时间怎么设？</h4>
+<p>我一般用「动态超时」策略。不是拍脑袋定一个固定值，而是根据任务类型和历史数据来算：</p>
+<table>
+    <thead>
+        <tr>
+            <th>任务类型</th>
+            <th>基础时间</th>
+            <th>额外缓冲</th>
+            <th>超时阈值</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>空车移动</td>
+            <td>路径时间 × 1.2</td>
+            <td>30秒</td>
+            <td>基础时间 + 30秒</td>
+        </tr>
+        <tr>
+            <td>取货任务</td>
+            <td>路径时间 × 1.5</td>
+            <td>60秒</td>
+            <td>基础时间 + 60秒</td>
+        </tr>
+        <tr>
+            <td>放货任务</td>
+            <td>路径时间 × 1.5</td>
+            <td>60秒</td>
+            <td>基础时间 + 60秒</td>
+        </tr>
+        <tr>
+            <td>充电任务</td>
+            <td>预估充电时间</td>
+            <td>120秒</td>
+            <td>预估时间 + 120秒</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>16.2.2 超时后的处理策略</h4>
+<p>任务超时了，不能一刀切。我总结了三种处理方式：</p>
+<ol>
+    <li><strong>重试</strong>：如果是临时性故障（比如网络抖动），重试1-2次即可。重试次数别太多，我一般设3次上限。</li>
+    <li><strong>重新分配</strong>：如果当前AGV搞不定，把任务转给另一台空闲的AGV。这招在集群里特别好用。</li>
+    <li><strong>人工介入</strong>：如果重试和重新分配都失败了，那就别硬撑了。把任务标记为「异常」，通知运维人员处理。</li>
+</ol>
+
+<div class="highlight">
+    <p><strong>核心原则</strong>：超时处理的目标不是「完成任务」，而是「不让系统卡死」。有时候放弃一个任务，比死磕到底更明智。</p>
+</div>
+
+<h3>16.3 降级运行模式：系统不能停</h3>
+
+<p>降级运行，说白了就是「保底方案」。系统出问题了，不能直接瘫痪，得能「带病工作」。</p>
+<p>我记得有一次，客户的调度系统数据库挂了。正常情况下，所有任务记录都要写库。但当时我们启动了降级模式——任务照常执行，只是记录先写到本地缓存，等数据库恢复了再同步。嗯，这个设计救了他们一命。</p>
+
+<h4>16.3.1 降级等级划分</h4>
+<p>我习惯把降级分为三个等级：</p>
+<ul>
+    <li><strong>L1 - 轻微降级</strong>：关闭非核心功能（如报表统计、历史查询），核心调度不受影响</li>
+    <li><strong>L2 - 中度降级</strong>：关闭路径优化算法，改用最短路径；关闭任务优先级，改为FIFO</li>
+    <li><strong>L3 - 严重降级</strong>：只执行紧急任务（如充电、回库），暂停所有普通任务</li>
+</ul>
+
+<h4>16.3.2 降级触发条件</h4>
+<p>降级不是手动开关的，得自动触发。我常用的触发条件：</p>
+<pre><code>// 降级触发逻辑
+if (systemLoad > 80%) {
+    enterDegradeMode(L1);  // 系统负载过高，关闭非核心功能
+}
+if (databaseResponseTime > 500ms) {
+    enterDegradeMode(L2);  // 数据库响应慢，关闭优化算法
+}
+if (availableAGVCount < 3) {
+    enterDegradeMode(L3);  // 可用AGV太少，只执行紧急任务
+}</code></pre>
+
+<h4>16.3.3 降级恢复</h4>
+<p>降级不是终点，恢复才是。我一般会设计一个「健康检查」线程，定期检查系统状态：</p>
+<ul>
+    <li>如果系统负载降到60%以下，自动恢复到L2</li>
+    <li>如果系统负载降到40%以下，自动恢复到L1</li>
+    <li>如果所有指标恢复正常，自动恢复到正常模式</li>
+</ul>
+
+<div class="warning">
+    <strong>避坑指南</strong>：恢复的时候要小心「抖动」。我曾经遇到过系统在降级和正常之间反复横跳——刚恢复又触发降级，降级后又恢复。后来我加了一个「稳定时间」窗口，比如持续正常5分钟才真正恢复。
+</div>
+
+<h3>16.4 知识体系总览</h3>
+
+<p>说了这么多，我画了一张图，把异常处理与容错机制的核心逻辑串起来。你一看就明白了：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV异常处理与容错机制知识体系</text>
+    
+    <!-- 三个核心模块 -->
+    <!-- 故障检测 -->
+    <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV故障检测</text>
+    
+    <!-- 任务超时处理 -->
+    <rect x="300" y="70" width="200" height="50" rx="8" fill="#e67e22" opacity="0.9"/>
+    <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务超时处理</text>
+    
+    <!-- 降级运行模式 -->
+    <rect x="550" y="70" width="200" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+    <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">降级运行模式</text>
+    
+    <!-- 连接线 -->
+    <line x1="250" y1="95" x2="300" y2="95" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="500" y1="95" x2="550" y2="95" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 故障检测子项 -->
+    <rect x="50" y="150" width="200" height="40" rx="6" fill="#85c1e9"/>
+    <text x="150" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">心跳检测</text>
+    
+    <rect x="50" y="200" width="200" height="40" rx="6" fill="#85c1e9"/>
+    <text x="150" y="225" text-anchor="middle" font-size="14" fill="#2c3e50">状态自检</text>
+    
+    <rect x="50" y="250" width="200" height="40" rx="6" fill="#85c1e9"/>
+    <text x="150" y="275" text-anchor="middle" font-size="14" fill="#2c3e50">异常行为检测</text>
+    
+    <!-- 任务超时子项 -->
+    <rect x="300" y="150" width="200" height="40" rx="6" fill="#f0b27a"/>
+    <text x="400" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">动态超时设置</text>
+    
+    <rect x="300" y="200" width="200" height="40" rx="6" fill="#f0b27a"/>
+    <text x="400" y="225" text-anchor="middle" font-size="14" fill="#2c3e50">重试机制</text>
+    
+    <rect x="300" y="250" width="200" height="40" rx="6" fill="#f0b27a"/>
+    <text x="400" y="275" text-anchor="middle" font-size="14" fill="#2c3e50">重新分配</text>
+    
+    <rect x="300" y="300" width="200" height="40" rx="6" fill="#f0b27a"/>
+    <text x="400" y="325" text-anchor="middle" font-size="14" fill="#2c3e50">人工介入</text>
+    
+    <!-- 降级模式子项 -->
+    <rect x="550" y="150" width="200" height="40" rx="6" fill="#82e0aa"/>
+    <text x="650" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">L1 轻微降级</text>
+    
+    <rect x="550" y="200" width="200" height="40" rx="6" fill="#82e0aa"/>
+    <text x="650" y="225" text-anchor="middle" font-size="14" fill="#2c3e50">L2 中度降级</text>
+    
+    <rect x="550" y="250" width="200" height="40" rx="6" fill="#82e0aa"/>
+    <text x="650" y="275" text-anchor="middle" font-size="14" fill="#2c3e50">L3 严重降级</text>
+    
+    <rect x="550" y="300" width="200" height="40" rx="6" fill="#82e0aa"/>
+    <text x="650" y="325" text-anchor="middle" font-size="14" fill="#2c3e50">健康检查与恢复</text>
+    
+    <!-- 底部总结 -->
+    <rect x="100" y="380" width="600" height="80" rx="10" fill="#34495e" opacity="0.9"/>
+    <text x="400" y="410" text-anchor="middle" font-size="15" fill="white" font-weight="bold">核心目标：系统不能停，任务不能丢，故障要可控</text>
+    <text x="400" y="440" text-anchor="middle" font-size="13" fill="#ecf0f1">故障检测 → 快速发现 | 超时处理 → 避免死锁 | 降级运行 → 保底方案</text>
+</svg>
+
+<p>你看，这三个模块其实是环环相扣的。故障检测发现问题，超时处理解决「卡住」的问题，降级运行保证系统整体不崩。缺一个都不行。</p>
+
+<div class="tip">
+    <strong>我的建议</strong>：刚开始做调度系统时，别想着把所有异常都处理完。先把「心跳检测」、「任务超时重试」、「L3降级」这三个最基础的做扎实。其他的，慢慢补。我曾经见过一个团队，花了一个月做各种花哨的异常处理，结果上线第一天，心跳检测没配好，AGV离线了系统都不知道——这就尴尬了。
+</div>
+
+<p>好了，这一章的内容就到这里。异常处理这东西，说难不难，说简单也不简单。关键是要有「底线思维」——先想清楚最坏的情况是什么，然后针对性地设计容错方案。你想想看，是不是这个道理？</p>
+
+<div class="footer-nav">
+            <a href="15ChargeAndTaskDispatch.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17SimulationEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

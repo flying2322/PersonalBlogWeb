@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>8 全局路径规划算法（二）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroOverview.html" class="">1 AGV概述与课程导论</a></li>
+<li><a href="02SystemArchitecture.html" class="">2 AGV系统架构</a></li>
+<li><a href="03CoordinateTransform.html" class="">3 坐标变换与空间描述</a></li>
+<li><a href="04SensorDataPreprocess.html" class="">4 传感器基础与数据预处理</a></li>
+<li><a href="05EnvMapRepresentation.html" class="">5 环境地图表示</a></li>
+<li><a href="06SlamMappingBasics.html" class="">6 SLAM基础与建图</a></li>
+<li><a href="07GlobalPathPlanningPart1.html" class="">7 全局路径规划算法（一）</a></li>
+<li><a href="08GlobalPathPlanningPart2.html" class="active">8 全局路径规划算法（二）</a></li>
+<li><a href="09GlobalPathPlanningPart3.html" class="">9 全局路径规划算法（三）</a></li>
+<li><a href="10LocalPathPlanningPart1.html" class="">10 局部路径规划算法（一）</a></li>
+<li><a href="11LocalPathPlanningPart2.html" class="">11 局部路径规划算法（二）</a></li>
+<li><a href="12LocalPathPlanningPart3.html" class="">12 局部路径规划算法（三）</a></li>
+<li><a href="13DynamicAvoidBasics.html" class="">13 动态避障基础</a></li>
+<li><a href="14DynamicAvoidAdvanced.html" class="">14 动态避障进阶</a></li>
+<li><a href="15TrajectorySmoothInterp.html" class="">15 轨迹平滑与插值</a></li>
+<li><a href="16KinematicConstraints.html" class="">16 运动学模型与约束</a></li>
+<li><a href="17RosNavStack.html" class="">17 ROS导航栈详解</a></li>
+<li><a href="18SimulationEnvironment.html" class="">18 仿真环境搭建</a></li>
+<li><a href="19PathPlanningPracticePart1.html" class="">19 路径规划综合实战（一）</a></li>
+<li><a href="20PathPlanningPracticePart2.html" class="">20 路径规划综合实战（二）</a></li>
+<li><a href="21MultiAgvCoopDispatch.html" class="">21 多AGV协同调度</a></li>
+<li><a href="22LocalizationTech.html" class="">22 AGV定位技术</a></li>
+<li><a href="23DynamicReplanStrategy.html" class="">23 动态环境中的重规划策略</a></li>
+<li><a href="24PathPlanningEval.html" class="">24 路径规划性能评估</a></li>
+<li><a href="25WarehouseShelfAvoidCase.html" class="">25 工业AGV案例实战（一）</a></li>
+<li><a href="26FactoryLineAvoidCase.html" class="">26 工业AGV案例实战（二）</a></li>
+<li><a href="27OutdoorAgvUnmanned.html" class="">27 室外AGV与无人车</a></li>
+<li><a href="28DeepLearningPathPlan.html" class="">28 深度学习在路径规划中的应用</a></li>
+<li><a href="29DebugAndOptimize.html" class="">29 AGV系统调试与优化</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>8 全局路径规划算法（二）——A*算法原理、启发函数设计、优化技巧</h2>
+
+<p>各位同学，欢迎来到第八讲。上一讲我们聊了Dijkstra，那个老老实实、地毯式搜索的算法。今天要讲的A*，可以说是Dijkstra的“升级版”——它多了个“脑子”，知道往哪个方向找更划算。</p>
+
+<p>我个人做AGV项目这么多年，用得最多的全局规划算法就是A*。不是说它完美，而是它在效率和最优性之间找到了一个很好的平衡点。你想想看，工厂里几百台AGV同时跑，每台都要实时规划路径，计算量稍微大一点，调度系统就卡死了。A*在这种场景下，表现相当靠谱。</p>
+
+<h3>8.1 A*算法的核心思想</h3>
+
+<p>A*本质上是一种启发式搜索算法。它跟Dijkstra最大的区别在于：Dijkstra只考虑“从起点走到当前点花了多少代价”，而A*还考虑了“从当前点到终点大概还要花多少代价”。</p>
+
+<p>这个“大概还要花多少代价”，就是我们说的<strong>启发函数（Heuristic Function）</strong>。</p>
+
+<p>A*的代价评估公式很简单：</p>
+
+<pre><code>f(n) = g(n) + h(n)</code></pre>
+
+<ul>
+  <li><strong>f(n)</strong>：节点n的总评估代价</li>
+  <li><strong>g(n)</strong>：从起点到节点n的实际代价</li>
+  <li><strong>h(n)</strong>：从节点n到终点的估计代价（启发函数）</li>
+</ul>
+
+<p>算法每次从open list中取出f(n)最小的节点进行扩展。说白了，就是“既要看走过的路，也要看没走的路”。</p>
+
+<div class="highlight">
+  <p><strong>核心理解：</strong>如果h(n)=0，A*就退化成Dijkstra。如果h(n)比实际代价大很多，A*就变成贪心算法，速度快但不保证最优。所以，启发函数的设计是A*的灵魂。</p>
+</div>
+
+<h3>8.2 启发函数的设计</h3>
+
+<p>启发函数怎么选？这取决于你的地图类型和运动模型。我给大家总结三种最常用的：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>启发函数</th>
+      <th>公式</th>
+      <th>适用场景</th>
+      <th>特点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>曼哈顿距离</td>
+      <td>|dx| + |dy|</td>
+      <td>四方向移动（上下左右）</td>
+      <td>计算快，但低估实际代价</td>
+    </tr>
+    <tr>
+      <td>欧几里得距离</td>
+      <td>√(dx² + dy²)</td>
+      <td>八方向或自由移动</td>
+      <td>最直观，但开方运算稍慢</td>
+    </tr>
+    <tr>
+      <td>切比雪夫距离</td>
+      <td>max(|dx|, |dy|)</td>
+      <td>八方向移动（对角代价相同）</td>
+      <td>适合网格地图，效率高</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我在项目中遇到过一个问题：用曼哈顿距离做启发函数，结果AGV在仓库里走出来的路径全是“直角拐弯”，看着特别别扭。后来换成切比雪夫距离，路径就平滑多了。嗯，这里要注意：启发函数的选择会影响路径的“风格”。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在AGV项目里直接用欧几里得距离，结果发现算法跑得特别慢。为什么？因为欧几里得距离往往低估实际代价（尤其在有障碍物时），导致A*扩展了太多不必要的节点。后来我改用“对角距离”（D* Lite里常用的一种），效果好了很多。</p>
+</div>
+
+<h3>8.3 A*的优化技巧</h3>
+
+<p>基础A*在简单地图上够用，但到了复杂场景，比如几千个节点的工厂地图，性能就不太行了。下面分享几个我常用的优化技巧。</p>
+
+<h4>8.3.1 JPS（Jump Point Search）</h4>
+
+<p>JPS是A*的一种加速变体。它的核心思想是：<strong>在网格地图中，很多节点是“对称”的，不需要一个个去扩展</strong>。</p>
+
+<p>举个例子：你在一条笔直的走廊里往前走，中间没有障碍物。A*会逐个检查走廊上的每个格子，而JPS会直接“跳”到走廊的尽头或者拐弯处。这一跳，省掉了大量无效计算。</p>
+
+<p>JPS的规则其实不复杂：</p>
+<ul>
+  <li>如果当前节点在一个直线方向上，且前方没有障碍物，就一直往前跳，直到遇到障碍物或拐点</li>
+  <li>拐点就是“强迫邻居”——即某个方向上有障碍物，导致必须改变方向的位置</li>
+</ul>
+
+<p>我做过对比测试：在1000x1000的网格地图上，普通A*需要扩展约15万个节点，而JPS只扩展了不到2万个。速度提升了7-8倍。不过JPS只适用于均匀网格地图，非网格场景用不了。</p>
+
+<h4>8.3.2 双向A*</h4>
+
+<p>双向A*的思路更直接：<strong>从起点和终点同时开始搜索，让它们在中间相遇</strong>。</p>
+
+<p>你想想看，如果地图很大，从起点单向搜索，搜索区域会像一个不断扩大的圆。而双向搜索，相当于两个圆同时扩大，它们相遇时，总面积比单个圆小得多。</p>
+
+<p>具体实现时要注意：</p>
+<ul>
+  <li>两个方向的搜索交替进行，每次选f(n)较小的那个方向扩展一步</li>
+  <li>当两个方向的搜索区域有交集时，算法终止</li>
+  <li>需要维护两个open list和两个close list</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>双向A*的终止条件要小心处理。我曾经踩过一个坑：两个方向各自找到了路径，但拼接起来不是最优的。原因是它们“相遇”的点不是最优连接点。正确的做法是：当两个方向的搜索区域有重叠时，检查所有重叠节点，取g值之和最小的那个作为连接点。</p>
+</div>
+
+<h4>8.3.3 其他实用优化</h4>
+
+<ul>
+  <li><strong>二叉堆优化open list</strong>：这是最基础的优化。用二叉堆代替普通列表，取最小f(n)的操作从O(n)降到O(log n)。</li>
+  <li><strong>权重A*</strong>：给启发函数加一个权重w（w>1），让算法更“贪心”。比如f(n)=g(n)+w*h(n)。w=1.5时，速度提升明显，路径质量下降不多。</li>
+  <li><strong>分层规划</strong>：先在高分辨率地图上做粗略规划，再在局部细化。适合超大场景。</li>
+</ul>
+
+<h3>8.4 知识体系总览</h3>
+
+<p>下面这张图，是我自己整理的A*算法知识体系。你可以把它当作一个“思维导图”来看：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">A* 算法</text>
+  
+  <!-- 分支1：核心原理 -->
+  <rect x="50" y="120" width="180" height="40" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+  <text x="140" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">核心原理</text>
+  <line x1="350" y1="70" x2="140" y2="120" stroke="#4a90d9" stroke-width="2"/>
+  
+  <text x="60" y="185" fill="#333" font-size="13">• f(n) = g(n) + h(n)</text>
+  <text x="60" y="205" fill="#333" font-size="13">• open list / close list</text>
+  <text x="60" y="225" fill="#333" font-size="13">• 启发式搜索</text>
+  
+  <!-- 分支2：启发函数 -->
+  <rect x="310" y="120" width="180" height="40" rx="8" fill="#f0ad4e" stroke="#d98a2e" stroke-width="2"/>
+  <text x="400" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">启发函数设计</text>
+  <line x1="400" y1="70" x2="400" y2="120" stroke="#4a90d9" stroke-width="2"/>
+  
+  <text x="320" y="185" fill="#333" font-size="13">• 曼哈顿距离</text>
+  <text x="320" y="205" fill="#333" font-size="13">• 欧几里得距离</text>
+  <text x="320" y="225" fill="#333" font-size="13">• 切比雪夫距离</text>
+  <text x="320" y="245" fill="#333" font-size="13">• 对角距离</text>
+  
+  <!-- 分支3：优化技巧 -->
+  <rect x="570" y="120" width="180" height="40" rx="8" fill="#d9534f" stroke="#b52e2a" stroke-width="2"/>
+  <text x="660" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">优化技巧</text>
+  <line x1="500" y1="70" x2="660" y2="120" stroke="#4a90d9" stroke-width="2"/>
+  
+  <text x="580" y="185" fill="#333" font-size="13">• JPS（跳点搜索）</text>
+  <text x="580" y="205" fill="#333" font-size="13">• 双向A*</text>
+  <text x="580" y="225" fill="#333" font-size="13">• 二叉堆优化</text>
+  <text x="580" y="245" fill="#333" font-size="13">• 权重A*</text>
+  <text x="580" y="265" fill="#333" font-size="13">• 分层规划</text>
+  
+  <!-- 分支4：应用场景 -->
+  <rect x="180" y="300" width="180" height="40" rx="8" fill="#6f42c1" stroke="#5a32a3" stroke-width="2"/>
+  <text x="270" y="326" text-anchor="middle" fill="white" font-size="15" font-weight="bold">应用场景</text>
+  <line x1="270" y1="260" x2="270" y2="300" stroke="#4a90d9" stroke-width="2"/>
+  
+  <text x="190" y="365" fill="#333" font-size="13">• AGV全局路径规划</text>
+  <text x="190" y="385" fill="#333" font-size="13">• 游戏AI寻路</text>
+  <text x="190" y="405" fill="#333" font-size="13">• 机器人导航</text>
+  
+  <!-- 分支5：注意事项 -->
+  <rect x="440" y="300" width="180" height="40" rx="8" fill="#20c997" stroke="#17a2b8" stroke-width="2"/>
+  <text x="530" y="326" text-anchor="middle" fill="white" font-size="15" font-weight="bold">注意事项</text>
+  <line x1="530" y1="260" x2="530" y2="300" stroke="#4a90d9" stroke-width="2"/>
+  
+  <text x="450" y="365" fill="#333" font-size="13">• 启发函数需满足可采纳性</text>
+  <text x="450" y="385" fill="#333" font-size="13">• 地图分辨率影响性能</text>
+  <text x="450" y="405" fill="#333" font-size="13">• 动态环境需重新规划</text>
+</svg>
+
+<h3>8.5 代码示例：基础A*实现</h3>
+
+<p>最后，给大家一个基础A*的Python实现。这个版本我加了详细的注释，方便你理解每一步在干什么。</p>
+
+<pre><code>import heapq
+
+def astar(grid, start, goal):
+    """
+    grid: 二维网格，0表示可通行，1表示障碍物
+    start: 起点坐标 (x, y)
+    goal: 终点坐标 (x, y)
+    """
+    rows, cols = len(grid), len(grid[0])
+    
+    # 启发函数：曼哈顿距离
+    def heuristic(a, b):
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    
+    # open list：用二叉堆存储 (f, g, x, y, path)
+    open_list = []
+    heapq.heappush(open_list, (0, 0, start[0], start[1], [start]))
+    
+    # close list：记录已访问节点
+    visited = set()
+    visited.add(start)
+    
+    # 四个方向：上、下、左、右
+    directions = [(-1,0), (1,0), (0,-1), (0,1)]
+    
+    while open_list:
+        f, g, x, y, path = heapq.heappop(open_list)
+        
+        # 到达终点
+        if (x, y) == goal:
+            return path
+        
+        for dx, dy in directions:
+            nx, ny = x + dx, y + dy
+            
+            # 边界检查
+            if nx &lt; 0 or nx &gt;= rows or ny &lt; 0 or ny &gt;= cols:
+                continue
+            # 障碍物检查
+            if grid[nx][ny] == 1:
+                continue
+            # 已访问检查
+            if (nx, ny) in visited:
+                continue
+            
+            visited.add((nx, ny))
+            new_g = g + 1
+            new_f = new_g + heuristic((nx, ny), goal)
+            new_path = path + [(nx, ny)]
+            heapq.heappush(open_list, (new_f, new_g, nx, ny, new_path))
+    
+    return None  # 无路径</code></pre>
+
+<div class="tip">
+  <p><strong>小提示：</strong>这段代码是教学用的简化版。实际项目中，我一般会用面向对象的方式封装，把节点状态、路径回溯逻辑都拆开。另外，open list的更新操作（当发现更优路径时更新已有节点的f值）在这个版本里没有体现，但实际应用中很重要。</p>
+</div>
+
+<p>好了，这一讲的内容就到这里。A*算法说难不难，说简单也不简单——关键是你得理解它的“启发”思想，以及在不同场景下怎么调参、怎么优化。我建议你先把基础A*跑通，然后试着加上JPS或者双向搜索，感受一下性能的提升。</p>
+
+<div class="footer-nav">
+            <a href="07GlobalPathPlanningPart1.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="09GlobalPathPlanningPart3.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

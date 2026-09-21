@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>24 交通管制系统部署与运维</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02TrafficControlBasics.html" class="">2 交通管制基础</a></li>
+<li><a href="03PathPlanningAlgo.html" class="">3 路径规划算法</a></li>
+<li><a href="04DeadlockDetectRelease.html" class="">4 死锁检测与解除</a></li>
+<li><a href="05TrafficControlStrategy.html" class="">5 交通管制策略</a></li>
+<li><a href="06MultiAgvCoopDispatch.html" class="">6 多AGV协同调度</a></li>
+<li><a href="07TrafficSystemArch.html" class="">7 交通管制系统架构</a></li>
+<li><a href="08CommProtocolData.html" class="">8 通信协议与数据交互</a></li>
+<li><a href="09MapModelingPerception.html" class="">9 地图建模与环境感知</a></li>
+<li><a href="10TaskPriorityManage.html" class="">10 任务调度与优先级管理</a></li>
+<li><a href="11PathConflictPredict.html" class="">11 路径冲突预测与预防</a></li>
+<li><a href="12TrafficSimPlatform.html" class="">12 交通管制仿真平台搭建</a></li>
+<li><a href="13LocalizationNav.html" class="">13 AGV定位与导航技术</a></li>
+<li><a href="14SafetyMechanism.html" class="">14 交通管制中的安全机制</a></li>
+<li><a href="15PerformanceOptimize.html" class="">15 交通管制性能优化</a></li>
+<li><a href="16DynamicObstacleAvoid.html" class="">16 动态障碍物避让</a></li>
+<li><a href="17TrafficRuleLibrary.html" class="">17 交通管制规则库设计</a></li>
+<li><a href="18MultiZoneTraffic.html" class="">18 多区域交通管制</a></li>
+<li><a href="19TestAndValidation.html" class="">19 交通管制系统测试与验证</a></li>
+<li><a href="20ChargingAndTraffic.html" class="">20 AGV充电调度与交通管制</a></li>
+<li><a href="21MlInTrafficControl.html" class="">21 交通管制中的机器学习应用</a></li>
+<li><a href="22SystemInterface.html" class="">22 交通管制系统接口设计</a></li>
+<li><a href="23LogAndMonitor.html" class="">23 交通管制日志与监控</a></li>
+<li><a href="24DeployAndOps.html" class="active">24 交通管制系统部署与运维</a></li>
+<li><a href="25SecurityPermission.html" class="">25 交通管制系统安全与权限管理</a></li>
+<li><a href="26StandardCompliance.html" class="">26 交通管制系统标准化与合规</a></li>
+<li><a href="27TrafficCaseAnalysis.html" class="">27 交通管制系统案例分析</a></li>
+<li><a href="28FrontierTech.html" class="">28 交通管制系统前沿技术</a></li>
+<li><a href="29TrafficProjectPractice.html" class="">29 交通管制系统项目实战</a></li>
+<li><a href="30FutureOutlook.html" class="">30 交通管制系统未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>24 交通管制系统部署与运维：系统部署架构、容器化部署（Docker）、运维监控与自动化运维</h2>
+
+<h3>24.1 系统部署架构：从单机到集群的演进</h3>
+
+<p>交通管制系统，说白了就是AGV调度的大脑。这个大脑要是宕机了，整个仓库的AGV都得趴窝。我最早做项目时，用的还是单机部署，一台工控机扛所有。结果有一次，系统升级时出了点小问题，重启花了5分钟，现场几十台AGV全堵在路口，那场面...嗯，后来我再也不敢用单机了。</p>
+
+<p>我个人习惯，生产环境至少是双机热备。架构上分三层：</p>
+
+<ul>
+  <li><strong>接入层</strong>：负责跟AGV通信，处理报文解析。这一层要扛住高并发，我建议用Nginx做负载均衡。</li>
+  <li><strong>逻辑层</strong>：交通管制核心算法，包括路径规划、死锁检测、路口分配。这是最吃CPU的模块。</li>
+  <li><strong>数据层</strong>：存储地图数据、任务日志、AGV状态。我一般用Redis做缓存，MySQL做持久化。</li>
+</ul>
+
+<p>你想想看，如果这三层全挤在一台机器上，一旦内存泄漏，整个系统就崩了。所以，我推荐微服务架构，每个模块独立部署，互不影响。</p>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：交通管制系统必须支持水平扩展。当AGV数量超过50台时，单机肯定扛不住。我建议至少预留30%的性能冗余。</p>
+</div>
+
+<h3>24.2 容器化部署：Docker让环境一致</h3>
+
+<p>我记得最早做部署时，最头疼的就是环境不一致。开发环境跑得好好的，一到现场就报错。后来用了Docker，这个问题才算彻底解决。</p>
+
+<p>Docker的好处，说白了就是「一次构建，到处运行」。我把交通管制系统打包成镜像，里面包含了所有依赖——JDK版本、Redis客户端、甚至时区设置。现场运维人员只需要拉取镜像，启动容器就行。</p>
+
+<p>下面是我常用的Dockerfile示例：</p>
+
+<pre><code>FROM openjdk:11-jre-slim
+WORKDIR /app
+COPY target/traffic-control.jar app.jar
+COPY config/application.yml config/
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.location=config/application.yml"]</code></pre>
+
+<p>这里有个坑，我踩过好几次。就是<strong>时区问题</strong>。AGV调度对时间敏感，如果容器时区跟现场不一致，任务时间戳全乱套。我现在的做法是在Dockerfile里加一行：</p>
+
+<pre><code>RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime</code></pre>
+
+<p>另外，容器化部署后，日志管理也要跟上。我习惯把日志挂载到宿主机目录，方便统一收集：</p>
+
+<pre><code>docker run -d \
+  --name traffic-control \
+  -v /data/logs:/app/logs \
+  -p 8080:8080 \
+  traffic-control:latest</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧</strong>：用docker-compose管理多容器。我一般把交通管制、Redis、Nginx写在一个compose文件里，一条命令启动所有服务。</p>
+</div>
+
+<h3>24.3 运维监控：别等出事了再看日志</h3>
+
+<p>我曾经有个项目，凌晨3点系统突然卡死，现场值班人员打电话给我，我才知道出事了。从那以后，我坚持所有系统必须上监控。</p>
+
+<p>监控分三个维度：</p>
+
+<ul>
+  <li><strong>基础设施监控</strong>：CPU、内存、磁盘、网络。我用Prometheus + Grafana，一目了然。</li>
+  <li><strong>应用层监控</strong>：接口响应时间、任务处理吞吐量、死锁检测耗时。这些指标直接反映系统健康度。</li>
+  <li><strong>业务层监控</strong>：AGV等待时间、路口拥堵指数、任务完成率。这才是现场最关心的。</li>
+</ul>
+
+<p>我建议设置三级告警：</p>
+
+<table>
+  <tr>
+    <th>级别</th>
+    <th>触发条件</th>
+    <th>响应方式</th>
+  </tr>
+  <tr>
+    <td>警告</td>
+    <td>CPU > 70% 持续5分钟</td>
+    <td>钉钉/微信通知</td>
+  </tr>
+  <tr>
+    <td>严重</td>
+    <td>CPU > 85% 或 接口超时率 > 5%</td>
+    <td>电话告警 + 自动扩容</td>
+  </tr>
+  <tr>
+    <td>紧急</td>
+    <td>系统宕机 或 死锁无法恢复</td>
+    <td>自动切换备用节点</td>
+  </tr>
+</table>
+
+<p>你想想看，如果没有监控，系统慢了你都不知道是哪里瓶颈。我见过一个项目，AGV频繁报超时，查了半天才发现是磁盘IO满了，日志文件把空间吃光了。</p>
+
+<div class="warning">
+  <p><strong>注意</strong>：监控本身也会消耗资源。我建议监控系统单独部署，不要跟业务系统混在一起。否则监控挂了，你连它挂了都不知道。</p>
+</div>
+
+<h3>24.4 自动化运维：能自动就别手动</h3>
+
+<p>说实话，运维工作最怕重复劳动。每次升级都要手动停服务、备份数据、启动新版本，既容易出错又浪费时间。我现在的做法是全部自动化。</p>
+
+<p>自动化运维的核心是CI/CD流水线。我习惯用Jenkins + GitLab，流程是这样的：</p>
+
+<ol>
+  <li>开发提交代码到GitLab，触发Webhook</li>
+  <li>Jenkins自动拉取代码，执行单元测试</li>
+  <li>测试通过后，自动构建Docker镜像</li>
+  <li>镜像推送到私有仓库</li>
+  <li>生产环境自动拉取新镜像，滚动更新</li>
+</ol>
+
+<p>这里有个关键点——<strong>滚动更新</strong>。交通管制系统不能停服，所以我用Kubernetes的滚动更新策略，逐个替换Pod，保证服务不中断。</p>
+
+<p>我曾经遇到过一个问题：新版本有bug，导致部分AGV任务失败。幸好我做了灰度发布，先让10%的流量走新版本，发现问题后立刻回滚。整个过程不到5分钟，现场几乎无感知。</p>
+
+<p>自动化运维还包括：</p>
+
+<ul>
+  <li><strong>自动备份</strong>：每天凌晨备份数据库和配置文件，保留最近7天</li>
+  <li><strong>自动清理</strong>：日志文件超过30天自动删除，避免磁盘爆满</li>
+  <li><strong>自动扩缩容</strong>：根据CPU负载自动调整容器数量</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>我的经验</strong>：自动化运维不是一蹴而就的。我建议先从备份和监控自动化开始，逐步扩展到部署和扩缩容。步子迈太大，容易扯着蛋。</p>
+</div>
+
+<h3>24.5 知识体系总览</h3>
+
+<p>下面这张图，是我对交通管制系统部署与运维的总结。你可以看到，从底层基础设施到上层业务监控，每一层都有对应的工具和策略。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">交通管制系统部署与运维知识体系</text>
+  
+  <!-- 第一层：基础设施 -->
+  <rect x="50" y="70" width="700" height="80" fill="#e8f5e9" stroke="#4caf50" stroke-width="2" rx="8"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d32">基础设施层</text>
+  <text x="400" y="120" text-anchor="middle" font-size="13" fill="#555">服务器集群 | 网络规划 | 存储方案 | 负载均衡（Nginx）</text>
+  <text x="400" y="140" text-anchor="middle" font-size="13" fill="#555">双机热备 | 冗余设计 | 机房环境</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="150" x2="400" y2="180" stroke="#999" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：容器化部署 -->
+  <rect x="50" y="180" width="700" height="80" fill="#e3f2fd" stroke="#2196f3" stroke-width="2" rx="8"/>
+  <text x="400" y="205" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565c0">容器化部署层</text>
+  <text x="400" y="230" text-anchor="middle" font-size="13" fill="#555">Docker镜像构建 | Dockerfile编写 | docker-compose编排</text>
+  <text x="400" y="250" text-anchor="middle" font-size="13" fill="#555">Kubernetes集群 | 滚动更新 | 灰度发布</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="260" x2="400" y2="290" stroke="#999" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：运维监控 -->
+  <rect x="50" y="290" width="700" height="80" fill="#fff3e0" stroke="#ff9800" stroke-width="2" rx="8"/>
+  <text x="400" y="315" text-anchor="middle" font-size="16" font-weight="bold" fill="#e65100">运维监控层</text>
+  <text x="400" y="340" text-anchor="middle" font-size="13" fill="#555">Prometheus + Grafana | 基础设施监控 | 应用层监控</text>
+  <text x="400" y="360" text-anchor="middle" font-size="13" fill="#555">业务层监控 | 三级告警机制 | 日志收集（ELK）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="370" x2="400" y2="400" stroke="#999" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：自动化运维 -->
+  <rect x="50" y="400" width="700" height="80" fill="#fce4ec" stroke="#e91e63" stroke-width="2" rx="8"/>
+  <text x="400" y="425" text-anchor="middle" font-size="16" font-weight="bold" fill="#c62828">自动化运维层</text>
+  <text x="400" y="450" text-anchor="middle" font-size="13" fill="#555">CI/CD流水线（Jenkins + GitLab） | 自动备份 | 自动清理</text>
+  <text x="400" y="470" text-anchor="middle" font-size="13" fill="#555">自动扩缩容 | 回滚机制 | 无人值守运维</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#999"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边说明 -->
+  <text x="30" y="490" font-size="11" fill="#999">从下往上：先打好基础设施基础，再容器化部署，然后上监控，最后实现自动化运维</text>
+</svg>
+
+<p>这张图我画了好几次才满意。你看，从基础设施到自动化运维，每一层都依赖下一层。如果基础设施没做好，容器化部署就是空中楼阁。同样，没有监控，自动化运维就是盲人摸象。</p>
+
+<div class="tip">
+  <p><strong>最后说一句</strong>：部署与运维这件事，没有银弹。每个现场的环境都不一样，我建议你多去现场看看，跟运维人员聊聊。有时候，一个简单的网络抖动，就能让整个系统崩掉。经验，都是在坑里摔出来的。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="23LogAndMonitor.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="25SecurityPermission.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

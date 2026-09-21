@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV系统概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="active">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV系统概述：AGV定义、发展历史、应用领域、系统组成与分类</h2>
+
+<h3>1.1 什么是AGV？先给个直白的定义</h3>
+
+<p>AGV，全称 Automated Guided Vehicle，中文叫“自动导引运输车”。</p>
+
+<p>说白了，就是一辆不用人开、自己会跑的小车。它沿着预设的路径走，能自动搬运货物，还能自己充电、自己避障。我入行那会儿，很多老师傅管它叫“无人搬运车”，其实意思差不多。</p>
+
+<p>我个人习惯这样定义：<strong>AGV是一种具备自主导航能力、能按规划路径行驶、并完成物料搬运任务的轮式移动机器人。</strong></p>
+
+<p>你想想看，工厂里那些来回穿梭的小黄车，仓库里默默搬货的小蓝车，基本都是AGV。它们没有司机，没有方向盘，但跑得比人还准。</p>
+
+<h3>1.2 发展历史：从磁条到激光，我见证了这十几年</h3>
+
+<p>AGV不是新鲜玩意儿。最早可以追溯到上世纪50年代。但真正进入实用阶段，是70年代以后的事。</p>
+
+<p>我简单梳理一下几个关键节点：</p>
+
+<table>
+    <tr>
+        <th>年代</th>
+        <th>技术特征</th>
+        <th>典型应用</th>
+    </tr>
+    <tr>
+        <td>1950s</td>
+        <td>拖车式、电磁感应导引</td>
+        <td>仓库、工厂</td>
+    </tr>
+    <tr>
+        <td>1970s</td>
+        <td>磁带导引、光反射导引</td>
+        <td>汽车制造、烟草</td>
+    </tr>
+    <tr>
+        <td>1990s</td>
+        <td>激光导引、惯性导航</td>
+        <td>电子、医药</td>
+    </tr>
+    <tr>
+        <td>2010s至今</td>
+        <td>SLAM、自然导航、多传感器融合</td>
+        <td>电商仓储、3C、半导体</td>
+    </tr>
+</table>
+
+<p>我记得2015年那会儿，我参与过一个汽车厂的AGV项目。当时用的还是磁带导引，地上贴满了黑色的磁带条。工人拖地时不小心弄断了一截，整条线就停了。后来我们花了三天排查，才发现是磁带被保洁阿姨的拖把蹭掉了。嗯，这里要注意——<strong>磁带导引虽然便宜，但维护成本其实不低。</strong></p>
+
+<p>现在主流已经是激光SLAM和自然导航了。说白了，就是让AGV自己认路，不用再在地上贴东西。这个变化，我感触挺深的。</p>
+
+<h3>1.3 应用领域：哪里需要搬东西，哪里就有AGV</h3>
+
+<p>AGV的应用范围，比你想象的要广得多。我随便列几个：</p>
+
+<ul>
+    <li><strong>汽车制造</strong>：发动机、底盘、零部件的线边配送。这是AGV最早大规模应用的领域。</li>
+    <li><strong>电商仓储</strong>：货到人、订单拣选。像亚马逊的Kiva机器人，就是典型。</li>
+    <li><strong>3C电子</strong>：SMT产线、PCB板搬运。对精度要求极高，我做过一个项目，AGV停位误差必须控制在±5mm以内。</li>
+    <li><strong>医药/食品</strong>：洁净车间、冷链运输。环境要求特殊，AGV得防尘、防潮。</li>
+    <li><strong>半导体</strong>：晶圆盒搬运。这个领域最苛刻，要求无尘、防静电、高精度。</li>
+    <li><strong>港口/机场</strong>：集装箱搬运、行李分拣。大型AGV，载重几十吨那种。</li>
+</ul>
+
+<p>我曾经在半导体厂里调试过一台AGV，晶圆盒价值几十万，撞一下就是重大事故。所以那台车的安全传感器装了整整12个，激光雷达、超声波、安全触边全上了。你想想看，这种场景下，导航系统的可靠性有多重要。</p>
+
+<h3>1.4 系统组成：AGV不是一辆车，而是一套系统</h3>
+
+<p>很多人以为AGV就是一辆车。其实不对。一套完整的AGV系统，至少包含以下几个部分：</p>
+
+<ol>
+    <li><strong>车体本体</strong>：底盘、驱动轮、万向轮、车架。这是骨架。</li>
+    <li><strong>导航模块</strong>：激光雷达、IMU、编码器、摄像头。这是眼睛和耳朵。</li>
+    <li><strong>控制系统</strong>：主控板、运动控制器、调度软件。这是大脑。</li>
+    <li><strong>能源系统</strong>：电池、充电桩、BMS。这是心脏。</li>
+    <li><strong>安全系统</strong>：激光避障、超声波、安全触边、急停按钮。这是保险。</li>
+    <li><strong>通信系统</strong>：WiFi、5G、ZigBee。这是神经。</li>
+    <li><strong>调度系统</strong>：上位机软件、任务分配、交通管理。这是指挥官。</li>
+</ol>
+
+<div class="highlight">
+    <p><strong>核心观点：</strong>导航模块和调度系统，是AGV最核心的两个部分。导航决定了AGV能不能走对，调度决定了AGV能不能走好。我见过太多项目，车本身没问题，但调度软件写得稀烂，结果三台车在路口堵成一团。</p>
+</div>
+
+<p>下面这张图，是我自己画的AGV系统组成框架图。你可以直观地看到各个模块之间的关系：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV系统组成框架图</text>
+    
+    <!-- 中心：AGV系统 -->
+    <rect x="300" y="60" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+    <text x="400" y="90" text-anchor="middle" font-size="16" font-weight="bold" fill="white">AGV系统</text>
+    
+    <!-- 第一层：三大核心 -->
+    <rect x="50" y="150" width="180" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <text x="140" y="175" text-anchor="middle" font-size="14" font-weight="bold" fill="white">车体本体</text>
+    
+    <rect x="310" y="150" width="180" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+    <text x="400" y="175" text-anchor="middle" font-size="14" font-weight="bold" fill="white">导航模块</text>
+    
+    <rect x="570" y="150" width="180" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+    <text x="660" y="175" text-anchor="middle" font-size="14" font-weight="bold" fill="white">控制系统</text>
+    
+    <!-- 连线：中心到第一层 -->
+    <line x1="350" y1="110" x2="140" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+    <line x1="400" y1="110" x2="400" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+    <line x1="450" y1="110" x2="660" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+    
+    <!-- 第二层：子系统 -->
+    <rect x="20" y="230" width="130" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="85" y="252" text-anchor="middle" font-size="12" fill="white">驱动系统</text>
+    
+    <rect x="170" y="230" width="130" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="235" y="252" text-anchor="middle" font-size="12" fill="white">能源系统</text>
+    
+    <rect x="250" y="230" width="130" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="315" y="252" text-anchor="middle" font-size="12" fill="white">激光雷达</text>
+    
+    <rect x="400" y="230" width="130" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="465" y="252" text-anchor="middle" font-size="12" fill="white">IMU/编码器</text>
+    
+    <rect x="550" y="230" width="130" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="615" y="252" text-anchor="middle" font-size="12" fill="white">运动控制器</text>
+    
+    <rect x="700" y="230" width="80" height="35" rx="6" fill="#95a5a6" stroke="#7f8c8d" stroke-width="1.5"/>
+    <text x="740" y="252" text-anchor="middle" font-size="12" fill="white">调度软件</text>
+    
+    <!-- 连线：第一层到第二层 -->
+    <line x1="140" y1="190" x2="85" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="140" y1="190" x2="235" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="400" y1="190" x2="315" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="400" y1="190" x2="465" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="660" y1="190" x2="615" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="660" y1="190" x2="740" y2="230" stroke="#bdc3c7" stroke-width="1.5"/>
+    
+    <!-- 第三层：支撑系统 -->
+    <rect x="100" y="310" width="150" height="35" rx="6" fill="#9b59b6" stroke="#8e44ad" stroke-width="1.5"/>
+    <text x="175" y="332" text-anchor="middle" font-size="12" fill="white">安全系统</text>
+    
+    <rect x="300" y="310" width="150" height="35" rx="6" fill="#9b59b6" stroke="#8e44ad" stroke-width="1.5"/>
+    <text x="375" y="332" text-anchor="middle" font-size="12" fill="white">通信系统</text>
+    
+    <rect x="500" y="310" width="150" height="35" rx="6" fill="#9b59b6" stroke="#8e44ad" stroke-width="1.5"/>
+    <text x="575" y="332" text-anchor="middle" font-size="12" fill="white">人机交互</text>
+    
+    <!-- 连线：第二层到第三层 -->
+    <line x1="140" y1="265" x2="175" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="400" y1="265" x2="375" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+    <line x1="660" y1="265" x2="575" y2="310" stroke="#bdc3c7" stroke-width="1.5"/>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="400" text-anchor="middle" font-size="13" fill="#7f8c8d">导航模块是AGV的“眼睛”，控制系统是“大脑”，调度系统是“指挥官”</text>
+    
+    <!-- 图例 -->
+    <rect x="150" y="430" width="15" height="15" fill="#e74c3c"/>
+    <text x="170" y="443" font-size="12" fill="#2c3e50">车体</text>
+    <rect x="250" y="430" width="15" height="15" fill="#e67e22"/>
+    <text x="270" y="443" font-size="12" fill="#2c3e50">导航</text>
+    <rect x="350" y="430" width="15" height="15" fill="#27ae60"/>
+    <text x="370" y="443" font-size="12" fill="#2c3e50">控制</text>
+    <rect x="450" y="430" width="15" height="15" fill="#9b59b6"/>
+    <text x="470" y="443" font-size="12" fill="#2c3e50">支撑</text>
+</svg>
+
+<h3>1.5 分类方式：AGV不是只有一种</h3>
+
+<p>AGV的分类方式很多。我按最常见的几种分法给你讲讲：</p>
+
+<h4>按导航方式分</h4>
+<ul>
+    <li><strong>磁条/磁带导引</strong>：地上贴磁条，AGV沿着磁条走。便宜，但改路径麻烦。</li>
+    <li><strong>激光导引</strong>：用激光雷达扫描反光板定位。精度高，但需要安装反光板。</li>
+    <li><strong>SLAM自然导航</strong>：不依赖任何人工标记，靠环境特征定位。这是目前最主流的方式。</li>
+    <li><strong>惯性导航</strong>：靠IMU和编码器推算位置。短距离还行，长距离会漂移。</li>
+    <li><strong>视觉导航</strong>：用摄像头识别地面纹理或二维码。成本低，但受光照影响大。</li>
+</ul>
+
+<div class="tip">
+    <p><strong>我的建议：</strong>如果你做新项目，优先考虑SLAM自然导航。虽然前期投入高一点，但后期维护成本低，柔性也最好。我2018年帮一个电子厂改造项目，把磁带导引全换成了SLAM导航，改造后产线调整时间从3天缩短到2小时。</p>
+</div>
+
+<h4>按负载方式分</h4>
+<ul>
+    <li><strong>潜伏式</strong>：钻到货架底下，顶起货架走。电商仓储用得最多。</li>
+    <li><strong>牵引式</strong>：拖着料车走。汽车厂常见。</li>
+    <li><strong>叉车式</strong>：自带叉臂，能叉取托盘。仓库、物流中心。</li>
+    <li><strong>辊道式</strong>：车上有辊道，能和产线对接。3C电子、半导体。</li>
+    <li><strong>背负式</strong>：货物直接放在车顶上。轻型搬运。</li>
+</ul>
+
+<h4>按应用场景分</h4>
+<ul>
+    <li><strong>产线配送AGV</strong>：把物料从仓库送到工位。</li>
+    <li><strong>仓储AGV</strong>：货到人、自动存取。</li>
+    <li><strong>装配AGV</strong>：在装配线上移动，工人跟着车装配。</li>
+    <li><strong>特种AGV</strong>：防爆、洁净、冷链等特殊环境。</li>
+</ul>
+
+<div class="warning">
+    <p><strong>注意：</strong>分类不是死的。很多AGV是混合型的。比如一台车既可以用激光导航，也可以用视觉导航做备份。我曾经遇到过一台AGV，白天用激光，晚上光线不好自动切到惯性导航。这种冗余设计，在关键场景下非常有用。</p>
+</div>
+
+<h3>1.6 小结：AGV的本质是什么？</h3>
+
+<p>说了这么多，我想总结一句：<strong>AGV的本质，是“移动的机器人平台”。</strong></p>
+
+<p>它不只是一辆车。它是一个集成了导航、控制、调度、安全、通信的复杂系统。你把它理解成一个“会自己走路的机器人”，就对了。</p>
+
+<p>我个人做AGV项目这么多年，最大的体会是：<strong>导航是基础，调度是灵魂。</strong>导航决定了AGV能不能走对路，调度决定了AGV能不能高效地完成任务。两者缺一不可。</p>
+
+<p>嗯，这一章就到这里。内容不算多，但都是干货。你把这些基础概念吃透了，后面讲地图构建和定位算法时，就不会觉得吃力。</p>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02NavigationTechBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

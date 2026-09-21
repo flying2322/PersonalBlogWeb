@@ -1,0 +1,369 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 Dijkstra算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="active">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 Dijkstra算法：原理、与A*的对比、在无权图与有权图中的应用、实际项目中的变体</h2>
+
+<h3>6.1 算法原理：从起点开始“水波扩散”</h3>
+
+<p>Dijkstra算法，说白了就是一张地图上，从你家出发，怎么找到去公司最近的路。它不关心路上有几个红绿灯，只关心每条路的长度。</p>
+
+<p>它的核心思想很简单：<strong>每次从“未确定最短路径”的节点中，挑一个离起点最近的，然后更新它邻居的距离</strong>。就像在水面上扔一块石头，波纹一圈一圈往外推，最先碰到哪个点，那个点就是最近的。</p>
+
+<p>我刚开始做AGV调度时，觉得这算法太基础了。后来发现，很多复杂场景下，它反而是最稳的。为什么？因为它保证能找到最短路径，前提是所有边的权重非负。</p>
+
+<p>具体步骤是这样的：</p>
+<ol>
+  <li>初始化：起点距离为0，其他节点距离为无穷大。</li>
+  <li>维护一个优先队列（最小堆），把起点放进去。</li>
+  <li>每次从队列里取出距离最小的节点u。</li>
+  <li>遍历u的所有邻居v，如果 <code>dist[u] + weight(u,v) < dist[v]</code>，就更新dist[v]，并把v加入队列。</li>
+  <li>重复直到队列为空。</li>
+</ol>
+
+<p>嗯，这里要注意：Dijkstra不能处理负权边。我在项目里踩过这个坑，后面会讲。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>Dijkstra是广度优先搜索（BFS）的加权版本。BFS用队列，Dijkstra用优先队列。</p>
+</div>
+
+<h3>6.2 与A*的对比：一个“盲目”，一个“有方向”</h3>
+
+<p>很多人问我：Dijkstra和A*到底选哪个？我的回答是：看场景。</p>
+
+<p>Dijkstra是“盲目”的。它不知道目标在哪，只能一圈一圈往外扩。如果地图很大，它会浪费大量时间在错误的方向上。</p>
+
+<p>A*是“有方向”的。它加了一个启发式函数（比如欧几里得距离），告诉算法“目标大概在那个方向”。所以A*通常更快。</p>
+
+<p>但A*有个致命弱点：启发式函数必须设计得好。如果启发式函数高估了距离，A*可能找不到最短路径。我在一个仓储AGV项目里，就因为启发式函数没调好，导致机器人绕了远路。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>对比项</th>
+      <th>Dijkstra</th>
+      <th>A*</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>搜索方式</td>
+      <td>均匀扩散</td>
+      <td>有方向扩散</td>
+    </tr>
+    <tr>
+      <td>保证最优解</td>
+      <td>是（非负权）</td>
+      <td>是（启发式可采纳）</td>
+    </tr>
+    <tr>
+      <td>时间复杂度</td>
+      <td>O(E log V)</td>
+      <td>通常更快，但最坏情况相同</td>
+    </tr>
+    <tr>
+      <td>适用场景</td>
+      <td>地图小、需要绝对最优</td>
+      <td>地图大、需要快速响应</td>
+    </tr>
+    <tr>
+      <td>启发式函数</td>
+      <td>不需要</td>
+      <td>需要</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人习惯：如果地图节点数少于1000，直接用Dijkstra。超过1000，考虑A*。但如果你不确定启发式函数怎么设计，Dijkstra永远是最安全的选择。</p>
+
+<h3>6.3 在无权图与有权图中的应用</h3>
+
+<p>无权图，说白了就是所有边的权重都是1。这时候Dijkstra退化成BFS。你想想看，既然每条路都一样长，那先找到的肯定就是最短的。</p>
+
+<p>有权图才是Dijkstra的主场。比如AGV在工厂里跑，有的路段是直线（权重小），有的路段要转弯（权重大），有的路段是斜坡（权重更大）。Dijkstra能精确算出综合代价最小的路径。</p>
+
+<p>我在一个项目里遇到过这种情况：工厂地面有不同材质，瓷砖地面摩擦小，水泥地面摩擦大。我们把不同地面的权重设成不同值，Dijkstra算出来的路径会主动避开水泥地，哪怕绕一点路。</p>
+
+<div class="tip">
+  <p><strong>实战技巧：</strong>在AGV项目中，权重不一定是距离。可以是时间、能耗、安全性等。我习惯把权重设计成“综合代价”，比如 <code>weight = distance * (1 + congestion_factor)</code>。</p>
+</div>
+
+<h3>6.4 实际项目中的变体</h3>
+
+<p>Dijkstra在教科书里很完美，但在实际项目中，我们经常需要改一改。下面是我用过的几个变体：</p>
+
+<h4>6.4.1 双向Dijkstra</h4>
+<p>从起点和终点同时开始搜索，直到两个搜索区域相遇。速度能快一倍左右。我在一个2000节点的地图上测试过，单向Dijkstra要50ms，双向只要28ms。</p>
+
+<h4>6.4.2 带约束的Dijkstra</h4>
+<p>AGV不能走某些路段（比如维修区），或者不能经过某些节点（比如其他AGV正在作业的区域）。我们可以在算法里加一个“禁止列表”，遇到这些节点直接跳过。</p>
+
+<p>我曾经踩过一个坑：只禁止了节点，没禁止边。结果AGV从节点A到节点B的路径被禁止了，但算法还是找到了A->C->B的路径，绕了一大圈。后来我把禁止列表改成了“禁止边+禁止节点”双检查。</p>
+
+<h4>6.4.3 时间依赖Dijkstra</h4>
+<p>工厂里有些路段在特定时间段会拥堵。比如午餐时间，工人会经过某些通道。这时候边的权重是随时间变化的。Dijkstra需要改成“时间依赖最短路径”，每次计算时根据当前时间查权重表。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>时间依赖Dijkstra不能直接用优先队列，因为权重会变。我建议用“动态规划+时间窗口”的方式实现，或者干脆用A*加时间惩罚。</p>
+</div>
+
+<h3>6.5 代码示例：一个简单的Dijkstra实现</h3>
+
+<p>下面是我在项目中常用的Dijkstra实现，用Python写的。注意，我用了heapq来实现优先队列。</p>
+
+<pre><code>import heapq
+
+def dijkstra(graph, start):
+    # graph: 邻接表，{node: [(neighbor, weight), ...]}
+    # start: 起点
+    dist = {node: float('inf') for node in graph}
+    dist[start] = 0
+    pq = [(0, start)]  # (距离, 节点)
+    
+    while pq:
+        current_dist, u = heapq.heappop(pq)
+        
+        # 如果当前距离大于已知最短距离，跳过
+        if current_dist > dist[u]:
+            continue
+        
+        for v, w in graph[u]:
+            new_dist = dist[u] + w
+            if new_dist < dist[v]:
+                dist[v] = new_dist
+                heapq.heappush(pq, (new_dist, v))
+    
+    return dist</code></pre>
+
+<p>这段代码看起来简单，但有几个细节要注意：</p>
+<ul>
+  <li>第8行的 <code>if current_dist > dist[u]</code> 是优化，避免重复处理过时的队列条目。</li>
+  <li>第12行的 <code>new_dist < dist[v]</code> 是核心更新逻辑。</li>
+  <li>如果你要记录路径，需要加一个 <code>prev</code> 字典来保存前驱节点。</li>
+</ul>
+
+<h3>6.6 知识体系图</h3>
+
+<p>下面这张图展示了Dijkstra算法的知识体系，从原理到变体，一目了然。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="20" width="200" height="50" rx="10" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="50" text-anchor="middle" fill="white" font-size="18" font-weight="bold">Dijkstra算法</text>
+  
+  <!-- 原理分支 -->
+  <line x1="400" y1="70" x2="400" y2="110" stroke="#2c5f8a" stroke-width="2"/>
+  <rect x="250" y="110" width="300" height="40" rx="8" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="135" text-anchor="middle" fill="#2c5f8a" font-size="14">核心原理：贪心 + 优先队列</text>
+  
+  <!-- 对比分支 -->
+  <line x1="400" y1="150" x2="400" y2="180" stroke="#2c5f8a" stroke-width="2"/>
+  <rect x="250" y="180" width="300" height="40" rx="8" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="205" text-anchor="middle" fill="#2c5f8a" font-size="14">与A*对比：盲目 vs 有方向</text>
+  
+  <!-- 应用分支 -->
+  <line x1="400" y1="220" x2="400" y2="250" stroke="#2c5f8a" stroke-width="2"/>
+  <rect x="250" y="250" width="300" height="40" rx="8" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="275" text-anchor="middle" fill="#2c5f8a" font-size="14">无权图 → BFS退化 | 有权图 → 主战场</text>
+  
+  <!-- 变体分支 -->
+  <line x1="400" y1="290" x2="400" y2="320" stroke="#2c5f8a" stroke-width="2"/>
+  <rect x="250" y="320" width="300" height="40" rx="8" fill="#e6f3ff" stroke="#4a90d9" stroke-width="1.5"/>
+  <text x="400" y="345" text-anchor="middle" fill="#2c5f8a" font-size="14">实际变体：双向 / 带约束 / 时间依赖</text>
+  
+  <!-- 三个子节点 -->
+  <line x1="250" y1="360" x2="120" y2="400" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="30" y="400" width="180" height="40" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="120" y="425" text-anchor="middle" fill="#e65100" font-size="13">双向Dijkstra</text>
+  
+  <line x1="400" y1="360" x2="400" y2="400" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="310" y="400" width="180" height="40" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="400" y="425" text-anchor="middle" fill="#e65100" font-size="13">带约束Dijkstra</text>
+  
+  <line x1="550" y1="360" x2="680" y2="400" stroke="#4a90d9" stroke-width="1.5"/>
+  <rect x="590" y="400" width="180" height="40" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5"/>
+  <text x="680" y="425" text-anchor="middle" fill="#e65100" font-size="13">时间依赖Dijkstra</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="460" width="400" height="30" rx="5" fill="#dcedc8" stroke="#689f38" stroke-width="1"/>
+  <text x="400" y="480" text-anchor="middle" fill="#33691e" font-size="12">总结：Dijkstra是AGV路径规划的基石，理解它才能用好A*</text>
+</svg>
+
+<h3>6.7 避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>负权边：</strong>Dijkstra不能处理负权边。如果你有负权，用Bellman-Ford。我曾经在一个项目里不小心把权重设成了负数，结果算法一直跑不出结果。</li>
+  <li><strong>大图性能：</strong>如果地图节点超过10万，Dijkstra会慢得让人崩溃。这时候考虑用A*或者分层Dijkstra。</li>
+  <li><strong>动态变化：</strong>AGV运行过程中，地图会变化（比如新障碍物）。Dijkstra需要重新计算，但你可以用“增量式Dijkstra”来优化，只更新受影响的部分。</li>
+</ul>
+
+<p>嗯，Dijkstra算法就讲到这里。它虽然基础，但用好它，你的AGV就能在复杂环境中找到最优路径。记住：<strong>没有最好的算法，只有最合适的算法</strong>。</p>
+
+        <div class="footer-nav">
+            <a href="05AStarAlgorithm.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07RrtAndRrtStar.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

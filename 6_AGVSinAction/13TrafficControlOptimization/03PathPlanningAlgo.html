@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 路径规划算法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02TrafficControlBasics.html" class="">2 交通管制基础</a></li>
+<li><a href="03PathPlanningAlgo.html" class="active">3 路径规划算法</a></li>
+<li><a href="04DeadlockDetectRelease.html" class="">4 死锁检测与解除</a></li>
+<li><a href="05TrafficControlStrategy.html" class="">5 交通管制策略</a></li>
+<li><a href="06MultiAgvCoopDispatch.html" class="">6 多AGV协同调度</a></li>
+<li><a href="07TrafficSystemArch.html" class="">7 交通管制系统架构</a></li>
+<li><a href="08CommProtocolData.html" class="">8 通信协议与数据交互</a></li>
+<li><a href="09MapModelingPerception.html" class="">9 地图建模与环境感知</a></li>
+<li><a href="10TaskPriorityManage.html" class="">10 任务调度与优先级管理</a></li>
+<li><a href="11PathConflictPredict.html" class="">11 路径冲突预测与预防</a></li>
+<li><a href="12TrafficSimPlatform.html" class="">12 交通管制仿真平台搭建</a></li>
+<li><a href="13LocalizationNav.html" class="">13 AGV定位与导航技术</a></li>
+<li><a href="14SafetyMechanism.html" class="">14 交通管制中的安全机制</a></li>
+<li><a href="15PerformanceOptimize.html" class="">15 交通管制性能优化</a></li>
+<li><a href="16DynamicObstacleAvoid.html" class="">16 动态障碍物避让</a></li>
+<li><a href="17TrafficRuleLibrary.html" class="">17 交通管制规则库设计</a></li>
+<li><a href="18MultiZoneTraffic.html" class="">18 多区域交通管制</a></li>
+<li><a href="19TestAndValidation.html" class="">19 交通管制系统测试与验证</a></li>
+<li><a href="20ChargingAndTraffic.html" class="">20 AGV充电调度与交通管制</a></li>
+<li><a href="21MlInTrafficControl.html" class="">21 交通管制中的机器学习应用</a></li>
+<li><a href="22SystemInterface.html" class="">22 交通管制系统接口设计</a></li>
+<li><a href="23LogAndMonitor.html" class="">23 交通管制日志与监控</a></li>
+<li><a href="24DeployAndOps.html" class="">24 交通管制系统部署与运维</a></li>
+<li><a href="25SecurityPermission.html" class="">25 交通管制系统安全与权限管理</a></li>
+<li><a href="26StandardCompliance.html" class="">26 交通管制系统标准化与合规</a></li>
+<li><a href="27TrafficCaseAnalysis.html" class="">27 交通管制系统案例分析</a></li>
+<li><a href="28FrontierTech.html" class="">28 交通管制系统前沿技术</a></li>
+<li><a href="29TrafficProjectPractice.html" class="">29 交通管制系统项目实战</a></li>
+<li><a href="30FutureOutlook.html" class="">30 交通管制系统未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 路径规划算法：Dijkstra算法原理与实现、A*算法原理与实现、动态路径规划策略</h2>
+
+<p>各位同学，今天我们来聊聊AGV调度系统的核心——路径规划。说白了，就是给小车找一条从A到B的路。你想想看，一个仓库里几十台AGV跑来跑去，要是路线规划不好，轻则绕远路，重则堵成一锅粥。我在项目里见过最夸张的一次，三台车在十字路口互不相让，硬生生堵了五分钟——从那以后，我就特别重视路径规划这块。</p>
+
+<h3>一、Dijkstra算法：最朴素的寻路方式</h3>
+
+<p>Dijkstra算法，我个人习惯叫它“老实人算法”。为什么？因为它会老老实实地把从起点到所有点的最短路径都算出来，然后挑一条最短的给你。</p>
+
+<h4>1.1 算法原理</h4>
+<p>核心思想其实很简单：从起点出发，一层层往外扩散，每次选一个当前距离最近的点，更新它的邻居。直到所有点都被访问过。</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>Dijkstra算法要求所有边的权重不能为负。我在实际项目中踩过这个坑——有一次地图里不小心配了个负权重的边，结果算法跑出来的路径完全不对。排查了半天才发现问题。</p>
+</div>
+
+<h4>1.2 代码实现</h4>
+<p>下面是我在项目中常用的一个简化版实现，去掉了复杂的工程化封装，保留了核心逻辑：</p>
+
+<pre><code>def dijkstra(graph, start, end):
+    # graph: 邻接矩阵或邻接表
+    # start: 起点节点ID
+    # end: 终点节点ID
+    
+    INF = float('inf')
+    n = len(graph)
+    
+    # 初始化距离数组和前驱节点数组
+    dist = [INF] * n
+    prev = [-1] * n
+    visited = [False] * n
+    
+    dist[start] = 0
+    
+    for _ in range(n):
+        # 找当前未访问节点中距离最小的
+        u = -1
+        min_dist = INF
+        for i in range(n):
+            if not visited[i] and dist[i] < min_dist:
+                min_dist = dist[i]
+                u = i
+        
+        if u == -1:
+            break
+        
+        visited[u] = True
+        
+        # 更新邻居的距离
+        for v in range(n):
+            if graph[u][v] > 0 and not visited[v]:
+                new_dist = dist[u] + graph[u][v]
+                if new_dist < dist[v]:
+                    dist[v] = new_dist
+                    prev[v] = u
+    
+    # 回溯路径
+    path = []
+    cur = end
+    while cur != -1:
+        path.append(cur)
+        cur = prev[cur]
+    path.reverse()
+    
+    return path, dist[end]</code></pre>
+
+<div class="tip">
+  <p><strong>个人经验：</strong>实际项目中，我一般不会用纯Python写Dijkstra，而是用C++或者Rust实现核心逻辑，然后用Python做上层封装。为什么？因为AGV调度对实时性要求高，纯Python在大地图（比如上千个节点）上跑起来太慢了。</p>
+</div>
+
+<h3>二、A*算法：带方向的寻路</h3>
+
+<p>Dijkstra有个问题——它像个无头苍蝇一样四面八方都找。而A*算法聪明多了，它会朝着目标方向优先搜索。说白了，Dijkstra是“广撒网”，A*是“精准打击”。</p>
+
+<h4>2.1 算法原理</h4>
+<p>A*的核心在于估价函数：<code>f(n) = g(n) + h(n)</code>。其中g(n)是起点到当前点的实际代价，h(n)是当前点到终点的估计代价。</p>
+
+<p>这里有个关键：h(n)必须满足“可采纳性”——也就是不能高估实际代价。我在项目中用过曼哈顿距离、欧几里得距离，还有切比雪夫距离。对于AGV在网格地图上的运动，我个人最推荐曼哈顿距离，因为它跟AGV的实际运动方式最匹配。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里用了欧几里得距离作为启发函数，结果算法找出来的路径经常穿墙。后来才发现，因为AGV只能走水平和垂直方向，欧几里得距离严重低估了实际路径长度，导致启发函数失效。嗯，这个坑我记了好几年。</p>
+</div>
+
+<h4>2.2 代码实现</h4>
+
+<pre><code>import heapq
+
+def a_star(grid, start, end):
+    # grid: 0表示可通行，1表示障碍物
+    # start, end: (x, y)坐标
+    
+    def heuristic(a, b):
+        # 曼哈顿距离
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])
+    
+    rows, cols = len(grid), len(grid[0])
+    open_set = [(0, start)]
+    came_from = {}
+    g_score = {start: 0}
+    f_score = {start: heuristic(start, end)}
+    
+    while open_set:
+        current = heapq.heappop(open_set)[1]
+        
+        if current == end:
+            # 重建路径
+            path = []
+            while current in came_from:
+                path.append(current)
+                current = came_from[current]
+            path.append(start)
+            path.reverse()
+            return path
+        
+        # 四个方向：上、下、左、右
+        for dx, dy in [(0,1), (0,-1), (1,0), (-1,0)]:
+            neighbor = (current[0] + dx, current[1] + dy)
+            
+            # 边界检查
+            if (neighbor[0] < 0 or neighbor[0] >= rows or
+                neighbor[1] < 0 or neighbor[1] >= cols):
+                continue
+            
+            # 障碍物检查
+            if grid[neighbor[0]][neighbor[1]] == 1:
+                continue
+            
+            tentative_g = g_score[current] + 1
+            
+            if neighbor not in g_score or tentative_g < g_score[neighbor]:
+                came_from[neighbor] = current
+                g_score[neighbor] = tentative_g
+                f_score[neighbor] = tentative_g + heuristic(neighbor, end)
+                heapq.heappush(open_set, (f_score[neighbor], neighbor))
+    
+    return None  # 无路径</code></pre>
+
+<h3>三、动态路径规划策略</h3>
+
+<p>静态路径规划有个致命问题——地图是死的，但AGV是活的。你想想看，一台AGV刚规划好路径，另一台车突然插进来，原来的路径就废了。所以我们需要动态路径规划。</p>
+
+<h4>3.1 重规划策略</h4>
+<p>最简单的做法就是定期重规划。比如每5秒重新跑一次A*。但这样做有个问题——计算量大，而且路径可能频繁变化，导致AGV走“蛇形”路线。</p>
+
+<p>我建议的做法是：</p>
+<ul>
+  <li><strong>事件触发重规划：</strong>只有当检测到路径被阻塞时才重规划，而不是定时重规划</li>
+  <li><strong>局部重规划：</strong>只重新规划受影响的那一段路径，而不是整条路径</li>
+  <li><strong>路径缓存：</strong>保留多条备选路径，当主路径被阻塞时快速切换</li>
+</ul>
+
+<h4>3.2 时间窗法</h4>
+<p>这是我在实际项目中用得最多的方法。核心思想是：给每条路径分配一个时间窗，确保同一时间同一路段只有一台AGV通过。</p>
+
+<table>
+  <tr>
+    <th>路段ID</th>
+    <th>AGV编号</th>
+    <th>进入时间</th>
+    <th>离开时间</th>
+  </tr>
+  <tr>
+    <td>R001</td>
+    <td>AGV-01</td>
+    <td>10:00:00</td>
+    <td>10:00:15</td>
+  </tr>
+  <tr>
+    <td>R001</td>
+    <td>AGV-02</td>
+    <td>10:00:20</td>
+    <td>10:00:35</td>
+  </tr>
+  <tr>
+    <td>R002</td>
+    <td>AGV-01</td>
+    <td>10:00:15</td>
+    <td>10:00:30</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>时间窗法要求AGV的行驶速度相对稳定。如果AGV走走停停，时间窗就会频繁失效。我在一个项目里遇到过AGV因为电池电量不足导致速度下降，结果时间窗全乱了。后来我们加了一个速度预测模块，根据电池电量动态调整时间窗。</p>
+</div>
+
+<h4>3.3 动态避让策略</h4>
+<p>当两台AGV在狭窄通道相遇时，谁让谁？我总结了一套规则：</p>
+<ol>
+  <li><strong>任务优先级：</strong>紧急任务优先，普通任务让行</li>
+  <li><strong>距离终点远近：</strong>离终点近的优先，远的让行</li>
+  <li><strong>空载让重载：</strong>空车让路给载货车辆</li>
+  <li><strong>就近避让：</strong>离避让区近的AGV主动进入避让区</li>
+</ol>
+
+<p>这套规则看起来简单，但实际落地时有很多细节。比如“任务优先级”怎么定义？我一般用三个等级：紧急（比如生产线断料）、普通（日常搬运）、低优先级（充电或待命）。</p>
+
+<h3>四、知识体系总览</h3>
+
+<p>下面这张图是我自己画的，把本章的核心内容串起来了。你仔细看看，应该能对路径规划有个整体认识。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV路径规划算法知识体系</text>
+  
+  <!-- 根节点 -->
+  <rect x="300" y="60" width="200" height="40" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="85" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径规划算法</text>
+  
+  <!-- 三条主线 -->
+  <line x1="400" y1="100" x2="400" y2="130" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="130" x2="150" y2="130" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="130" x2="400" y2="130" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="130" x2="650" y2="130" stroke="#3498db" stroke-width="2"/>
+  
+  <!-- Dijkstra -->
+  <rect x="50" y="130" width="200" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="155" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Dijkstra算法</text>
+  
+  <line x1="150" y1="170" x2="150" y2="200" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="50" y="200" width="200" height="30" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="150" y="220" text-anchor="middle" font-size="12" fill="#c0392b">广度优先搜索</text>
+  
+  <line x1="150" y1="230" x2="150" y2="260" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="50" y="260" width="200" height="30" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="150" y="280" text-anchor="middle" font-size="12" fill="#c0392b">非负权重要求</text>
+  
+  <line x1="150" y1="290" x2="150" y2="320" stroke="#e74c3c" stroke-width="2"/>
+  <rect x="50" y="320" width="200" height="30" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="150" y="340" text-anchor="middle" font-size="12" fill="#c0392b">时间复杂度 O(V²)</text>
+  
+  <!-- A* -->
+  <rect x="300" y="130" width="200" height="40" rx="8" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="400" y="155" text-anchor="middle" font-size="14" fill="white" font-weight="bold">A*算法</text>
+  
+  <line x1="400" y1="170" x2="400" y2="200" stroke="#27ae60" stroke-width="2"/>
+  <rect x="300" y="200" width="200" height="30" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="400" y="220" text-anchor="middle" font-size="12" fill="#1e8449">启发式搜索</text>
+  
+  <line x1="400" y1="230" x2="400" y2="260" stroke="#27ae60" stroke-width="2"/>
+  <rect x="300" y="260" width="200" height="30" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="400" y="280" text-anchor="middle" font-size="12" fill="#1e8449">f(n) = g(n) + h(n)</text>
+  
+  <line x1="400" y1="290" x2="400" y2="320" stroke="#27ae60" stroke-width="2"/>
+  <rect x="300" y="320" width="200" height="30" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="400" y="340" text-anchor="middle" font-size="12" fill="#1e8449">曼哈顿/欧几里得距离</text>
+  
+  <!-- 动态规划 -->
+  <rect x="550" y="130" width="200" height="40" rx="8" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="650" y="155" text-anchor="middle" font-size="14" fill="white" font-weight="bold">动态路径规划</text>
+  
+  <line x1="650" y1="170" x2="650" y2="200" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="550" y="200" width="200" height="30" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="650" y="220" text-anchor="middle" font-size="12" fill="#6c3483">事件触发重规划</text>
+  
+  <line x1="650" y1="230" x2="650" y2="260" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="550" y="260" width="200" height="30" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="650" y="280" text-anchor="middle" font-size="12" fill="#6c3483">时间窗法</text>
+  
+  <line x1="650" y1="290" x2="650" y2="320" stroke="#8e44ad" stroke-width="2"/>
+  <rect x="550" y="320" width="200" height="30" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="650" y="340" text-anchor="middle" font-size="12" fill="#6c3483">动态避让策略</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="400" width="400" height="50" rx="10" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="425" text-anchor="middle" font-size="14" fill="white" font-weight="bold">核心原则：静态规划 + 动态调整 = 高效调度</text>
+  <text x="400" y="442" text-anchor="middle" font-size="11" fill="#fff3cd">实际项目中，三种算法往往组合使用</text>
+</svg>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>别把Dijkstra和A*对立起来。在实际项目中，我经常用A*做全局规划，用Dijkstra做局部重规划。为什么？因为局部区域小，Dijkstra的劣势不明显，而且它保证最优解，适合做精细调整。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。路径规划这块，理论其实不难，难的是在实际系统中把各种边界情况处理好。你想想看，地图上可能有临时障碍物、AGV可能故障、任务可能取消——这些都需要你的算法能灵活应对。我在项目里吃过不少亏，希望你们能少走些弯路。</p>
+
+<div class="footer-nav">
+            <a href="02TrafficControlBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04DeadlockDetectRelease.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

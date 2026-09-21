@@ -1,0 +1,339 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>18 性能评估指标</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="active">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>18 性能评估指标：任务完成率、平均等待时间、总行驶距离、系统吞吐量</h2>
+
+<p>各位同学，今天我们来聊聊AGV调度系统里最实在的东西——性能评估指标。</p>
+
+<p>说实话，我见过不少团队，系统做出来跑得挺欢，但一问到“你的系统到底好不好”，就支支吾吾了。为什么？因为没有统一的度量衡。你想想看，没有指标，你怎么知道这次优化是变好了还是变差了？</p>
+
+<p>我个人习惯，在项目启动的第一天，就把这四大指标钉在墙上。它们是：<strong>任务完成率、平均等待时间、总行驶距离、系统吞吐量</strong>。今天咱们一个一个掰开揉碎了讲。</p>
+
+<h3>18.1 任务完成率：最直观的“及格线”</h3>
+
+<p>任务完成率，说白了就是“派出去100个任务，最后成功干完了几个”。</p>
+
+<p>公式很简单：</p>
+
+<pre><code>任务完成率 = (成功完成任务数 / 总下发任务数) × 100%</code></pre>
+
+<p>我在项目中遇到过一件事。某次上线前，测试环境跑得好好的，完成率99.8%。结果一上生产环境，直接掉到82%。查了两天，发现是某个地点的二维码被叉车压花了，AGV识别不到，就一直卡在那。你看，指标不会骗人，它会帮你快速定位问题。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong></p>
+  <ul>
+    <li>低于95%：系统存在严重问题，必须立即排查</li>
+    <li>95%-98%：有优化空间，但可以接受</li>
+    <li>98%以上：系统健康，可以关注其他指标</li>
+  </ul>
+</div>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong></p>
+  <p>我曾经犯过一个错误——把“超时重试”也算作新任务。结果完成率虚高，实际效率一塌糊涂。记住：同一个任务，不管重试多少次，只算一次。</p>
+</div>
+
+<h3>18.2 平均等待时间：用户体验的“温度计”</h3>
+
+<p>这个指标，我建议你们重点关注。它直接反映了AGV的响应速度。</p>
+
+<p>平均等待时间 = 所有任务从下发到开始执行的时间总和 / 任务总数</p>
+
+<p>你想想看，一个任务发下去，AGV要等30秒才动，操作员会怎么想？肯定觉得系统卡死了。其实不一定，可能是AGV正在执行其他任务，或者路径被占用了。</p>
+
+<p>我在一个电商仓库的项目里，平均等待时间一度飙到45秒。后来发现是任务分配策略太死板——总是优先分配给最近的AGV，结果那台AGV忙死，其他的闲死。改成“负载均衡+就近分配”后，等待时间降到了12秒。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>场景</th>
+      <th>合理等待时间</th>
+      <th>需要警惕</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>电商拣货</td>
+      <td>&lt; 10秒</td>
+      <td>&gt; 20秒</td>
+    </tr>
+    <tr>
+      <td>产线配送</td>
+      <td>&lt; 5秒</td>
+      <td>&gt; 15秒</td>
+    </tr>
+    <tr>
+      <td>仓储搬运</td>
+      <td>&lt; 15秒</td>
+      <td>&gt; 30秒</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  <p><strong>小技巧：</strong></p>
+  <p>如果平均等待时间突然升高，先别急着调算法。检查一下是不是有AGV“假死”了——就是那种在线但不动弹的。我遇到过三次，两次是网络问题，一次是电池没电了。</p>
+</div>
+
+<h3>18.3 总行驶距离：成本控制的“晴雨表”</h3>
+
+<p>这个指标，说白了就是“AGV跑了多少冤枉路”。</p>
+
+<p>总行驶距离 = 所有AGV在统计周期内行驶的路径长度之和</p>
+
+<p>为什么重要？因为AGV每跑一米，都在消耗电池、磨损轮胎、占用通道。我见过一个项目，总行驶距离优化了30%，结果电池寿命延长了40%。</p>
+
+<p>嗯，这里要注意：总行驶距离不是越小越好。如果为了省距离，让AGV频繁走捷径，反而可能造成拥堵。我个人的经验是，在保证任务完成率的前提下，尽量优化路径。</p>
+
+<p>举个例子：</p>
+
+<pre><code># 优化前：A点→B点→C点，总距离120米
+# 优化后：A点→C点→B点，总距离85米
+# 节省了35米，而且没有增加等待时间</code></pre>
+
+<p>你看，有时候只是调整一下任务顺序，效果就很明显。</p>
+
+<h3>18.4 系统吞吐量：综合实力的“试金石”</h3>
+
+<p>系统吞吐量，是衡量AGV系统“能干多少活”的核心指标。</p>
+
+<p>公式：系统吞吐量 = 单位时间内完成的任务数</p>
+
+<p>比如，每小时完成120个任务，那吞吐量就是120 tasks/h。</p>
+
+<p>我在一个大型物流中心做过测试，10台AGV，理论吞吐量是150 tasks/h，实际只有98。为什么？因为路径冲突、充电等待、任务分配不均，这些都在拖后腿。</p>
+
+<div class="highlight">
+  <p><strong>吞吐量优化三原则：</strong></p>
+  <ol>
+    <li><strong>减少空跑</strong>：AGV空载行驶就是浪费，尽量让它在返程时也带任务</li>
+    <li><strong>避免拥堵</strong>：多车同线时，适当绕路反而更快</li>
+    <li><strong>动态调度</strong>：不要死守固定路线，根据实时情况调整</li>
+  </ol>
+</div>
+
+<h3>18.5 四大指标的关系：一张图看懂</h3>
+
+<p>这四个指标不是孤立的，它们互相影响。我画了一张图，帮你理清关系：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 中心标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV调度系统四大性能指标关系图</text>
+  
+  <!-- 四个节点 -->
+  <!-- 任务完成率 -->
+  <rect x="300" y="60" width="200" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="400" y="95" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务完成率</text>
+  
+  <!-- 平均等待时间 -->
+  <rect x="50" y="180" width="200" height="60" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="150" y="215" text-anchor="middle" font-size="16" fill="white" font-weight="bold">平均等待时间</text>
+  
+  <!-- 总行驶距离 -->
+  <rect x="550" y="180" width="200" height="60" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="215" text-anchor="middle" font-size="16" fill="white" font-weight="bold">总行驶距离</text>
+  
+  <!-- 系统吞吐量 -->
+  <rect x="300" y="300" width="200" height="60" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="335" text-anchor="middle" font-size="16" fill="white" font-weight="bold">系统吞吐量</text>
+  
+  <!-- 连线 -->
+  <!-- 完成率 -> 等待时间 -->
+  <line x1="350" y1="120" x2="200" y2="180" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="250" y="145" text-anchor="middle" font-size="12" fill="#7f8c8d">等待越短，完成率越高</text>
+  
+  <!-- 完成率 -> 行驶距离 -->
+  <line x1="450" y1="120" x2="600" y2="180" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="540" y="145" text-anchor="middle" font-size="12" fill="#7f8c8d">距离越短，完成率越高</text>
+  
+  <!-- 等待时间 -> 吞吐量 -->
+  <line x1="200" y1="240" x2="350" y2="300" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="250" y="275" text-anchor="middle" font-size="12" fill="#7f8c8d">等待时间影响吞吐量</text>
+  
+  <!-- 行驶距离 -> 吞吐量 -->
+  <line x1="600" y1="240" x2="450" y2="300" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="540" y="275" text-anchor="middle" font-size="12" fill="#7f8c8d">行驶距离影响吞吐量</text>
+  
+  <!-- 完成率 -> 吞吐量 -->
+  <line x1="400" y1="120" x2="400" y2="300" stroke="#e67e22" stroke-width="3"/>
+  <text x="420" y="210" text-anchor="start" font-size="12" fill="#e67e22" font-weight="bold">核心关系：完成率是吞吐量的基础</text>
+</svg>
+
+<p>从这张图你能看出来，<strong>任务完成率是基础</strong>，它直接影响其他三个指标。而平均等待时间和总行驶距离，又是影响系统吞吐量的关键因素。</p>
+
+<p>我个人习惯，在项目初期先盯着任务完成率，等它稳定在98%以上了，再开始优化等待时间和行驶距离。最后才去冲吞吐量。这个顺序，我建议你也试试。</p>
+
+<div class="tip">
+  <p><strong>实战建议：</strong></p>
+  <p>别想着一次性优化所有指标。我曾经在一个项目里同时调了三个参数，结果指标全乱了，根本不知道哪个改动起了作用。一次只改一个，观察24小时，再决定下一步。</p>
+</div>
+
+<p>好了，这四大指标就讲到这里。记住：没有完美的指标，只有适合你场景的指标。下次你调试系统时，不妨先问问自己——我现在最该关注哪个？</p>
+
+<div class="footer-nav">
+            <a href="17SimulationEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="19GoodsToPersonCase.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 死锁解除策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="active">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 死锁解除策略：资源剥夺法（抢占式）</h2>
+
+<p>各位同行，咱们接着聊死锁解除。前面讲了资源耗尽型死锁怎么预防，但说实话，再好的预防也挡不住现场突发状况。这时候就得请出我们的「最后手段」——资源剥夺法，也叫抢占式解除。</p>
+
+<p>说白了，就是强行从某个AGV手里把资源抢回来，分给别的车用。听着有点粗暴是吧？但我在项目里遇到过好几次，不用这招，整个系统就卡死了。</p>
+
+<h3>6.1 什么是资源剥夺法</h3>
+
+<p>资源剥夺法的核心思想很简单：<strong>当系统检测到死锁时，强制回收一个或多个AGV占用的资源，分配给其他等待的AGV，从而打破循环等待链</strong>。</p>
+
+<p>你想想看，死锁的本质就是每个车都握着资源不撒手，都在等别人手里的。那好，我直接让某个车「松手」，把资源让出来，死锁不就解了？</p>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>剥夺不是随机的，得有策略。我见过有人直接抢最近那台车的资源，结果导致那台车上的货物摔了，损失不小。</p>
+</div>
+
+<h3>6.2 剥夺策略的三种模式</h3>
+
+<p>我个人习惯把资源剥夺分成三种模式，每种适用场景不一样：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>模式</th>
+      <th>操作方式</th>
+      <th>适用场景</th>
+      <th>风险等级</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>完全剥夺</td>
+      <td>回收AGV所有占用的资源</td>
+      <td>死锁严重，多车纠缠</td>
+      <td>高</td>
+    </tr>
+    <tr>
+      <td>部分剥夺</td>
+      <td>只回收关键资源（如某个路段）</td>
+      <td>局部死锁，影响范围小</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>渐进剥夺</td>
+      <td>逐步回收，每次回收一个资源</td>
+      <td>系统负载高，需精细控制</td>
+      <td>低</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>嗯，这里要注意：<strong>完全剥夺风险最大</strong>。我曾经在一个汽车零部件仓库里，就因为用了完全剥夺，导致一台AGV上的变速箱壳体掉下来，直接报废了三个。从那以后，我只要能用部分剥夺，绝不用完全的。</p>
+
+<h3>6.3 剥夺对象的选择原则</h3>
+
+<p>选谁下手？这是个技术活。我总结了几条原则：</p>
+
+<ul>
+  <li><strong>代价最小原则</strong>：选那些占用资源少、任务不紧急的AGV下手</li>
+  <li><strong>任务优先级</strong>：低优先级的车先被剥夺，高优先级的保</li>
+  <li><strong>资源价值</strong>：如果某个AGV占着关键路段，而它本身任务不重，那就抢它</li>
+  <li><strong>回退成本</strong>：看AGV当前位置，离充电桩近的、离空载区近的优先</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong>在调度系统里维护一个「可剥夺优先级列表」。每台AGV实时更新自己的状态，系统根据这个列表快速决策。比临时算快多了。</p>
+</div>
+
+<h3>6.4 剥夺后的恢复机制</h3>
+
+<p>资源抢过来，死锁解了，但被抢的那台车怎么办？不能不管它啊。</p>
+
+<p>我一般会做三件事：</p>
+
+<ol>
+  <li><strong>记录被剥夺的AGV</strong>：把它标记为「待恢复」状态</li>
+  <li><strong>分配临时缓冲区</strong>：让被剥夺的车先停到安全区域，别堵路</li>
+  <li><strong>重新调度任务</strong>：等系统稳定了，再给这台车重新分配资源</li>
+</ol>
+
+<p>说白了，就是「先救人，再治病」。死锁解了是第一位的，后续的补偿可以慢慢来。</p>
+
+<h3>6.5 代码示例：简单的剥夺决策逻辑</h3>
+
+<p>下面是我在实际项目中用过的剥夺决策伪代码，简化了一些细节，但核心逻辑都在：</p>
+
+<pre><code>// 死锁检测到后，调用此函数
+function selectVictim(deadlockedAGVs) {
+    let bestVictim = null;
+    let minCost = Infinity;
+    
+    for (let agv of deadlockedAGVs) {
+        // 计算剥夺代价
+        let cost = 0;
+        cost += agv.taskPriority * 10;      // 优先级越高代价越大
+        cost += agv.occupiedResources.length * 5;  // 占的资源越多代价越大
+        cost += agv.distanceToSafeZone;     // 离安全区越远代价越大
+        
+        // 如果AGV正在搬运贵重货物，代价翻倍
+        if (agv.cargoType === 'fragile' || agv.cargoType === 'expensive') {
+            cost *= 2;
+        }
+        
+        if (cost &lt; minCost) {
+            minCost = cost;
+            bestVictim = agv;
+        }
+    }
+    
+    return bestVictim;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>警告：</strong>这段代码只是示例，实际项目中还要考虑AGV的电池电量、当前速度、路面状况等。我曾经因为没考虑电量，抢了一台快没电的车，结果它被剥夺后直接趴窝在路中间，反而造成了更大的拥堵。</p>
+</div>
+
+<h3>6.6 资源剥夺法的优缺点</h3>
+
+<p>任何策略都有两面性，资源剥夺法也不例外：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>解除死锁速度快，几秒内就能恢复</td>
+      <td>可能造成货物损坏或掉落</td>
+    </tr>
+    <tr>
+      <td>不需要预留大量空闲资源</td>
+      <td>被剥夺的AGV需要额外调度，增加系统负担</td>
+    </tr>
+    <tr>
+      <td>适用于各种复杂死锁场景</td>
+      <td>如果频繁使用，会降低整体效率</td>
+    </tr>
+    <tr>
+      <td>实现相对简单，不需要复杂的预判</td>
+      <td>对AGV的硬件有一定要求（如急停、倒退功能）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>说白了，资源剥夺法就像消防队的破拆工具——平时用不上，但真着火了，该砸就得砸。关键是要砸对地方，别砸到人。</p>
+
+<h3>6.7 核心逻辑流程图</h3>
+
+<p>下面我用一张图把整个资源剥夺的决策流程串起来，方便你理解：</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="520" fill="#f8f9fa" rx="8"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">资源剥夺法决策流程图</text>
+  
+  <!-- 开始 -->
+  <rect x="260" y="55" width="200" height="40" rx="20" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="80" text-anchor="middle" font-size="14" fill="white" font-weight="bold">检测到死锁</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="95" x2="360" y2="125" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 决策1 -->
+  <rect x="210" y="125" width="300" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="145" text-anchor="middle" font-size="13" fill="#2c3e50">选择剥夺对象（代价最小原则）</text>
+  <text x="360" y="162" text-anchor="middle" font-size="11" fill="#7f8c8d">评估优先级、资源数、货物价值、距离</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="170" x2="360" y2="200" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 决策2 -->
+  <rect x="210" y="200" width="300" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="220" text-anchor="middle" font-size="13" fill="#2c3e50">执行资源剥夺操作</text>
+  <text x="360" y="237" text-anchor="middle" font-size="11" fill="#7f8c8d">完全剥夺 / 部分剥夺 / 渐进剥夺</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="245" x2="360" y2="275" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 决策3 -->
+  <rect x="210" y="275" width="300" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="295" text-anchor="middle" font-size="13" fill="#2c3e50">分配资源给等待的AGV</text>
+  <text x="360" y="312" text-anchor="middle" font-size="11" fill="#7f8c8d">打破循环等待链</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="320" x2="360" y2="350" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 决策4 -->
+  <rect x="210" y="350" width="300" height="45" rx="6" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="2"/>
+  <text x="360" y="370" text-anchor="middle" font-size="13" fill="#2c3e50">恢复被剥夺的AGV</text>
+  <text x="360" y="387" text-anchor="middle" font-size="11" fill="#7f8c8d">分配缓冲区 → 重新调度任务</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="395" x2="360" y2="425" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 结束 -->
+  <rect x="260" y="425" width="200" height="40" rx="20" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="360" y="450" text-anchor="middle" font-size="14" fill="white" font-weight="bold">死锁解除完成</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 说明 -->
+  <text x="360" y="505" text-anchor="middle" font-size="11" fill="#95a5a6">整个流程应在 2-5 秒内完成，避免系统长时间阻塞</text>
+</svg>
+
+<p>这张图把整个流程串起来了。从检测到死锁开始，到选择受害者、执行剥夺、分配资源、恢复被剥夺的AGV，最后解除完成。每一步都有讲究，尤其是「选择剥夺对象」那一步，我建议你多花点心思设计评估算法。</p>
+
+<h3>6.8 实际项目中的避坑指南</h3>
+
+<p>最后，分享几个我踩过的坑：</p>
+
+<ul>
+  <li><strong>别抢正在转弯的车</strong>：我曾经抢了一台正在转弯的AGV，结果它急停后直接侧翻了。后来我加了一条规则：AGV在转弯、上下坡、举升时，禁止剥夺。</li>
+  <li><strong>注意货物重心</strong>：如果AGV载着重心高的货物，剥夺时速度要慢，否则货物会倒。我在一个饮料仓库里就见过，整托的矿泉水瓶全倒了，满地都是。</li>
+  <li><strong>别频繁剥夺同一台车</strong>：如果某台AGV总是被选为受害者，它的任务永远完不成。我一般会加一个「被剥夺次数计数器」，超过3次就跳过它。</li>
+  <li><strong>剥夺后要留缓冲时间</strong>：别刚剥夺完就立刻分配新任务。给AGV一点时间稳定下来，我一般设3秒的缓冲。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>资源剥夺法是死锁解除的「核武器」，威力大但副作用也大。用得好，系统瞬间恢复；用不好，可能造成更大的混乱。我的建议是：能预防就预防，实在不行再剥夺。剥夺时，选代价最小的，恢复时，给足缓冲时间。</p>
+</div>
+
+<p>好了，资源剥夺法就聊到这儿。记住，死锁解除不是目的，让系统稳定运行才是。下次遇到死锁，别慌，按这个流程来，基本都能搞定。</p>
+
+<div class="footer-nav">
+            <a href="05BankersAlgorithmDetect.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07TaskRollbackRelease.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

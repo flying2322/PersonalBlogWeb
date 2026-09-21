@@ -1,0 +1,381 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 硬件平台搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="active">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 硬件平台搭建：工控机选型、传感器选型、通信接口设计</h2>
+
+<p>做AGV导航系统，硬件平台是地基。地基没打好，算法再牛也白搭。我这些年见过太多项目，软件调得差不多了，一上路就出问题——最后查出来，不是工控机算力不够，就是传感器数据丢帧，要么就是通信接口被干扰。嗯，今天咱们就把这块硬骨头啃下来。</p>
+
+<h3>26.1 工控机选型：算力、功耗与可靠性的平衡</h3>
+
+<p>工控机是AGV的大脑。选型时，我习惯先问三个问题：跑什么算法？装几个传感器？环境有多恶劣？</p>
+
+<p><strong>算力需求</strong>：如果你只用2D激光雷达做纯定位，i5级别的工控机就够了。但如果你要跑视觉SLAM、深度学习避障，或者多传感器融合，那得上i7甚至更高。我个人建议，至少预留30%的算力余量。为什么？因为后期总会加功能，你想想看。</p>
+
+<p><strong>功耗与散热</strong>：AGV是移动设备，电池容量有限。工控机功耗每增加10W，续航可能就少半小时。我遇到过一台工控机，标称15W，实际跑起来飙到25W，散热跟不上，直接降频卡顿。所以，选型时一定要看TDP（热设计功耗），并且确认散热方案是否匹配。</p>
+
+<p><strong>环境适应性</strong>：工厂车间有粉尘、震动、温度变化。普通商用电脑撑不过三个月。工控机必须满足：宽温（-20℃~60℃）、宽压（9V~36V）、IP防护等级（至少IP54）。</p>
+
+<div class="highlight">
+<p><strong>核心选型参数表</strong></p>
+<table>
+  <tr>
+    <th>参数</th>
+    <th>入门级</th>
+    <th>进阶级</th>
+    <th>旗舰级</th>
+  </tr>
+  <tr>
+    <td>CPU</td>
+    <td>Intel i5-8代</td>
+    <td>Intel i7-10代</td>
+    <td>Intel i9-12代 / Xeon</td>
+  </tr>
+  <tr>
+    <td>内存</td>
+    <td>8GB DDR4</td>
+    <td>16GB DDR4</td>
+    <td>32GB DDR4 ECC</td>
+  </tr>
+  <tr>
+    <td>存储</td>
+    <td>128GB SSD</td>
+    <td>256GB NVMe</td>
+    <td>512GB NVMe + 冗余</td>
+  </tr>
+  <tr>
+    <td>接口</td>
+    <td>2xLAN, 4xUSB, 2xCOM</td>
+    <td>4xLAN, 6xUSB, 4xCOM, CAN</td>
+    <td>6xLAN, 8xUSB, 6xCOM, CAN, GPIO</td>
+  </tr>
+  <tr>
+    <td>功耗</td>
+    <td>≤15W</td>
+    <td>≤25W</td>
+    <td>≤45W</td>
+  </tr>
+  <tr>
+    <td>防护等级</td>
+    <td>IP54</td>
+    <td>IP65</td>
+    <td>IP67</td>
+  </tr>
+</table>
+</div>
+
+<div class="tip">
+<p><strong>我的经验</strong>：别只看CPU主频。AGV工控机更看重单核性能和IO吞吐量。我曾经用一块低功耗的赛扬处理器跑2D SLAM，结果CPU占用率常年90%+，后来换成i5-8265U，占用率直接降到40%。</p>
+</div>
+
+<h3>26.2 传感器选型：激光雷达、IMU、编码器、相机</h3>
+
+<p>传感器是AGV的眼睛和耳朵。选型原则很简单：够用就好，别堆料。堆料不仅贵，还增加融合难度。</p>
+
+<h4>26.2.1 激光雷达</h4>
+<p>2D激光雷达是AGV导航的标配。主流方案有：</p>
+<ul>
+  <li><strong>单线雷达</strong>：用于建图和定位，精度高，成本低。我常用的是Sick、Hokuyo，国产的思岚也不错。</li>
+  <li><strong>多线雷达</strong>：用于3D环境感知和避障。16线够用，32线更好，但价格翻倍。</li>
+</ul>
+<p>选型时注意：扫描频率（10Hz以上）、测距半径（室内20m足够）、角度分辨率（0.5°以内）。</p>
+
+<h4>26.2.2 IMU</h4>
+<p>IMU提供角速度和加速度，用于姿态估计和短时定位。我建议选工业级MEMS IMU，比如ADI的ADIS系列或博世的BMI系列。消费级IMU（比如手机里的）温漂太大，跑几分钟就偏了。</p>
+
+<div class="warning">
+<p><strong>避坑指南</strong>：我曾经用过一个便宜的IMU，标称零偏稳定性10°/h，实际跑起来100°/h。后来换了ADIS16470，才稳定下来。记住，IMU的零偏稳定性至少要在1°/h以内。</p>
+</div>
+
+<h4>26.2.3 编码器</h4>
+<p>编码器装在电机或轮子上，提供里程计信息。增量式编码器便宜，但需要上电找零。绝对式编码器贵，但掉电不丢位置。我习惯用增量式+霍尔传感器做零位校准，性价比高。</p>
+
+<h4>26.2.4 相机</h4>
+<p>视觉传感器用于二维码定位、视觉SLAM、障碍物识别。选型要点：</p>
+<ul>
+  <li>分辨率：VGA够用，720P更好</li>
+  <li>帧率：30fps以上</li>
+  <li>快门：全局快门（避免运动模糊）</li>
+  <li>接口：USB3.0或GigE</li>
+</ul>
+
+<h3>26.3 通信接口设计：数据链路与实时性</h3>
+
+<p>传感器数据要传到工控机，工控机要发指令给底盘。通信接口设计不好，数据延迟、丢包、干扰全来了。</p>
+
+<h4>26.3.1 传感器接口</h4>
+<table>
+  <tr>
+    <th>传感器</th>
+    <th>推荐接口</th>
+    <th>带宽需求</th>
+    <th>注意事项</th>
+  </tr>
+  <tr>
+    <td>激光雷达</td>
+    <td>Ethernet (UDP)</td>
+    <td>10~100 Mbps</td>
+    <td>使用独立网卡，避免与上位机共用</td>
+  </tr>
+  <tr>
+    <td>IMU</td>
+    <td>SPI / UART</td>
+    <td>1~10 Mbps</td>
+    <td>SPI延迟更低，UART更简单</td>
+  </tr>
+  <tr>
+    <td>编码器</td>
+    <td>GPIO / 计数器</td>
+    <td>低频</td>
+    <td>注意电平匹配（5V/3.3V）</td>
+  </tr>
+  <tr>
+    <td>相机</td>
+    <td>USB3.0 / GigE</td>
+    <td>200~1000 Mbps</td>
+    <td>USB3.0线长限制5m，GigE可达100m</td>
+  </tr>
+</table>
+
+<h4>26.3.2 底盘控制接口</h4>
+<p>工控机与底盘控制器（如PLC、MCU）通信，常用方式：</p>
+<ul>
+  <li><strong>CAN总线</strong>：工业标准，抗干扰强，适合实时控制。波特率建议500kbps或1Mbps。</li>
+  <li><strong>RS232/485</strong>：简单可靠，但速度慢。适合低速AGV。</li>
+  <li><strong>EtherCAT</strong>：实时以太网，延迟微秒级。适合高速高精度控制。</li>
+</ul>
+
+<div class="highlight">
+<p><strong>通信架构图</strong></p>
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 工控机 -->
+  <rect x="300" y="20" width="200" height="60" fill="#4a90d9" rx="8"/>
+  <text x="400" y="55" text-anchor="middle" fill="white" font-size="16" font-weight="bold">工控机</text>
+  
+  <!-- 传感器层 -->
+  <rect x="50" y="140" width="150" height="50" fill="#50c878" rx="8"/>
+  <text x="125" y="170" text-anchor="middle" fill="white" font-size="14">激光雷达</text>
+  
+  <rect x="250" y="140" width="150" height="50" fill="#50c878" rx="8"/>
+  <text x="325" y="170" text-anchor="middle" fill="white" font-size="14">IMU</text>
+  
+  <rect x="450" y="140" width="150" height="50" fill="#50c878" rx="8"/>
+  <text x="525" y="170" text-anchor="middle" fill="white" font-size="14">编码器</text>
+  
+  <rect x="650" y="140" width="150" height="50" fill="#50c878" rx="8"/>
+  <text x="725" y="170" text-anchor="middle" fill="white" font-size="14">相机</text>
+  
+  <!-- 通信接口层 -->
+  <rect x="50" y="250" width="700" height="40" fill="#ffa500" rx="8"/>
+  <text x="400" y="275" text-anchor="middle" fill="white" font-size="14">通信接口：Ethernet / SPI / UART / USB / CAN</text>
+  
+  <!-- 底盘控制层 -->
+  <rect x="250" y="330" width="300" height="50" fill="#e74c3c" rx="8"/>
+  <text x="400" y="360" text-anchor="middle" fill="white" font-size="14">底盘控制器（PLC / MCU）</text>
+  
+  <!-- 连线：传感器 -> 工控机 -->
+  <line x1="125" y1="190" x2="350" y2="80" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="325" y1="190" x2="380" y2="80" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="525" y1="190" x2="420" y2="80" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="725" y1="190" x2="460" y2="80" stroke="#333" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 连线：工控机 -> 通信接口 -->
+  <line x1="400" y1="80" x2="400" y2="250" stroke="#333" stroke-width="2"/>
+  
+  <!-- 连线：通信接口 -> 底盘 -->
+  <line x1="400" y1="290" x2="400" y2="330" stroke="#333" stroke-width="2"/>
+  
+  <!-- 标签 -->
+  <text x="180" y="110" fill="#333" font-size="12">传感器数据流</text>
+  <text x="420" y="310" fill="#333" font-size="12">控制指令流</text>
+</svg>
+</div>
+
+<h4>26.3.3 实时性与同步</h4>
+<p>多传感器融合需要时间同步。我常用的方法：</p>
+<ul>
+  <li><strong>硬件同步</strong>：用PPS（秒脉冲）信号同步所有传感器。精度微秒级。</li>
+  <li><strong>软件同步</strong>：用ROS的Time Synchronizer或自定义时间戳。精度毫秒级。</li>
+</ul>
+<p>说实话，硬件同步效果最好，但成本高。软件同步够用，但要注意时钟漂移。我建议：激光雷达和IMU用硬件同步，编码器和相机用软件同步。</p>
+
+<div class="tip">
+<p><strong>我的习惯</strong>：所有传感器数据都打上时间戳，在工控机里统一做时间对齐。这样即使某个传感器延迟了，也能通过插值补偿。我曾经用这个办法，把IMU和激光雷达的融合误差从50ms降到了5ms以内。</p>
+</div>
+
+<h3>26.4 硬件平台搭建总结</h3>
+
+<p>搭建硬件平台，说白了就是选对零件、连好线、调好参数。我见过太多人把时间花在算法上，结果硬件平台三天两头出问题。记住：</p>
+<ul>
+  <li>工控机选型：算力够用，功耗低，环境适应性强</li>
+  <li>传感器选型：精度够用，接口匹配，成本可控</li>
+  <li>通信接口设计：带宽够，延迟低，抗干扰强</li>
+</ul>
+<p>嗯，硬件平台搭好了，后面的融合算法才能跑得稳。别急，一步一步来。</p>
+
+<div class="footer-nav">
+            <a href="25SimulationEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27RealtimeOptimization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

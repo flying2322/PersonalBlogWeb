@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 时间窗约束下的分配</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="active">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 时间窗约束下的分配：硬时间窗与软时间窗、时间窗冲突检测、基于时间窗的可行解搜索</h2>
+
+<p>各位同学，咱们今天聊一个实战中绕不开的话题——时间窗约束。</p>
+
+<p>说实话，很多刚入行的朋友觉得任务分配就是“谁近谁去”。但在真实工厂里，哪有这么简单？你想想看，一个任务要求8:00送到，结果车8:05才到，产线可能就停线了。这就是时间窗约束在起作用。</p>
+
+<p>我个人习惯把时间窗分成两类：硬时间窗和软时间窗。这两者的区别，说白了就是“能不能商量”。</p>
+
+<h3>6.1 硬时间窗与软时间窗</h3>
+
+<p><strong>硬时间窗</strong>，就是死命令。AGV必须在[最早开始时间, 最晚完成时间]内完成任务。早到不行，晚到更不行。我在项目中遇到过一条汽车总装线，物料必须在工位需求前2分钟到达，早了没地方放，晚了产线停。这就是典型的硬时间窗。</p>
+
+<div class="highlight">
+  <p><strong>硬时间窗的数学表达：</strong></p>
+  <pre><code>任务j的时间窗：[ET_j, LT_j]
+AGV到达时间：A_j
+约束条件：ET_j ≤ A_j ≤ LT_j</code></pre>
+</div>
+
+<p><strong>软时间窗</strong>，就有商量余地了。你可以早到或晚到，但会有惩罚成本。比如早到1分钟扣0.5分，晚到1分钟扣1分。嗯，这里要注意：软时间窗不是没有约束，而是把约束变成了优化目标。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>软时间窗在电商仓储里特别常见。订单有优先级，高优先级订单的惩罚系数大，低优先级的可以稍微等等。我曾经帮一家仓库调过参数，把惩罚系数从线性改成指数型，效果反而更好——因为操作员更怕“超时太多”而不是“超时一点”。</p>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>类型</th>
+      <th>特点</th>
+      <th>适用场景</th>
+      <th>惩罚机制</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>硬时间窗</td>
+      <td>不可违反</td>
+      <td>汽车总装、半导体晶圆搬运</td>
+      <td>无惩罚，直接不可行</td>
+    </tr>
+    <tr>
+      <td>软时间窗</td>
+      <td>可违反但有成本</td>
+      <td>电商分拣、仓库补货</td>
+      <td>线性/指数惩罚函数</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>6.2 时间窗冲突检测</h3>
+
+<p>冲突检测，是调度系统里最烧脑的部分之一。为什么？因为冲突不是“有没有”的问题，而是“什么时候有”的问题。</p>
+
+<p>我举个例子。两辆AGV，A车要在8:00-8:10占用路段R1，B车要在8:05-8:15占用同一路段。你一看就知道，8:05-8:10这段时间重叠了，这就是冲突。</p>
+
+<p>但实际场景更复杂。比如A车8:00到路口，B车8:01到，看起来只差1秒，但如果路口只能单向通行，那这1秒就是冲突。</p>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>早期我写冲突检测时，只检查了“时间区间是否重叠”。结果有一次，两辆车同时到达同一个充电站，但充电站只有一个接口。我这才意识到——<strong>资源冲突不仅要看时间，还要看资源类型和容量</strong>。从那以后，我的冲突检测函数里多了个参数叫“resource_capacity”。</p>
+</div>
+
+<p>冲突检测的核心算法其实不复杂：</p>
+
+<pre><code>def detect_conflict(task1, task2):
+    # 检查时间窗是否重叠
+    if task1.end_time &lt; task2.start_time or task2.end_time &lt; task1.start_time:
+        return False  # 无冲突
+    
+    # 检查资源是否冲突
+    if task1.resource != task2.resource:
+        return False  # 不同资源，无冲突
+    
+    # 检查资源容量
+    if task1.resource.capacity &lt; 2:
+        return True   # 单容量资源，有冲突
+    
+    return False      # 多容量资源，暂时无冲突</code></pre>
+
+<p>你可能会问：为什么最后返回False？因为多容量资源需要进一步计算“剩余容量”，不能简单判定冲突。嗯，这里留个思考题给你。</p>
+
+<h3>6.3 基于时间窗的可行解搜索</h3>
+
+<p>找到冲突只是第一步。真正的难题是：<strong>如何在冲突中找到可行解？</strong></p>
+
+<p>我个人习惯用“时间窗滑动法”。说白了，就是给每个任务一个“可调整范围”，在这个范围内寻找不冲突的时间点。</p>
+
+<p>举个例子。任务A的时间窗是[8:00, 8:10]，任务B的时间窗是[8:05, 8:15]，两者在路段R1上冲突。怎么办？</p>
+
+<ol>
+  <li><strong>尝试滑动A：</strong>把A的开始时间从8:00滑到8:10之后，但这样可能超出A的硬时间窗。</li>
+  <li><strong>尝试滑动B：</strong>把B的开始时间从8:05滑到8:15之后，同样可能超时。</li>
+  <li><strong>尝试交换顺序：</strong>让B先走，A后走。但B的到达时间可能比A晚，需要重新计算路径。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>可行解搜索的伪代码：</strong></p>
+  <pre><code>function search_feasible_solution(tasks):
+    sort tasks by start_time  # 按开始时间排序
+    for each task in tasks:
+        while task has conflict with any assigned task:
+            # 尝试滑动当前任务
+            new_time = slide_task(task, step=1min)
+            if new_time is within task's time window:
+                update task.start_time = new_time
+            else:
+                # 尝试滑动已分配的任务
+                if can_slide_previous_tasks(task):
+                    slide_previous_tasks(task)
+                else:
+                    return "无可行解"
+    return "找到可行解"</code></pre>
+</div>
+
+<p>你想想看，这个算法其实很暴力。但在实际项目中，任务数量通常不超过50个，这种暴力搜索完全够用。我见过有人用遗传算法、粒子群算法来搜，说实话，杀鸡用牛刀了。</p>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>搜索时优先滑动“时间窗较宽”的任务。因为宽时间窗的任务弹性大，调整后对其他任务影响小。我在一个项目中把这个启发式规则加进去后，搜索时间从3秒降到了0.2秒。</p>
+</div>
+
+<h3>6.4 实战中的时间窗管理</h3>
+
+<p>最后，我想分享几个实战中的经验。</p>
+
+<p><strong>第一，时间窗不是越紧越好。</strong>有些工程师喜欢把时间窗设得很窄，觉得这样“精确”。但实际运行中，AGV的行驶时间会有波动——地面湿滑、电池电量、负载重量都会影响速度。时间窗太窄，系统会频繁报冲突，调度员会疯掉。</p>
+
+<p><strong>第二，软时间窗的惩罚系数要调参。</strong>我建议用历史数据来拟合。比如统计过去一个月里，任务延迟时间与产线停线时间的相关性，然后反推惩罚系数。别拍脑袋定系数，会出事的。</p>
+
+<p><strong>第三，冲突检测要实时。</strong>不要等任务分配完了再检测。我习惯在每次分配任务时，就做一次增量冲突检测。这样能提前发现潜在问题，而不是事后补救。</p>
+
+<div class="warning">
+  <p><strong>我曾经犯过的错：</strong>有一次，我把所有任务都分配完了，然后统一做冲突检测。结果发现30个任务里有12个冲突，而且互相嵌套，根本没法局部调整。最后只能全部重新分配，浪费了整整一个下午。从那以后，我再也不敢“先分配后检测”了。</p>
+</div>
+
+<p>好了，时间窗这块的内容就讲到这里。记住一句话：<strong>时间窗不是限制，而是保护</strong>。它保护你的AGV不会撞车，保护你的产线不会停线，保护你的调度系统不会崩溃。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">时间窗约束下的任务分配核心逻辑</text>
+  
+  <!-- 主节点：时间窗约束 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">时间窗约束</text>
+  
+  <!-- 分支线 -->
+  <line x1="400" y1="120" x2="400" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="150" x2="200" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="150" x2="600" y2="150" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 左分支：硬时间窗 -->
+  <rect x="80" y="140" width="240" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="200" y="165" text-anchor="middle" font-size="15" fill="white" font-weight="bold">硬时间窗：不可违反</text>
+  
+  <!-- 右分支：软时间窗 -->
+  <rect x="480" y="140" width="240" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="600" y="165" text-anchor="middle" font-size="15" fill="white" font-weight="bold">软时间窗：可违反但有成本</text>
+  
+  <!-- 硬时间窗子节点 -->
+  <line x1="200" y1="180" x2="200" y2="210" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="80" y="210" width="240" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="200" y="233" text-anchor="middle" font-size="13" fill="#c0392b">ET_j ≤ A_j ≤ LT_j</text>
+  
+  <line x1="200" y1="245" x2="200" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="80" y="270" width="240" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="200" y="293" text-anchor="middle" font-size="13" fill="#c0392b">适用：汽车总装、半导体</text>
+  
+  <!-- 软时间窗子节点 -->
+  <line x1="600" y1="180" x2="600" y2="210" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="480" y="210" width="240" height="35" rx="5" fill="#fdebd0" stroke="#e67e22" stroke-width="1"/>
+  <text x="600" y="233" text-anchor="middle" font-size="13" fill="#d35400">惩罚函数：线性/指数</text>
+  
+  <line x1="600" y1="245" x2="600" y2="270" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="480" y="270" width="240" height="35" rx="5" fill="#fdebd0" stroke="#e67e22" stroke-width="1"/>
+  <text x="600" y="293" text-anchor="middle" font-size="13" fill="#d35400">适用：电商仓储、补货</text>
+  
+  <!-- 冲突检测模块 -->
+  <line x1="400" y1="150" x2="400" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="250" y="340" width="300" height="45" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="368" text-anchor="middle" font-size="16" fill="white" font-weight="bold">冲突检测：时间重叠 + 资源容量</text>
+  
+  <!-- 可行解搜索模块 -->
+  <line x1="400" y1="385" x2="400" y2="415" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="200" y="415" width="400" height="45" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="443" text-anchor="middle" font-size="16" fill="white" font-weight="bold">可行解搜索：时间窗滑动法 + 启发式规则</text>
+  
+  <!-- 箭头 -->
+  <polygon points="400,460 395,470 405,470" fill="#2ecc71"/>
+</svg>
+
+        <div class="footer-nav">
+            <a href="05BatchTaskAllocation.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07DynamicTaskInsert.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

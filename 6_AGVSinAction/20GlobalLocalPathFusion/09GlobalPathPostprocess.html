@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>9 全局路径后处理</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="active">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>9 全局路径后处理：路径剪枝、B样条曲线平滑、贝塞尔曲线、路径点插值</h2>
+
+<p>各位同学，欢迎来到第九章。前面几章我们聊了怎么规划出一条从A到B的路径，但说实话，规划出来的原始路径，直接拿给机器人去跑，往往会出问题。为什么？因为路径点太密、太锯齿、或者不符合运动学约束。</p>
+
+<p>我最早做AGV项目时，就吃过这个亏。规划器输出了一堆点，我直接丢给底层控制器，结果机器人原地打转，像喝醉了酒。后来才明白——路径后处理，是连接规划和控制的桥梁，这步省不了。</p>
+
+<p>今天我们就来拆解四个核心操作：<strong>路径剪枝、B样条曲线平滑、贝塞尔曲线、路径点插值</strong>。它们各有各的用处，也各有各的坑。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>路径后处理不是为了好看，而是为了让机器人能真正跑起来。剪枝去掉冗余，平滑消除抖动，插值满足精度。</p>
+</div>
+
+<h3>9.1 路径剪枝：去掉那些没用的点</h3>
+
+<p>先说说路径剪枝。你想想看，A*或者RRT规划出来的路径，往往包含大量共线的点。比如一条直线段上，可能有几十个点，但真正有用的只有起点和终点。</p>
+
+<p>我习惯用<strong>Ramer-Douglas-Peucker（RDP）算法</strong>来做剪枝。它的思路很简单：</p>
+
+<ol>
+  <li>找到路径上离首尾连线最远的点</li>
+  <li>如果这个距离大于阈值，就保留该点，并递归处理左右两段</li>
+  <li>否则，删除中间所有点</li>
+</ol>
+
+<p>代码实现也不复杂：</p>
+
+<pre><code>def rdp_simplify(points, epsilon=0.1):
+    if len(points) &lt; 3:
+        return points
+    
+    # 找到最远点
+    dmax = 0
+    index = 0
+    for i in range(1, len(points) - 1):
+        d = perpendicular_distance(points[i], points[0], points[-1])
+        if d &gt; dmax:
+            index = i
+            dmax = d
+    
+    if dmax &gt; epsilon:
+        left = rdp_simplify(points[:index+1], epsilon)
+        right = rdp_simplify(points[index:], epsilon)
+        return left[:-1] + right
+    else:
+        return [points[0], points[-1]]</code></pre>
+
+<div class="tip">
+  <p><strong>经验之谈：</strong>epsilon的取值很关键。我一般取0.05~0.2米，具体看AGV的尺寸。太大路径会失真，太小又剪不干净。建议先画个图看看效果。</p>
+</div>
+
+<p>剪枝之后，路径点数量通常能减少70%~90%。这对后续的平滑和插值来说，负担小了很多。</p>
+
+<h3>9.2 B样条曲线平滑：让路径更顺滑</h3>
+
+<p>剪枝完的路径，虽然点少了，但转折处还是尖锐的。AGV如果直接沿着这些折线走，每到一个拐角就得停下来转向，效率极低。</p>
+
+<p>这时候就需要B样条曲线了。B样条的好处是：<strong>局部可控</strong>。你修改一个控制点，只影响附近一小段曲线，不会牵一发动全身。</p>
+
+<p>我记得有一次做仓储AGV，通道很窄，用贝塞尔曲线做平滑，结果曲线跑到墙里去了。换成B样条，调整几个控制点就搞定了。</p>
+
+<p>B样条的数学定义是这样的：</p>
+
+<pre><code>C(u) = Σ Ni,p(u) * Pi</code></pre>
+
+<p>其中Ni,p是基函数，Pi是控制点。p是阶数，一般用3阶（三次B样条）就够了。</p>
+
+<p>实际应用中，我通常把剪枝后的路径点作为控制点，然后采样生成平滑路径：</p>
+
+<pre><code>import numpy as np
+
+def bspline_curve(control_points, num_samples=100):
+    n = len(control_points) - 1
+    p = 3  # 阶数
+    knots = np.linspace(0, 1, n + p + 2)
+    
+    u_vals = np.linspace(0, 1, num_samples)
+    curve = []
+    
+    for u in u_vals:
+        point = np.zeros(2)
+        for i in range(n + 1):
+            basis = basis_function(i, p, u, knots)
+            point += basis * control_points[i]
+        curve.append(point)
+    
+    return np.array(curve)</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>B样条不保证通过所有控制点。如果你需要路径严格经过某些关键点（比如充电桩位置），得用插值型样条，或者把关键点作为曲线端点。</p>
+</div>
+
+<h3>9.3 贝塞尔曲线：简单但有限制</h3>
+
+<p>贝塞尔曲线大家可能更熟悉。它的优点是数学简单、直观。但缺点也很明显：<strong>全局性</strong>——移动一个控制点，整条曲线都会变。</p>
+
+<p>对于AGV路径平滑，我一般只在<strong>局部拐角</strong>处用贝塞尔曲线。比如一个90度的转弯，用两段直线加一段贝塞尔曲线过渡，效果就很不错。</p>
+
+<p>二阶贝塞尔曲线的公式：</p>
+
+<pre><code>B(t) = (1-t)²P0 + 2t(1-t)P1 + t²P2,  t∈[0,1]</code></pre>
+
+<p>三阶的：</p>
+
+<pre><code>B(t) = (1-t)³P0 + 3t(1-t)²P1 + 3t²(1-t)P2 + t³P3</code></pre>
+
+<p>我建议你记住一个原则：<strong>控制点数量越少越好</strong>。对于AGV路径，三阶贝塞尔（4个控制点）基本够用。再多就容易出现不必要的波动。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经在一条长直道上用了高阶贝塞尔，结果曲线中间出现了波浪形抖动。后来查资料才发现，高阶贝塞尔容易产生龙格现象。所以，长路径分段处理，每段用低阶曲线，才是正道。</p>
+</div>
+
+<h3>9.4 路径点插值：补上缺失的细节</h3>
+
+<p>最后说说插值。剪枝和平滑之后，路径点可能比较稀疏。但底层控制器需要高频率的位置指令（比如50Hz），这就得靠插值来补点。</p>
+
+<p>常用的插值方法有：</p>
+
+<ul>
+  <li><strong>线性插值</strong>：简单快速，但加速度不连续</li>
+  <li><strong>三次样条插值</strong>：二阶连续，适合大多数场景</li>
+  <li><strong>五次多项式插值</strong>：可以约束加加速度（jerk），适合高精度场景</li>
+</ul>
+
+<p>我个人偏爱三次样条。它能在保证平滑的同时，计算量也不大。下面是一个简单的实现：</p>
+
+<pre><code>from scipy.interpolate import CubicSpline
+
+def interpolate_path(path_points, num_points=200):
+    # path_points: Nx2 的路径点
+    t = np.linspace(0, 1, len(path_points))
+    t_new = np.linspace(0, 1, num_points)
+    
+    cs_x = CubicSpline(t, path_points[:, 0])
+    cs_y = CubicSpline(t, path_points[:, 1])
+    
+    x_new = cs_x(t_new)
+    y_new = cs_y(t_new)
+    
+    return np.column_stack((x_new, y_new))</code></pre>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>插值前一定要确保路径点已经剪枝和平滑过了。否则，原始路径中的噪声会被插值放大，反而更糟。</p>
+</div>
+
+<h3>9.5 四种方法的对比与选择</h3>
+
+<p>说了这么多，到底什么时候用哪个？我整理了一个表格，方便你对照：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>方法</th>
+      <th>主要用途</th>
+      <th>优点</th>
+      <th>缺点</th>
+      <th>推荐场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>路径剪枝</td>
+      <td>减少冗余点</td>
+      <td>大幅压缩数据量</td>
+      <td>可能丢失细节</td>
+      <td>所有路径的预处理</td>
+    </tr>
+    <tr>
+      <td>B样条曲线</td>
+      <td>全局平滑</td>
+      <td>局部可控，灵活</td>
+      <td>不通过控制点</td>
+      <td>长路径、复杂环境</td>
+    </tr>
+    <tr>
+      <td>贝塞尔曲线</td>
+      <td>局部过渡</td>
+      <td>简单直观</td>
+      <td>全局影响</td>
+      <td>拐角、转弯处</td>
+    </tr>
+    <tr>
+      <td>路径点插值</td>
+      <td>增加密度</td>
+      <td>满足控制频率</td>
+      <td>可能引入振荡</td>
+      <td>控制指令生成</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>在实际项目中，我通常的流程是：<strong>先剪枝 → 再B样条平滑 → 局部拐角用贝塞尔微调 → 最后插值生成控制点</strong>。这个流程我用了好几年，在几十个AGV项目上都验证过，效果稳定。</p>
+
+<h3>9.6 本章小结</h3>
+
+<p>嗯，今天的内容就到这里。路径后处理看起来是细枝末节，但往往决定了AGV能不能稳定运行。剪枝、平滑、插值，这三板斧用好了，你的路径就从「能走」变成了「走得稳」。</p>
+
+<p>最后提醒一句：<strong>不要盲目追求平滑</strong>。太光滑的路径可能偏离原始路径太远，导致碰撞。我见过有人把路径平滑成一个完美的圆弧，结果机器人直接撞上了旁边的货架。所以，平滑的代价是牺牲路径的保真度，这个度要把握好。</p>
+
+<p>下一章我们会聊动态避障，到时候这些后处理过的路径，就要面对真正的挑战了。</p>
+
+<div class="footer-nav">
+            <a href="08HybridAStar.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="10LocalPlannerOverview.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

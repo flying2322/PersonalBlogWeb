@@ -1,0 +1,376 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 基于遗传算法的分配优化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="active">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 基于遗传算法的分配优化：染色体编码、适应度函数、交叉与变异操作</h2>
+
+<p>说到任务分配，很多朋友第一反应就是贪心算法或者匈牙利算法。嗯，这些方法在小规模场景下确实好用。但当你面对几十台AGV、几百个任务点时，传统方法往往就卡住了——要么解不出来，要么解出来的结果让人哭笑不得。</p>
+
+<p>这时候，遗传算法就派上用场了。说白了，它就是模拟大自然的进化过程：优胜劣汰，适者生存。我最早接触这个是在一个汽车总装车间的项目里，200多台AGV同时跑，任务队列乱成一锅粥。后来我用遗传算法重构了分配模块，效果出奇的好。</p>
+
+<p>今天我们就来拆解一下，遗传算法在AGV任务分配中到底怎么落地。核心就四个字：编、适、交、变。</p>
+
+<h3>12.1 染色体编码——怎么把任务“塞”进基因里</h3>
+
+<p>遗传算法第一步，就是把你的解决方案表示成一条“染色体”。在AGV任务分配里，染色体其实就是一组任务到AGV的映射关系。</p>
+
+<p>我个人习惯用<strong>整数编码</strong>。举个例子：</p>
+
+<pre><code>染色体：[2, 1, 3, 1, 2, 3]
+含义：
+- 任务0 → AGV 2
+- 任务1 → AGV 1
+- 任务2 → AGV 3
+- 任务3 → AGV 1
+- 任务4 → AGV 2
+- 任务5 → AGV 3
+</code></pre>
+
+<p>你看，每个基因位代表一个任务，基因值就是分配给哪台AGV。这种编码方式直观、好理解，而且交叉变异操作起来也方便。</p>
+
+<div class="tip">
+  <strong>我的经验：</strong> 编码方式决定了算法的搜索空间。整数编码适合任务数不多（几百以内）的场景。如果任务量上万，建议改用基于优先级的编码，否则染色体太长，收敛速度会慢得让你怀疑人生。
+</div>
+
+<p>还有一种编码方式叫<strong>排列编码</strong>，就是把所有任务排成一个序列，然后按顺序分配给AGV。比如：</p>
+
+<pre><code>染色体：[3, 1, 4, 2, 5, 0]
+含义：按这个顺序依次分配给AGV 1、2、3循环
+</code></pre>
+
+<p>这种方式的好处是天然保证每个AGV的任务量均衡。但我在实际项目中踩过坑——如果AGV的负载能力不一样，这种编码反而会出问题。所以，<strong>编码方式一定要跟你的业务约束匹配</strong>。</p>
+
+<h3>12.2 适应度函数——怎么才算“好”的分配</h3>
+
+<p>有了染色体，接下来就要评判它好不好。适应度函数就是干这个的。</p>
+
+<p>在AGV调度里，我们通常关心这几个指标：</p>
+
+<ul>
+  <li><strong>总行驶距离</strong>：所有AGV完成任务的总路径长度</li>
+  <li><strong>任务完成时间</strong>：最后一个任务完成的时间（makespan）</li>
+  <li><strong>AGV负载均衡</strong>：各AGV的工作量差异</li>
+  <li><strong>能耗</strong>：电池消耗情况</li>
+</ul>
+
+<p>我一般会把它们加权组合成一个适应度值。比如：</p>
+
+<pre><code>适应度 = w1 * (1/总距离) + w2 * (1/完成时间) + w3 * (1/负载方差)
+
+其中 w1 + w2 + w3 = 1
+</code></pre>
+
+<p>为什么要取倒数？因为遗传算法里适应度越大越好，而距离、时间这些指标是越小越好。取个倒数，方向就对了。</p>
+
+<div class="warning">
+  <strong>注意：</strong> 权重的设置很关键。我曾经在一个项目里把负载均衡的权重设得太高，结果算法拼命让所有AGV跑一样多的任务，完全不管路径长短，最后总时间反而变差了。后来我把权重调成了 0.5:0.3:0.2，效果才正常。
+</div>
+
+<p>还有一种做法是<strong>多目标优化</strong>，用帕累托前沿来筛选。但说实话，在工业现场，老板通常只关心一个综合指标。所以加权法更实用。</p>
+
+<h3>12.3 交叉操作——让好基因“联姻”</h3>
+
+<p>交叉，就是让两条染色体交换部分基因，产生新的后代。目的是把好的基因片段组合起来。</p>
+
+<p>常用的交叉方式有：</p>
+
+<ul>
+  <li><strong>单点交叉</strong>：随机选一个点，交换后面的部分</li>
+  <li><strong>两点交叉</strong>：选两个点，交换中间的部分</li>
+  <li><strong>均匀交叉</strong>：每个基因位以50%概率交换</li>
+</ul>
+
+<p>我个人最常用的是<strong>两点交叉</strong>。为什么？因为单点交叉容易破坏好的基因块，均匀交叉又太随机。两点交叉刚好平衡。</p>
+
+<pre><code>父代1: [2, 1, 3, 1, 2, 3]
+父代2: [1, 3, 2, 2, 1, 3]
+
+选交叉点：位置2和位置4
+
+子代1: [2, 1, | 2, 2, | 2, 3]  → 中间部分来自父代2
+子代2: [1, 3, | 3, 1, | 1, 3]  → 中间部分来自父代1
+</code></pre>
+
+<p>你看，子代既保留了父代的“头部”和“尾部”特征，又引入了新的中间组合。这样搜索空间就能不断扩展。</p>
+
+<div class="tip">
+  <strong>避坑指南：</strong> 交叉概率一般设在0.7~0.9之间。我曾经设成0.5，结果算法收敛极慢，跑了500代还没找到好解。后来改成0.8，100代就出结果了。
+</div>
+
+<h3>12.4 变异操作——防止“近亲繁殖”</h3>
+
+<p>交叉虽然能组合基因，但如果种群里所有个体都差不多，就容易陷入局部最优。这时候就需要变异——随机改变某个基因的值，引入新的可能性。</p>
+
+<p>在AGV任务分配里，变异操作很简单：</p>
+
+<pre><code>原始染色体: [2, 1, 3, 1, 2, 3]
+随机选中位置3，把值从1改成2
+变异后:     [2, 1, 3, 2, 2, 3]
+</code></pre>
+
+<p>相当于把任务3从AGV 1改派给了AGV 2。就这么一个小改动，有时候能带来意想不到的优化效果。</p>
+
+<p>变异概率通常设得很低，0.01~0.1之间。太高了算法就变成随机搜索了，太低又起不到作用。我一般取0.05，也就是每100个基因里有5个会发生变异。</p>
+
+<div class="highlight">
+  <strong>核心要点：</strong>
+  <ul>
+    <li>编码：整数编码最常用，注意匹配业务约束</li>
+    <li>适应度：加权组合多个指标，权重需要调参</li>
+    <li>交叉：两点交叉效果好，概率0.7~0.9</li>
+    <li>变异：概率0.01~0.1，防止早熟收敛</li>
+  </ul>
+</div>
+
+<h3>12.5 完整流程示意图</h3>
+
+<p>下面这张图展示了遗传算法在AGV任务分配中的完整流程。你可以看到，从初始化种群开始，经过适应度评估、选择、交叉、变异，一代代进化，直到找到满意的分配方案。</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D1E8F5;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF3E0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE0B2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="boxGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="720" height="520" fill="#F8FBFF" rx="12" ry="12"/>
+
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2C3E50">遗传算法AGV任务分配流程</text>
+
+  <!-- 步骤1：初始化种群 -->
+  <rect x="260" y="55" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad)" stroke="#4A90D9" stroke-width="2"/>
+  <text x="360" y="82" text-anchor="middle" font-size="14" fill="#2C3E50">1. 初始化种群</text>
+  <text x="360" y="97" text-anchor="middle" font-size="10" fill="#7F8C8D">随机生成N条染色体</text>
+
+  <!-- 箭头1 -->
+  <line x1="360" y1="100" x2="360" y2="130" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 步骤2：适应度评估 -->
+  <rect x="260" y="130" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad2)" stroke="#E67E22" stroke-width="2"/>
+  <text x="360" y="157" text-anchor="middle" font-size="14" fill="#2C3E50">2. 适应度评估</text>
+  <text x="360" y="172" text-anchor="middle" font-size="10" fill="#7F8C8D">计算每条染色体的适应度</text>
+
+  <!-- 箭头2 -->
+  <line x1="360" y1="175" x2="360" y2="205" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 步骤3：选择 -->
+  <rect x="260" y="205" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad)" stroke="#4A90D9" stroke-width="2"/>
+  <text x="360" y="232" text-anchor="middle" font-size="14" fill="#2C3E50">3. 选择操作</text>
+  <text x="360" y="247" text-anchor="middle" font-size="10" fill="#7F8C8D">轮盘赌/锦标赛选择</text>
+
+  <!-- 箭头3 -->
+  <line x1="360" y1="250" x2="360" y2="280" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 步骤4：交叉 -->
+  <rect x="260" y="280" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad3)" stroke="#27AE60" stroke-width="2"/>
+  <text x="360" y="307" text-anchor="middle" font-size="14" fill="#2C3E50">4. 交叉操作</text>
+  <text x="360" y="322" text-anchor="middle" font-size="10" fill="#7F8C8D">两点交叉，概率0.7~0.9</text>
+
+  <!-- 箭头4 -->
+  <line x1="360" y1="325" x2="360" y2="355" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 步骤5：变异 -->
+  <rect x="260" y="355" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad2)" stroke="#E67E22" stroke-width="2"/>
+  <text x="360" y="382" text-anchor="middle" font-size="14" fill="#2C3E50">5. 变异操作</text>
+  <text x="360" y="397" text-anchor="middle" font-size="10" fill="#7F8C8D">随机改变基因，概率0.01~0.1</text>
+
+  <!-- 箭头5 -->
+  <line x1="360" y1="400" x2="360" y2="430" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 步骤6：终止判断 -->
+  <rect x="260" y="430" width="200" height="45" rx="8" ry="8" fill="url(#boxGrad)" stroke="#4A90D9" stroke-width="2"/>
+  <text x="360" y="457" text-anchor="middle" font-size="14" fill="#2C3E50">6. 终止条件判断</text>
+  <text x="360" y="472" text-anchor="middle" font-size="10" fill="#7F8C8D">达到最大代数或收敛？</text>
+
+  <!-- 返回箭头（从步骤6回到步骤2） -->
+  <line x1="460" y1="452" x2="510" y2="452" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="510" y1="452" x2="510" y2="152" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3"/>
+  <line x1="510" y1="152" x2="460" y2="152" stroke="#E74C3C" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowhead)"/>
+  <text x="515" y="300" font-size="11" fill="#E74C3C" transform="rotate(90,515,300)">否，继续进化</text>
+
+  <!-- 输出箭头 -->
+  <line x1="360" y1="475" x2="360" y2="505" stroke="#27AE60" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="370" y="515" font-size="12" fill="#27AE60" font-weight="bold">输出最优分配方案</text>
+</svg>
+
+<p>嗯，到这里你应该对遗传算法的核心操作有了清晰的认识。编码、适应度、交叉、变异，这四个环节环环相扣。我在实际项目中调试最多的就是适应度函数的权重和交叉概率，这两个参数直接决定了算法能不能找到好解。</p>
+
+<p>记住一句话：<strong>没有万能的参数，只有不断调试出来的经验</strong>。多跑几组实验，对比不同参数下的收敛曲线，你很快就能找到适合自己场景的那组参数。</p>
+
+<div class="footer-nav">
+            <a href="11ReinforcementLearningAlloc.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13ParticleSwarmAlloc.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,340 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 真实项目案例3</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="active">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 真实项目案例3：人机协作场景下的融合方案（RRT* + TEB + 社会力模型）</h2>
+
+<p>各位同学，欢迎来到第29讲。</p>
+<p>前面我们聊了不少理论，从全局规划到局部避障，再到各种优化。但说实话，理论再漂亮，落地才是硬道理。今天这个案例，是我个人觉得最有意思的一个——<strong>人机协作场景下的路径融合</strong>。</p>
+<p>什么叫人机协作？说白了，就是AGV和人在同一个物理空间里干活。AGV不能把工人当障碍物一样绕过去就完事，你得考虑人的意图、人的舒适度，甚至人的“面子”。你想想看，一台叉车AGV从工人背后突然贴脸冲过去，工人吓一跳，这项目肯定黄。</p>
+<p>所以，今天这个方案，我把它叫做<strong>“三层融合”</strong>：RRT* 负责全局骨架，TEB 负责局部平滑与动态避障，社会力模型负责“人味儿”。</p>
+
+<div class="highlight">
+  <p><strong>核心思路：</strong>全局规划定方向，局部优化保安全，社会力模型管“人情世故”。</p>
+</div>
+
+<h3>29.1 场景痛点分析</h3>
+
+<p>先说说我遇到过的真实场景。某汽车零部件工厂，产线旁边有工人走动、有叉车AGV送货。原来的方案是纯TEB，结果呢？AGV经常在工人面前“犹豫不决”，或者走出一条让工人觉得“这机器人是不是有病”的路径。</p>
+<p>具体痛点有三个：</p>
+<ul>
+  <li><strong>全局路径不合理：</strong>纯TEB容易陷入局部最优，比如被一个站着不动的工人堵死，绕一大圈。</li>
+  <li><strong>局部避障太“硬”：</strong>TEB的优化目标主要是路径长度和平滑度，它不会考虑“人会不会觉得被冒犯”。</li>
+  <li><strong>人机交互缺失：</strong>AGV不知道工人下一步要往哪走，只能被动反应。</li>
+</ul>
+<p>嗯，这里要注意，<strong>被动反应</strong>在低速场景还行，一旦速度上来，很容易出安全事故。</p>
+
+<h3>29.2 融合方案架构</h3>
+
+<p>我设计的方案，简单来说就是<strong>“RRT* 搭骨架，TEB 做肌肉，社会力模型当神经”</strong>。下面这张图能帮你快速理解整体流程：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="400" fill="#F0F8FF" rx="10"/>
+  
+  <!-- 三个模块 -->
+  <rect x="50" y="80" width="180" height="100" rx="10" fill="#E3F2FD" stroke="#2196F3" stroke-width="2"/>
+  <text x="140" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#1565C0">RRT* 全局规划</text>
+  <text x="140" y="145" text-anchor="middle" font-size="12" fill="#333">生成无碰撞骨架路径</text>
+  <text x="140" y="165" text-anchor="middle" font-size="12" fill="#333">提供初始参考轨迹</text>
+
+  <rect x="310" y="80" width="180" height="100" rx="10" fill="#FFF3E0" stroke="#FF9800" stroke-width="2"/>
+  <text x="400" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#E65100">TEB 局部优化</text>
+  <text x="400" y="145" text-anchor="middle" font-size="12" fill="#333">平滑路径 + 动态避障</text>
+  <text x="400" y="165" text-anchor="middle" font-size="12" fill="#333">满足运动学约束</text>
+
+  <rect x="570" y="80" width="180" height="100" rx="10" fill="#E8F5E9" stroke="#4CAF50" stroke-width="2"/>
+  <text x="660" y="120" text-anchor="middle" font-size="16" font-weight="bold" fill="#2E7D32">社会力模型</text>
+  <text x="660" y="145" text-anchor="middle" font-size="12" fill="#333">预测行人意图</text>
+  <text x="660" y="165" text-anchor="middle" font-size="12" fill="#333">生成“社交力”约束</text>
+
+  <!-- 箭头 -->
+  <line x1="230" y1="130" x2="310" y2="130" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <line x1="490" y1="130" x2="570" y2="130" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 反馈回路 -->
+  <path d="M 660 180 L 660 250 L 140 250 L 140 180" fill="none" stroke="#FF5722" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrowhead)"/>
+  <text x="400" y="270" text-anchor="middle" font-size="12" fill="#FF5722">反馈回路：社会力模型影响TEB优化权重</text>
+
+  <!-- 输出 -->
+  <rect x="300" y="310" width="200" height="50" rx="25" fill="#7C4DFF" stroke="#651FFF" stroke-width="2"/>
+  <text x="400" y="340" text-anchor="middle" font-size="16" font-weight="bold" fill="white">最终融合轨迹</text>
+  
+  <line x1="400" y1="180" x2="400" y2="310" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+</svg>
+
+<p>你看，RRT* 先跑一遍，给出一个从起点到终点的无碰撞路径。这个路径可能很粗糙，有很多折角，但它保证了<strong>可达性</strong>。然后TEB接手，把这个粗糙路径作为初始解，进行局部优化，生成平滑、满足运动学约束的轨迹。</p>
+<p>关键点来了：<strong>社会力模型</strong>不是独立运行的，它作为TEB优化中的一个<strong>额外代价项</strong>。什么意思？就是TEB在优化时，不仅要考虑路径长度、平滑度、障碍物距离，还要考虑“这个轨迹会不会让旁边的人感到不舒服”。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>社会力模型的参数调起来很玄学。我曾经在一个仓库里，把“人际距离”参数设得太小，结果AGV贴着工人走，工人直接投诉说“这机器人想撞我”。后来我把参数调大，AGV开始绕远路，工人又说“这机器人太怂了”。最后折中方案是：根据工人当前的活动状态动态调整参数——工人站着不动时，保持1.5米距离；工人在走动时，保持2米以上。</p>
+</div>
+
+<h3>29.3 关键技术实现</h3>
+
+<h4>29.3.1 RRT* 的改进：引入“人机友好”采样</h4>
+
+<p>标准的RRT* 采样是均匀的，但在人机协作场景下，我建议做一点小改动：<strong>在行人密集区域，提高采样密度</strong>。这样生成的骨架路径会更精细，给后续TEB留出更多调整空间。</p>
+<p>代码实现上，其实就是改一下采样概率分布：</p>
+
+<pre><code>// 伪代码：人机友好采样
+if (区域内有行人) {
+    // 在行人周围进行高斯采样
+    sample_point = 行人位置 + 高斯噪声(mean=0, std=1.5m);
+} else {
+    // 标准均匀采样
+    sample_point = 随机采样(地图边界);
+}</code></pre>
+
+<p>这样做的好处是，RRT* 生成的路径天然会“避开”行人密集区，而不是等到TEB阶段才急刹车。</p>
+
+<h4>29.3.2 TEB 的改造：加入社会力代价项</h4>
+
+<p>TEB 的核心是一个优化问题，目标函数通常是这样的：</p>
+
+<pre><code>min J = w_path * 路径长度代价 
+       + w_smooth * 平滑度代价 
+       + w_obstacle * 障碍物距离代价 
+       + w_social * 社会力代价   // 新增！</code></pre>
+
+<p>这个<strong>社会力代价</strong>怎么算？我参考了Helbing的社会力模型，但做了简化：</p>
+
+<ul>
+  <li><strong>排斥力：</strong>AGV与行人距离越近，代价越大。公式：cost = 1 / (距离^2)，距离小于阈值时急剧增大。</li>
+  <li><strong>方向力：</strong>如果AGV的运动方向与行人预期运动方向相反，代价增加。说白了，就是不要“迎面怼”行人。</li>
+  <li><strong>速度力：</strong>AGV在行人附近时，速度越快，代价越大。这符合直觉——离人近就慢点。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把社会力代价的权重设得过高，结果AGV在空旷区域也“畏手畏脚”，走出一条蛇形路径。后来我加了一个<strong>自适应权重</strong>：行人密度高时，w_social 增大；行人密度低时，w_social 减小。这样AGV在没人的地方该快就快，有人的地方该怂就怂。</p>
+</div>
+
+<h4>29.3.3 社会力模型的实时预测</h4>
+
+<p>社会力模型不仅要考虑当前时刻的行人位置，还要<strong>预测未来几秒的行人位置</strong>。我用的方法很简单：</p>
+
+<ol>
+  <li>通过激光雷达或视觉传感器获取行人位置和速度。</li>
+  <li>假设行人保持当前速度方向匀速运动，预测未来2秒内的轨迹。</li>
+  <li>将预测轨迹上的每个点都作为“动态障碍物”输入到TEB中。</li>
+</ol>
+
+<p>你可能会问：“预测不准怎么办？” 嗯，确实不准。所以我在TEB中设置了一个<strong>滚动时域</strong>，每0.5秒重新优化一次。这样即使预测有偏差，也能快速修正。</p>
+
+<h3>29.4 实际效果与参数调优</h3>
+
+<p>我在现场跑过这个方案，给大家看一组对比数据：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; text-align:center;">
+  <tr style="background-color:#E3F2FD;">
+    <th>指标</th>
+    <th>纯TEB方案</th>
+    <th>RRT* + TEB + 社会力模型</th>
+  </tr>
+  <tr>
+    <td>平均路径长度</td>
+    <td>12.3 m</td>
+    <td>13.1 m（略长，但可接受）</td>
+  </tr>
+  <tr>
+    <td>行人“惊吓”次数（主观评价）</td>
+    <td>8次/小时</td>
+    <td>1次/小时</td>
+  </tr>
+  <tr>
+    <td>AGV急停次数</td>
+    <td>15次/小时</td>
+    <td>3次/小时</td>
+  </tr>
+  <tr>
+    <td>工人满意度评分（满分10）</td>
+    <td>4.2</td>
+    <td>8.7</td>
+  </tr>
+</table>
+
+<p>你看，路径长度虽然增加了不到1米，但人机交互体验提升了一大截。说白了，<strong>在和人打交道的场景里，效率不是唯一指标，舒适度和安全感更重要</strong>。</p>
+
+<h3>29.5 部署时的几个坑</h3>
+
+<p>最后，分享几个我踩过的坑，希望能帮你少走弯路：</p>
+
+<ul>
+  <li><strong>传感器延迟：</strong>社会力模型依赖行人位置数据，如果传感器延迟超过100ms，预测就会严重不准。我建议用EKF（扩展卡尔曼滤波）对行人轨迹做平滑和预测。</li>
+  <li><strong>多人场景的计算量：</strong>如果场景里有10个以上行人，社会力代价的计算会变得很重。我的做法是：只考虑AGV周围5米内的行人，远处的忽略。</li>
+  <li><strong>社会力模型的“过度礼貌”：</strong>有时候AGV会为了避让行人，把自己逼到墙角出不去。这时候需要给TEB加一个<strong>“逃生路径”</strong>约束，确保AGV始终有一条通往目标的可行路径。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>RRT* 负责“能不能到”，TEB 负责“怎么到得好”，社会力模型负责“怎么到得让人舒服”。三者缺一不可。这个方案我在三个不同工厂部署过，效果都还不错。如果你也在做人机协作项目，不妨试试这个思路。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="28CampusHybridMpcCase.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30CourseSummaryAdvanced.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

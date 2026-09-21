@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 全局路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="active">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 全局路径规划：Dijkstra算法、A*算法、Hybrid A*算法、路径平滑处理</h2>
+
+<p>全局路径规划，说白了就是给AGV找一条从起点到终点的路。你想想看，AGV在工厂里跑，总不能瞎撞吧？得有个“导航地图”，然后算法告诉它怎么走最省时间、最安全。</p>
+
+<p>这一章，我带你过一遍最经典的几个算法：Dijkstra、A*、Hybrid A*，还有路径平滑处理。这些算法我几乎每个项目都碰过，踩过不少坑，今天一并分享给你。</p>
+
+<h3>16.1 Dijkstra算法：最朴素的“地毯式搜索”</h3>
+
+<p>Dijkstra算法，说白了就是“广度优先搜索”的加权版。它从起点开始，一层一层往外扩，直到找到终点。我刚开始学SLAM时，觉得这算法太笨了——明明终点就在右边，它非得把左边也搜一遍。</p>
+
+<p>但后来我发现，Dijkstra有个好处：<strong>一定能找到最短路径</strong>。只要地图是静态的，它不会漏掉任何一条可能的路线。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>维护一个“距离表”，记录从起点到每个节点的最短距离。每次从未访问的节点中选一个距离最小的，然后更新它的邻居。</p>
+</div>
+
+<p>伪代码长这样：</p>
+
+<pre><code>function Dijkstra(Graph, source):
+    dist[source] = 0
+    for each vertex v in Graph:
+        if v != source:
+            dist[v] = INFINITY
+        prev[v] = UNDEFINED
+        add v to Q  // 优先队列
+
+    while Q is not empty:
+        u = vertex in Q with min dist[u]
+        remove u from Q
+
+        for each neighbor v of u:
+            alt = dist[u] + length(u, v)
+            if alt &lt; dist[v]:
+                dist[v] = alt
+                prev[v] = u
+    return dist[], prev[]</code></pre>
+
+<p>嗯，这里要注意：<strong>Dijkstra不能处理负权边</strong>。我在一个项目中遇到过，地图里有个“下坡路段”被设成了负权值，结果算法直接崩了。后来我改成A*才解决。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>Dijkstra适合小地图（比如100x100网格以内），或者需要精确最短路径的场景。如果地图很大，它的效率就太低了。</p>
+</div>
+
+<h3>16.2 A*算法：带“方向感”的搜索</h3>
+
+<p>A*算法是Dijkstra的升级版。它加了一个“启发式函数”，说白了就是给搜索一个方向感。你想想看，如果终点在右边，A*会优先往右边搜，而不是像Dijkstra那样四面八方乱扩。</p>
+
+<p>A*的核心公式很简单：</p>
+
+<pre><code>f(n) = g(n) + h(n)</code></pre>
+
+<ul>
+  <li><strong>g(n)</strong>：从起点到当前节点n的实际代价</li>
+  <li><strong>h(n)</strong>：从节点n到终点的估计代价（启发式函数）</li>
+  <li><strong>f(n)</strong>：总代价，算法优先选f(n)最小的节点</li>
+</ul>
+
+<p>启发式函数h(n)怎么选？我常用的有两种：</p>
+
+<table>
+  <tr>
+    <th>启发式函数</th>
+    <th>适用场景</th>
+    <th>特点</th>
+  </tr>
+  <tr>
+    <td>曼哈顿距离</td>
+    <td>四方向移动（上下左右）</td>
+    <td>计算快，但可能不是最优</td>
+  </tr>
+  <tr>
+    <td>欧几里得距离</td>
+    <td>八方向移动（可斜走）</td>
+    <td>更精确，但计算稍慢</td>
+  </tr>
+</table>
+
+<p>我曾经在一个仓库项目里，用曼哈顿距离做A*，结果AGV老是走“之”字形路径，看着特别别扭。后来换成欧几里得距离，路径就顺多了。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong>如果h(n)估计值比实际值大，A*就退化成Dijkstra了。如果h(n)估计值比实际值小太多，A*可能找不到最短路径。所以h(n)要选得“可采纳”——即不大于实际代价。</p>
+</div>
+
+<h3>16.3 Hybrid A*算法：让路径更“可驾驶”</h3>
+
+<p>A*算法虽然快，但它生成的路径是一段段直线，AGV没法直接跟着走——你想想看，AGV有转弯半径，不能像像素点一样瞬间转向。这就是Hybrid A*要解决的问题。</p>
+
+<p>Hybrid A*是A*的变种，它把<strong>连续状态空间</strong>考虑进去了。说白了，它不光规划位置，还规划朝向和曲率。我最早接触Hybrid A*是在做无人驾驶项目时，当时觉得这算法太巧妙了。</p>
+
+<p>它的核心区别在于：</p>
+
+<ul>
+  <li><strong>A*</strong>：在离散网格上搜索，每个格子只有一个状态</li>
+  <li><strong>Hybrid A*</strong>：在连续空间里搜索，每个格子可以有多个状态（不同朝向、速度）</li>
+</ul>
+
+<p>Hybrid A*的搜索过程大致如下：</p>
+
+<ol>
+  <li>从起点开始，用车辆运动模型生成一系列可能的轨迹（比如左转、直行、右转）</li>
+  <li>对每条轨迹，计算终点状态（位置+朝向）</li>
+  <li>用A*的启发式函数评估这些状态，选最优的继续扩展</li>
+  <li>重复直到到达终点附近</li>
+</ol>
+
+<p>伪代码示例：</p>
+
+<pre><code>function HybridAStar(start, goal):
+    open_set = PriorityQueue()
+    open_set.add(start)
+    closed_set = {}
+
+    while not open_set.empty():
+        current = open_set.pop()
+        if distance(current, goal) &lt; threshold:
+            return reconstruct_path(current)
+
+        for each control_input in [steer_left, steer_straight, steer_right]:
+            next_state = motion_model(current, control_input)
+            if is_collision(next_state):
+                continue
+            if next_state not in closed_set:
+                closed_set.add(next_state)
+                next_state.g = current.g + cost(current, next_state)
+                next_state.h = heuristic(next_state, goal)
+                open_set.add(next_state)
+    return failure</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>Hybrid A*的计算量比A*大很多，所以一般会配合“Reeds-Shepp曲线”做终点附近的精确连接。我习惯在距离终点5米以内时，直接用Reeds-Shepp曲线生成路径，而不是继续搜索。</p>
+</div>
+
+<h3>16.4 路径平滑处理：让AGV走得“优雅”</h3>
+
+<p>不管是A*还是Hybrid A*，生成的路径都可能存在“折角”或“抖动”。AGV如果直接跟着走，要么急转弯，要么来回晃。所以我们需要做路径平滑处理。</p>
+
+<p>常用的平滑方法有几种：</p>
+
+<table>
+  <tr>
+    <th>方法</th>
+    <th>原理</th>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>B样条曲线</td>
+    <td>用控制点生成平滑曲线</td>
+    <td>局部可控，计算快</td>
+    <td>可能偏离原始路径</td>
+  </tr>
+  <tr>
+    <td>贝塞尔曲线</td>
+    <td>用控制点生成多项式曲线</td>
+    <td>简单直观</td>
+    <td>全局影响，调整麻烦</td>
+  </tr>
+  <tr>
+    <td>梯度下降平滑</td>
+    <td>优化路径点，最小化曲率</td>
+    <td>可保留路径形状</td>
+    <td>迭代计算，可能慢</td>
+  </tr>
+</table>
+
+<p>我个人最常用的是<strong>梯度下降平滑</strong>。它的思路很简单：把路径上的每个点看作一个“粒子”，然后施加两种力——</p>
+
+<ul>
+  <li><strong>平滑力</strong>：让相邻点尽量共线（减小曲率）</li>
+  <li><strong>吸引力</strong>：让点尽量靠近原始路径（不偏离太远）</li>
+</ul>
+
+<p>代码实现大概长这样：</p>
+
+<pre><code>def smooth_path(path, alpha=0.5, beta=0.1, iterations=100):
+    """
+    alpha: 平滑权重（越大越平滑）
+    beta: 吸引权重（越大越贴近原始路径）
+    """
+    new_path = path.copy()
+    for _ in range(iterations):
+        for i in range(1, len(path) - 1):
+            # 平滑项：让点靠近相邻点的中点
+            smooth_term = (new_path[i-1] + new_path[i+1]) / 2 - new_path[i]
+            # 吸引项：让点靠近原始路径
+            attract_term = path[i] - new_path[i]
+            # 更新
+            new_path[i] += alpha * smooth_term + beta * attract_term
+    return new_path</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>平滑后的路径一定要做碰撞检测！我曾经有一次平滑做得太猛，路径直接穿墙了。后来我加了一步“碰撞检查+局部调整”，才解决这个问题。</p>
+</div>
+
+<h3>16.5 知识体系总览</h3>
+
+<p>下面这张图，我把这一章的核心逻辑画出来了。你一看就明白：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">全局路径规划知识体系</text>
+  
+  <!-- 主节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="10" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">全局路径规划</text>
+  
+  <!-- 分支1：Dijkstra -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="50" y="180" width="200" height="50" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Dijkstra算法</text>
+  
+  <!-- 分支2：A* -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="300" y="180" width="200" height="50" rx="10" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">A*算法</text>
+  
+  <!-- 分支3：Hybrid A* -->
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="550" y="180" width="200" height="50" rx="10" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="650" y="210" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Hybrid A*算法</text>
+  
+  <!-- Dijkstra子节点 -->
+  <line x1="100" y1="230" x2="100" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="20" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="100" y="305" text-anchor="middle" font-size="12" fill="white">广度优先 + 加权</text>
+  
+  <line x1="200" y1="230" x2="200" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="120" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="200" y="305" text-anchor="middle" font-size="12" fill="white">保证最短路径</text>
+  
+  <!-- A*子节点 -->
+  <line x1="350" y1="230" x2="300" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="220" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="300" y="305" text-anchor="middle" font-size="12" fill="white">启发式函数 h(n)</text>
+  
+  <line x1="450" y1="230" x2="500" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="420" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="500" y="305" text-anchor="middle" font-size="12" fill="white">f(n) = g(n) + h(n)</text>
+  
+  <!-- Hybrid A*子节点 -->
+  <line x1="600" y1="230" x2="550" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="470" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="550" y="305" text-anchor="middle" font-size="12" fill="white">连续状态空间</text>
+  
+  <line x1="700" y1="230" x2="700" y2="280" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="620" y="280" width="160" height="40" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="1"/>
+  <text x="700" y="305" text-anchor="middle" font-size="12" fill="white">运动模型驱动</text>
+  
+  <!-- 路径平滑 -->
+  <line x1="400" y1="330" x2="400" y2="380" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="300" y="380" width="200" height="50" rx="10" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" fill="white" font-weight="bold">路径平滑处理</text>
+  
+  <!-- 平滑子节点 -->
+  <line x1="250" y1="430" x2="150" y2="460" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="50" y="450" width="200" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="1"/>
+  <text x="150" y="475" text-anchor="middle" font-size="12" fill="white">B样条 / 贝塞尔曲线</text>
+  
+  <line x1="400" y1="430" x2="400" y2="460" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="300" y="450" width="200" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="1"/>
+  <text x="400" y="475" text-anchor="middle" font-size="12" fill="white">梯度下降平滑</text>
+  
+  <line x1="550" y1="430" x2="650" y2="460" stroke="#7f8c8d" stroke-width="2"/>
+  <rect x="550" y="450" width="200" height="40" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="1"/>
+  <text x="650" y="475" text-anchor="middle" font-size="12" fill="white">碰撞检测 + 局部调整</text>
+</svg>
+
+<p>从这张图你能看到，全局路径规划的核心就是“搜索+平滑”。Dijkstra是基础，A*加了方向感，Hybrid A*考虑了车辆运动约束，最后平滑处理让路径可执行。每一步都有它的意义。</p>
+
+<p>好了，这一章就到这里。记住：<strong>没有最好的算法，只有最合适的算法</strong>。选哪个，取决于你的地图大小、AGV的运动模型、还有你对路径质量的要求。</p>
+
+<div class="footer-nav">
+            <a href="15MapProcessOptimize.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17LocalPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

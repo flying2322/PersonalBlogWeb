@@ -1,0 +1,433 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 图搜索基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="active">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 图搜索基础——DFS、BFS与Dijkstra算法原理</h2>
+
+<p>各位同学，今天我们来聊聊图搜索。说实话，很多做AGV路径规划的朋友，一上来就盯着A*算法看，结果调参调到怀疑人生。我当年也是这么过来的——后来才发现，真正理解DFS、BFS和Dijkstra，才是打好地基的关键。</p>
+
+<p>你想想看，A*算法本质上就是Dijkstra加了个启发式函数。如果连Dijkstra都没吃透，那A*的G值和H值怎么权衡，你心里肯定没底。所以这一章，咱们把这三个基础算法彻底讲明白。</p>
+
+<h3>3.1 图的基本概念</h3>
+
+<p>先简单回顾一下图是什么。图由节点（Node）和边（Edge）组成。在AGV场景里，节点就是地图上的位置点，边就是可通行的路径。</p>
+
+<p>图分两种：</p>
+<ul>
+  <li><strong>有向图</strong>：边有方向，比如AGV只能单向行驶的通道</li>
+  <li><strong>无向图</strong>：边没有方向，双向通行</li>
+</ul>
+
+<p>还有一种叫加权图，每条边带一个权重。在AGV里，权重可以是距离、时间、能耗，甚至风险系数。我个人习惯把权重统一设为时间，因为AGV调度最关心的就是时效。</p>
+
+<div class="highlight">
+  <p><strong>核心概念</strong>：搜索算法要解决的核心问题，就是「从起点到终点，找一条路径」。至于找得快不快、路径好不好，就看算法怎么遍历图了。</p>
+</div>
+
+<h3>3.2 深度优先搜索（DFS）</h3>
+
+<p>DFS的思路很简单：一条路走到黑，撞了南墙再回头。</p>
+
+<p>具体做法是：从起点出发，沿着一条边一直往下走，直到走不动了（没有未访问的邻居），然后回溯到上一个节点，换一条路继续走。</p>
+
+<h4>3.2.1 DFS的伪代码</h4>
+
+<pre><code>function DFS(start, goal):
+    stack = [start]
+    visited = set()
+    
+    while stack is not empty:
+        current = stack.pop()
+        if current == goal:
+            return path
+        
+        for neighbor in current.neighbors:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                stack.push(neighbor)
+    return None</code></pre>
+
+<p>注意这里用的是栈（Stack），后进先出。这就是DFS能「一条路走到黑」的原因。</p>
+
+<h4>3.2.2 DFS的特点</h4>
+
+<table>
+  <tr>
+    <th>特性</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>完备性</td>
+    <td>有限图里能找到解，但可能不是最优解</td>
+  </tr>
+  <tr>
+    <td>时间复杂度</td>
+    <td>O(V+E)，V是节点数，E是边数</td>
+  </tr>
+  <tr>
+    <td>空间复杂度</td>
+    <td>O(V)，最坏情况要存所有节点</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>拓扑排序、连通性检测、迷宫求解</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经在AGV调度系统里用DFS做路径搜索，结果地图稍微大一点，算法就跑了几分钟还没出结果。为什么？因为DFS会盲目地往深处钻，如果目标节点在浅层，它反而要绕一大圈。所以DFS不适合做AGV的实时路径规划。</p>
+</div>
+
+<h3>3.3 广度优先搜索（BFS）</h3>
+
+<p>BFS和DFS正好相反。它是层层推进，像水波一样扩散。</p>
+
+<p>从起点开始，先访问所有距离为1的节点，再访问距离为2的节点，以此类推。直到找到目标节点。</p>
+
+<h4>3.3.1 BFS的伪代码</h4>
+
+<pre><code>function BFS(start, goal):
+    queue = [start]
+    visited = set()
+    parent = {}
+    
+    while queue is not empty:
+        current = queue.pop(0)
+        if current == goal:
+            return reconstruct_path(parent, start, goal)
+        
+        for neighbor in current.neighbors:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                parent[neighbor] = current
+                queue.append(neighbor)
+    return None</code></pre>
+
+<p>这里用的是队列（Queue），先进先出。所以BFS会先处理离起点近的节点。</p>
+
+<h4>3.3.2 BFS的特点</h4>
+
+<table>
+  <tr>
+    <th>特性</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>完备性</td>
+    <td>能找到解，且是步数最少的解（无权图）</td>
+  </tr>
+  <tr>
+    <td>时间复杂度</td>
+    <td>O(V+E)</td>
+  </tr>
+  <tr>
+    <td>空间复杂度</td>
+    <td>O(V)，需要存储所有已访问节点</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>无权图的最短路径、社交网络分析</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：BFS在AGV里有个很实用的场景——当所有路径的代价都相同时（比如网格地图），BFS能找到最短路径。但一旦引入权重（比如不同路面的摩擦系数不同），BFS就失效了。这时候就得请出Dijkstra。</p>
+</div>
+
+<h3>3.4 Dijkstra算法</h3>
+
+<p>Dijkstra算法是BFS的升级版。它解决了加权图的最短路径问题。</p>
+
+<p>核心思想：维护一个「当前最短距离」表，每次从未处理的节点中选一个距离最小的，然后更新它的邻居。</p>
+
+<h4>3.4.1 Dijkstra的伪代码</h4>
+
+<pre><code>function Dijkstra(start, goal):
+    dist = {node: INF for node in graph}
+    dist[start] = 0
+    pq = [(0, start)]  // 优先队列
+    parent = {}
+    
+    while pq is not empty:
+        current_dist, current = pq.pop()
+        if current == goal:
+            return reconstruct_path(parent, start, goal)
+        
+        if current_dist > dist[current]:
+            continue
+        
+        for neighbor, weight in current.neighbors:
+            new_dist = dist[current] + weight
+            if new_dist < dist[neighbor]:
+                dist[neighbor] = new_dist
+                parent[neighbor] = current
+                pq.push((new_dist, neighbor))
+    return None</code></pre>
+
+<p>注意这里用了优先队列（Priority Queue），每次取出距离最小的节点。这就是Dijkstra比BFS聪明的地方——它知道先处理「最有希望」的节点。</p>
+
+<h4>3.4.2 Dijkstra的特点</h4>
+
+<table>
+  <tr>
+    <th>特性</th>
+    <th>说明</th>
+  </tr>
+  <tr>
+    <td>完备性</td>
+    <td>能找到解，且是加权图的最短路径</td>
+  </tr>
+  <tr>
+    <td>时间复杂度</td>
+    <td>O((V+E)logV)，使用二叉堆优化</td>
+  </tr>
+  <tr>
+    <td>空间复杂度</td>
+    <td>O(V)</td>
+  </tr>
+  <tr>
+    <td>适用场景</td>
+    <td>加权图的最短路径、网络路由、AGV路径规划</td>
+  </tr>
+</table>
+
+<div class="highlight">
+  <p><strong>重要提醒</strong>：Dijkstra要求所有边的权重必须是非负的。如果有负权边，算法会陷入死循环。我在实际项目中遇到过这个问题——有一次地图里设置了「下坡路」的负权重，结果Dijkstra跑出来的路径完全不对。后来改用Bellman-Ford才解决。</p>
+</div>
+
+<h3>3.5 三种算法的对比</h3>
+
+<p>为了让你看得更清楚，我画了一张对比图：</p>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">DFS vs BFS vs Dijkstra 对比</text>
+  
+  <!-- 算法名称 -->
+  <text x="100" y="80" text-anchor="middle" font-size="16" font-weight="bold" fill="#e74c3c">DFS</text>
+  <text x="400" y="80" text-anchor="middle" font-size="16" font-weight="bold" fill="#27ae60">BFS</text>
+  <text x="700" y="80" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">Dijkstra</text>
+  
+  <!-- 数据结构 -->
+  <text x="100" y="120" text-anchor="middle" font-size="14" fill="#555">栈 (Stack)</text>
+  <text x="400" y="120" text-anchor="middle" font-size="14" fill="#555">队列 (Queue)</text>
+  <text x="700" y="120" text-anchor="middle" font-size="14" fill="#555">优先队列</text>
+  
+  <!-- 搜索策略 -->
+  <text x="100" y="160" text-anchor="middle" font-size="14" fill="#555">深度优先</text>
+  <text x="400" y="160" text-anchor="middle" font-size="14" fill="#555">广度优先</text>
+  <text x="700" y="160" text-anchor="middle" font-size="14" fill="#555">最小代价优先</text>
+  
+  <!-- 路径质量 -->
+  <text x="100" y="200" text-anchor="middle" font-size="14" fill="#555">不一定最优</text>
+  <text x="400" y="200" text-anchor="middle" font-size="14" fill="#555">无权图最优</text>
+  <text x="700" y="200" text-anchor="middle" font-size="14" fill="#555">加权图最优</text>
+  
+  <!-- 适用场景 -->
+  <text x="100" y="240" text-anchor="middle" font-size="14" fill="#555">拓扑排序</text>
+  <text x="400" y="240" text-anchor="middle" font-size="14" fill="#555">无权最短路径</text>
+  <text x="700" y="240" text-anchor="middle" font-size="14" fill="#555">AGV路径规划</text>
+  
+  <!-- 分隔线 -->
+  <line x1="250" y1="60" x2="250" y2="280" stroke="#ddd" stroke-width="2"/>
+  <line x1="550" y1="60" x2="550" y2="280" stroke="#ddd" stroke-width="2"/>
+  
+  <!-- 底部总结 -->
+  <rect x="50" y="300" width="700" height="80" rx="8" fill="#fff3cd" stroke="#ffc107" stroke-width="2"/>
+  <text x="400" y="330" text-anchor="middle" font-size="14" font-weight="bold" fill="#856404">总结</text>
+  <text x="400" y="355" text-anchor="middle" font-size="13" fill="#856404">DFS适合探索所有可能路径，BFS适合无权图最短路径，Dijkstra是AGV路径规划的基础</text>
+</svg>
+
+<h3>3.6 实际应用中的选择建议</h3>
+
+<p>说了这么多理论，咱们来点实际的。在AGV路径规划里，到底该用哪个？</p>
+
+<ul>
+  <li><strong>地图很小（几十个节点）</strong>：用DFS就够了，简单粗暴</li>
+  <li><strong>地图中等（几百个节点），所有路径代价相同</strong>：BFS是最佳选择，能找到最短路径</li>
+  <li><strong>地图大（几千个节点），路径有不同权重</strong>：必须用Dijkstra，或者它的升级版A*</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的建议</strong>：如果你刚开始做AGV项目，先用Dijkstra打底。等跑通了，再考虑优化成A*。我见过太多人一上来就搞A*，结果启发式函数设计不好，反而比Dijkstra还慢。基础打牢了，后面才能飞得起来。</p>
+</div>
+
+<h3>3.7 本章小结</h3>
+
+<p>这一章我们讲了三个基础搜索算法：</p>
+<ul>
+  <li>DFS：深度优先，用栈，适合探索</li>
+  <li>BFS：广度优先，用队列，适合无权图最短路径</li>
+  <li>Dijkstra：最小代价优先，用优先队列，适合加权图最短路径</li>
+</ul>
+
+<p>这三个算法是图搜索的基石。下一章我们会看到，A*算法就是在Dijkstra的基础上加了一个启发式函数，让搜索更有方向感。但如果你连Dijkstra都没搞明白，那A*的调参绝对会让你头疼。</p>
+
+<p>好了，今天就到这里。建议你动手写写代码，把这三个算法都实现一遍。纸上得来终觉浅，绝知此事要躬行。</p>
+
+        <div class="footer-nav">
+            <a href="02EnvModelingBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04HeuristicSearchIntro.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

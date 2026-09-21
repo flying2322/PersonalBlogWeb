@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 地图构建基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="active">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 地图构建基础——地图类型与坐标变换</h2>
+
+<p>各位同学，今天我们来聊聊地图构建的底子。说实话，地图是AGV导航的灵魂。没有地图，AGV就是个瞎子。我在项目里见过太多人一上来就调路径规划，结果地图没建好，车跑得再快也是乱撞。</p>
+
+<p>这一章，我们重点讲三件事：地图有哪些类型、坐标系怎么玩、坐标变换怎么算。嗯，都是基本功，但也是后面所有高级功能的地基。</p>
+
+<h3>3.1 地图类型：三种主流方案</h3>
+
+<p>AGV用的地图，说白了就三种：栅格地图、拓扑地图、特征地图。每种都有它的脾气，我一个个说。</p>
+
+<h4>3.1.1 栅格地图（Occupancy Grid Map）</h4>
+
+<p>这是最直观的一种。把环境切成一个个小格子，每个格子标记为“有障碍”或“无障碍”。就像像素画一样。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>用概率表示每个格子被占用的可能性。0表示空闲，1表示占用，0.5表示未知。</p>
+</div>
+
+<p>我个人习惯用栅格地图做室内导航。为什么？因为它简单、直观，激光雷达扫一圈，直接往格子里填概率就行。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>容易构建和维护</li>
+  <li>适合路径规划（A*、Dijkstra直接跑）</li>
+  <li>能表达任意形状的环境</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>存储量大（100m×100m，0.05m分辨率，就是400万个格子）</li>
+  <li>对动态环境敏感</li>
+  <li>精度受分辨率限制</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>分辨率别设太高。0.05m够用了，再细就是浪费内存。我曾经有个项目，把分辨率设成0.01m，结果地图文件300MB，AGV加载都要半分钟。后来改成0.05m，效果差不多，文件只有30MB。</p>
+</div>
+
+<h4>3.1.2 拓扑地图（Topological Map）</h4>
+
+<p>拓扑地图不关心具体尺寸，只关心“节点”和“边”。节点代表关键位置（比如路口、工位），边代表连通关系。</p>
+
+<p>你想想看，地铁线路图就是典型的拓扑地图。它不告诉你站台有多宽、轨道有多长，只告诉你哪站能换乘。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>存储量极小</li>
+  <li>适合大规模环境</li>
+  <li>路径规划速度快</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>无法精确定位</li>
+  <li>构建需要人工标注或额外算法</li>
+  <li>对动态环境适应性差</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>拓扑地图不能单独用于精确导航。我见过有人只用拓扑地图做AGV导航，结果车在走廊里走歪了也不知道。拓扑地图必须配合其他定位手段（比如二维码、UWB）才能用。</p>
+</div>
+
+<h4>3.1.3 特征地图（Feature Map）</h4>
+
+<p>特征地图提取环境中的几何特征，比如墙、柱子、角点。它不存所有点，只存“有意义”的点。</p>
+
+<p>举个例子：一个房间有四面墙、四个角、一根柱子。特征地图就存这9个特征，而不是几万个激光点。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>存储量适中</li>
+  <li>适合做SLAM（特征匹配方便）</li>
+  <li>对动态环境有一定鲁棒性</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>特征提取算法复杂</li>
+  <li>在空旷环境（比如大仓库）特征太少</li>
+  <li>对传感器质量要求高</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>选型建议：</strong></p>
+  <ul>
+    <li>室内小场景（<1000m²）：栅格地图</li>
+    <li>大场景（>10000m²）：拓扑地图+局部栅格地图</li>
+    <li>需要SLAM：特征地图+栅格地图混合</li>
+  </ul>
+</div>
+
+<h3>3.2 坐标系：AGV的“世界观”</h3>
+
+<p>坐标系这东西，说白了就是给AGV一个“我在哪”的参考系。AGV导航里，我们至少需要三个坐标系。</p>
+
+<h4>3.2.1 世界坐标系（World Frame）</h4>
+
+<p>也叫全局坐标系。它是固定的，通常以地图原点为基准。所有物体的绝对位置都用世界坐标表示。</p>
+
+<p>比如：仓库的东北角是(0,0)，货架A在(10, 5)，充电站在(20, 0)。</p>
+
+<h4>3.2.2 机器人坐标系（Robot Frame）</h4>
+
+<p>以AGV自身为原点。通常定义：车头方向为X轴正方向，左侧为Y轴正方向。</p>
+
+<p>这个坐标系是动的。AGV往前走，坐标系也跟着走。</p>
+
+<h4>3.2.3 传感器坐标系（Sensor Frame）</h4>
+
+<p>激光雷达、摄像头、IMU都有自己的坐标系。它们相对于机器人坐标系有一个固定的偏移和旋转。</p>
+
+<p>举个例子：激光雷达装在车头前方0.3米处，那它的坐标就是(0.3, 0, 0)（相对于机器人坐标系）。</p>
+
+<div class="tip">
+  <p><strong>避坑指南：</strong>我曾经犯过一个低级错误——把激光雷达的安装位置量错了5厘米。结果建出来的地图全是歪的，AGV定位偏差10厘米以上。后来花了整整两天排查，才发现是传感器外参标定出了问题。所以，安装参数一定要反复核对。</p>
+</div>
+
+<h3>3.3 坐标变换：从传感器到世界</h3>
+
+<p>坐标变换，就是把一个坐标系下的点，换算到另一个坐标系下。AGV导航里，我们经常要做三件事：</p>
+
+<ol>
+  <li>把激光雷达的点云从传感器坐标系转到机器人坐标系</li>
+  <li>把机器人坐标系下的障碍物转到世界坐标系</li>
+  <li>把目标点从世界坐标系转到机器人坐标系</li>
+</ol>
+
+<h4>3.3.1 二维坐标变换公式</h4>
+
+<p>二维空间里，坐标变换就是旋转+平移。公式很简单：</p>
+
+<pre><code>// 点P在坐标系A下的坐标是(x_a, y_a)
+// 坐标系A到坐标系B的变换：旋转θ，平移(tx, ty)
+// 点P在坐标系B下的坐标：
+
+x_b = x_a * cos(θ) - y_a * sin(θ) + tx
+y_b = x_a * sin(θ) + y_a * cos(θ) + ty</code></pre>
+
+<p>嗯，其实就是旋转矩阵加上平移向量。我建议你把这个公式背下来，后面写代码天天用。</p>
+
+<h4>3.3.2 齐次坐标与变换矩阵</h4>
+
+<p>为了计算方便，我们通常用齐次坐标。把二维点(x, y)写成(x, y, 1)，变换就变成了矩阵乘法：</p>
+
+<pre><code>// 变换矩阵 T
+// [cosθ  -sinθ  tx]
+// [sinθ   cosθ  ty]
+// [  0      0    1 ]
+
+// 点P的齐次坐标
+// [x]
+// [y]
+// [1]
+
+// 变换后的坐标 = T * P</code></pre>
+
+<p>为什么用齐次坐标？因为可以把旋转和平移写在一个矩阵里，方便链式变换。比如：</p>
+
+<pre><code>// 传感器坐标 -> 机器人坐标 -> 世界坐标
+T_world_sensor = T_world_robot * T_robot_sensor</code></pre>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>坐标变换的链式法则——从A到C的变换，等于从A到B的变换乘以从B到C的变换。顺序不能搞反，矩阵乘法不满足交换律。</p>
+</div>
+
+<h4>3.3.3 实际应用：激光点云投影</h4>
+
+<p>我举个实际例子。激光雷达扫到一个点，距离2米，角度30度。怎么把它画到地图上？</p>
+
+<pre><code>// 1. 传感器坐标系下的坐标
+float range = 2.0;  // 距离
+float angle = 30.0 * M_PI / 180.0;  // 转弧度
+float x_sensor = range * cos(angle);  // 1.732m
+float y_sensor = range * sin(angle);  // 1.0m
+
+// 2. 转到机器人坐标系（假设激光雷达装在车头前方0.3m）
+float x_robot = x_sensor + 0.3;  // 2.032m
+float y_robot = y_sensor;        // 1.0m
+
+// 3. 转到世界坐标系（假设机器人当前位置(5, 3)，朝向45度）
+float theta = 45.0 * M_PI / 180.0;
+float x_world = x_robot * cos(theta) - y_robot * sin(theta) + 5.0;
+float y_world = x_robot * sin(theta) + y_robot * cos(theta) + 3.0;
+
+// 结果：这个激光点在世界坐标系下的位置
+printf("世界坐标: (%.3f, %.3f)\n", x_world, y_world);</code></pre>
+
+<p>你看，三步变换，清清楚楚。我在写代码时，习惯把每一步的变换都封装成函数，这样不容易出错。</p>
+
+<div class="warning">
+  <p><strong>常见错误：</strong></p>
+  <ul>
+    <li>角度单位搞混（度 vs 弧度）——我吃过这个亏，一次调试花了3小时</li>
+    <li>变换顺序搞反——先旋转后平移，不是先平移后旋转</li>
+    <li>忘记更新机器人位姿——AGV在动，坐标系也在动，每帧都要重新计算</li>
+  </ul>
+</div>
+
+<h3>3.4 知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的地图构建知识体系。你把它存下来，后面学完整个课程再回来看，会有更深的理解。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">地图构建基础：知识体系</text>
+  
+  <!-- 地图类型分支 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图类型</text>
+  
+  <rect x="30" y="150" width="120" height="40" rx="5" fill="#2980b9"/>
+  <text x="90" y="175" text-anchor="middle" font-size="13" fill="white">栅格地图</text>
+  
+  <rect x="170" y="150" width="120" height="40" rx="5" fill="#2980b9"/>
+  <text x="230" y="175" text-anchor="middle" font-size="13" fill="white">拓扑地图</text>
+  
+  <rect x="100" y="220" width="120" height="40" rx="5" fill="#2980b9"/>
+  <text x="160" y="245" text-anchor="middle" font-size="13" fill="white">特征地图</text>
+  
+  <!-- 连线 -->
+  <line x1="150" y1="120" x2="90" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="150" y1="120" x2="230" y2="150" stroke="#3498db" stroke-width="2"/>
+  <line x1="90" y1="190" x2="160" y2="220" stroke="#3498db" stroke-width="2"/>
+  <line x1="230" y1="190" x2="160" y2="220" stroke="#3498db" stroke-width="2"/>
+  
+  <!-- 坐标系分支 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">坐标系</text>
+  
+  <rect x="280" y="150" width="120" height="40" rx="5" fill="#c0392b"/>
+  <text x="340" y="175" text-anchor="middle" font-size="13" fill="white">世界坐标系</text>
+  
+  <rect x="420" y="150" width="120" height="40" rx="5" fill="#c0392b"/>
+  <text x="480" y="175" text-anchor="middle" font-size="13" fill="white">机器人坐标系</text>
+  
+  <rect x="350" y="220" width="120" height="40" rx="5" fill="#c0392b"/>
+  <text x="410" y="245" text-anchor="middle" font-size="13" fill="white">传感器坐标系</text>
+  
+  <!-- 连线 -->
+  <line x1="400" y1="120" x2="340" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="400" y1="120" x2="480" y2="150" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="340" y1="190" x2="410" y2="220" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="480" y1="190" x2="410" y2="220" stroke="#e74c3c" stroke-width="2"/>
+  
+  <!-- 坐标变换分支 -->
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">坐标变换</text>
+  
+  <rect x="530" y="150" width="120" height="40" rx="5" fill="#1e8449"/>
+  <text x="590" y="175" text-anchor="middle" font-size="13" fill="white">旋转+平移</text>
+  
+  <rect x="670" y="150" width="120" height="40" rx="5" fill="#1e8449"/>
+  <text x="730" y="175" text-anchor="middle" font-size="13" fill="white">齐次坐标</text>
+  
+  <rect x="600" y="220" width="120" height="40" rx="5" fill="#1e8449"/>
+  <text x="660" y="245" text-anchor="middle" font-size="13" fill="white">链式变换</text>
+  
+  <!-- 连线 -->
+  <line x1="650" y1="120" x2="590" y2="150" stroke="#27ae60" stroke-width="2"/>
+  <line x1="650" y1="120" x2="730" y2="150" stroke="#27ae60" stroke-width="2"/>
+  <line x1="590" y1="190" x2="660" y2="220" stroke="#27ae60" stroke-width="2"/>
+  <line x1="730" y1="190" x2="660" y2="220" stroke="#27ae60" stroke-width="2"/>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="310" width="600" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="400" y="335" text-anchor="middle" font-size="14" fill="white">核心：地图类型决定“存什么”，坐标系决定“在哪看”，坐标变换决定“怎么算”</text>
+  <text x="400" y="355" text-anchor="middle" font-size="13" fill="white">三者缺一不可，共同构成AGV导航的地图基础</text>
+  
+  <!-- 箭头连接 -->
+  <line x1="250" y1="95" x2="300" y2="95" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="500" y1="95" x2="550" y2="95" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="12" fill="#7f8c8d">图3-1 地图构建基础知识体系结构图</text>
+</svg>
+
+<p>这张图把本章的三个核心内容串起来了。地图类型决定了你用什么方式存环境信息，坐标系定义了参考基准，坐标变换则负责在不同参考系之间转换数据。这三者就像三脚架，缺一个，AGV导航就站不稳。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>学完这一章，你最好自己动手写一个小程序：</p>
+  <ol>
+    <li>定义一个2D栅格地图（100×100，分辨率0.1m）</li>
+    <li>模拟一个激光雷达，在几个位置扫描</li>
+    <li>把扫描结果通过坐标变换投影到地图上</li>
+    <li>可视化显示结果</li>
+  </ol>
+  <p>这个练习做完，你对地图构建的理解会上一个台阶。我当年就是这么学的。</p>
+</div>
+
+<p>好了，地图构建的基础就讲到这里。记住：地图类型选对，坐标系理清，变换算准，后面的事情就顺了。</p>
+
+<div class="footer-nav">
+            <a href="02NavigationTechBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04SensorPrinciples.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

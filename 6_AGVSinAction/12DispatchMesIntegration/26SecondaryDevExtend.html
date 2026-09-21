@@ -1,0 +1,494 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 二次开发与扩展</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="active">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 二次开发与扩展：插件化架构设计、自定义任务类型、自定义报表、自定义告警规则</h2>
+
+<p>各位做MES-AGV集成的朋友，大家好。这一章我们聊点“硬核”的——二次开发与扩展。</p>
+<p>说实话，我做了这么多年系统集成，最怕听到的一句话就是：“这个功能标准产品不支持，你们改代码吧。” 改代码一时爽，维护火葬场。所以，一个优秀的AGV调度系统，必须预留好扩展接口。今天我就把我在几个大型项目中积累的插件化设计经验，掰开揉碎了讲给你听。</p>
+
+<h3>26.1 为什么需要插件化架构？</h3>
+<p>先问大家一个问题：你见过那种“大泥球”式的调度系统吗？所有逻辑揉在一起，加一个自定义任务类型，要改十几个文件。我见过，而且我接手过。</p>
+<p>插件化架构，说白了就是把系统核心和扩展功能解耦。核心负责调度引擎、路径规划、交通管制这些“硬骨头”。而像自定义任务、报表、告警这些，都做成插件。插上去就能用，拔下来也不影响核心。</p>
+<p>这样做的好处很明显：</p>
+<ul>
+    <li><strong>隔离性</strong>：插件出问题，不会拖垮整个调度系统</li>
+    <li><strong>可维护性</strong>：升级插件不用停系统，热插拔</li>
+    <li><strong>团队协作</strong>：不同团队可以并行开发不同插件</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>核心观点</strong>：插件化不是“炫技”，而是为了应对工厂现场“千奇百怪”的需求。你想想看，每个客户的MES接口都不一样，每个车间的AGV任务逻辑都有差异。没有插件化，你就是在给自己挖坑。</p>
+</div>
+
+<p>下面这张图，是我个人习惯用的插件化架构分层图。你看一眼就明白了。</p>
+
+<svg width="800" height="450" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="450" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV调度系统插件化架构</text>
+    
+    <!-- 核心层 -->
+    <rect x="50" y="60" width="700" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="400" y="95" text-anchor="middle" font-size="16" font-weight="bold" fill="white">核心调度引擎（Core）</text>
+    <text x="400" y="115" text-anchor="middle" font-size="12" fill="white">路径规划 | 交通管制 | 任务分配 | 状态管理</text>
+    
+    <!-- 扩展点层 -->
+    <rect x="50" y="140" width="700" height="40" rx="8" fill="#2ecc71" opacity="0.8"/>
+    <text x="400" y="165" text-anchor="middle" font-size="14" font-weight="bold" fill="white">扩展点接口（Extension Points）</text>
+    
+    <!-- 插件层 -->
+    <rect x="50" y="200" width="220" height="100" rx="8" fill="#e74c3c" opacity="0.7"/>
+    <text x="160" y="230" text-anchor="middle" font-size="14" font-weight="bold" fill="white">任务类型插件</text>
+    <text x="160" y="250" text-anchor="middle" font-size="11" fill="white">自定义搬运任务</text>
+    <text x="160" y="265" text-anchor="middle" font-size="11" fill="white">充电任务</text>
+    <text x="160" y="280" text-anchor="middle" font-size="11" fill="white">呼叫任务</text>
+    
+    <rect x="290" y="200" width="220" height="100" rx="8" fill="#f39c12" opacity="0.7"/>
+    <text x="400" y="230" text-anchor="middle" font-size="14" font-weight="bold" fill="white">报表插件</text>
+    <text x="400" y="250" text-anchor="middle" font-size="11" fill="white">OEE报表</text>
+    <text x="400" y="265" text-anchor="middle" font-size="11" fill="white">任务统计报表</text>
+    <text x="400" y="280" text-anchor="middle" font-size="11" fill="white">自定义图表</text>
+    
+    <rect x="530" y="200" width="220" height="100" rx="8" fill="#9b59b6" opacity="0.7"/>
+    <text x="640" y="230" text-anchor="middle" font-size="14" font-weight="bold" fill="white">告警插件</text>
+    <text x="640" y="250" text-anchor="middle" font-size="11" fill="white">邮件告警</text>
+    <text x="640" y="265" text-anchor="middle" font-size="11" fill="white">短信告警</text>
+    <text x="640" y="280" text-anchor="middle" font-size="11" fill="white">自定义规则</text>
+    
+    <!-- 连接线 -->
+    <line x1="400" y1="180" x2="160" y2="200" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="400" y1="180" x2="400" y2="200" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5"/>
+    <line x1="400" y1="180" x2="640" y2="200" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5"/>
+    
+    <!-- 配置层 -->
+    <rect x="50" y="320" width="700" height="40" rx="8" fill="#1abc9c" opacity="0.7"/>
+    <text x="400" y="345" text-anchor="middle" font-size="14" font-weight="bold" fill="white">插件配置中心（热加载）</text>
+    
+    <!-- 外部接口 -->
+    <rect x="50" y="380" width="700" height="50" rx="8" fill="#e67e22" opacity="0.6"/>
+    <text x="400" y="405" text-anchor="middle" font-size="14" font-weight="bold" fill="white">MES接口 | WMS接口 | ERP接口 | 第三方系统</text>
+</svg>
+
+<h3>26.2 自定义任务类型：让AGV听懂你的“方言”</h3>
+<p>标准AGV调度系统，通常只支持“从A点搬到B点”这种基础任务。但实际现场呢？我遇到过客户要求“AGV先到质检台，如果合格再送到仓库，不合格送到返修区”。这种带条件判断的任务，标准系统根本搞不定。</p>
+
+<h4>26.2.1 任务类型插件接口设计</h4>
+<p>我的做法是定义一个抽象的任务接口。所有自定义任务类型，都实现这个接口。核心调度引擎只认接口，不认具体实现。</p>
+
+<pre><code>// 任务接口定义
+public interface ICustomTask
+{
+    string TaskTypeId { get; }          // 任务类型唯一标识
+    string Description { get; }         // 任务描述
+    
+    // 任务执行前的校验
+    Task&lt;bool&gt; ValidateAsync(TaskContext context);
+    
+    // 任务执行逻辑
+    Task&lt;TaskResult&gt; ExecuteAsync(TaskContext context);
+    
+    // 任务状态变更回调
+    Task OnStatusChangedAsync(TaskStatus oldStatus, TaskStatus newStatus);
+}</code></pre>
+
+<p>嗯，这里要注意一点：<code>ValidateAsync</code> 和 <code>ExecuteAsync</code> 必须分开。为什么？我在一个项目里吃过亏——把校验逻辑写在执行里，结果任务跑到一半才发现条件不满足，AGV卡在半路上，进退两难。</p>
+
+<h4>26.2.2 实战：实现一个“质检分流任务”</h4>
+<p>我给大家看一个实际案例。这个任务类型，AGV接到指令后，先去质检台，然后根据质检结果决定下一步。</p>
+
+<pre><code>public class QualityInspectionTask : ICustomTask
+{
+    public string TaskTypeId => "QUALITY_INSPECTION";
+    public string Description => "质检分流任务：先到质检台，根据结果分流";
+    
+    public async Task&lt;bool&gt; ValidateAsync(TaskContext context)
+    {
+        // 检查质检台是否空闲
+        var qcStation = context.GetStation("QC01");
+        if (qcStation == null || qcStation.IsBusy)
+        {
+            return false;  // 质检台忙，不执行
+        }
+        return true;
+    }
+    
+    public async Task&lt;TaskResult&gt; ExecuteAsync(TaskContext context)
+    {
+        // 第一步：导航到质检台
+        await context.NavigateTo("QC01");
+        
+        // 第二步：等待质检结果（通过MES接口获取）
+        var result = await context.WaitForExternalSignal("QC_RESULT", timeout: 300);
+        
+        // 第三步：根据结果分流
+        if (result == "PASS")
+        {
+            await context.NavigateTo("WH01");  // 送到仓库
+        }
+        else
+        {
+            await context.NavigateTo("REWORK"); // 送到返修区
+        }
+        
+        return TaskResult.Success;
+    }
+    
+    public Task OnStatusChangedAsync(TaskStatus oldStatus, TaskStatus newStatus)
+    {
+        // 记录日志，或者通知MES
+        Console.WriteLine($"任务状态变更: {oldStatus} -> {newStatus}");
+        return Task.CompletedTask;
+    }
+}</code></pre>
+
+<div class="tip">
+    <p><strong>避坑指南</strong>：我曾经在 <code>WaitForExternalSignal</code> 里忘记设置超时，结果MES那边网络断了，AGV在质检台前傻等了两个小时。记住，所有外部等待都要加超时，超时后要有兜底逻辑。</p>
+</div>
+
+<h3>26.3 自定义报表：数据要“看得见”</h3>
+<p>MES那边天天要报表：AGV利用率、任务完成率、平均等待时间...标准报表往往不够用。客户会说：“我要看每个工位在8:00-10:00这个时段，AGV来了多少次，平均等待多久。”</p>
+<p>这种需求，写死代码？太傻了。我习惯用报表插件+模板引擎的方式。</p>
+
+<h4>26.3.1 报表插件接口</h4>
+<pre><code>public interface IReportPlugin
+{
+    string ReportId { get; }
+    string ReportName { get; }
+    
+    // 报表数据源
+    Task&lt;DataSet&gt; GetDataAsync(ReportFilter filter);
+    
+    // 报表模板（HTML/Excel）
+    string GetTemplate();
+    
+    // 报表导出格式
+    List&lt;string&gt; SupportedFormats { get; }  // ["HTML", "Excel", "PDF"]
+}</code></pre>
+
+<p>我个人习惯用 <strong>Razor模板引擎</strong> 来生成HTML报表。为什么？因为HTML可以直接嵌入图表，用ECharts或者Chart.js画出来，客户看了直呼专业。</p>
+
+<h4>26.3.2 一个简单的报表插件示例</h4>
+<pre><code>public class AGVUtilizationReport : IReportPlugin
+{
+    public string ReportId => "AGV_UTILIZATION";
+    public string ReportName => "AGV利用率报表";
+    
+    public async Task&lt;DataSet&gt; GetDataAsync(ReportFilter filter)
+    {
+        // 从数据库查询AGV运行数据
+        var sql = @"
+            SELECT agv_id, 
+                   SUM(working_time) as working_time,
+                   SUM(idle_time) as idle_time,
+                   SUM(charging_time) as charging_time
+            FROM agv_status_log
+            WHERE timestamp BETWEEN @start AND @end
+            GROUP BY agv_id";
+        
+        return await DbHelper.QueryAsync(sql, filter);
+    }
+    
+    public string GetTemplate()
+    {
+        return @"
+&lt;h2&gt;AGV利用率报表&lt;/h2&gt;
+&lt;table border='1'&gt;
+    &lt;tr&gt;&lt;th&gt;AGV编号&lt;/th&gt;&lt;th&gt;工作时间&lt;/th&gt;&lt;th&gt;空闲时间&lt;/th&gt;&lt;th&gt;充电时间&lt;/th&gt;&lt;th&gt;利用率&lt;/th&gt;&lt;/tr&gt;
+    @foreach(var row in Model.Tables[0].Rows)
+    {
+        var utilization = row.working_time / (row.working_time + row.idle_time) * 100;
+        &lt;tr&gt;
+            &lt;td&gt;@row.agv_id&lt;/td&gt;
+            &lt;td&gt;@row.working_time 分钟&lt;/td&gt;
+            &lt;td&gt;@row.idle_time 分钟&lt;/td&gt;
+            &lt;td&gt;@row.charging_time 分钟&lt;/td&gt;
+            &lt;td&gt;@utilization.ToString(""F2"")%&lt;/td&gt;
+        &lt;/tr&gt;
+    }
+&lt;/table&gt;";
+    }
+    
+    public List&lt;string&gt; SupportedFormats => new List&lt;string&gt; { "HTML", "Excel" };
+}</code></pre>
+
+<div class="highlight">
+    <p><strong>关键点</strong>：报表插件的数据源和模板是分离的。这样，即使MES那边的数据库结构变了，你只需要改 <code>GetDataAsync</code> 方法，模板不用动。反之亦然。</p>
+</div>
+
+<h3>26.4 自定义告警规则：别让AGV“带病工作”</h3>
+<p>AGV调度系统里，告警规则是最容易“众口难调”的。有的客户觉得AGV电量低于30%就要告警，有的觉得20%才告警。还有的客户要求“如果AGV在同一个位置停留超过5分钟，就发告警”。</p>
+<p>标准系统通常只提供几个固定的告警类型。怎么办？用规则引擎插件。</p>
+
+<h4>26.4.1 告警规则插件接口</h4>
+<pre><code>public interface IAlertRule
+{
+    string RuleId { get; }
+    string RuleName { get; }
+    int Priority { get; }  // 优先级，数值越小越优先
+    
+    // 评估规则是否触发
+    Task&lt;AlertResult&gt; EvaluateAsync(AlertContext context);
+    
+    // 告警动作（邮件、短信、Webhook等）
+    Task ExecuteActionAsync(AlertResult result);
+}</code></pre>
+
+<h4>26.4.2 实战：实现“AGV长时间停留告警”</h4>
+<pre><code>public class LongStayAlertRule : IAlertRule
+{
+    public string RuleId => "LONG_STAY";
+    public string RuleName => "AGV长时间停留告警";
+    public int Priority => 5;
+    
+    public async Task&lt;AlertResult&gt; EvaluateAsync(AlertContext context)
+    {
+        // 获取所有AGV的当前位置和停留时间
+        var agvs = context.GetAllAGVs();
+        var alerts = new List&lt;AlertItem&gt;();
+        
+        foreach (var agv in agvs)
+        {
+            if (agv.Status == AGVStatus.Idle && 
+                agv.StayDuration.TotalMinutes > 5)
+            {
+                alerts.Add(new AlertItem
+                {
+                    AGVId = agv.Id,
+                    Level = AlertLevel.Warning,
+                    Message = $"AGV {agv.Id} 在 {agv.CurrentStation} 停留超过5分钟",
+                    Timestamp = DateTime.Now
+                });
+            }
+        }
+        
+        return new AlertResult { Items = alerts };
+    }
+    
+    public async Task ExecuteActionAsync(AlertResult result)
+    {
+        foreach (var item in result.Items)
+        {
+            // 发送邮件告警
+            await EmailService.SendAsync(
+                to: "operator@factory.com",
+                subject: "AGV长时间停留告警",
+                body: item.Message
+            );
+            
+            // 同时写入告警日志
+            await AlertLogger.WriteAsync(item);
+        }
+    }
+}</code></pre>
+
+<div class="warning">
+    <p><strong>注意</strong>：告警规则不要写得太“敏感”。我曾经遇到一个客户，把停留告警时间设为30秒，结果AGV在路口等交通管制，30秒很正常，结果告警邮件把运维人员的邮箱塞爆了。建议默认值设为5分钟以上，并且支持动态调整。</p>
+</div>
+
+<h3>26.5 插件热加载与配置管理</h3>
+<p>插件做出来了，怎么部署？总不能每次加个插件就重启调度系统吧？</p>
+<p>我推荐用 <strong>MEF（Managed Extensibility Framework）</strong> 或者 <strong>MAF（Managed Add-in Framework）</strong>。这两个都是.NET平台下的插件框架，支持热加载。</p>
+
+<h4>26.5.1 插件配置示例</h4>
+<pre><code>// 插件配置文件 (plugin.config)
+{
+  "plugins": [
+    {
+      "id": "QUALITY_INSPECTION",
+      "type": "task",
+      "assembly": "Plugins.QualityInspection.dll",
+      "enabled": true,
+      "config": {
+        "qcStationId": "QC01",
+        "timeoutSeconds": 300
+      }
+    },
+    {
+      "id": "LONG_STAY",
+      "type": "alert",
+      "assembly": "Plugins.LongStayAlert.dll",
+      "enabled": true,
+      "config": {
+        "stayThresholdMinutes": 5,
+        "emailRecipients": ["operator@factory.com"]
+      }
+    }
+  ]
+}</code></pre>
+
+<p>核心调度引擎启动时，扫描这个配置文件，加载所有 <code>enabled: true</code> 的插件。如果某个插件崩溃了，引擎会自动把它标记为 <code>disabled</code>，并继续运行其他插件。这就是隔离性的好处。</p>
+
+<h3>26.6 总结</h3>
+<p>好了，这一章的内容就这些。插件化架构设计，说白了就是“预留接口，开放扩展”。自定义任务类型让你能应对千奇百怪的搬运逻辑；自定义报表让数据展示随心所欲；自定义告警规则让系统更“懂”你的现场。</p>
+<p>记住一句话：好的架构，不是把所有功能都做出来，而是让其他人能轻松地做出你想要的功能。</p>
+
+<div class="highlight">
+    <p><strong>最后送大家一个经验</strong>：做插件化设计时，接口定义一定要“稳”。接口一旦发布，就不要轻易修改。因为你的插件可能来自不同的团队、不同的供应商。接口变了，所有插件都得跟着改，那就失去了插件化的意义。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="25PortTosMesCase.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27SimulatorDev.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

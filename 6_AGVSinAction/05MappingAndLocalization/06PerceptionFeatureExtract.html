@@ -1,0 +1,374 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>6 环境感知与特征提取</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="active">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>6 环境感知与特征提取</h2>
+
+<p>各位好，欢迎来到第六讲。前面几讲我们聊了地图的表示方式、定位的基本原理。今天要讲的，是AGV导航系统里最"接地气"的一环——环境感知与特征提取。</p>
+
+<p>说白了，就是AGV怎么"看懂"周围的世界。激光雷达扫出来的点云，密密麻麻几万个点，你不能直接拿它去匹配地图吧？得先提炼出有用的信息。我个人习惯把这一步叫做"从数据到知识"的转化。</p>
+
+<h3>6.1 点云预处理：别让噪声毁了你的定位</h3>
+
+<p>先说说点云处理。你想想看，激光雷达扫出来的原始数据，其实挺"脏"的。我在项目中遇到过，一台AGV在仓库里跑，旁边有台叉车经过，扬起的灰尘直接让点云里多了一堆"幽灵点"。</p>
+
+<p>所以第一步，滤波。常用的方法有这么几种：</p>
+
+<ul>
+<li><strong>体素滤波（Voxel Filter）</strong>：把空间切成小立方体，每个立方体里只保留一个代表点。说白了就是降采样，减少计算量。</li>
+<li><strong>统计滤波（Statistical Outlier Removal）</strong>：计算每个点周围邻居的平均距离，离群太远的直接干掉。我习惯把阈值设成1.5倍标准差，效果不错。</li>
+<li><strong>半径滤波（Radius Outlier Removal）</strong>：如果一个点周围指定半径内邻居太少，就认为是噪声。</li>
+</ul>
+
+<div class="tip">
+<p><strong>我的经验</strong>：体素滤波的格子大小很关键。设太大，特征细节全丢了；设太小，降采样效果不明显。室内场景我一般用0.05m，室外开阔场景可以放宽到0.1m。</p>
+</div>
+
+<p>嗯，这里要注意一点：滤波的顺序也有讲究。我建议先做体素降采样，再做统计滤波。为什么？因为降采样后点数少了，统计滤波的计算量会小很多。</p>
+
+<h3>6.2 特征提取：从点到线、面、角</h3>
+
+<p>滤波完的点云，还是几万个离散的点。怎么变成AGV能用的特征？</p>
+
+<p>我个人把特征分成三类：<strong>角点、直线、平面</strong>。这三类特征基本能覆盖室内环境90%以上的结构信息。</p>
+
+<h4>6.2.1 直线提取</h4>
+
+<p>走廊、墙壁、货架边缘，这些都是直线特征。最经典的方法是<strong>RANSAC（随机采样一致性）</strong>。</p>
+
+<p>思路很简单：随机选两个点拟合一条直线，然后数一数有多少点"支持"这条线（距离小于阈值）。重复多次，选支持点最多的那条。</p>
+
+<pre><code>// 伪代码示例
+for i = 1 to maxIterations:
+    随机选两个点 p1, p2
+    计算直线参数 (a, b, c)
+    inliers = 0
+    for each point in cloud:
+        if distance(point, line) &lt; threshold:
+            inliers++
+    if inliers &gt; bestInliers:
+        更新最佳直线参数</code></pre>
+
+<div class="warning">
+<p><strong>避坑指南</strong>：我曾经把RANSAC的迭代次数设得太少，结果在长走廊里提取出来的直线歪歪扭扭。后来我总结了一个经验公式：迭代次数至少是 (1 - 内点比例)^(-3) 的量级。保守起见，室内场景设500次以上比较稳妥。</p>
+</div>
+
+<h4>6.2.2 角点检测</h4>
+
+<p>角点就是两条直线相交的地方。在AGV导航里，角点特别有用——它提供了明确的几何约束，定位精度比直线高得多。</p>
+
+<p>我常用的方法是<strong>基于曲率的角点检测</strong>。计算每个点邻域的曲率变化，曲率突变的地方就是潜在的角点。</p>
+
+<p>还有一种做法：先提取直线，再求直线交点。这个方法更鲁棒，但计算量稍大。我个人偏好后者，因为直线提取本身已经做了滤波，角点质量更高。</p>
+
+<h4>6.2.3 平面提取</h4>
+
+<p>地面、天花板、墙面，这些都是平面。平面特征对AGV的位姿估计特别重要——尤其是地面，它能直接约束Z轴和俯仰角、翻滚角。</p>
+
+<p>平面提取的主流方法还是RANSAC，只不过模型从直线换成了平面方程 ax + by + cz + d = 0。</p>
+
+<table>
+<tr>
+<th>特征类型</th>
+<th>提取方法</th>
+<th>典型应用</th>
+<th>我的建议</th>
+</tr>
+<tr>
+<td>直线</td>
+<td>RANSAC / Hough变换</td>
+<td>走廊导航、墙壁对齐</td>
+<td>RANSAC更鲁棒，Hough适合密集点云</td>
+</tr>
+<tr>
+<td>角点</td>
+<td>曲率分析 / 直线求交</td>
+<td>定位锚点、回环检测</td>
+<td>直线求交更稳定</td>
+</tr>
+<tr>
+<td>平面</td>
+<td>RANSAC / 区域生长</td>
+<td>地面检测、障碍物分割</td>
+<td>区域生长适合连续平面</td>
+</tr>
+</table>
+
+<h3>6.3 障碍物检测：AGV的"刹车系统"</h3>
+
+<p>特征提取完了，接下来是更实际的问题——障碍物检测。这直接关系到AGV会不会撞上东西。</p>
+
+<p>我把它分成两个层次：</p>
+
+<ol>
+<li><strong>静态障碍物</strong>：墙壁、货架、柱子。这些通常已经在地图里了，但实际环境中可能有变化（比如货架被移动了）。</li>
+<li><strong>动态障碍物</strong>：人、叉车、其他AGV。这些是实时检测的重点。</li>
+</ol>
+
+<p>对于静态障碍物，我习惯用<strong>栅格地图法</strong>。把点云投影到二维栅格上，每个格子统计点的高度分布。如果某个格子的点云高度突然变化，说明可能有新障碍物出现。</p>
+
+<p>对于动态障碍物，方法就不一样了。我推荐<strong>基于聚类的检测</strong>：</p>
+
+<ul>
+<li>用欧几里得聚类把点云分成一堆一堆的簇</li>
+<li>每个簇计算包围盒、速度（通过帧间匹配）</li>
+<li>如果某个簇的速度不为零，且尺寸符合人/车的特征，就标记为动态障碍物</li>
+</ul>
+
+<div class="highlight">
+<p><strong>核心要点</strong>：障碍物检测的难点不在算法，而在阈值设置。聚类距离阈值设太大，会把人和货架粘在一起；设太小，一个人会被切成好几块。我一般从0.3m开始调，根据实际场景微调。</p>
+</div>
+
+<h3>6.4 知识体系总览</h3>
+
+<p>好了，这一讲的内容比较多。我画了一张图，帮你理清思路：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">环境感知与特征提取知识体系</text>
+  
+  <!-- 顶层：原始点云 -->
+  <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">原始点云数据</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：预处理 -->
+  <rect x="250" y="140" width="300" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" font-size="16" fill="white" font-weight="bold">点云预处理（滤波、降采样）</text>
+  
+  <!-- 箭头分叉 -->
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="220" x2="200" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="220" x2="600" y2="220" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <line x1="200" y1="220" x2="200" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="220" x2="400" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="600" y1="220" x2="600" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：特征提取 -->
+  <rect x="100" y="250" width="200" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="200" y="280" text-anchor="middle" font-size="15" fill="white" font-weight="bold">直线提取（RANSAC）</text>
+  
+  <rect x="300" y="250" width="200" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="280" text-anchor="middle" font-size="15" fill="white" font-weight="bold">角点检测（曲率/求交）</text>
+  
+  <rect x="500" y="250" width="200" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="600" y="280" text-anchor="middle" font-size="15" fill="white" font-weight="bold">平面提取（RANSAC）</text>
+  
+  <!-- 箭头 -->
+  <line x1="200" y1="300" x2="200" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="300" x2="400" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="600" y1="300" x2="600" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <!-- 合并 -->
+  <line x1="200" y1="340" x2="200" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="340" x2="400" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="600" y1="340" x2="600" y2="370" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <line x1="200" y1="370" x2="200" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="400" y1="370" x2="400" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="600" y1="370" x2="600" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <line x1="200" y1="390" x2="400" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="600" y1="390" x2="400" y2="390" stroke="#7f8c8d" stroke-width="2"/>
+  
+  <line x1="400" y1="390" x2="400" y2="420" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：障碍物检测 -->
+  <rect x="250" y="420" width="300" height="50" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="450" text-anchor="middle" font-size="16" fill="white" font-weight="bold">障碍物检测（静态/动态）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图把整个流程串起来了：原始点云 → 预处理 → 特征提取（直线/角点/平面） → 障碍物检测。每一步都有对应的算法和注意事项。</p>
+
+<h3>6.5 实战中的几个坑</h3>
+
+<p>最后，分享几个我在实际项目中踩过的坑：</p>
+
+<ul>
+<li><strong>地面点干扰</strong>：提取直线时，地面上的点（比如地砖缝）经常被误识别为墙壁。我习惯先做地面分割，把地面点去掉再提取特征。</li>
+<li><strong>动态物体污染</strong>：有人走过时，点云里会多出一坨"移动的墙"。如果不做动态物体滤除，特征提取结果会乱套。我一般用帧差法或者速度滤波来处理。</li>
+<li><strong>参数泛化性</strong>：同一个算法，换一个场景就要重新调参。我的做法是写一个自动调参脚本，在不同场景下跑一遍，选最优参数组合。</li>
+</ul>
+
+<div class="tip">
+<p><strong>小技巧</strong>：如果你用的是ROS，可以试试 <code>pcl_ros</code> 包里的现成节点。它封装了大部分滤波和特征提取算法，省去不少重复造轮子的时间。</p>
+</div>
+
+<p>好了，这一讲就到这里。环境感知和特征提取是AGV导航的"眼睛"，做好了，后面的定位和路径规划才能稳。下一讲我们会聊地图构建，到时候见。</p>
+
+<div class="footer-nav">
+            <a href="05SensorDataProcessing.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="07SlamOverview.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,393 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 AGV运动控制任务</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="active">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 AGV运动控制任务：差速驱动模型、PID控制算法实现、速度与位置闭环</h2>
+
+<p>各位好，我是老李。今天咱们聊点硬核的——AGV的运动控制。说实话，我当年第一次调AGV的时候，车在地上画龙，我在屏幕前画圈。后来才明白，差速模型和PID算法，这两样东西必须吃透。</p>
+
+<p>AGV运动控制，说白了就是让车按照你想要的轨迹走。差速驱动是它的腿，PID算法是它的大脑。腿要稳，脑子要灵，车才能跑得顺。</p>
+
+<h3>差速驱动模型：AGV的“两条腿”</h3>
+
+<p>差速驱动，就是左右两个轮子独立驱动。通过控制两个轮子的转速差，实现前进、后退、转弯。我习惯把它想象成坦克的履带——左轮快右轮慢，车就往右转。</p>
+
+<p>先看运动学模型。假设两个驱动轮间距为L，轮子半径为R。左轮转速ωL，右轮转速ωR。那么：</p>
+
+<ul>
+    <li>前进速度v = (ωL + ωR) * R / 2</li>
+    <li>旋转角速度ω = (ωR - ωL) * R / L</li>
+    <li>转弯半径r = v / ω</li>
+</ul>
+
+<p>嗯，这里要注意：当ωL = ωR时，车直线前进。当ωL = -ωR时，车原地旋转。我在项目中遇到过，有些新手把左右轮方向搞反了，结果车原地打转，还以为是电机坏了。</p>
+
+<div class="highlight">
+    <p><strong>核心公式：</strong></p>
+    <p>v = (ωL + ωR) * R / 2</p>
+    <p>ω = (ωR - ωL) * R / L</p>
+</div>
+
+<p>实际编码时，我们通常把目标速度v和角速度ω作为输入，反算出左右轮的目标转速：</p>
+
+<pre><code>// 差速模型逆解算
+float L = 0.5;  // 轮距，单位米
+float R = 0.1;  // 轮半径，单位米
+
+void diff_drive_inverse(float v, float omega, float *wl, float *wr) {
+    *wl = (v - omega * L / 2.0) / R;
+    *wr = (v + omega * L / 2.0) / R;
+}</code></pre>
+
+<p>你想想看，这个逆解算在RTOS里怎么跑？我一般把它放在运动控制任务里，每10ms执行一次。输入来自上层路径规划，输出给PID控制器。</p>
+
+<h3>PID控制算法：AGV的“小脑”</h3>
+
+<p>PID控制，比例、积分、微分。说白了就是：看现在差多少（P），看过去差了多少（I），预测未来会差多少（D）。</p>
+
+<p>我刚开始做PID时，总觉得参数调起来很玄学。后来发现，其实有套路可循。先调P，让系统能响应；再加I，消除静差；最后加D，抑制超调。</p>
+
+<p>看一个位置式PID的实现：</p>
+
+<pre><code>typedef struct {
+    float Kp, Ki, Kd;
+    float integral;
+    float prev_error;
+    float limit;
+} PID_Controller;
+
+float pid_update(PID_Controller *pid, float setpoint, float measurement) {
+    float error = setpoint - measurement;
+    
+    // 比例项
+    float p_out = pid->Kp * error;
+    
+    // 积分项，带限幅
+    pid->integral += error;
+    if (pid->integral > pid->limit) pid->integral = pid->limit;
+    if (pid->integral < -pid->limit) pid->integral = -pid->limit;
+    float i_out = pid->Ki * pid->integral;
+    
+    // 微分项
+    float d_out = pid->Kd * (error - pid->prev_error);
+    pid->prev_error = error;
+    
+    return p_out + i_out + d_out;
+}</code></pre>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong>我曾经在积分项上吃过亏。积分限幅一定要做，否则积分饱和会让系统响应变得极其迟钝。还有，微分项对噪声敏感，建议先对测量值做低通滤波。</p>
+</div>
+
+<h3>速度闭环与位置闭环</h3>
+
+<p>AGV控制通常分两层：内环是速度环，外环是位置环。速度环跑得快，位置环跑得稳。</p>
+
+<p>速度闭环的目标是让电机实际转速跟上目标转速。我一般用编码器反馈，PID输出给电机驱动器。位置闭环则是在速度环的基础上，再加一层位置误差的PID。</p>
+
+<p>看一个双环控制的伪代码：</p>
+
+<pre><code>// 10ms任务：位置环
+void position_control_task(void) {
+    float pos_error = target_position - current_position;
+    float target_speed = position_pid_update(pos_error);
+    // 限幅
+    if (target_speed > MAX_SPEED) target_speed = MAX_SPEED;
+    // 传给速度环
+    set_speed_target(target_speed);
+}
+
+// 2ms任务：速度环
+void speed_control_task(void) {
+    float speed_error = target_speed - current_speed;
+    float motor_output = speed_pid_update(speed_error);
+    set_motor_pwm(motor_output);
+}</code></pre>
+
+<p>为什么速度环要跑得更快？因为电机响应快，位置变化慢。速度环2ms更新一次，位置环10ms更新一次，这样系统既稳定又灵敏。我在项目中试过把速度环也放到10ms，结果车一加速就抖，跟得了帕金森似的。</p>
+
+<h3>实战中的坑与经验</h3>
+
+<p>讲几个我踩过的坑：</p>
+
+<ol>
+    <li><strong>编码器方向搞反</strong>：左右轮编码器相位接反，导致速度反馈为负，PID疯狂输出，车直接冲出去。建议上电后先手动转轮子，确认编码器方向。</li>
+    <li><strong>积分饱和</strong>：AGV被堵住时，积分项会一直累加。等障碍物移开，车会猛地冲出去。解决办法：积分限幅 + 条件积分（误差大时不积分）。</li>
+    <li><strong>微分震荡</strong>：编码器信号有噪声时，微分项会放大噪声。我习惯在微分前加一个一阶低通滤波，截止频率设20Hz左右。</li>
+</ol>
+
+<div class="warning">
+    <p><strong>警告：</strong>PID参数不要在生产环境直接调。先在仿真环境里跑通，再上真车。我见过有人直接在AGV上调参数，结果车撞墙了，损失好几万。</p>
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我自己总结的AGV运动控制知识结构。你看一眼，心里就有谱了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV运动控制知识体系</text>
+    
+    <!-- 第一层：三个核心模块 -->
+    <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">差速驱动模型</text>
+    
+    <rect x="300" y="70" width="200" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">PID控制算法</text>
+    
+    <rect x="550" y="70" width="200" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">双环控制架构</text>
+    
+    <!-- 箭头：第一层到第二层 -->
+    <line x1="150" y1="120" x2="100" y2="180" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    <line x1="150" y1="120" x2="200" y2="180" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    
+    <line x1="400" y1="120" x2="350" y2="180" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+    <line x1="400" y1="120" x2="450" y2="180" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+    
+    <line x1="650" y1="120" x2="600" y2="180" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <line x1="650" y1="120" x2="700" y2="180" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    
+    <!-- 第二层：子模块 -->
+    <!-- 差速驱动子模块 -->
+    <rect x="30" y="180" width="140" height="40" rx="6" fill="#85c1e9"/>
+    <text x="100" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">正解算</text>
+    
+    <rect x="180" y="180" width="140" height="40" rx="6" fill="#85c1e9"/>
+    <text x="250" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">逆解算</text>
+    
+    <!-- PID子模块 -->
+    <rect x="310" y="180" width="140" height="40" rx="6" fill="#f1948a"/>
+    <text x="380" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">位置式PID</text>
+    
+    <rect x="460" y="180" width="140" height="40" rx="6" fill="#f1948a"/>
+    <text x="530" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">增量式PID</text>
+    
+    <!-- 双环子模块 -->
+    <rect x="560" y="180" width="140" height="40" rx="6" fill="#82e0aa"/>
+    <text x="630" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">速度环(内环)</text>
+    
+    <rect x="710" y="180" width="140" height="40" rx="6" fill="#82e0aa"/>
+    <text x="780" y="205" text-anchor="middle" font-size="13" fill="#2c3e50">位置环(外环)</text>
+    
+    <!-- 箭头：第二层到第三层 -->
+    <line x1="100" y1="220" x2="100" y2="280" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    <line x1="250" y1="220" x2="250" y2="280" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    
+    <line x1="380" y1="220" x2="380" y2="280" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+    <line x1="530" y1="220" x2="530" y2="280" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+    
+    <line x1="630" y1="220" x2="630" y2="280" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <line x1="780" y1="220" x2="780" y2="280" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    
+    <!-- 第三层：实现细节 -->
+    <rect x="30" y="280" width="160" height="40" rx="6" fill="#d4e6f1"/>
+    <text x="110" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">编码器反馈</text>
+    
+    <rect x="200" y="280" width="160" height="40" rx="6" fill="#d4e6f1"/>
+    <text x="280" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">轮距/轮径标定</text>
+    
+    <rect x="300" y="280" width="160" height="40" rx="6" fill="#fadbd8"/>
+    <text x="380" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">参数整定</text>
+    
+    <rect x="470" y="280" width="160" height="40" rx="6" fill="#fadbd8"/>
+    <text x="550" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">积分限幅</text>
+    
+    <rect x="560" y="280" width="160" height="40" rx="6" fill="#d5f5e3"/>
+    <text x="640" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">任务优先级</text>
+    
+    <rect x="730" y="280" width="160" height="40" rx="6" fill="#d5f5e3"/>
+    <text x="810" y="305" text-anchor="middle" font-size="12" fill="#2c3e50">时序同步</text>
+    
+    <!-- 底部总结 -->
+    <rect x="150" y="380" width="500" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+    <text x="400" y="410" text-anchor="middle" font-size="15" fill="white" font-weight="bold">核心目标：让AGV走得稳、转得准、停得正</text>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+        </marker>
+        <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+        </marker>
+        <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>这张图把差速模型、PID算法、双环控制串起来了。你照着这个结构去写代码，基本不会跑偏。</p>
+
+<h3>写在最后</h3>
+
+<p>AGV运动控制，说难不难，说简单也不简单。差速模型是基础，PID是核心，双环是工程实践。我建议你先在仿真环境里把模型跑通，再移植到RTOS上。记住，代码要简洁，逻辑要清晰，参数要留有余量。</p>
+
+<p>好了，今天就聊到这儿。有什么问题，咱们群里见。</p>
+
+<div class="footer-nav">
+            <a href="20SafetyReliability.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22SensorFusionTask.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

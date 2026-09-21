@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 生产与制造支持</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="active">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 生产与制造支持</h2>
+
+<p>做AGV控制器，设计完成只是第一步。真正让产品从样机走向量产，中间还有一段很长的路要走。我个人习惯把这一阶段叫做「从图纸到实物」的最后一公里。今天我们就聊聊BOM管理、SMT工艺、功能测试和老化测试这几个关键环节。</p>
+
+<h3>21.1 BOM管理——别小看这张表</h3>
+
+<p>BOM，物料清单。听起来简单吧？就是一张零件列表。但我见过太多项目栽在这上面。</p>
+
+<p>有一次，我们一个批次的控制器焊回来，发现板子上的LDO输出电压不对。查了半天，原来是BOM里写的是3.3V版本，但采购那边拿到的物料编码对应的是5.0V版本。嗯，这就是BOM管理没做好。</p>
+
+<div class="highlight">
+  <p><strong>BOM管理核心要点：</strong></p>
+  <ul>
+    <li><strong>层级清晰</strong>：总成BOM → 模块BOM → 元器件BOM</li>
+    <li><strong>版本控制</strong>：每次改板必须更新BOM版本号</li>
+    <li><strong>替代料管理</strong>：标注主选和备选物料，避免断供</li>
+    <li><strong>位号对应</strong>：原理图位号与PCB位号必须一一对应</li>
+  </ul>
+</div>
+
+<p>我个人习惯用Excel做BOM，但会加上条件格式和校验公式。比如，检查有没有位号重复、有没有物料缺失封装信息。你想想看，如果一颗电阻的封装写错了，SMT贴片机可不会帮你纠错。</p>
+
+<h3>21.2 SMT工艺要求——贴片不是贴上去就行</h3>
+
+<p>SMT，表面贴装技术。说白了就是把元器件焊到PCB上。但这里面的门道不少。</p>
+
+<p>AGV控制器上通常有BGA封装的MCU、大电流的MOS管、还有各种传感器接口。这些器件的焊接工艺要求各不相同。</p>
+
+<table>
+  <tr>
+    <th>器件类型</th>
+    <th>焊接温度要求</th>
+    <th>特殊注意事项</th>
+  </tr>
+  <tr>
+    <td>BGA封装MCU</td>
+    <td>峰值245±5℃</td>
+    <td>需要X-ray检测焊球</td>
+  </tr>
+  <tr>
+    <td>大电流MOS管</td>
+    <td>峰值260±5℃</td>
+    <td>底部散热焊盘需充分上锡</td>
+  </tr>
+  <tr>
+    <td>连接器</td>
+    <td>峰值230±5℃</td>
+    <td>注意耐温等级，避免变形</td>
+  </tr>
+  <tr>
+    <td>电解电容</td>
+    <td>峰值220±5℃</td>
+    <td>预热时间要足够，防止爆裂</td>
+  </tr>
+</table>
+
+<p>我曾经遇到过一个案例：一批控制器在老化测试时频繁死机。排查到最后，发现是BGA芯片底部有几个焊球虚焊。为什么？因为回流焊的温区设置不对，升温太快，助焊剂还没挥发完就凝固了。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong></p>
+  <p>做SMT之前，先做一次「炉温曲线测试」。用测温板实测PCB上各个关键点的温度曲线，确保符合器件规格书的要求。这一步省不得。</p>
+</div>
+
+<h3>21.3 功能测试（FCT）——上电之前想清楚测什么</h3>
+
+<p>功能测试，FCT。不是简单地上电看看灯亮不亮。</p>
+
+<p>AGV控制器的FCT，我一般分成三个层次：</p>
+
+<ol>
+  <li><strong>电源测试</strong>：各电压轨的输出值、纹波、上电时序</li>
+  <li><strong>通信测试</strong>：CAN、RS485、以太网等接口的收发是否正常</li>
+  <li><strong>功能验证</strong>：电机驱动、传感器采集、IO控制等核心功能</li>
+</ol>
+
+<p>举个例子，CAN通信测试。不能只发一帧数据看看有没有回。我习惯的做法是：连续发送10000帧，每帧带CRC校验，然后统计丢帧率和误码率。AGV在工厂里跑，通信可靠性是第一位的。</p>
+
+<div class="warning">
+  <p><strong>注意：</strong></p>
+  <p>FCT的测试项不是越多越好。要抓住「关键质量特性」。比如，电机驱动器的过流保护功能，必须每台都测。而一些辅助功能，可以抽检。</p>
+</div>
+
+<p>我设计FCT工装时，会留一个「自检」步骤。工装先自检，确认自身没问题，再开始测板子。这样能避免误判。你想想看，如果工装本身坏了，测出来的结果全是废品，那损失就大了。</p>
+
+<h3>21.4 老化测试——让问题提前暴露</h3>
+
+<p>老化测试，说白了就是让控制器在模拟工况下连续运行一段时间。目的是把早期失效的器件筛选出来。</p>
+
+<p>AGV控制器的老化测试，我一般设置三个条件：</p>
+
+<ul>
+  <li><strong>温度</strong>：55℃恒温（模拟夏天车间环境）</li>
+  <li><strong>负载</strong>：电机带额定负载运行</li>
+  <li><strong>时长</strong>：至少48小时</li>
+</ul>
+
+<p>为什么要48小时？因为电子元器件的早期失效期（浴盆曲线的左端）通常在前24-48小时内。过了这个时间段，失效率会显著下降。</p>
+
+<p>我记得有一次，一批控制器老化到第36小时，突然有3台同时报错。查日志发现是电源管理芯片过热保护了。拆开一看，散热硅脂涂得太薄。这就是老化测试的价值——把问题拦在出厂之前。</p>
+
+<div class="highlight">
+  <p><strong>老化测试的监控指标：</strong></p>
+  <ul>
+    <li>核心温度（MCU、MOS管、电源芯片）</li>
+    <li>电压波动（各电源轨的实时值）</li>
+    <li>通信状态（CAN总线错误帧计数）</li>
+    <li>运行时长（记录每台设备的累计运行时间）</li>
+  </ul>
+</div>
+
+<p>我个人习惯在老化测试中加一个「心跳」机制。每台控制器每隔1秒发一个心跳包，上位机实时监控。如果哪台超过5秒没发心跳，立刻报警。这样不用等到老化结束才发现问题。</p>
+
+<h3>21.5 生产测试流程总览</h3>
+
+<p>下面这张图，是我做AGV控制器生产测试的完整流程。从SMT贴片到包装出货，每一步都有明确的测试节点。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV控制器生产测试流程</text>
+  
+  <!-- 流程节点 -->
+  <!-- SMT -->
+  <rect x="50" y="80" width="140" height="60" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="120" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">SMT贴片</text>
+  
+  <!-- 箭头1 -->
+  <line x1="190" y1="110" x2="240" y2="110" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="240,105 250,110 240,115" fill="#2c3e50"/>
+  
+  <!-- AOI -->
+  <rect x="250" y="80" width="140" height="60" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="320" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AOI光学检测</text>
+  
+  <!-- 箭头2 -->
+  <line x1="390" y1="110" x2="440" y2="110" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="440,105 450,110 440,115" fill="#2c3e50"/>
+  
+  <!-- 分板 -->
+  <rect x="450" y="80" width="140" height="60" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="520" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">分板/清洗</text>
+  
+  <!-- 箭头3 -->
+  <line x1="590" y1="110" x2="640" y2="110" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="640,105 650,110 640,115" fill="#2c3e50"/>
+  
+  <!-- FCT -->
+  <rect x="650" y="80" width="140" height="60" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="720" y="115" text-anchor="middle" font-size="14" fill="white" font-weight="bold">功能测试FCT</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="720" y1="140" x2="720" y2="190" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="715,190 720,200 725,190" fill="#2c3e50"/>
+  
+  <!-- 老化测试 -->
+  <rect x="650" y="200" width="140" height="60" rx="10" fill="#f39c12" opacity="0.9"/>
+  <text x="720" y="235" text-anchor="middle" font-size="14" fill="white" font-weight="bold">老化测试48h</text>
+  
+  <!-- 向左箭头 -->
+  <line x1="650" y1="230" x2="590" y2="230" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="590,225 580,230 590,235" fill="#2c3e50"/>
+  
+  <!-- 最终FCT -->
+  <rect x="440" y="200" width="140" height="60" rx="10" fill="#1abc9c" opacity="0.9"/>
+  <text x="510" y="235" text-anchor="middle" font-size="14" fill="white" font-weight="bold">最终FCT复测</text>
+  
+  <!-- 向下箭头 -->
+  <line x1="510" y1="260" x2="510" y2="310" stroke="#2c3e50" stroke-width="2"/>
+  <polygon points="505,310 510,320 515,310" fill="#2c3e50"/>
+  
+  <!-- 包装 -->
+  <rect x="440" y="320" width="140" height="60" rx="10" fill="#34495e" opacity="0.9"/>
+  <text x="510" y="355" text-anchor="middle" font-size="14" fill="white" font-weight="bold">包装/出货</text>
+  
+  <!-- 不合格品分支 -->
+  <line x1="320" y1="140" x2="320" y2="320" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="315,320 320,330 325,320" fill="#e74c3c"/>
+  
+  <rect x="250" y="330" width="140" height="60" rx="10" fill="#e74c3c" opacity="0.7"/>
+  <text x="320" y="365" text-anchor="middle" font-size="14" fill="white" font-weight="bold">不合格品返修</text>
+  
+  <!-- 返修回流箭头 -->
+  <line x1="250" y1="360" x2="120" y2="360" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="120" y1="360" x2="120" y2="140" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <polygon points="115,140 120,130 125,140" fill="#e74c3c"/>
+  
+  <!-- 图例 -->
+  <rect x="50" y="420" width="20" height="20" fill="#3498db"/>
+  <text x="80" y="435" font-size="12" fill="#2c3e50">正常流程</text>
+  
+  <rect x="200" y="420" width="20" height="20" fill="#e74c3c"/>
+  <text x="230" y="435" font-size="12" fill="#2c3e50">不合格品处理</text>
+  
+  <line x1="380" y1="430" x2="420" y2="430" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="430" y="435" font-size="12" fill="#2c3e50">返修回流路径</text>
+</svg>
+
+<p>从这张图你可以看到，整个流程是闭环的。不合格品不会直接流到下一道工序，而是进入返修通道。返修后的板子，必须重新经过FCT和老化测试，才能放行。</p>
+
+<p>嗯，这里要注意一点：返修过的板子，老化时间可以适当缩短，但不能跳过。我见过有人为了赶工期，返修后直接包装出货。结果呢？客户那边用了不到一个月就出问题了。</p>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong></p>
+  <p>在生产测试系统中，给每块板子分配一个唯一的序列号。从SMT到老化，所有测试数据都关联到这个序列号。这样，如果某块板子在客户现场出了问题，你可以快速回溯它的整个生产履历。</p>
+</div>
+
+<p>好了，关于生产与制造支持的内容，今天就聊到这里。BOM管理、SMT工艺、FCT、老化测试，这四个环节环环相扣。任何一个环节出了问题，最终都会反映到产品的质量和可靠性上。</p>
+
+<p>做AGV控制器，说到底就是做可靠性。而可靠性，是从每一颗电阻、每一个焊点、每一行测试代码里一点一点积累出来的。</p>
+
+<div class="footer-nav">
+            <a href="20EmcReliability.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22IndustryStandards.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

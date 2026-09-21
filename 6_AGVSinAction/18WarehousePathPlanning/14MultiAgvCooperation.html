@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 多AGV协同问题</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="active">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 多AGV协同问题：冲突类型（节点冲突、相向冲突、追赶冲突）</h2>
+
+<p>各位，咱们继续聊AGV路径规划。前面几章我们把单车的路径规划讲透了，但实际仓储里从来不是一辆车在跑。你想想看，几十台AGV在同一个巷道里穿梭，就像早高峰的地铁站——不出点状况才怪。</p>
+
+<p>多AGV协同，说白了就是解决“谁先走、谁让谁”的问题。我最早做的一个项目，客户把20台AGV丢进一个3000平的仓库，结果第一天就撞了三次。嗯，从那以后我明白了一个道理：<strong>路径规划不只是找路，更是找“不打架”的路</strong>。</p>
+
+<p>今天咱们就专门聊聊AGV之间的冲突类型。我个人习惯把冲突分成三大类：<strong>节点冲突、相向冲突、追赶冲突</strong>。这三种情况，你只要搞懂了，多车调度系统的基本盘就稳了。</p>
+
+<div class="highlight">
+  <strong>核心观点：</strong>多AGV冲突的本质是“资源竞争”——谁先占用路径段、谁先通过交叉口。解决冲突的关键在于“预测”和“协商”。
+</div>
+
+<h3>14.1 节点冲突</h3>
+
+<p>节点冲突是最常见的。什么叫节点？就是路径上的交叉点、分岔口、或者工位停靠点。两辆AGV同时想占用同一个节点，这就叫节点冲突。</p>
+
+<p>我举个例子。仓库里有个十字路口，A车要从南往北，B车要从东往西。如果两车同时到达路口中心，那就撞上了。这就是典型的节点冲突。</p>
+
+<p>解决节点冲突，我常用的方法有三种：</p>
+
+<ul>
+  <li><strong>资源锁机制</strong>：每个节点加一把“锁”，AGV进入前先申请锁，拿到锁才能通过。这就像咱们上厕所，门锁了你就得等。</li>
+  <li><strong>优先级规则</strong>：给每辆车设定优先级。比如执行紧急任务的AGV优先级高，空载回收的车优先级低。高优先级的先过。</li>
+  <li><strong>时间窗预留</strong>：提前计算每辆车到达节点的时间，如果时间窗重叠，就让其中一辆车减速等待。</li>
+</ul>
+
+<div class="tip">
+  <strong>我的经验：</strong>时间窗预留法最灵活，但计算量也最大。我曾经在一个项目里用时间窗法，结果调度服务器的CPU直接飙到90%。后来我改成“混合策略”——高密度区域用资源锁，低密度区域用时间窗，效果好了很多。
+</div>
+
+<h3>14.2 相向冲突</h3>
+
+<p>相向冲突，说白了就是“顶牛”。两辆AGV在同一条直道上，面对面行驶，谁也不让谁。这在单行道布局里尤其常见。</p>
+
+<p>为什么会发生相向冲突？说白了就是路径规划时只考虑了“最短路径”，没考虑“对向车辆”。A车规划了一条从东到西的路径，B车规划了一条从西到东的路径，两条路径在中间段重合了——这就顶上了。</p>
+
+<p>解决相向冲突，我建议从两个层面入手：</p>
+
+<ol>
+  <li><strong>路径规划层面</strong>：在规划路径时，就把“对向车流”考虑进去。比如，把仓库巷道分成“上行道”和“下行道”，AGV只能按指定方向行驶。这就像咱们开车，不能逆行。</li>
+  <li><strong>实时调度层面</strong>：如果已经发生了相向冲突，那就让其中一辆车倒车到最近的避让点。避让点可以是巷道加宽处、或者专门的避让区。</li>
+</ol>
+
+<div class="warning">
+  <strong>注意：</strong>相向冲突的避让策略一定要考虑“死锁”问题。我曾经见过一个案例：两辆AGV在窄巷子里顶牛，各自后退到避让点，结果第三辆车从后面堵住了退路——三辆车全卡死了。所以，避让前一定要检查后方路径是否畅通。
+</div>
+
+<h3>14.3 追赶冲突</h3>
+
+<p>追赶冲突，就是后车速度比前车快，追尾了。这在AGV系统里其实很常见，尤其是当AGV的负载不同时——空车跑得快，重车跑得慢。</p>
+
+<p>我记得有一次，一个客户抱怨说AGV老是“亲屁股”。我去现场一看，发现是空车和重车混跑。空车速度1.5m/s，重车只有0.8m/s，空车从后面追上来，距离没控制好，就撞上了。</p>
+
+<p>解决追赶冲突，核心是<strong>保持安全距离</strong>。具体做法：</p>
+
+<ul>
+  <li><strong>动态速度调整</strong>：后车检测到前车时，自动降速到与前车一致的速度。这就像高速上的自适应巡航。</li>
+  <li><strong>路径分段占用</strong>：把路径分成若干段，每段同一时间只允许一辆AGV占用。后车必须等前车离开当前段，才能进入。</li>
+  <li><strong>速度分级</strong>：根据负载、任务紧急程度，给AGV设定不同的速度等级。同等级的车可以跟车，不同等级的车要保持更大距离。</li>
+</ul>
+
+<div class="tip">
+  <strong>避坑指南：</strong>我曾经在追赶冲突里犯过一个低级错误——把安全距离设得太小。结果AGV频繁急刹，导致货物倾倒。后来我把安全距离从0.5米改成了1.2米，问题就解决了。记住：安全距离不是算出来的，是试出来的。
+</div>
+
+<h3>14.4 三种冲突的关系与对比</h3>
+
+<p>这三种冲突不是孤立的。在实际场景里，它们经常交织在一起。比如，一辆AGV为了避让相向冲突而倒车，结果引发了后方车辆的追赶冲突。</p>
+
+<p>我画了一张图，帮你理清这三种冲突的关系：</p>
+
+<svg width="720" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">多AGV冲突类型关系图</text>
+  
+  <!-- 三个主节点 -->
+  <!-- 节点冲突 -->
+  <rect x="60" y="80" width="180" height="80" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="white">节点冲突</text>
+  <text x="150" y="140" text-anchor="middle" font-size="13" fill="white">交叉口/工位点竞争</text>
+  
+  <!-- 相向冲突 -->
+  <rect x="270" y="80" width="180" height="80" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="360" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="white">相向冲突</text>
+  <text x="360" y="140" text-anchor="middle" font-size="13" fill="white">面对面顶牛</text>
+  
+  <!-- 追赶冲突 -->
+  <rect x="480" y="80" width="180" height="80" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="570" y="115" text-anchor="middle" font-size="18" font-weight="bold" fill="white">追赶冲突</text>
+  <text x="570" y="140" text-anchor="middle" font-size="13" fill="white">后车追尾前车</text>
+  
+  <!-- 连接线 -->
+  <line x1="240" y1="120" x2="270" y2="120" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  <line x1="450" y1="120" x2="480" y2="120" stroke="#7f8c8d" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- 共同特征 -->
+  <rect x="160" y="200" width="400" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="360" y="228" text-anchor="middle" font-size="16" font-weight="bold" fill="white">共同特征：资源竞争</text>
+  <text x="360" y="248" text-anchor="middle" font-size="13" fill="white">路径段、节点、时间窗的占用冲突</text>
+  
+  <!-- 箭头指向共同特征 -->
+  <line x1="150" y1="160" x2="250" y2="200" stroke="#7f8c8d" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="360" y1="160" x2="360" y2="200" stroke="#7f8c8d" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="570" y1="160" x2="470" y2="200" stroke="#7f8c8d" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 解决方案 -->
+  <rect x="60" y="300" width="600" height="80" rx="10" fill="#9b59b6" opacity="0.7"/>
+  <text x="360" y="330" text-anchor="middle" font-size="16" font-weight="bold" fill="white">解决方案体系</text>
+  <text x="360" y="355" text-anchor="middle" font-size="13" fill="white">资源锁 | 优先级规则 | 时间窗预留 | 路径分段 | 动态调速 | 避让点</text>
+  
+  <!-- 连接线 -->
+  <line x1="360" y1="260" x2="360" y2="300" stroke="#7f8c8d" stroke-width="2"/>
+</svg>
+
+<p>从这张图你能看出来，三种冲突的根源都是“资源竞争”。只不过竞争的资源不同：节点冲突争的是“点”，相向冲突争的是“段”，追赶冲突争的是“时间窗”。</p>
+
+<p>下面这个表格，是我自己总结的三种冲突的对比，方便你快速查阅：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 20px 0;">
+  <tr style="background-color: #2c3e50; color: white;">
+    <th>冲突类型</th>
+    <th>发生场景</th>
+    <th>核心原因</th>
+    <th>常用解法</th>
+    <th>我的建议</th>
+  </tr>
+  <tr>
+    <td>节点冲突</td>
+    <td>交叉口、分岔口、停靠点</td>
+    <td>多车同时申请同一节点</td>
+    <td>资源锁、优先级、时间窗</td>
+    <td>高密度区用资源锁</td>
+  </tr>
+  <tr>
+    <td>相向冲突</td>
+    <td>单行道、窄巷道</td>
+    <td>路径规划未考虑对向车流</td>
+    <td>单向道设计、避让点倒车</td>
+    <td>规划阶段就避免</td>
+  </tr>
+  <tr>
+    <td>追赶冲突</td>
+    <td>直道、长巷道</td>
+    <td>速度差异导致追尾</td>
+    <td>动态调速、路径分段</td>
+    <td>安全距离宁大勿小</td>
+  </tr>
+</table>
+
+<h3>14.5 实际项目中的冲突处理流程</h3>
+
+<p>说了这么多理论，咱们来点实际的。我在项目里处理多AGV冲突，一般按这个流程走：</p>
+
+<ol>
+  <li><strong>路径预检</strong>：每辆AGV规划路径后，先检查路径上有没有其他车的路径重叠。如果有，标记出重叠的节点和路段。</li>
+  <li><strong>冲突分类</strong>：根据重叠的类型，判断是节点冲突、相向冲突还是追赶冲突。</li>
+  <li><strong>优先级排序</strong>：根据任务紧急程度、AGV编号、距离目标点的远近，给每辆车排个优先级。</li>
+  <li><strong>协商解决</strong>：低优先级的车让高优先级的车。让的方式可以是减速、等待、或者重新规划路径。</li>
+  <li><strong>死锁检测</strong>：解决完冲突后，再检查一遍有没有形成死锁。如果有，强制让一辆车退出。</li>
+</ol>
+
+<div class="highlight">
+  <strong>关键点：</strong>冲突处理不是“一次性”的。AGV每走一步，都要重新检查。因为环境是动态的——前车可能突然急刹，后车可能突然加速。所以，<strong>实时性</strong>比什么都重要。
+</div>
+
+<p>嗯，关于多AGV冲突的三种类型，今天就聊到这儿。这三种冲突你搞清楚了，多车调度系统的基本功就算打牢了。下一章咱们会深入聊聊死锁的检测与恢复——那才是真正考验系统设计能力的地方。</p>
+
+<div class="footer-nav">
+            <a href="13TebAlgorithm.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15TrafficControlStrategy.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

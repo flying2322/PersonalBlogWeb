@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 动态障碍物避让</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02TrafficControlBasics.html" class="">2 交通管制基础</a></li>
+<li><a href="03PathPlanningAlgo.html" class="">3 路径规划算法</a></li>
+<li><a href="04DeadlockDetectRelease.html" class="">4 死锁检测与解除</a></li>
+<li><a href="05TrafficControlStrategy.html" class="">5 交通管制策略</a></li>
+<li><a href="06MultiAgvCoopDispatch.html" class="">6 多AGV协同调度</a></li>
+<li><a href="07TrafficSystemArch.html" class="">7 交通管制系统架构</a></li>
+<li><a href="08CommProtocolData.html" class="">8 通信协议与数据交互</a></li>
+<li><a href="09MapModelingPerception.html" class="">9 地图建模与环境感知</a></li>
+<li><a href="10TaskPriorityManage.html" class="">10 任务调度与优先级管理</a></li>
+<li><a href="11PathConflictPredict.html" class="">11 路径冲突预测与预防</a></li>
+<li><a href="12TrafficSimPlatform.html" class="">12 交通管制仿真平台搭建</a></li>
+<li><a href="13LocalizationNav.html" class="">13 AGV定位与导航技术</a></li>
+<li><a href="14SafetyMechanism.html" class="">14 交通管制中的安全机制</a></li>
+<li><a href="15PerformanceOptimize.html" class="">15 交通管制性能优化</a></li>
+<li><a href="16DynamicObstacleAvoid.html" class="active">16 动态障碍物避让</a></li>
+<li><a href="17TrafficRuleLibrary.html" class="">17 交通管制规则库设计</a></li>
+<li><a href="18MultiZoneTraffic.html" class="">18 多区域交通管制</a></li>
+<li><a href="19TestAndValidation.html" class="">19 交通管制系统测试与验证</a></li>
+<li><a href="20ChargingAndTraffic.html" class="">20 AGV充电调度与交通管制</a></li>
+<li><a href="21MlInTrafficControl.html" class="">21 交通管制中的机器学习应用</a></li>
+<li><a href="22SystemInterface.html" class="">22 交通管制系统接口设计</a></li>
+<li><a href="23LogAndMonitor.html" class="">23 交通管制日志与监控</a></li>
+<li><a href="24DeployAndOps.html" class="">24 交通管制系统部署与运维</a></li>
+<li><a href="25SecurityPermission.html" class="">25 交通管制系统安全与权限管理</a></li>
+<li><a href="26StandardCompliance.html" class="">26 交通管制系统标准化与合规</a></li>
+<li><a href="27TrafficCaseAnalysis.html" class="">27 交通管制系统案例分析</a></li>
+<li><a href="28FrontierTech.html" class="">28 交通管制系统前沿技术</a></li>
+<li><a href="29TrafficProjectPractice.html" class="">29 交通管制系统项目实战</a></li>
+<li><a href="30FutureOutlook.html" class="">30 交通管制系统未来展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 动态障碍物避让：动态障碍物检测方法、避让路径重规划、避让优先级策略</h2>
+
+<p>各位做AGV调度的朋友，咱们今天聊一个绕不开的话题——动态障碍物避让。</p>
+<p>说实话，静态障碍物好处理。地图画好，禁区标好，路径一规划，基本就稳了。但动态障碍物不一样。你想想看，车间里突然窜出一辆叉车，或者工人临时放了个料架在通道上，AGV要是傻乎乎撞上去，那画面太美我不敢看。</p>
+<p>我入行那会儿，就亲眼见过一台AGV直直撞上临时堆放的托盘。原因很简单——系统根本没检测到那个障碍物。从那以后，我对动态避让这块就特别上心。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>动态障碍物避让不是单一技术，而是「检测 → 决策 → 重规划」的闭环。缺一环，系统就瘸腿。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;margin:20px auto;display:block;background:#f0f8ff;border-radius:12px;padding:10px;">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2980b9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e74c3c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c0392b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2ecc71;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#27ae60;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f39c12;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e67e22;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 中心主题 -->
+  <rect x="300" y="20" width="200" height="50" rx="25" fill="url(#grad1)" stroke="#1a5276" stroke-width="2"/>
+  <text x="400" y="52" text-anchor="middle" fill="white" font-size="18" font-weight="bold">动态障碍物避让</text>
+
+  <!-- 分支1：检测方法 -->
+  <line x1="350" y1="70" x2="150" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <rect x="60" y="120" width="180" height="40" rx="8" fill="url(#grad2)" stroke="#7b241c" stroke-width="1.5"/>
+  <text x="150" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">动态障碍物检测</text>
+
+  <line x1="100" y1="160" x2="100" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="100" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">激光雷达扫描</text>
+
+  <line x1="150" y1="160" x2="150" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="150" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">超声波/红外</text>
+
+  <line x1="200" y1="160" x2="200" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="200" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">视觉识别</text>
+
+  <!-- 分支2：路径重规划 -->
+  <line x1="400" y1="70" x2="400" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <rect x="310" y="120" width="180" height="40" rx="8" fill="url(#grad3)" stroke="#1e8449" stroke-width="1.5"/>
+  <text x="400" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">避让路径重规划</text>
+
+  <line x1="350" y1="160" x2="350" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="350" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">局部路径调整</text>
+
+  <line x1="400" y1="160" x2="400" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="400" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">全局路径重算</text>
+
+  <line x1="450" y1="160" x2="450" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="450" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">平滑过渡曲线</text>
+
+  <!-- 分支3：优先级策略 -->
+  <line x1="450" y1="70" x2="650" y2="130" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <rect x="560" y="120" width="180" height="40" rx="8" fill="url(#grad4)" stroke="#b7950b" stroke-width="1.5"/>
+  <text x="650" y="146" text-anchor="middle" fill="white" font-size="15" font-weight="bold">避让优先级策略</text>
+
+  <line x1="600" y1="160" x2="600" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="600" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">任务优先级</text>
+
+  <line x1="650" y1="160" x2="650" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="650" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">障碍物类型</text>
+
+  <line x1="700" y1="160" x2="700" y2="200" stroke="#2c3e50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+  <text x="700" y="220" text-anchor="middle" fill="#2c3e50" font-size="13">交通规则</text>
+
+  <!-- 底部闭环 -->
+  <rect x="250" y="260" width="300" height="40" rx="20" fill="#ecf0f1" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="5,3"/>
+  <text x="400" y="286" text-anchor="middle" fill="#2c3e50" font-size="14" font-weight="bold">检测 → 决策 → 重规划 → 执行 → 再检测</text>
+  <line x1="400" y1="260" x2="400" y2="240" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrowhead)"/>
+</svg>
+
+<h3>16.1 动态障碍物检测方法</h3>
+
+<p>检测是避让的第一步。检测不准，后面全是白搭。</p>
+<p>我个人习惯把检测方法分成三类：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>检测方式</th>
+      <th>典型传感器</th>
+      <th>优点</th>
+      <th>缺点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>接触式</td>
+      <td>碰撞条、触边</td>
+      <td>成本低、可靠</td>
+      <td>已经撞上了才检测到</td>
+    </tr>
+    <tr>
+      <td>近距非接触</td>
+      <td>超声波、红外</td>
+      <td>成本适中、反应快</td>
+      <td>易受环境干扰</td>
+    </tr>
+    <tr>
+      <td>远距非接触</td>
+      <td>激光雷达、深度相机</td>
+      <td>精度高、可预判</td>
+      <td>成本高、计算量大</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我在项目中遇到过一个问题：某客户车间粉尘大，激光雷达经常误报。后来我们加了一层「时间窗口滤波」——连续3帧都检测到障碍物才触发避让，误报率直接降了80%。</p>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>别只依赖一种传感器。激光雷达+超声波互补，是我最常用的方案。激光负责远距离预判，超声波负责近距补盲。</p>
+</div>
+
+<h3>16.2 避让路径重规划</h3>
+
+<p>检测到障碍物之后，怎么办？</p>
+<p>说白了就两条路：绕过去，或者停下来等。</p>
+<p>我一般把重规划分成两个层级：</p>
+
+<h4>16.2.1 局部路径调整</h4>
+<p>适用于障碍物不大、旁边有空间的情况。AGV不需要重新算全局路径，只需要在当前路径附近微调。</p>
+<p>举个例子：</p>
+<pre><code>// 伪代码：局部避让
+if (detectObstacle(currentPath, obstacle)) {
+    // 计算偏移量
+    offset = calculateSafeOffset(obstacle, AGV_WIDTH);
+    // 生成临时绕行点
+    waypoint = generateDetourPoint(currentPath, offset);
+    // 平滑插入路径
+    insertWaypoint(waypoint);
+}</code></pre>
+<p>嗯，这里要注意——局部调整不能太激进。我见过有人把偏移量设得太大，结果AGV直接怼到墙上了。</p>
+
+<h4>16.2.2 全局路径重算</h4>
+<p>如果障碍物把路堵死了，或者局部调整找不到可行路径，那就得重新规划全局路径。</p>
+<p>这时候我建议用A*或者Dijkstra重新算一遍。但有个坑——重算不能太频繁。我曾经遇到一个项目，AGV每遇到一个小障碍就重算全局路径，结果CPU跑满了，调度响应慢得像蜗牛。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经吃过一次亏——全局重算时没考虑AGV当前的运动状态。结果路径算出来了，AGV却因为惯性拐不过那个弯。后来我加了一个「运动学可行性检查」，确保新路径AGV能实际走下来。</p>
+</div>
+
+<h3>16.3 避让优先级策略</h3>
+
+<p>多台AGV同时遇到障碍物，谁先走？</p>
+<p>这个问题其实挺复杂的。我总结了一套优先级规则：</p>
+
+<ol>
+  <li><strong>任务紧急度优先</strong>——有急单的AGV优先通过</li>
+  <li><strong>障碍物类型优先</strong>——固定障碍物让AGV绕，移动障碍物让AGV等</li>
+  <li><strong>交通规则优先</strong>——主路上的AGV优先于支路上的</li>
+  <li><strong>先到先得</strong>——谁先到达冲突区域谁先走</li>
+</ol>
+
+<p>你想想看，如果一台空载AGV和一台满载紧急任务的AGV同时要避让，让空载的等一等，是不是更合理？</p>
+
+<p>实际项目中，我一般用「加权评分法」来计算优先级：</p>
+
+<pre><code>// 优先级评分计算
+priorityScore = 
+    taskUrgency * 0.4 + 
+    obstacleType * 0.3 + 
+    roadPriority * 0.2 + 
+    arrivalOrder * 0.1;</code></pre>
+
+<p>权重怎么调？说实话，没有标准答案。每个工厂的工况不一样，我建议上线后先跑一段时间，根据实际数据调整。</p>
+
+<div class="highlight">
+  <p><strong>关键提醒：</strong>优先级策略不是死的。我见过一个案例——某工厂晚上加班，只有一台AGV在跑，优先级策略反而拖慢了效率。所以，策略要能动态调整，甚至支持手动干预。</p>
+</div>
+
+<h3>16.4 实战经验总结</h3>
+
+<p>做了这么多年AGV调度，我觉得动态避让最核心的就三点：</p>
+
+<ul>
+  <li><strong>检测要快</strong>——延迟超过200ms，避让就变成「撞上」了</li>
+  <li><strong>路径要稳</strong>——别让AGV走S形，车间里看着不专业，还容易出事故</li>
+  <li><strong>策略要活</strong>——死板的优先级规则，早晚会出问题</li>
+</ul>
+
+<p>最后说一句：动态避让没有银弹。每个工厂的布局、AGV型号、物料种类都不一样。我建议先做仿真，再小规模试跑，最后才全面铺开。别一上来就搞大而全的方案，容易翻车。</p>
+
+<div class="footer-nav">
+            <a href="15PerformanceOptimize.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17TrafficRuleLibrary.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

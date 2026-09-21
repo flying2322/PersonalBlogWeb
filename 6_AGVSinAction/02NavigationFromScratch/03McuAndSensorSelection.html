@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 嵌入式主控与传感器选型</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="active">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 嵌入式主控与传感器选型</h2>
+
+<p>做AGV导航系统，第一步就是选主控和传感器。</p>
+<p>很多人一上来就纠结算法，其实硬件选型才是真正的坑。我见过太多项目，算法写得漂漂亮亮，结果主控算力不够，或者传感器精度拉胯，最后整个系统推倒重来。</p>
+<p>这一章，咱们就把主控芯片和核心传感器的选型逻辑讲透。</p>
+
+<h3>3.1 主控芯片选型</h3>
+
+<p>主控芯片是AGV的大脑。选错了，后面全白搭。</p>
+<p>我个人习惯把主控分成四个梯队：</p>
+
+<table>
+  <tr>
+    <th>芯片型号</th>
+    <th>算力等级</th>
+    <th>典型应用场景</th>
+    <th>我的评价</th>
+  </tr>
+  <tr>
+    <td>STM32F4/H7</td>
+    <td>低（Cortex-M4/M7）</td>
+    <td>简易磁导航、二维码导航</td>
+    <td>稳定可靠，适合做底层驱动</td>
+  </tr>
+  <tr>
+    <td>ESP32</td>
+    <td>中低（双核Xtensa）</td>
+    <td>轻量AGV、原型验证</td>
+    <td>WiFi/蓝牙集成，适合快速迭代</td>
+  </tr>
+  <tr>
+    <td>RK3588</td>
+    <td>高（4核A76+4核A55）</td>
+    <td>视觉SLAM、多传感器融合</td>
+    <td>性价比之王，NPU加持</td>
+  </tr>
+  <tr>
+    <td>Jetson Orin</td>
+    <td>极高（GPU+DL加速器）</td>
+    <td>深度学习导航、复杂环境</td>
+    <td>算力过剩，但功耗和成本高</td>
+  </tr>
+</table>
+
+<p><strong>STM32</strong>：我最早做AGV时用的就是它。说白了，它就是个可靠的“老黄牛”。做电机控制、编码器采集、IO控制，它比谁都稳。但你要是想跑个激光SLAM，它直接歇菜。</p>
+
+<p><strong>ESP32</strong>：这玩意儿我用来做原型验证特别多。WiFi和蓝牙都集成了，调试方便。但注意，它的ADC精度一般，做模拟量采集时要小心。</p>
+
+<p><strong>RK3588</strong>：这是我目前的主力。6TOPS的NPU，跑轻量级视觉模型绰绰有余。我在一个仓储AGV项目里，用RK3588同时接了激光雷达和深度相机，CPU占用率才40%左右。</p>
+
+<p><strong>Jetson Orin</strong>：说实话，大部分AGV用不到这个级别。除非你要做端到端的深度学习导航，或者多路高清视频处理。否则，功耗和成本会让你头疼。</p>
+
+<div class="tip">
+  <strong>我的建议：</strong> 新手起步，先选RK3588。算力够用，生态好，踩坑少。等做熟了，再根据实际需求降级或升级。
+</div>
+
+<h3>3.2 激光雷达选型</h3>
+
+<p>激光雷达是AGV的“眼睛”。选型时，我主要看三个维度：线数、测距原理、环境适应性。</p>
+
+<h4>3.2.1 单线激光雷达</h4>
+<p>最常用，也最成熟。适合室内平面导航。</p>
+<ul>
+  <li><strong>代表型号：</strong> 思岚RPLIDAR A2、镭神N10</li>
+  <li><strong>测距范围：</strong> 8-25米</li>
+  <li><strong>精度：</strong> ±1-3cm</li>
+  <li><strong>我的经验：</strong> 单线雷达对地面反光敏感。我在一个工厂项目里，地面是亮面环氧地坪，雷达经常误报。后来加了遮光罩才解决。</li>
+</ul>
+
+<h4>3.2.2 多线激光雷达</h4>
+<p>适合室外或复杂地形。能输出3D点云。</p>
+<ul>
+  <li><strong>代表型号：</strong> Velodyne VLP-16、禾赛Pandar系列</li>
+  <li><strong>线数：</strong> 16线、32线、64线</li>
+  <li><strong>注意：</strong> 价格贵，数据量大。16线雷达每秒产生30万个点，主控算力不够会卡死。</li>
+</ul>
+
+<h4>3.2.3 固态激光雷达</h4>
+<p>没有旋转部件，寿命长，体积小。但视场角有限。</p>
+<ul>
+  <li><strong>代表型号：</strong> 速腾聚创RS-LiDAR-M1</li>
+  <li><strong>优势：</strong> 抗震动，适合移动机器人</li>
+  <li><strong>劣势：</strong> 目前价格偏高，FOV通常只有120°</li>
+</ul>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在一个项目里选了某品牌的16线雷达，结果在阳光直射下测距直接掉到3米。后来才知道，它没有做抗强光处理。选型时一定要看“抗环境光”参数。
+</div>
+
+<h3>3.3 IMU选型</h3>
+
+<p>IMU（惯性测量单元）提供加速度和角速度。它不能单独用，但和激光雷达或视觉融合后，效果翻倍。</p>
+
+<p>选IMU，我只看三个指标：</p>
+<ul>
+  <li><strong>零偏稳定性：</strong> 低于10°/h算合格，低于1°/h算优秀</li>
+  <li><strong>加速度计噪声：</strong> 低于100 μg/√Hz</li>
+  <li><strong>输出频率：</strong> 至少200Hz，越高越好</li>
+</ul>
+
+<p>常用的有：</p>
+<ul>
+  <li><strong>MPU6050：</strong> 便宜，但精度一般。适合原型验证。</li>
+  <li><strong>ICM-20948：</strong> 9轴，带磁力计。我目前在用，性价比不错。</li>
+  <li><strong>ADIS16470：</strong> 工业级，零偏稳定性0.8°/h。贵，但稳。</li>
+</ul>
+
+<div class="tip">
+  <strong>一个小技巧：</strong> IMU一定要做温度补偿。我见过有人直接拿MPU6050的原始数据做融合，结果温度一变化，姿态就飘了。加个温度模型，效果立竿见影。
+</div>
+
+<h3>3.4 编码器选型</h3>
+
+<p>编码器是AGV的“腿”。它告诉你轮子转了多少圈。</p>
+
+<p>选型要点：</p>
+<ul>
+  <li><strong>分辨率：</strong> 每圈脉冲数（PPR）。一般AGV用1000-5000 PPR。</li>
+  <li><strong>输出类型：</strong> 增量式（便宜，但掉电丢位置） vs 绝对式（贵，但掉电不丢位）。</li>
+  <li><strong>接口：</strong> 差分信号（RS422）抗干扰好，适合长距离传输。</li>
+</ul>
+
+<p>我常用的编码器：</p>
+<ul>
+  <li><strong>欧姆龙E6B2：</strong> 增量式，1000 PPR，稳定可靠。</li>
+  <li><strong>海德汉ERN系列：</strong> 绝对式，精度高，但价格感人。</li>
+</ul>
+
+<div class="warning">
+  <strong>注意：</strong> 编码器安装时，一定要保证同心度。我曾经因为安装偏差，导致编码器读数周期性跳动，查了三天才找到原因。后来加了弹性联轴器，问题解决。
+</div>
+
+<h3>3.5 深度相机选型</h3>
+
+<p>深度相机用于避障和视觉SLAM。它比激光雷达便宜，但受光照影响大。</p>
+
+<p>主流方案：</p>
+<ul>
+  <li><strong>Intel RealSense D435：</strong> 双目+红外，室内效果好。我用来做货架识别。</li>
+  <li><strong>Microsoft Azure Kinect：</strong> ToF方案，精度高，但功耗大。</li>
+  <li><strong>奥比中光Astra：</strong> 国产替代，性价比高。我在一个项目里用它替代了RealSense，成本降了40%。</li>
+</ul>
+
+<p>选型时注意：</p>
+<ul>
+  <li><strong>有效测距：</strong> 室内一般0.3-5米够用</li>
+  <li><strong>帧率：</strong> 至少15fps，30fps更好</li>
+  <li><strong>抗光性：</strong> 强光下双目方案会失效，ToF相对好一些</li>
+</ul>
+
+<h3>3.6 传感器数据融合基础</h3>
+
+<p>单个传感器都有缺陷。融合才是王道。</p>
+
+<p>我常用的融合框架：</p>
+<ul>
+  <li><strong>卡尔曼滤波：</strong> 线性系统，简单高效。适合编码器+IMU融合。</li>
+  <li><strong>扩展卡尔曼滤波（EKF）：</strong> 非线性系统，适合激光+IMU融合。</li>
+  <li><strong>粒子滤波：</strong> 非线性非高斯，适合全局定位。但计算量大。</li>
+</ul>
+
+<p>举个实际例子：</p>
+<p>我在一个AGV项目里，用激光雷达做定位，IMU做短时间预测。当激光雷达被遮挡时（比如经过货架缝隙），IMU能撑2-3秒。等激光雷达恢复，再通过EKF把位置修正回来。</p>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong> 传感器融合不是简单取平均。而是根据每个传感器的置信度，动态调整权重。激光雷达精度高但更新慢，IMU精度低但更新快。两者互补，才能稳定。</p>
+</div>
+
+<p>嗯，这一章的内容就到这里。选型是个经验活，多踩坑才能长记性。下一章咱们聊硬件电路设计，到时候见。</p>
+
+<div class="footer-nav">
+            <a href="02HardwareChassisDesign.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04Ros2EnvironmentSetup.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

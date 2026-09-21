@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 实际案例</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="active">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 货架到人模式的核心逻辑</h2>
+
+<p>各位同学，今天咱们聊聊仓储场景里最火的一种模式——货架到人。</p>
+
+<p>说白了，就是让AGV把货架搬到人面前，而不是让人满仓库跑去找货。这个模式在电商、3C、医药行业特别常见。我最早接触这个项目是在2018年，一个大型电商仓，每天要处理10万+订单。当时我就想，如果靠人拉着拣货车满场跑，效率肯定上不去。</p>
+
+<h3>1.1 货架到人 vs 人到货架</h3>
+
+<p>先看个对比，你就明白为什么货架到人更香了。</p>
+
+<table>
+  <tr>
+    <th>对比项</th>
+    <th>人到货架</th>
+    <th>货架到人</th>
+  </tr>
+  <tr>
+    <td>行走距离</td>
+    <td>拣货员每天走10-15公里</td>
+    <td>拣货员几乎不动</td>
+  </tr>
+  <tr>
+    <td>拣货效率</td>
+    <td>80-120件/小时</td>
+    <td>300-500件/小时</td>
+  </tr>
+  <tr>
+    <td>人员培训</td>
+    <td>需要熟悉库位</td>
+    <td>几乎零培训</td>
+  </tr>
+  <tr>
+    <td>系统复杂度</td>
+    <td>低</td>
+    <td>高（调度+路径规划）</td>
+  </tr>
+</table>
+
+<p>你看，效率提升3-5倍，但代价是系统复杂度上去了。嗯，这就是咱们这节课要啃的硬骨头。</p>
+
+<h3>1.2 拣选任务分配的核心要素</h3>
+
+<p>任务分配不是随便扔给一台AGV就完事。我总结了三要素：</p>
+
+<ul>
+  <li><strong>任务优先级</strong>：紧急订单、超时订单要优先处理</li>
+  <li><strong>AGV状态</strong>：电量、当前位置、当前负载</li>
+  <li><strong>货架位置</strong>：哪个货架离AGV最近、哪个货架被锁定了</li>
+</ul>
+
+<p>举个例子。有一次我在现场调试，发现一台AGV明明空载，却一直不接任务。查了半天，原来是它的电量低于30%，系统自动把它切成了充电模式。你看，状态判断有多重要。</p>
+
+<h3>1.3 路径规划与任务分配的集成</h3>
+
+<p>任务分配和路径规划，其实是两件事，但必须一起考虑。</p>
+
+<p>任务分配决定「谁去干」，路径规划决定「怎么去」。如果分开做，很容易出现：AGV被分配了任务，但路径被堵死，或者绕远路。</p>
+
+<p>我个人习惯的做法是：</p>
+
+<ol>
+  <li>先做粗粒度分配：根据AGV位置和货架位置，算一个曼哈顿距离</li>
+  <li>再做细粒度校验：用A*算法算实际路径，看是否可行</li>
+  <li>最后做冲突检测：多台AGV会不会抢路</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>核心原则</strong>：任务分配时就要考虑路径可行性，别等AGV出发了才发现走不通。</p>
+</div>
+
+<h3>1.4 系统架构图</h3>
+
+<p>下面这张图，是我自己画的一个典型货架到人调度系统架构。你看一眼就明白了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 顶层：订单入口 -->
+  <rect x="300" y="20" width="200" height="50" rx="8" fill="#4a90d9" stroke="#2c5f8a" stroke-width="2"/>
+  <text x="400" y="50" text-anchor="middle" fill="white" font-size="16" font-weight="bold">订单系统</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="70" x2="400" y2="110" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：任务分配 -->
+  <rect x="250" y="110" width="300" height="60" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+  <text x="400" y="135" text-anchor="middle" fill="white" font-size="15" font-weight="bold">任务分配引擎</text>
+  <text x="400" y="155" text-anchor="middle" fill="white" font-size="12">优先级排序 | AGV匹配 | 货架锁定</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="170" x2="400" y2="210" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：路径规划 -->
+  <rect x="250" y="210" width="300" height="60" rx="8" fill="#f0ad4e" stroke="#d58512" stroke-width="2"/>
+  <text x="400" y="235" text-anchor="middle" fill="white" font-size="15" font-weight="bold">路径规划模块</text>
+  <text x="400" y="255" text-anchor="middle" fill="white" font-size="12">A*算法 | 交通管制 | 动态避障</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="270" x2="400" y2="310" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：AGV调度 -->
+  <rect x="250" y="310" width="300" height="60" rx="8" fill="#d9534f" stroke="#b52e27" stroke-width="2"/>
+  <text x="400" y="335" text-anchor="middle" fill="white" font-size="15" font-weight="bold">AGV调度执行</text>
+  <text x="400" y="355" text-anchor="middle" fill="white" font-size="12">指令下发 | 状态监控 | 异常处理</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="370" x2="400" y2="410" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底层：AGV集群 -->
+  <rect x="150" y="410" width="500" height="60" rx="8" fill="#9b59b6" stroke="#7d3c98" stroke-width="2"/>
+  <text x="400" y="435" text-anchor="middle" fill="white" font-size="15" font-weight="bold">AGV集群（N台机器人）</text>
+  <text x="400" y="455" text-anchor="middle" fill="white" font-size="12">AGV-01 | AGV-02 | AGV-03 | ... | AGV-N</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+  </defs>
+  
+  <!-- 左侧标注 -->
+  <text x="80" y="140" fill="#333" font-size="13" font-weight="bold">数据流</text>
+  <line x1="100" y1="145" x2="240" y2="145" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+  
+  <text x="80" y="240" fill="#333" font-size="13" font-weight="bold">控制流</text>
+  <line x1="100" y1="245" x2="240" y2="245" stroke="#333" stroke-width="1" stroke-dasharray="5,5"/>
+</svg>
+
+<p>这张图里，订单系统把任务扔给分配引擎，分配引擎算好谁去干，再交给路径规划模块算路线，最后AGV执行。环环相扣，缺一不可。</p>
+
+<h3>1.5 避坑指南</h3>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong></p>
+  <ul>
+    <li>任务分配时没考虑AGV电量，结果AGV半路没电，货架卡在半道上</li>
+    <li>路径规划只算最短路径，没考虑多AGV冲突，结果三台车在路口堵死</li>
+    <li>货架锁定机制没做好，两台AGV同时去搬同一个货架</li>
+  </ul>
+</div>
+
+<p>这些坑，你想想看，任何一个都够你调试一整天。所以我的建议是：</p>
+
+<div class="tip">
+  <p><strong>实战建议：</strong></p>
+  <ul>
+    <li>任务分配时，预留10%的AGV作为机动队，处理突发订单</li>
+    <li>路径规划要预留安全距离，至少1.5倍车长</li>
+    <li>货架锁定用Redis的分布式锁，别用数据库行锁，性能差太多</li>
+  </ul>
+</div>
+
+<h3>1.6 代码示例：任务分配核心逻辑</h3>
+
+<p>下面是一个简化版的任务分配代码，我用Python写的。实际项目里会用C++或者Java，但逻辑是一样的。</p>
+
+<pre><code>class TaskAllocator:
+    def __init__(self, agv_list, shelf_list):
+        self.agvs = agv_list  # AGV列表
+        self.shelves = shelf_list  # 货架列表
+    
+    def assign_task(self, order):
+        # 1. 筛选可用AGV（电量>30%，空闲状态）
+        available_agvs = [agv for agv in self.agvs 
+                         if agv.battery &gt; 30 and agv.status == 'idle']
+        
+        if not available_agvs:
+            return None  # 没有可用AGV
+        
+        # 2. 找到最近的AGV
+        target_shelf = self.shelves[order.shelf_id]
+        best_agv = min(available_agvs, 
+                      key=lambda agv: self.manhattan_distance(
+                          agv.position, target_shelf.position))
+        
+        # 3. 锁定货架和AGV
+        target_shelf.lock()
+        best_agv.assign(order)
+        
+        return best_agv
+    
+    def manhattan_distance(self, pos1, pos2):
+        return abs(pos1.x - pos2.x) + abs(pos1.y - pos2.y)</code></pre>
+
+<p>这段代码看着简单，但实际项目里要考虑的东西多得多。比如：</p>
+<ul>
+  <li>多订单同时到达时的排队策略</li>
+  <li>AGV任务完成后的回库策略</li>
+  <li>货架热度的动态调整（热门货架优先靠近拣选站）</li>
+</ul>
+
+<p>嗯，这些咱们后面章节会慢慢展开。今天先把骨架搭好，后面再填肉。</p>
+
+<div class="footer-nav">
+            <a href="18PerformanceMetrics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20FactoryLineDispatchCase.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

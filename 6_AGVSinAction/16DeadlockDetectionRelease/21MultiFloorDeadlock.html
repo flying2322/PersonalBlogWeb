@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>21 死锁检测与解除实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="active">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>21 死锁检测与解除实战：多楼层AGV系统的死锁处理</h2>
+
+<p>多楼层AGV系统，听起来挺高大上的吧？说白了，就是把单层平面的死锁问题，硬生生拉到了三维空间里。你想想看，AGV不光要在同一层里跟别的车抢路，还得考虑上下楼、等电梯、跨层运输。这复杂度，直接翻倍。</p>
+
+<p>我最早接触多楼层项目时，心里还想着「不就是多装几台电梯嘛」。结果上线第一天，三台AGV堵在电梯口，谁都不让谁，整个二楼的生产线直接停摆。嗯，从那以后，我再也不敢小看跨层死锁了。</p>
+
+<h3>21.1 多楼层死锁的特殊性</h3>
+
+<p>单层死锁，通常就是环路等待。但多楼层系统里，死锁的成因更「阴险」。</p>
+
+<ul>
+  <li><strong>电梯资源竞争</strong>：电梯本身就是一个共享资源。AGV进了电梯，电梯门一关，其他AGV就只能干等。</li>
+  <li><strong>跨层路径依赖</strong>：A车要从1楼去3楼，B车要从3楼去1楼。两车在电梯里相遇，如果调度策略不对，就会互相阻塞。</li>
+  <li><strong>楼层缓冲区溢出</strong>：某一层的AGV太多，把电梯口堵死了，楼上的车下不来，楼下的车上不去。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心观点</strong>：多楼层死锁的本质，是「平面路径死锁」与「垂直运输资源死锁」的叠加。解决思路，也必须分层、分资源去处理。</p>
+</div>
+
+<h3>21.2 死锁检测：从平面到立体</h3>
+
+<p>我个人的习惯是，把多楼层系统的死锁检测拆成两层：</p>
+
+<ol>
+  <li><strong>楼层内检测</strong>：沿用单层的环路检测算法（比如资源分配图法）。</li>
+  <li><strong>跨层检测</strong>：重点监控电梯资源的状态。</li>
+</ol>
+
+<p>跨层检测的核心，是维护一张「电梯等待图」。每个电梯是一个节点，等待电梯的AGV是边。如果这张图里出现了环路，那就说明死锁了。</p>
+
+<p>举个例子：</p>
+
+<pre><code>电梯1：等待AGV_A（从2楼下到1楼）
+电梯2：等待AGV_B（从1楼上到3楼）
+AGV_A：等待电梯2空闲（因为要去3楼）
+AGV_B：等待电梯1空闲（因为要去2楼）
+
+环路形成：电梯1 → AGV_A → 电梯2 → AGV_B → 电梯1
+</code></pre>
+
+<p>你看，这就是典型的跨层死锁。我在项目里遇到过好几次，每次都是因为AGV的跨层任务分配不合理导致的。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在检测算法里只考虑了「AGV等待AGV」的情况，忽略了「AGV等待电梯」这种间接等待。结果死锁检测一直报假阴性。后来我把电梯也当作一种「特殊AGV」加入等待图，问题就解决了。</p>
+</div>
+
+<h3>21.3 死锁解除：三种实战策略</h3>
+
+<p>检测到死锁之后，怎么解？我总结了三招，按优先级排序：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>策略</th>
+      <th>适用场景</th>
+      <th>代价</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>任务重调度</td>
+      <td>死锁涉及的任务可取消或延迟</td>
+      <td>低</td>
+    </tr>
+    <tr>
+      <td>路径重规划</td>
+      <td>死锁点附近有绕行路径</td>
+      <td>中</td>
+    </tr>
+    <tr>
+      <td>强制移车</td>
+      <td>以上两种都无效时</td>
+      <td>高</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><strong>任务重调度</strong>：说白了，就是让某个AGV放弃当前任务，先去干别的。比如让电梯里的AGV先出来，让别的车先过。这个策略代价最小，但需要任务管理系统支持。</p>
+
+<p><strong>路径重规划</strong>：如果死锁点附近有备用路径，就让AGV绕一下。多楼层系统里，有时候可以走楼梯（如果允许的话），或者换一个电梯。</p>
+
+<p><strong>强制移车</strong>：这是最后的手段。我曾经在一个项目里，不得不让AGV原地倒车，退回到上一个路口。嗯，场面确实有点尴尬，但总比整个系统瘫痪强。</p>
+
+<div class="warning">
+  <p><strong>注意</strong>：强制移车时，一定要确保AGV的传感器能检测到后方障碍物。我见过一个案例，AGV倒车时撞到了后面的料架，损失不小。</p>
+</div>
+
+<h3>21.4 实战案例：三层仓库的死锁处理</h3>
+
+<p>我记得有个项目，是一个三层仓库，每层有10台AGV，共用2部货梯。上线第三天，死锁了。</p>
+
+<p>现象是：1楼的AGV都在等电梯，2楼的AGV也都在等电梯，3楼的AGV下不来。电梯门开开合合，就是没有AGV能进去。</p>
+
+<p>我当时的排查步骤：</p>
+
+<ol>
+  <li>先看电梯等待图，发现两部电梯都被AGV占用了，但AGV的任务目标楼层互相冲突。</li>
+  <li>再看楼层内路径，发现1楼和2楼的电梯口缓冲区都满了。</li>
+  <li>最终定位：死锁原因是「电梯资源分配策略太死板」——AGV进了电梯后，必须到达目标楼层才能开门，中间不能切换。</li>
+</ol>
+
+<p>解决方案：</p>
+
+<ul>
+  <li>修改电梯调度策略，允许AGV在电梯内「中途下车」。</li>
+  <li>增加楼层缓冲区容量限制，当某一层AGV数量超过阈值时，禁止新AGV进入该层。</li>
+  <li>加入超时机制：AGV在电梯内等待超过10秒，自动退出电梯，让出资源。</li>
+</ul>
+
+<p>改完之后，死锁再也没出现过。</p>
+
+<h3>21.5 核心逻辑流程图</h3>
+
+<p>下面这张图，是我自己总结的多楼层死锁检测与解除流程。你照着这个思路去设计，基本不会出大问题。</p>
+
+<svg width="720" height="520" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="520" fill="#f9fafb" rx="8"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="16" font-weight="bold" fill="#1f2937">多楼层AGV死锁检测与解除流程</text>
+  
+  <!-- 开始 -->
+  <rect x="260" y="55" width="200" height="40" rx="20" fill="#3b82f6" stroke="#2563eb" stroke-width="2"/>
+  <text x="360" y="80" text-anchor="middle" font-size="14" fill="#fff" font-weight="bold">开始检测</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="95" x2="360" y2="125" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤1 -->
+  <rect x="210" y="125" width="300" height="45" rx="6" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="2"/>
+  <text x="360" y="145" text-anchor="middle" font-size="13" fill="#1e40af">采集所有AGV位置、任务、电梯状态</text>
+  <text x="360" y="162" text-anchor="middle" font-size="11" fill="#475569">（每200ms刷新一次）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="170" x2="360" y2="200" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断1 -->
+  <polygon points="360,200 480,235 360,270 240,235" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="360" y="235" text-anchor="middle" font-size="12" fill="#92400e">楼层内存在环路？</text>
+  <text x="360" y="252" text-anchor="middle" font-size="11" fill="#92400e">（资源分配图法）</text>
+  
+  <!-- 是 -->
+  <text x="490" y="225" font-size="12" fill="#dc2626">是</text>
+  <line x1="480" y1="235" x2="540" y2="235" stroke="#dc2626" stroke-width="2"/>
+  <line x1="540" y1="235" x2="540" y2="310" stroke="#dc2626" stroke-width="2"/>
+  <line x1="540" y1="310" x2="480" y2="310" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 否 -->
+  <text x="350" y="285" font-size="12" fill="#16a34a">否</text>
+  <line x1="360" y1="270" x2="360" y2="310" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2 -->
+  <rect x="210" y="310" width="300" height="45" rx="6" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="2"/>
+  <text x="360" y="330" text-anchor="middle" font-size="13" fill="#1e40af">构建电梯等待图</text>
+  <text x="360" y="347" text-anchor="middle" font-size="11" fill="#475569">（电梯作为节点，AGV作为边）</text>
+  
+  <!-- 箭头 -->
+  <line x1="360" y1="355" x2="360" y2="385" stroke="#6b7280" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 判断2 -->
+  <polygon points="360,385 480,420 360,455 240,420" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="360" y="420" text-anchor="middle" font-size="12" fill="#92400e">跨层存在环路？</text>
+  <text x="360" y="437" text-anchor="middle" font-size="11" fill="#92400e">（电梯等待图检测）</text>
+  
+  <!-- 是 -->
+  <text x="490" y="410" font-size="12" fill="#dc2626">是</text>
+  <line x1="480" y1="420" x2="540" y2="420" stroke="#dc2626" stroke-width="2"/>
+  <line x1="540" y1="420" x2="540" y2="480" stroke="#dc2626" stroke-width="2"/>
+  <line x1="540" y1="480" x2="480" y2="480" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 否 -->
+  <text x="350" y="470" font-size="12" fill="#16a34a">否</text>
+  <line x1="360" y1="455" x2="360" y2="480" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 结果 -->
+  <rect x="210" y="480" width="300" height="35" rx="6" fill="#dcfce7" stroke="#86efac" stroke-width="2"/>
+  <text x="360" y="502" text-anchor="middle" font-size="13" fill="#166534">无死锁，继续监控</text>
+  
+  <!-- 死锁解除分支 -->
+  <rect x="480" y="460" width="200" height="35" rx="6" fill="#fce7f3" stroke="#f9a8d4" stroke-width="2"/>
+  <text x="580" y="482" text-anchor="middle" font-size="13" fill="#9d174d">触发死锁解除策略</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280"/>
+    </marker>
+  </defs>
+</svg>
+
+<div class="highlight">
+  <p><strong>总结一下</strong>：多楼层死锁检测，核心是「分层检测+跨层联动」。先解决楼层内的环路，再处理电梯资源的竞争。解除策略上，优先用任务重调度，实在不行再强制移车。记住，电梯资源是瓶颈，一定要重点监控。</p>
+</div>
+
+<div class="tip">
+  <p><strong>个人建议</strong>：在设计多楼层系统时，最好给每个楼层预留一个「紧急缓冲区」。一旦检测到死锁，可以先把部分AGV引导到缓冲区里，腾出空间。这个缓冲区平时不用，但关键时刻能救命。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="20WarehouseIoDeadlock.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="22AutoDoorDeadlock.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

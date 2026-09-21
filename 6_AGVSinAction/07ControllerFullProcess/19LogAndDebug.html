@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 日志与调试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="active">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 日志与调试——AGV开发者的“眼睛”</h2>
+
+<p>做AGV控制器开发，说白了就是跟看不见摸不着的逻辑打交道。你写了一大堆代码，电机转不转？传感器读没读到？PID参数调没调对？这些信息，都得靠日志和调试工具来告诉你。</p>
+
+<p>我个人习惯，在项目一开始就把调试手段搭好。别等到车跑起来发现抖得像跳舞，才想起来加日志。那时候你连问题出在哪都不知道。</p>
+
+<h3>1.1 SEGGER RTT日志——实时、低开销的“黑匣子”</h3>
+
+<p>先说说SEGGER RTT。这玩意儿我用了好几年，真心推荐。它全称是Real-Time Transfer，是SEGGER公司搞出来的一种调试接口技术。</p>
+
+<p><strong>为什么不用串口？</strong></p>
+<p>串口打印日志，速度慢，还占CPU。你想想看，AGV在高速运行时，串口每打印一行，可能就耽误了几毫秒的控制周期。RTT就不一样，它通过JTAG/SWD接口，直接在内存里读写数据，几乎不占用CPU时间。</p>
+
+<div class="highlight">
+  <p><strong>RTT的核心优势：</strong></p>
+  <ul>
+    <li>极低延迟：微秒级响应</li>
+    <li>不影响实时性：不打断主循环</li>
+    <li>双向通信：既能输出日志，也能输入命令</li>
+    <li>支持多通道：可以分不同优先级输出</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过一个问题：AGV在转弯时突然卡顿。用串口打印PID数据，结果一开打印，卡顿更严重了。后来换成RTT，数据实时输出，才发现是积分项饱和了。嗯，这就是工具选对的好处。</p>
+
+<h4>RTT的基本配置</h4>
+<p>在SEGGER Embedded Studio或者J-Link驱动里，都有RTT的源码。你只需要把<code>SEGGER_RTT.c</code>和<code>SEGGER_RTT.h</code>加到工程里，然后调用<code>SEGGER_RTT_printf()</code>就行。</p>
+
+<pre><code>// 初始化（一般放在main函数开头）
+SEGGER_RTT_Init();
+
+// 打印日志，类似printf
+SEGGER_RTT_printf(0, "电机速度: %d rpm, 目标: %d rpm\n", current_speed, target_speed);
+
+// 带时间戳的打印
+SEGGER_RTT_printf(0, "[%u] 编码器计数: %ld\n", HAL_GetTick(), encoder_count);</code></pre>
+
+<div class="tip">
+  <p><strong>我的小技巧：</strong> 用通道0做普通日志，通道1做错误日志，通道2做调试命令。这样在J-Link RTT Viewer里可以分别查看，不会乱。</p>
+</div>
+
+<h3>1.2 串口调试助手——最朴素的“听诊器”</h3>
+
+<p>虽然RTT很强大，但串口调试助手依然是每个嵌入式工程师的必备工具。为什么？因为它简单、通用、不挑硬件。</p>
+
+<p>我记得刚入行时，带我的师傅说：“串口是嵌入式世界的通用语言。” 后来我深有体会。不管你是STM32、GD32还是国产MCU，只要引出TX/RX，就能通信。</p>
+
+<h4>串口调试的常见坑</h4>
+<ul>
+  <li><strong>波特率不匹配：</strong> 我见过有人调了一下午，结果是115200和9600没对上</li>
+  <li><strong>电平不匹配：</strong> 3.3V的MCU接5V的USB转串口，不烧IO口算运气好</li>
+  <li><strong>缓冲区溢出：</strong> 打印太快，串口缓冲区满了，数据就丢了</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong> 我曾经在AGV的电机控制循环里直接放了一个<code>printf()</code>，结果电机直接停了。后来才发现，printf是阻塞的，会等串口发送完才返回。在实时控制里，千万别这么干！</p>
+</div>
+
+<p>正确的做法是：用DMA+环形缓冲区。把日志先写到内存里，然后由DMA后台慢慢发送。这样主循环不会被阻塞。</p>
+
+<pre><code>// 伪代码：非阻塞串口日志
+void log_printf(const char *fmt, ...) {
+    // 1. 格式化字符串到环形缓冲区
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(ring_buf + write_idx, ...);
+    va_end(args);
+    
+    // 2. 启动DMA传输（如果上一次传输已完成）
+    if (dma_idle) {
+        HAL_UART_Transmit_DMA(&huart1, ring_buf + send_idx, len);
+    }
+}</code></pre>
+
+<h3>1.3 逻辑分析仪——数字世界的“示波器”</h3>
+
+<p>做AGV控制，免不了要跟各种数字信号打交道：PWM波、编码器脉冲、I2C/SPI通信、CAN总线……这时候，逻辑分析仪就是你的第三只眼。</p>
+
+<p>我个人觉得，逻辑分析仪比示波器更适合调试数字信号。为什么？因为它通道多（一般8-16通道），能同时看多路信号，还能解码协议。</p>
+
+<h4>什么时候该用逻辑分析仪？</h4>
+<ul>
+  <li>电机PWM频率不对，怀疑定时器配置错了</li>
+  <li>编码器读数跳变，怀疑AB相时序有问题</li>
+  <li>I2C设备不响应，想看SCL/SDA波形</li>
+  <li>CAN总线通信失败，想看报文有没有发出去</li>
+</ul>
+
+<p>我记得有一次，AGV的里程计数据总是偏大。用逻辑分析仪抓了编码器的A、B相波形，发现B相的上升沿和下降沿有毛刺，导致计数器多计了脉冲。后来在硬件上加了个RC滤波，问题就解决了。</p>
+
+<div class="highlight">
+  <p><strong>逻辑分析仪使用要点：</strong></p>
+  <ol>
+    <li><strong>采样率要够：</strong> 至少是信号频率的4倍，建议10倍以上</li>
+    <li><strong>触发设置：</strong> 用上升沿或下降沿触发，别傻等</li>
+    <li><strong>协议解码：</strong> 现在的逻辑分析仪都支持UART、I2C、SPI、CAN等解码，直接用</li>
+    <li><strong>导出数据：</strong> 可以把波形导出成CSV，用Python做进一步分析</li>
+  </ol>
+</div>
+
+<h3>1.4 性能分析（Profiling）——找到代码的“瓶颈”</h3>
+
+<p>AGV控制是个实时系统。主循环跑一圈，必须在规定时间内完成（比如1ms）。如果超时，轻则控制精度下降，重则电机失控。</p>
+
+<p>性能分析，就是找出代码里最耗时的部分。说白了，就是看时间都花在哪了。</p>
+
+<h4>常用的性能分析方法</h4>
+<table>
+  <tr>
+    <th>方法</th>
+    <th>原理</th>
+    <th>适用场景</th>
+  </tr>
+  <tr>
+    <td>GPIO翻转法</td>
+    <td>在代码段前后翻转GPIO，用示波器测脉宽</td>
+    <td>快速定位，不需要额外工具</td>
+  </tr>
+  <tr>
+    <td>定时器捕获</td>
+    <td>用定时器记录代码段的执行时间</td>
+    <td>需要精确到微秒级</td>
+  </tr>
+  <tr>
+    <td>IDE Profiler</td>
+    <td>用IDE自带的性能分析工具（如IAR的C-SPY）</td>
+    <td>需要看函数调用关系和耗时占比</td>
+  </tr>
+  <tr>
+    <td>RTT+时间戳</td>
+    <td>在关键位置打印时间戳，事后分析</td>
+    <td>长时间运行，看趋势</td>
+  </tr>
+</table>
+
+<p>我个人最常用的是GPIO翻转法。简单粗暴，不依赖任何工具。你只需要在代码里加两行：</p>
+
+<pre><code>// 在要测量的代码段开始处
+HAL_GPIO_WritePin(DEBUG_GPIO_Port, DEBUG_Pin, GPIO_PIN_SET);
+
+// ... 要测量的代码 ...
+
+// 在代码段结束处
+HAL_GPIO_WritePin(DEBUG_GPIO_Port, DEBUG_Pin, GPIO_PIN_RESET);</code></pre>
+
+<p>然后用示波器或者逻辑分析仪看这个GPIO的脉宽。嗯，一目了然。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong> 在AGV的主循环里，我一般会测量这几个关键段的耗时：传感器读取、控制算法计算、电机输出。如果总时间超过1ms，就逐个排查。通常问题出在浮点运算或者数学库函数上。</p>
+</div>
+
+<h3>1.5 本章知识体系</h3>
+
+<p>下面这张图，是我自己总结的AGV调试工具链。你可以把它当作一个检查清单：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV控制器调试工具链</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="70" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV控制器调试</text>
+  
+  <!-- 四个分支 -->
+  <!-- 分支1: SEGGER RTT -->
+  <line x1="350" y1="120" x2="150" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="50" y="180" width="200" height="60" rx="10" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="150" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">SEGGER RTT日志</text>
+  <text x="150" y="225" text-anchor="middle" font-size="11" fill="#f0f0f0">实时、低开销、双向</text>
+  
+  <!-- 分支2: 串口调试 -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="300" y="180" width="200" height="60" rx="10" fill="#27ae60" stroke="#1e8449" stroke-width="2"/>
+  <text x="400" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">串口调试助手</text>
+  <text x="400" y="225" text-anchor="middle" font-size="11" fill="#f0f0f0">通用、简单、DMA优化</text>
+  
+  <!-- 分支3: 逻辑分析仪 -->
+  <line x1="450" y1="120" x2="650" y2="180" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="550" y="180" width="200" height="60" rx="10" fill="#8e44ad" stroke="#6c3483" stroke-width="2"/>
+  <text x="650" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">逻辑分析仪</text>
+  <text x="650" y="225" text-anchor="middle" font-size="11" fill="#f0f0f0">多通道、协议解码</text>
+  
+  <!-- 分支4: 性能分析 -->
+  <line x1="400" y1="120" x2="400" y2="180" stroke="#2c3e50" stroke-width="2" visibility="hidden"/>
+  <line x1="400" y1="240" x2="400" y2="300" stroke="#2c3e50" stroke-width="2"/>
+  <rect x="300" y="300" width="200" height="60" rx="10" fill="#f39c12" stroke="#d68910" stroke-width="2"/>
+  <text x="400" y="325" text-anchor="middle" font-size="14" fill="white" font-weight="bold">性能分析(Profiling)</text>
+  <text x="400" y="345" text-anchor="middle" font-size="11" fill="#f0f0f0">GPIO翻转、定时器、IDE</text>
+  
+  <!-- 子节点 -->
+  <!-- RTT子节点 -->
+  <line x1="100" y1="240" x2="100" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="30" y="290" width="140" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="100" y="312" text-anchor="middle" font-size="11" fill="#c0392b">多通道配置</text>
+  
+  <line x1="200" y1="240" x2="200" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="130" y="290" width="140" height="35" rx="5" fill="#fadbd8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="200" y="312" text-anchor="middle" font-size="11" fill="#c0392b">时间戳打印</text>
+  
+  <!-- 串口子节点 -->
+  <line x1="350" y1="240" x2="350" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="280" y="290" width="140" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="350" y="312" text-anchor="middle" font-size="11" fill="#1e8449">DMA+环形缓冲</text>
+  
+  <line x1="450" y1="240" x2="450" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="380" y="290" width="140" height="35" rx="5" fill="#d5f5e3" stroke="#27ae60" stroke-width="1"/>
+  <text x="450" y="312" text-anchor="middle" font-size="11" fill="#1e8449">波特率匹配</text>
+  
+  <!-- 逻辑分析仪子节点 -->
+  <line x1="600" y1="240" x2="600" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="530" y="290" width="140" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="600" y="312" text-anchor="middle" font-size="11" fill="#6c3483">采样率设置</text>
+  
+  <line x1="700" y1="240" x2="700" y2="290" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="630" y="290" width="140" height="35" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1"/>
+  <text x="700" y="312" text-anchor="middle" font-size="11" fill="#6c3483">触发与解码</text>
+  
+  <!-- 性能分析子节点 -->
+  <line x1="350" y1="360" x2="350" y2="410" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="280" y="410" width="140" height="35" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="350" y="432" text-anchor="middle" font-size="11" fill="#d68910">GPIO翻转法</text>
+  
+  <line x1="450" y1="360" x2="450" y2="410" stroke="#2c3e50" stroke-width="1.5"/>
+  <rect x="380" y="410" width="140" height="35" rx="5" fill="#fdebd0" stroke="#f39c12" stroke-width="1"/>
+  <text x="450" y="432" text-anchor="middle" font-size="11" fill="#d68910">定时器捕获</text>
+  
+  <!-- 底部总结 -->
+  <rect x="200" y="460" width="400" height="30" rx="15" fill="#2c3e50"/>
+  <text x="400" y="480" text-anchor="middle" font-size="13" fill="white">调试工具选对，问题解决快一倍</text>
+</svg>
+
+<p>这张图把本章讲的四个工具串起来了。你不需要一次性全用上，但心里要有数：遇到什么问题，该用哪个工具。</p>
+
+<p>好了，这一章的内容就到这。日志和调试是AGV开发的基石，别嫌麻烦，前期搭好了，后面能省你大量时间。</p>
+
+<div class="footer-nav">
+            <a href="18FirmwareOta.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20EmcReliability.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

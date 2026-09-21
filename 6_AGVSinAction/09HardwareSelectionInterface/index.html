@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>AGV控制器硬件选型与接口设计实战 · 课程目录</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f9ff 0%, #e6f5e9 100%);
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem 1rem;
+            color: #1e3c4f;
+        }
+        .course-wrapper {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.70);
+            backdrop-filter: blur(2px);
+            border-radius: 48px 48px 32px 32px;
+            padding: 2rem 2rem 1.5rem;
+            box-shadow: 0 20px 40px rgba(0, 40, 60, 0.12);
+            border: 2px solid rgba(255, 240, 150, 0.5);
+        }
+        .header-title {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            border-bottom: 6px solid #fdd835;
+            padding-bottom: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0077b6, #00b4d8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-title h1::before {
+            content: "📘";
+            font-size: 2.2rem;
+            background: #fff2c0;
+            padding: 0 8px;
+            border-radius: 40px;
+        }
+        .header-title .subhead {
+            font-size: 1.1rem;
+            background: #b7e4c7;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            color: #1b4d3d;
+            font-weight: 600;
+        }
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+            margin: 1.8rem 0 1.2rem;
+        }
+        .chapter-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.2rem;
+            transition: all 0.2s ease;
+            border: 3px solid #ffd966;
+            box-shadow: 0 6px 0 #e0c27a;
+            cursor: pointer;
+            position: relative;
+        }
+        .chapter-card:hover {
+            transform: translateY(-4px);
+            border-color: #f9c74f;
+            background: #fffef7;
+        }
+        .chapter-badge {
+            display: inline-block;
+            background: #f94144;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            margin-bottom: 0.5rem;
+        }
+        .chapter-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .chapter-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #023e8a;
+            margin: 0.2rem 0 0.4rem;
+            line-height: 1.3;
+        }
+        .chapter-desc {
+            font-size: 0.85rem;
+            color: #1e4a5f;
+            line-height: 1.4;
+            margin: 0.2rem 0;
+            padding-left: 10px;
+            border-left: 4px solid #90e0ef;
+        }
+        .card-tags {
+            margin-top: 0.6rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+        .tag {
+            background: #d8f3dc;
+            color: #1b4332;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .chapter-card a.chapter-link::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 28px;
+            z-index: 1;
+        }
+        .chapter-card > *:not(a.chapter-link) {
+            position: relative;
+            z-index: 2;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            .course-wrapper { padding: 1.2rem; }
+            .header-title h1 { font-size: 2rem; }
+            .catalog-grid { grid-template-columns: 1fr; }
+        }
+        .footer {
+            max-width: 1300px;
+            width: 100%;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        .footer-note {
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: #2c5a6b;
+            background: rgba(255, 245, 200, 0.6);
+            display: inline-block;
+            padding: 0.4rem 2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            border: 1px solid #f7d44a;
+        }
+    </style>
+</head>
+<body>
+<div class="course-wrapper">
+    <div class="header-title">
+        <h1>AGV控制器硬件选型与接口设计实战</h1>
+        <span class="subhead">📚 共计 30 章节</span>
+    </div>
+    <div class="catalog-grid">
+        <!-- 1 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="01ControllerOverview.html"></a>
+            <span class="chapter-badge">01</span>
+            <div class="chapter-title">AGV控制器概述</div>
+            <div class="chapter-desc">AGV系统组成、控制器角色定位、主流控制器类型对比（PLC/工控机/嵌入式）</div>
+            <div class="card-tags"><span class="tag">系统架构</span><span class="tag">选型对比</span></div>
+        </div>
+        <!-- 2 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="02ProcessorSelection.html"></a>
+            <span class="chapter-badge">02</span>
+            <div class="chapter-title">核心处理器选型</div>
+            <div class="chapter-desc">ARM Cortex-A系列、x86架构、RISC-V架构的性能与功耗分析</div>
+            <div class="card-tags"><span class="tag">CPU</span><span class="tag">功耗</span></div>
+        </div>
+        <!-- 3 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="03RtosSelection.html"></a>
+            <span class="chapter-badge">03</span>
+            <div class="chapter-title">实时操作系统选型</div>
+            <div class="chapter-desc">FreeRTOS、RT-Linux、VxWorks在AGV场景下的适用性</div>
+            <div class="card-tags"><span class="tag">RTOS</span><span class="tag">实时性</span></div>
+        </div>
+        <!-- 4 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="04CommInterfacePart1.html"></a>
+            <span class="chapter-badge">04</span>
+            <div class="chapter-title">通信接口设计（上）</div>
+            <div class="chapter-desc">CAN总线、RS485/RS232、EtherCAT的选型与布线要点</div>
+            <div class="card-tags"><span class="tag">总线</span><span class="tag">布线</span></div>
+        </div>
+        <!-- 5 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="05CommInterfacePart2.html"></a>
+            <span class="chapter-badge">05</span>
+            <div class="chapter-title">通信接口设计（下）</div>
+            <div class="chapter-desc">Wi-Fi 6、5G、UWB在AGV集群调度中的应用</div>
+            <div class="card-tags"><span class="tag">无线</span><span class="tag">集群</span></div>
+        </div>
+        <!-- 6 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="06SensorInterface.html"></a>
+            <span class="chapter-badge">06</span>
+            <div class="chapter-title">传感器接口设计</div>
+            <div class="chapter-desc">激光雷达（LiDAR）、IMU、编码器的接口协议与数据同步</div>
+            <div class="card-tags"><span class="tag">传感器</span><span class="tag">同步</span></div>
+        </div>
+        <!-- 7 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="07MotorDriverInterface.html"></a>
+            <span class="chapter-badge">07</span>
+            <div class="chapter-title">电机驱动接口</div>
+            <div class="chapter-desc">直流无刷电机（BLDC）与伺服电机的驱动器选型与PWM接口</div>
+            <div class="card-tags"><span class="tag">电机</span><span class="tag">PWM</span></div>
+        </div>
+        <!-- 8 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="08PowerManagement.html"></a>
+            <span class="chapter-badge">08</span>
+            <div class="chapter-title">电源管理设计</div>
+            <div class="chapter-desc">电池选型（铅酸/锂电池）、BMS通信、电源轨设计与功耗估算</div>
+            <div class="card-tags"><span class="tag">电源</span><span class="tag">BMS</span></div>
+        </div>
+        <!-- 9 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="09SafetyRedundancy.html"></a>
+            <span class="chapter-badge">09</span>
+            <div class="chapter-title">安全与冗余设计</div>
+            <div class="chapter-desc">急停电路、双通道安全继电器、STO（安全转矩关闭）功能实现</div>
+            <div class="card-tags"><span class="tag">安全</span><span class="tag">冗余</span></div>
+        </div>
+        <!-- 10 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="10IoExpandIsolation.html"></a>
+            <span class="chapter-badge">10</span>
+            <div class="chapter-title">I/O扩展与隔离</div>
+            <div class="chapter-desc">数字量输入输出、模拟量采集、光耦隔离与TVS保护</div>
+            <div class="card-tags"><span class="tag">I/O</span><span class="tag">隔离</span></div>
+        </div>
+        <!-- 11 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="11HmiInterface.html"></a>
+            <span class="chapter-badge">11</span>
+            <div class="chapter-title">人机交互接口</div>
+            <div class="chapter-desc">触摸屏选型、按键矩阵、状态指示灯与蜂鸣器驱动</div>
+            <div class="card-tags"><span class="tag">HMI</span><span class="tag">交互</span></div>
+        </div>
+        <!-- 12 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="12StorageAndLog.html"></a>
+            <span class="chapter-badge">12</span>
+            <div class="chapter-title">存储与日志设计</div>
+            <div class="chapter-desc">eMMC、SD卡、NAND Flash的选型与文件系统选择（FAT32/EXT4）</div>
+            <div class="card-tags"><span class="tag">存储</span><span class="tag">文件系统</span></div>
+        </div>
+        <!-- 13 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="13StructureEnvAdapt.html"></a>
+            <span class="chapter-badge">13</span>
+            <div class="chapter-title">结构与环境适应性</div>
+            <div class="chapter-desc">防护等级（IP等级）、散热设计、振动与冲击测试标准</div>
+            <div class="card-tags"><span class="tag">结构</span><span class="tag">IP防护</span></div>
+        </div>
+        <!-- 14 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="14EmcDesign.html"></a>
+            <span class="chapter-badge">14</span>
+            <div class="chapter-title">电磁兼容性（EMC）设计</div>
+            <div class="chapter-desc">PCB布局、屏蔽、滤波与接地策略</div>
+            <div class="card-tags"><span class="tag">EMC</span><span class="tag">PCB</span></div>
+        </div>
+        <!-- 15 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="15HardwareDebugTest.html"></a>
+            <span class="chapter-badge">15</span>
+            <div class="chapter-title">硬件调试与测试</div>
+            <div class="chapter-desc">示波器使用、逻辑分析仪抓取总线数据、电源纹波测试</div>
+            <div class="card-tags"><span class="tag">调试</span><span class="tag">测试</span></div>
+        </div>
+        <!-- 16 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="16HardwareArchitecture.html"></a>
+            <span class="chapter-badge">16</span>
+            <div class="chapter-title">AGV控制器硬件架构总览</div>
+            <div class="chapter-desc">从传感器到执行器的数据流与信号流</div>
+            <div class="card-tags"><span class="tag">架构</span><span class="tag">数据流</span></div>
+        </div>
+        <!-- 17 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="17McuChipCompare.html"></a>
+            <span class="chapter-badge">17</span>
+            <div class="chapter-title">主控芯片选型深度对比</div>
+            <div class="chapter-desc">STM32MP1 vs i.MX8M vs Jetson Nano</div>
+            <div class="card-tags"><span class="tag">主控</span><span class="tag">对比</span></div>
+        </div>
+        <!-- 18 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="18DdrFlashCircuit.html"></a>
+            <span class="chapter-badge">18</span>
+            <div class="chapter-title">DDR与Flash电路设计</div>
+            <div class="chapter-desc">DDR3/DDR4布线规则、NAND Flash的ECC校验</div>
+            <div class="card-tags"><span class="tag">DDR</span><span class="tag">Flash</span></div>
+        </div>
+        <!-- 19 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="19EthernetTsn.html"></a>
+            <span class="chapter-badge">19</span>
+            <div class="chapter-title">以太网与TSN（时间敏感网络）</div>
+            <div class="chapter-desc">在AGV多机协同中的同步作用</div>
+            <div class="card-tags"><span class="tag">TSN</span><span class="tag">同步</span></div>
+        </div>
+        <!-- 20 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="20WirelessModule.html"></a>
+            <span class="chapter-badge">20</span>
+            <div class="chapter-title">无线通信模块选型</div>
+            <div class="chapter-desc">Zigbee、LoRa、蓝牙Mesh在仓储场景下的取舍</div>
+            <div class="card-tags"><span class="tag">无线</span><span class="tag">仓储</span></div>
+        </div>
+        <!-- 21 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="21VisualSensorInterface.html"></a>
+            <span class="chapter-badge">21</span>
+            <div class="chapter-title">视觉传感器接口</div>
+            <div class="chapter-desc">USB3.0 Camera、GigE Vision、MIPI CSI-2接口设计</div>
+            <div class="card-tags"><span class="tag">视觉</span><span class="tag">接口</span></div>
+        </div>
+        <!-- 22 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="22UltrasonicInfrared.html"></a>
+            <span class="chapter-badge">22</span>
+            <div class="chapter-title">超声波与红外传感器</div>
+            <div class="chapter-desc">避障与辅助定位中的低成本方案</div>
+            <div class="card-tags"><span class="tag">超声波</span><span class="tag">红外</span></div>
+        </div>
+        <!-- 23 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="23MagneticQrNavSensor.html"></a>
+            <span class="chapter-badge">23</span>
+            <div class="chapter-title">磁导航与二维码导航传感器接口</div>
+            <div class="chapter-desc">I2C/SPI/UART的典型应用</div>
+            <div class="card-tags"><span class="tag">导航</span><span class="tag">协议</span></div>
+        </div>
+        <!-- 24 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="24BatteryChargeManage.html"></a>
+            <span class="chapter-badge">24</span>
+            <div class="chapter-title">电池充电管理</div>
+            <div class="chapter-desc">无线充电、接触式充电的硬件接口与协议</div>
+            <div class="card-tags"><span class="tag">充电</span><span class="tag">接口</span></div>
+        </div>
+        <!-- 25 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="25WatchdogMonitor.html"></a>
+            <span class="chapter-badge">25</span>
+            <div class="chapter-title">硬件看门狗与系统监控</div>
+            <div class="chapter-desc">独立看门狗芯片、电压监控与复位电路</div>
+            <div class="card-tags"><span class="tag">看门狗</span><span class="tag">监控</span></div>
+        </div>
+        <!-- 26 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="26MultiControllerCoop.html"></a>
+            <span class="chapter-badge">26</span>
+            <div class="chapter-title">多控制器协同</div>
+            <div class="chapter-desc">主从控制器通信、心跳机制与故障切换</div>
+            <div class="card-tags"><span class="tag">协同</span><span class="tag">冗余</span></div>
+        </div>
+        <!-- 27 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="27HardwareCostControl.html"></a>
+            <span class="chapter-badge">27</span>
+            <div class="chapter-title">硬件成本控制</div>
+            <div class="chapter-desc">BOM优化、国产化替代方案与供应链风险</div>
+            <div class="card-tags"><span class="tag">成本</span><span class="tag">BOM</span></div>
+        </div>
+        <!-- 28 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="28DesignDocVersion.html"></a>
+            <span class="chapter-badge">28</span>
+            <div class="chapter-title">设计文档与版本管理</div>
+            <div class="chapter-desc">原理图、PCB、BOM的规范化管理工具（Git/Altium）</div>
+            <div class="card-tags"><span class="tag">文档</span><span class="tag">版本</span></div>
+        </div>
+        <!-- 29 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="29CertificationCompliance.html"></a>
+            <span class="chapter-badge">29</span>
+            <div class="chapter-title">认证与合规</div>
+            <div class="chapter-desc">CE、FCC、UL认证对AGV控制器的硬件要求</div>
+            <div class="card-tags"><span class="tag">认证</span><span class="tag">合规</span></div>
+        </div>
+        <!-- 30 -->
+        <div class="chapter-card">
+            <a class="chapter-link" href="30HardwarePrototypeCase.html"></a>
+            <span class="chapter-badge">30</span>
+            <div class="chapter-title">实战案例</div>
+            <div class="chapter-desc">从需求分析到原型打样的完整硬件设计流程</div>
+            <div class="card-tags"><span class="tag">实战</span><span class="tag">流程</span></div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

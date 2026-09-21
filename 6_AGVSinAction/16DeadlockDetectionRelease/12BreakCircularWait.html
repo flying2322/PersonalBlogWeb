@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>12 死锁预防</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DeadlockPhenomenon.html" class="">1 死锁现象初探</a></li>
+<li><a href="02FourNecessaryConditions.html" class="">2 死锁产生的四大必要条件</a></li>
+<li><a href="03ResourceAllocationGraph.html" class="">3 死锁检测基础</a></li>
+<li><a href="04CycleDetectDfs.html" class="">4 死锁检测算法</a></li>
+<li><a href="05BankersAlgorithmDetect.html" class="">5 死锁检测算法</a></li>
+<li><a href="06ResourcePreemptionRelease.html" class="">6 死锁解除策略</a></li>
+<li><a href="07TaskRollbackRelease.html" class="">7 死锁解除策略</a></li>
+<li><a href="08TerminateAgvRelease.html" class="">8 死锁解除策略</a></li>
+<li><a href="09BreakMutualExclusion.html" class="">9 死锁预防</a></li>
+<li><a href="10BreakHoldAndWait.html" class="">10 死锁预防</a></li>
+<li><a href="11BreakNoPreemption.html" class="">11 死锁预防</a></li>
+<li><a href="12BreakCircularWait.html" class="active">12 死锁预防</a></li>
+<li><a href="13SafeUnsafeState.html" class="">13 死锁避免</a></li>
+<li><a href="14BankersPreallocation.html" class="">14 死锁避免</a></li>
+<li><a href="15TimeWindowPathReserve.html" class="">15 死锁避免</a></li>
+<li><a href="16ZoneAndDirectionLock.html" class="">16 死锁避免</a></li>
+<li><a href="17PetriNetAvoidance.html" class="">17 死锁避免</a></li>
+<li><a href="18SingleLaneDeadlock.html" class="">18 死锁检测与解除实战</a></li>
+<li><a href="19MultiIntersectionDeadlock.html" class="">19 死锁检测与解除实战</a></li>
+<li><a href="20WarehouseIoDeadlock.html" class="">20 死锁检测与解除实战</a></li>
+<li><a href="21MultiFloorDeadlock.html" class="">21 死锁检测与解除实战</a></li>
+<li><a href="22AutoDoorDeadlock.html" class="">22 死锁检测与解除实战</a></li>
+<li><a href="23ElevatorDeadlock.html" class="">23 死锁检测与解除实战</a></li>
+<li><a href="24RobotArmDockDeadlock.html" class="">24 死锁检测与解除实战</a></li>
+<li><a href="25MixedFleetDeadlock.html" class="">25 死锁检测与解除实战</a></li>
+<li><a href="26DynamicReplanDeadlock.html" class="">26 死锁检测与解除实战</a></li>
+<li><a href="27PriorityReleaseStrategy.html" class="">27 死锁检测与解除实战</a></li>
+<li><a href="28DistributedClusterDetect.html" class="">28 死锁检测与解除实战</a></li>
+<li><a href="29MlDeadlockPredict.html" class="">29 死锁检测与解除实战</a></li>
+<li><a href="30MonitorAlarmPlatform.html" class="">30 死锁检测与解除实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>12 死锁预防：破坏循环等待（资源有序分配法）</h2>
+
+<p>死锁预防这事儿，说白了就是「别让死锁发生」。</p>
+<p>我们上一章聊了死锁的四个必要条件。今天要讲的，就是直接对其中一个条件下手——<strong>破坏循环等待</strong>。</p>
+<p>我个人习惯把这种方法叫做「资源有序分配法」。名字听着挺学术，其实道理很简单：<strong>给所有资源排个队，AGV只能按顺序申请</strong>。</p>
+
+<h3>为什么循环等待会发生？</h3>
+<p>你想想看，AGV调度系统里，死锁最常见的样子是什么？</p>
+<p>AGV_A 占了路口1，想去路口2。<br>
+AGV_B 占了路口2，想去路口3。<br>
+AGV_C 占了路口3，想去路口1。</p>
+<p>这不就闭环了嘛。谁也别想动。</p>
+<p>我在项目里遇到过好几次这种场景。有一次在仓库里，三台AGV在十字路口堵成一团，调度系统直接卡死。后来一查日志，就是典型的循环等待。</p>
+
+<h3>资源有序分配法的核心思想</h3>
+<p>给每个资源（比如路口、充电站、装卸点）分配一个唯一的编号。<br>
+AGV 申请资源时，必须按照编号从小到大的顺序来。</p>
+<p>举个例子：</p>
+<ul>
+    <li>路口1 编号 1</li>
+    <li>路口2 编号 2</li>
+    <li>路口3 编号 3</li>
+</ul>
+<p>AGV 想从路口1 到路口3，必须先申请 1，再申请 2，最后申请 3。<br>
+不能跳着申请，更不能倒着来。</p>
+
+<div class="highlight">
+    <p><strong>核心原则：</strong>所有AGV必须按照资源编号递增的顺序申请资源。</p>
+</div>
+
+<h3>为什么这样能预防死锁？</h3>
+<p>因为循环等待的条件被破坏了。</p>
+<p>假设所有AGV都按编号从小到大申请资源，那么：</p>
+<ul>
+    <li>持有大编号资源的AGV，不可能去申请小编号资源</li>
+    <li>持有小编号资源的AGV，只能申请更大的编号</li>
+</ul>
+<p>这样一来，资源申请的方向永远是单向的。闭环？不存在的。</p>
+
+<div class="tip">
+    <p><strong>我的经验：</strong>我曾经在一个大型物流中心部署这套方案。刚开始觉得编号规则很简单，结果发现资源数量一多，编号管理就乱了。后来我建议用「区域+层级」的方式编号，比如 1-1、1-2、2-1，这样扩展性更好。</p>
+</div>
+
+<h3>资源编号怎么定？</h3>
+<p>嗯，这里要注意。编号不是随便给的。</p>
+<p>我一般遵循这几个原则：</p>
+<ol>
+    <li><strong>全局唯一</strong>：每个资源只有一个编号，不能重复</li>
+    <li><strong>物理位置相关</strong>：靠近入口的编号小，靠近出口的编号大</li>
+    <li><strong>层级清晰</strong>：主路径资源编号小，分支路径编号大</li>
+</ol>
+
+<p>举个例子，一个仓库的路径资源编号可以这样设计：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>资源类型</th>
+            <th>编号范围</th>
+            <th>说明</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>主通道路口</td>
+            <td>1 - 50</td>
+            <td>优先级最高，先申请</td>
+        </tr>
+        <tr>
+            <td>货架区路口</td>
+            <td>51 - 200</td>
+            <td>次优先级</td>
+        </tr>
+        <tr>
+            <td>充电站</td>
+            <td>201 - 250</td>
+            <td>最后申请</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>代码示例：资源有序分配检查</h3>
+<p>下面是我在项目中用过的检查逻辑，判断AGV申请资源是否合法：</p>
+
+<pre><code>def check_resource_order(agv_id, current_resources, new_resource):
+    """
+    检查AGV申请新资源是否满足有序分配原则
+    :param agv_id: AGV编号
+    :param current_resources: 当前已占用的资源编号列表
+    :param new_resource: 新申请的资源编号
+    :return: True 合法，False 非法
+    """
+    if not current_resources:
+        # 没有占用任何资源，可以申请任意编号
+        return True
+    
+    # 获取当前占用的最大资源编号
+    max_held = max(current_resources)
+    
+    # 新资源编号必须大于当前最大编号
+    if new_resource &lt;= max_held:
+        print(f"AGV {agv_id} 申请资源 {new_resource} 失败，"
+              f"当前最大资源编号为 {max_held}")
+        return False
+    
+    return True
+
+# 使用示例
+agv_1_resources = [1, 2]  # 已占用路口1和2
+new_resource = 3          # 想申请路口3
+if check_resource_order("AGV_001", agv_1_resources, new_resource):
+    print("申请合法，允许通行")
+else:
+    print("申请非法，拒绝通行")
+</code></pre>
+
+<div class="warning">
+    <p><strong>避坑指南：</strong>我曾经犯过一个错误——只检查了申请顺序，没考虑释放顺序。AGV释放资源时，如果先释放小编号资源，后释放大编号资源，可能会造成其他AGV「插队」。后来我加了一条规则：释放资源必须按编号从大到小释放。</p>
+</div>
+
+<h3>资源有序分配法的优缺点</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>优点</th>
+            <th>缺点</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>实现简单，逻辑清晰</td>
+            <td>资源编号需要全局规划，灵活性差</td>
+        </tr>
+        <tr>
+            <td>死锁预防效果可靠</td>
+            <td>AGV可能绕路，降低效率</td>
+        </tr>
+        <tr>
+            <td>不需要额外的死锁检测机制</td>
+            <td>资源编号变更时，需要重新规划</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3>实际项目中的调整</h3>
+<p>说实话，纯理论的有序分配法在实际中很少直接套用。为什么？因为AGV的路径不是线性的。</p>
+<p>我在一个项目中做过调整：</p>
+<ul>
+    <li>把「资源」从「路口」改成「路径段」</li>
+    <li>每个路径段按起点到终点的方向编号</li>
+    <li>AGV只能沿着编号递增的方向移动</li>
+</ul>
+<p>这样既保留了有序分配的思想，又更贴合实际路径规划。</p>
+
+<div class="highlight">
+    <p><strong>一句话总结：</strong>资源有序分配法，就是给资源排个队，让AGV按顺序申请。简单、有效，但需要结合实际场景做调整。</p>
+</div>
+
+<p>嗯，死锁预防这块，破坏循环等待是最容易落地的方法之一。我建议你在设计调度系统时，优先考虑这个方案。毕竟，能预防的问题，何必等到检测和解除呢？</p>
+
+<div class="footer-nav">
+            <a href="11BreakNoPreemption.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="13SafeUnsafeState.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

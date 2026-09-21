@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>5 电机控制基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="active">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>5 电机控制基础</h2>
+
+<p>各位同学，今天我们来聊聊AGV控制器的核心——电机控制。说实话，我见过太多AGV项目，算法写得天花乱坠，结果电机都抖得像筛子一样。为什么？因为基础没打牢。这一章，我们就从直流电机的数学模型开始，一步步把PID控制、速度环、位置环，还有那个让人头疼的PWM死区补偿，全都讲透。</p>
+
+<div class="highlight">
+  <p><strong>本章核心脉络：</strong>直流电机数学模型 → PID控制器原理 → 速度环设计 → 位置环设计 → PWM死区补偿</p>
+</div>
+
+<h3>5.1 直流电机的数学模型</h3>
+
+<p>先说说直流电机。你想想看，AGV要跑起来，靠的就是电机转动轮子。但电机不是你想让它转多快它就转多快的，它有自己的物理特性。</p>
+
+<p>直流电机的等效电路，说白了就是一个电阻串联一个电感，再串联一个反电动势。反电动势这东西，我刚开始学的时候总觉得很玄乎，其实就是电机转动时自己产生的电压，方向跟外加电压相反。</p>
+
+<p>电枢回路的电压方程是这样的：</p>
+
+<pre><code>U = R * i + L * (di/dt) + E</code></pre>
+
+<p>其中E是反电动势，跟转速成正比：</p>
+
+<pre><code>E = Ke * ω</code></pre>
+
+<p>电机的转矩方程：</p>
+
+<pre><code>T = Kt * i</code></pre>
+
+<p>嗯，这里要注意，Ke和Kt在数值上是相等的（如果都用国际单位制）。我在项目中遇到过有人把这两个系数搞混，结果速度环怎么调都不对，查了两天才发现是系数差了一个数量级。</p>
+
+<p>机械运动方程：</p>
+
+<pre><code>T - TL = J * (dω/dt) + B * ω</code></pre>
+
+<p>TL是负载转矩，J是转动惯量，B是阻尼系数。把这些方程联立起来，就得到了直流电机的完整数学模型。说白了，电机就是一个二阶系统，有电气时间常数和机械时间常数。</p>
+
+<div class="tip">
+  <p><strong>实战经验：</strong>电气时间常数通常比机械时间常数小得多。我一般先测电气时间常数，再测机械时间常数，这样调试PID参数时心里有底。</p>
+</div>
+
+<h3>5.2 PID控制器原理</h3>
+
+<p>PID控制器，搞控制的没人不知道。但你真的理解它吗？</p>
+
+<p>比例（P）部分：误差越大，输出越大。但光有P，系统会有稳态误差。我记得第一次调P参数时，把增益调得很大，结果电机嗡嗡响，像要散架一样。</p>
+
+<p>积分（I）部分：消除稳态误差。但积分太强，系统会 overshoot。我有个习惯，先调P让系统稳定，再加I消除误差，最后加D改善响应。</p>
+
+<p>微分（D）部分：预测误差变化趋势。D能提高响应速度，但对噪声敏感。我曾经在一条生产线上，D参数调得稍微大了一点，结果电机高频抖动，后来发现是编码器信号有毛刺。</p>
+
+<p>位置式PID公式：</p>
+
+<pre><code>u(k) = Kp * e(k) + Ki * Σe(i) + Kd * [e(k) - e(k-1)]</code></pre>
+
+<p>增量式PID公式：</p>
+
+<pre><code>Δu(k) = Kp * [e(k) - e(k-1)] + Ki * e(k) + Kd * [e(k) - 2*e(k-1) + e(k-2)]</code></pre>
+
+<p>我个人习惯用增量式PID，因为输出是增量，不会出现积分饱和的问题。而且切换手动/自动时，冲击小得多。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在AGV项目里直接用位置式PID，结果电机启动时积分项疯狂累积，导致输出饱和，电机直接冲出去了。后来改成增量式，问题解决。</p>
+</div>
+
+<h3>5.3 速度环与位置环设计</h3>
+
+<p>AGV的电机控制，通常采用串级控制结构。内环是速度环，外环是位置环。为什么这样设计？你想想看，位置控制需要速度先稳定，速度控制需要电流先稳定。一层层嵌套，就像俄罗斯套娃。</p>
+
+<p>速度环的设计要点：</p>
+<ul>
+  <li>采样频率：一般1kHz到10kHz。我常用2kHz，够用又不浪费算力</li>
+  <li>PI参数整定：先调P，让速度响应快但不超调；再加I，消除稳态误差</li>
+  <li>限幅保护：速度输出必须限幅，防止电机过速</li>
+</ul>
+
+<p>位置环的设计要点：</p>
+<ul>
+  <li>采样频率：一般100Hz到500Hz。比速度环慢一个数量级</li>
+  <li>P参数为主：位置环通常只用P，因为速度环已经消除了稳态误差</li>
+  <li>前馈控制：可以加入速度前馈，提高位置跟踪精度</li>
+</ul>
+
+<p>我给你们看一个实际的速度环代码框架：</p>
+
+<pre><code>// 速度环中断服务函数，2kHz
+void SpeedLoop_ISR(void)
+{
+    // 读取编码器速度
+    int16_t speed_actual = Encoder_GetSpeed();
+    
+    // 计算速度误差
+    int16_t speed_error = speed_target - speed_actual;
+    
+    // PI控制器
+    static int32_t integral = 0;
+    int16_t p_out = Kp_speed * speed_error;
+    integral += Ki_speed * speed_error;
+    
+    // 积分限幅
+    if(integral > INTEGRAL_LIMIT) integral = INTEGRAL_LIMIT;
+    if(integral < -INTEGRAL_LIMIT) integral = -INTEGRAL_LIMIT;
+    
+    // 输出限幅
+    int16_t output = p_out + integral;
+    if(output > OUTPUT_LIMIT) output = OUTPUT_LIMIT;
+    if(output < -OUTPUT_LIMIT) output = -OUTPUT_LIMIT;
+    
+    // 输出到PWM模块
+    PWM_SetDuty(output);
+}</code></pre>
+
+<p>位置环的代码类似，但输入是位置误差，输出是速度目标值。说白了，位置环就是给速度环设定目标。</p>
+
+<h3>5.4 PWM死区补偿</h3>
+
+<p>PWM死区，这是个大坑。为什么要有死区？因为功率管（MOSFET或IGBT）的开关速度不是无限快的。如果上下桥臂同时导通，就会短路，烧管子。</p>
+
+<p>死区时间一般设置几百纳秒到几微秒。但死区会导致输出电压失真，尤其是在低速时，电机可能会抖动。</p>
+
+<p>死区补偿的方法，我总结了几种：</p>
+
+<table>
+  <tr>
+    <th>补偿方法</th>
+    <th>原理</th>
+    <th>优缺点</th>
+  </tr>
+  <tr>
+    <td>电流极性法</td>
+    <td>根据电流方向调整PWM占空比</td>
+    <td>简单，但需要电流传感器</td>
+  </tr>
+  <tr>
+    <td>电压前馈法</td>
+    <td>根据死区时间计算补偿电压</td>
+    <td>精度高，但需要精确的死区时间</td>
+  </tr>
+  <tr>
+    <td>自适应补偿</td>
+    <td>在线估计死区效应并补偿</td>
+    <td>复杂，但适应性强</td>
+  </tr>
+</table>
+
+<p>我在AGV项目里常用电流极性法。说白了就是：电流流入电机时，死区导致输出电压降低，我就把占空比调大一点；电流流出时，死区导致输出电压升高，我就把占空比调小一点。</p>
+
+<p>补偿代码示例：</p>
+
+<pre><code>void DeadTime_Compensation(uint16_t *duty, int16_t current)
+{
+    // 死区补偿量，根据死区时间和PWM频率计算
+    static const uint16_t comp_value = 50;  // 假设死区2us，PWM 20kHz
+    
+    if(current > 0)  // 电流流入电机
+    {
+        *duty += comp_value;
+    }
+    else if(current < 0)  // 电流流出电机
+    {
+        *duty -= comp_value;
+    }
+    // 电流为零时，不补偿
+    
+    // 限幅
+    if(*duty > PWM_MAX) *duty = PWM_MAX;
+    if(*duty < PWM_MIN) *duty = PWM_MIN;
+}</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在调试时发现电机低速抖动，查了半天发现是死区补偿没做。加上补偿后，电机运行平稳多了。记住，死区补偿不是可选项，是必选项。</p>
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，是我自己画的，把本章的知识点串起来了。你仔细看看，就能明白电机控制的整体逻辑。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">电机控制知识体系</text>
+  
+  <!-- 直流电机数学模型 -->
+  <rect x="50" y="70" width="200" height="80" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="white">直流电机数学模型</text>
+  <text x="150" y="130" text-anchor="middle" font-size="12" fill="white">电压方程 · 转矩方程</text>
+  
+  <!-- PID控制器原理 -->
+  <rect x="300" y="70" width="200" height="80" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="white">PID控制器原理</text>
+  <text x="400" y="130" text-anchor="middle" font-size="12" fill="white">比例 · 积分 · 微分</text>
+  
+  <!-- 速度环设计 -->
+  <rect x="550" y="70" width="200" height="80" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="white">速度环设计</text>
+  <text x="650" y="130" text-anchor="middle" font-size="12" fill="white">PI控制 · 限幅保护</text>
+  
+  <!-- 位置环设计 -->
+  <rect x="50" y="250" width="200" height="80" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="150" y="285" text-anchor="middle" font-size="16" font-weight="bold" fill="white">位置环设计</text>
+  <text x="150" y="310" text-anchor="middle" font-size="12" fill="white">P控制 · 前馈控制</text>
+  
+  <!-- PWM死区补偿 -->
+  <rect x="300" y="250" width="200" height="80" rx="8" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="285" text-anchor="middle" font-size="16" font-weight="bold" fill="white">PWM死区补偿</text>
+  <text x="400" y="310" text-anchor="middle" font-size="12" fill="white">电流极性法 · 前馈法</text>
+  
+  <!-- 串级控制结构 -->
+  <rect x="550" y="250" width="200" height="80" rx="8" fill="#1abc9c" opacity="0.9"/>
+  <text x="650" y="285" text-anchor="middle" font-size="16" font-weight="bold" fill="white">串级控制结构</text>
+  <text x="650" y="310" text-anchor="middle" font-size="12" fill="white">位置环→速度环→电流环</text>
+  
+  <!-- 箭头连接 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 第一层到第二层 -->
+  <line x1="150" y1="150" x2="150" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="150" x2="400" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="150" x2="650" y2="250" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 横向关联 -->
+  <line x1="250" y1="110" x2="300" y2="110" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="500" y1="110" x2="550" y2="110" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="250" y1="290" x2="300" y2="290" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  <line x1="500" y1="290" x2="550" y2="290" stroke="#7f8c8d" stroke-width="1.5" stroke-dasharray="5,5"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="420" text-anchor="middle" font-size="14" fill="#7f8c8d">核心逻辑：数学模型 → PID控制 → 速度/位置环 → 死区补偿</text>
+  
+  <!-- 实战要点 -->
+  <rect x="150" y="440" width="500" height="40" rx="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="465" text-anchor="middle" font-size="13" fill="#2c3e50">实战要点：先调速度环，再调位置环，最后做死区补偿</text>
+</svg>
+
+<p>好了，这一章的内容就到这里。电机控制是AGV控制器的基石，你把这些搞懂了，后面的路径规划、运动控制才能玩得转。下一章我们讲编码器接口与速度测量，到时候见。</p>
+
+<div class="footer-nav">
+            <a href="04GpioTimerDriver.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="06SensorDataAcquire.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

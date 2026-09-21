@@ -1,0 +1,398 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 工程化与性能优化</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="active">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 工程化与性能优化——规划频率提升、内存管理、多线程规划、实时性保障</h2>
+
+<p>各位同学，欢迎来到实战课的工程化环节。</p>
+<p>前面我们聊了很多算法，A*、DWA、TEB，听起来都很酷。但说实话，把这些算法塞进一台真实的AGV里，让它跑得又快又稳，那才是真正的考验。我见过太多项目，算法仿真跑得飞起，一上实车就卡顿、丢路径、甚至撞墙。</p>
+<p>为什么会这样？因为工程化没做好。今天我们就来聊聊，怎么把规划算法“打磨”成能上战场的武器。</p>
+
+<div class="highlight">
+    <p><strong>核心观点：</strong> 规划算法的性能，不只看算法复杂度，更看工程实现的质量。一个优秀的规划器，是算法与工程完美结合的产物。</p>
+</div>
+
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="400" fill="#f0f8ff" rx="10"/>
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#333">AGV规划系统性能优化核心维度</text>
+    <!-- 中心节点 -->
+    <circle cx="400" cy="200" r="60" fill="#4a90d9" stroke="#2c5f8a" stroke-width="3"/>
+    <text x="400" y="195" text-anchor="middle" font-size="16" fill="white" font-weight="bold">规划引擎</text>
+    <text x="400" y="215" text-anchor="middle" font-size="12" fill="#e0f0ff">性能优化</text>
+    <!-- 四个分支 -->
+    <!-- 分支1：规划频率 -->
+    <line x1="350" y1="160" x2="200" y2="80" stroke="#4a90d9" stroke-width="2"/>
+    <rect x="120" y="40" width="160" height="60" rx="8" fill="#e6f7ff" stroke="#4a90d9" stroke-width="2"/>
+    <text x="200" y="65" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">规划频率提升</text>
+    <text x="200" y="85" text-anchor="middle" font-size="11" fill="#666">增量规划 · 轻量化</text>
+    <!-- 分支2：内存管理 -->
+    <line x1="460" y1="160" x2="600" y2="80" stroke="#4a90d9" stroke-width="2"/>
+    <rect x="520" y="40" width="160" height="60" rx="8" fill="#e6f7ff" stroke="#4a90d9" stroke-width="2"/>
+    <text x="600" y="65" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">内存管理</text>
+    <text x="600" y="85" text-anchor="middle" font-size="11" fill="#666">对象池 · 零拷贝</text>
+    <!-- 分支3：多线程规划 -->
+    <line x1="340" y1="240" x2="180" y2="320" stroke="#4a90d9" stroke-width="2"/>
+    <rect x="100" y="300" width="160" height="60" rx="8" fill="#e6f7ff" stroke="#4a90d9" stroke-width="2"/>
+    <text x="180" y="325" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">多线程规划</text>
+    <text x="180" y="345" text-anchor="middle" font-size="11" fill="#666">任务拆分 · 锁优化</text>
+    <!-- 分支4：实时性保障 -->
+    <line x1="460" y1="240" x2="620" y2="320" stroke="#4a90d9" stroke-width="2"/>
+    <rect x="540" y="300" width="160" height="60" rx="8" fill="#e6f7ff" stroke="#4a90d9" stroke-width="2"/>
+    <text x="620" y="325" text-anchor="middle" font-size="14" fill="#333" font-weight="bold">实时性保障</text>
+    <text x="620" y="345" text-anchor="middle" font-size="11" fill="#666">看门狗 · 降级策略</text>
+</svg>
+
+<h3>一、规划频率提升：从“慢吞吞”到“快准狠”</h3>
+
+<p>先问大家一个问题：你的AGV规划器，多久跑一次？</p>
+<p>我见过很多团队，全局规划跑一次要100ms，局部规划跑一次要50ms。听起来还行？但你要知道，AGV在动态环境里，50ms的延迟可能就意味着一次急刹，甚至碰撞。</p>
+<p>我个人习惯，把全局规划频率做到20Hz以上，局部规划做到50Hz以上。怎么做到的？</p>
+
+<h4>1.1 增量规划：别每次都从头算</h4>
+<p>全局规划里，A*算法每次都要从起点搜到终点。但你想过没有，如果环境变化不大，路径其实只需要微调。</p>
+<p>我在项目中用过一种方法：<strong>路径缓存 + 局部修复</strong>。当障碍物出现时，只重新规划受影响的那一小段路径，而不是全盘重来。这招在仓储AGV里特别管用，因为货架位置很少变，变的只是临时障碍物。</p>
+
+<pre><code>// 伪代码：增量路径修复
+Path repairPath(Path oldPath, Obstacle newObs) {
+    // 找到障碍物影响的路段
+    int startIdx = findImpactStart(oldPath, newObs);
+    int endIdx = findImpactEnd(oldPath, newObs);
+    
+    // 只重新规划这一段
+    Path localPath = aStarSearch(
+        oldPath[startIdx], 
+        oldPath[endIdx],
+        newObs.getBoundingBox()
+    );
+    
+    // 拼接回原路径
+    return splicePath(oldPath, localPath, startIdx, endIdx);
+}
+</code></pre>
+
+<div class="tip">
+    <p><strong>小技巧：</strong> 增量规划的关键是“影响范围”的判定。我一般用障碍物的AABB（轴对齐包围盒）加上一个安全裕度，来确定需要重新规划的路段。裕度设太大，优化效果不明显；设太小，可能漏掉影响。</p>
+</div>
+
+<h4>1.2 轻量化计算：能算一次就别算两次</h4>
+<p>局部规划里，DWA算法要采样很多速度组合。我见过有人采样1000组，然后评估。其实没必要。</p>
+<p>我的做法是：<strong>先粗筛，再精评</strong>。第一轮用简单的碰撞检测，快速过滤掉明显不可行的速度；第二轮再用完整的代价函数，对剩下的候选做精细评估。这样能把计算量降到原来的1/5。</p>
+
+<h3>二、内存管理：别让内存成为瓶颈</h3>
+
+<p>说到内存管理，很多做算法的同学不太在意。但你知道吗？在嵌入式AGV上，内存泄漏是导致系统崩溃的头号杀手。</p>
+<p>我曾经在一个项目里，AGV跑了3个小时后突然死机。查了两天，发现是规划器里有个vector每次规划都push_back，但从来没clear。嗯，这种坑我踩过不止一次。</p>
+
+<h4>2.1 对象池：避免频繁new/delete</h4>
+<p>规划过程中，会频繁创建节点、路径点、代价地图。每次new/delete都很慢，而且会产生内存碎片。</p>
+<p>我的习惯是：<strong>预分配一个对象池</strong>。比如A*的节点，提前分配好1000个，用的时候从池子里取，用完放回去。这样既快又稳。</p>
+
+<pre><code>class NodePool {
+    std::vector&lt;AStarNode&gt; pool;
+    std::vector&lt;int&gt; freeList;
+public:
+    AStarNode* acquire() {
+        if (freeList.empty()) {
+            pool.emplace_back();
+            return &amp;pool.back();
+        }
+        int idx = freeList.back();
+        freeList.pop_back();
+        return &amp;pool[idx];
+    }
+    void release(AStarNode* node) {
+        freeList.push_back(node - &amp;pool[0]);
+    }
+};
+</code></pre>
+
+<div class="warning">
+    <p><strong>注意：</strong> 对象池的大小要合理设置。太小了会频繁扩容，太大了浪费内存。我一般根据地图大小和路径长度，动态调整池子大小。比如100x100的栅格地图，节点池设5000个基本够用。</p>
+</div>
+
+<h4>2.2 零拷贝：减少数据搬运</h4>
+<p>规划器经常要访问代价地图、障碍物列表。如果每次规划都拷贝一份，内存和CPU都受不了。</p>
+<p>我的做法是：<strong>共享指针 + 只读访问</strong>。代价地图用智能指针管理，规划器只读不写。如果地图更新了，用原子操作替换指针，保证线程安全。</p>
+
+<h3>三、多线程规划：让CPU为你打工</h3>
+
+<p>现在的AGV控制器，基本都是多核处理器。如果你只用一个线程跑规划，那简直是暴殄天物。</p>
+<p>但多线程不是简单的“开几个线程就完事”。我见过有人开了8个线程，结果性能还不如单线程，因为锁竞争太严重了。</p>
+
+<h4>3.1 任务拆分：把规划拆成独立模块</h4>
+<p>我的做法是：<strong>全局规划、局部规划、碰撞检测，各跑一个线程</strong>。它们之间通过消息队列通信。</p>
+<ul>
+    <li>全局规划线程：负责生成宏观路径，频率可以低一些（10Hz）</li>
+    <li>局部规划线程：负责跟踪全局路径并避障，频率要高（50Hz）</li>
+    <li>碰撞检测线程：持续检测前方障碍物，一旦发现危险，立即通知局部规划</li>
+</ul>
+<p>这样，三个线程各司其职，互不干扰。全局规划慢一点没关系，局部规划依然能高频运行。</p>
+
+<h4>3.2 锁优化：能不用锁就不用</h4>
+<p>线程间共享数据，最怕加锁。我推荐用<strong>无锁队列</strong>或者<strong>读写锁</strong>。</p>
+<p>比如代价地图，大部分时间是读操作，写操作很少。用读写锁，多个读线程可以同时访问，只有写的时候才互斥。这样性能能提升好几倍。</p>
+
+<pre><code>// 读写锁示例
+std::shared_mutex mapMutex;
+CostMap globalMap;
+
+// 读线程（规划器）
+void plannerThread() {
+    std::shared_lock lock(mapMutex);
+    // 读取地图，多个线程可以同时读
+    auto cost = globalMap.getCost(x, y);
+}
+
+// 写线程（地图更新）
+void mapUpdateThread() {
+    std::unique_lock lock(mapMutex);
+    // 更新地图，只有一个线程能写
+    globalMap.update(region, newCost);
+}
+</code></pre>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong> 我曾经在一个项目里用了std::mutex，结果局部规划线程经常被全局规划线程阻塞，导致避障延迟。后来改成std::shared_mutex，问题就解决了。记住：读多写少的场景，读写锁是王道。</p>
+</div>
+
+<h3>四、实时性保障：别让AGV“死机”</h3>
+
+<p>实时性，说白了就是：<strong>在规定的时间内，必须给出结果</strong>。AGV不像你的手机，卡顿一下没关系。AGV卡顿100ms，可能就撞上了。</p>
+
+<h4>4.1 看门狗：监控规划超时</h4>
+<p>我的每个规划器里，都内置一个看门狗定时器。如果规划时间超过阈值（比如全局规划50ms，局部规划20ms），就触发超时处理。</p>
+<p>超时处理策略：</p>
+<ul>
+    <li><strong>降级：</strong> 如果局部规划超时，直接沿用上一帧的路径，同时降低速度</li>
+    <li><strong>回退：</strong> 如果连续超时3次以上，触发紧急制动，并上报调度系统</li>
+    <li><strong>日志：</strong> 记录超时时的上下文，方便事后分析</li>
+</ul>
+
+<h4>4.2 时间片管理：给每个任务分配预算</h4>
+<p>我习惯用<strong>时间触发架构</strong>。每个规划任务分配固定的时间片，比如：</p>
+<table>
+    <tr>
+        <th>任务</th>
+        <th>时间片</th>
+        <th>频率</th>
+        <th>超时处理</th>
+    </tr>
+    <tr>
+        <td>全局规划</td>
+        <td>30ms</td>
+        <td>20Hz</td>
+        <td>沿用旧路径</td>
+    </tr>
+    <tr>
+        <td>局部规划</td>
+        <td>15ms</td>
+        <td>50Hz</td>
+        <td>减速+沿用旧路径</td>
+    </tr>
+    <tr>
+        <td>碰撞检测</td>
+        <td>5ms</td>
+        <td>100Hz</td>
+        <td>紧急制动</td>
+    </tr>
+    <tr>
+        <td>状态监控</td>
+        <td>2ms</td>
+        <td>200Hz</td>
+        <td>系统复位</td>
+    </tr>
+</table>
+<p>这样，即使某个任务超时，也不会影响其他任务的执行。AGV依然能保持基本的运动控制。</p>
+
+<div class="warning">
+    <p><strong>重要提醒：</strong> 时间片不是越短越好。太短会导致频繁切换，增加系统开销。我一般根据任务的计算量和重要性来分配。碰撞检测最重要，时间片最短；全局规划可以慢一点，但必须保证路径质量。</p>
+</div>
+
+<h4>4.3 降级策略：从“最优”到“可行”</h4>
+<p>实时性的核心思想是：<strong>宁可要一个次优的路径，也不要一个没有路径</strong>。</p>
+<p>我在项目中设计了三档降级策略：</p>
+<ol>
+    <li><strong>正常模式：</strong> 完整规划，追求最优路径</li>
+    <li><strong>轻量模式：</strong> 减少采样数量，简化代价函数，追求快速响应</li>
+    <li><strong>安全模式：</strong> 放弃路径规划，直接沿当前方向减速，直到停止</li>
+</ol>
+<p>当系统负载高或者环境复杂时，自动切换到轻量模式。当检测到传感器异常或通信中断时，直接进入安全模式。</p>
+
+<p>好了，关于工程化与性能优化，今天就聊这么多。这些经验，都是我一个个项目踩坑踩出来的。你想想看，一个AGV在仓库里跑，每天几万次规划，如果每次都能稳定在20ms以内，那整个系统的可靠性就完全不一样了。</p>
+<p>记住：<strong>算法决定上限，工程决定下限</strong>。把工程做好，你的AGV才能真正落地。</p>
+
+<div class="highlight">
+    <p><strong>总结要点：</strong></p>
+    <ul>
+        <li>规划频率提升：增量规划 + 轻量化计算</li>
+        <li>内存管理：对象池 + 零拷贝</li>
+        <li>多线程规划：任务拆分 + 读写锁</li>
+        <li>实时性保障：看门狗 + 时间片 + 降级策略</li>
+    </ul>
+</div>
+
+        <div class="footer-nav">
+            <a href="24SensorFusionLocalization.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26FaultAndSafety.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

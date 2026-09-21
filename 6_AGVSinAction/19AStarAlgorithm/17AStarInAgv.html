@@ -1,0 +1,347 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 A星算法在AGV中的应用</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01PathPlanningOverview.html" class="">1 AGV与路径规划概述</a></li>
+<li><a href="02EnvModelingBasics.html" class="">2 环境建模基础</a></li>
+<li><a href="03GraphSearchBasics.html" class="">3 图搜索基础</a></li>
+<li><a href="04HeuristicSearchIntro.html" class="">4 启发式搜索入门</a></li>
+<li><a href="05AStarCorePrinciple.html" class="">5 A星算法核心原理</a></li>
+<li><a href="06HeuristicFunctionDesign.html" class="">6 启发式函数设计</a></li>
+<li><a href="07AStarFlowDetail.html" class="">7 A星算法流程详解</a></li>
+<li><a href="08AStarPythonImpl.html" class="">8 A星算法Python实现</a></li>
+<li><a href="09AStarVisualization.html" class="">9 A星算法可视化</a></li>
+<li><a href="10AStarPerformance.html" class="">10 A星算法性能分析</a></li>
+<li><a href="11AStarVsDijkstra.html" class="">11 A星算法与Dijkstra对比</a></li>
+<li><a href="12AStarVsGreedy.html" class="">12 A星算法与贪心算法对比</a></li>
+<li><a href="13AStarVariants.html" class="">13 A星算法变种</a></li>
+<li><a href="14BidirectionalAStar.html" class="">14 双向A星算法</a></li>
+<li><a href="15JumpPointSearch.html" class="">15 跳点搜索(JPS)</a></li>
+<li><a href="16DynamicEnvAStar.html" class="">16 动态环境下的A星</a></li>
+<li><a href="17AStarInAgv.html" class="active">17 A星算法在AGV中的应用</a></li>
+<li><a href="18KinematicConstraints.html" class="">18 AGV运动学约束</a></li>
+<li><a href="19PathSmoothing.html" class="">19 路径平滑技术</a></li>
+<li><a href="20MultiAgvPathPlanning.html" class="">20 多AGV路径规划</a></li>
+<li><a href="21AStarOptimization.html" class="">21 A星算法优化</a></li>
+<li><a href="22AStarInRos.html" class="">22 A星算法在ROS中的实现</a></li>
+<li><a href="23IndustrialAgvCase.html" class="">23 A星算法在工业AGV中的应用案例</a></li>
+<li><a href="24ServiceRobotCase.html" class="">24 A星算法在服务机器人中的应用案例</a></li>
+<li><a href="25CommonIssues.html" class="">25 A星算法常见问题</a></li>
+<li><a href="26EvalMetrics.html" class="">26 A星算法评估指标</a></li>
+<li><a href="27ParameterTuning.html" class="">27 A星算法参数调优</a></li>
+<li><a href="28FusionWithOthers.html" class="">28 A星算法与其他路径规划算法融合</a></li>
+<li><a href="29FrontierDevelopment.html" class="">29 A星算法前沿发展</a></li>
+<li><a href="30CourseSummaryProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 A星算法在AGV中的应用：全局路径规划、局部路径规划</h2>
+
+<p>各位好，我是老张。今天咱们聊聊A星算法在实际AGV项目里到底怎么用。说实话，很多教材把A星讲得神乎其神，但真正落地时你会发现——嗯，理论和工程之间，隔着一道不小的鸿沟。</p>
+
+<p>我个人习惯把AGV的路径规划拆成两层：全局规划和局部规划。全局规划负责“大方向”，局部规划负责“避坑”。这两层配合好了，AGV才能跑得又稳又聪明。</p>
+
+<h3>17.1 全局路径规划：先定大方向</h3>
+
+<p>全局规划，说白了就是在地图上找一条从起点到终点的可行路径。A星算法在这里是绝对的主力。</p>
+
+<p>我在项目中遇到过一个问题：工厂地图动不动就几百米乘几百米，栅格化后网格数量惊人。如果直接用标准A星，搜索空间太大，计算时间能让你等到怀疑人生。</p>
+
+<p><strong>那怎么办？</strong> 我一般会做两件事：</p>
+
+<ul>
+  <li><strong>地图分层</strong>：先在高一层的地图上跑A星，找到关键路径点，再在低一层的地图上细化。这就像你先看城市地图选主干道，再看街区地图找具体路线。</li>
+  <li><strong>启发函数调优</strong>：标准A星用曼哈顿距离或欧几里得距离。但在AGV场景里，我建议用<strong>对角距离</strong>，因为它更符合AGV的运动特性——AGV可以斜着走，但代价比直行高一点。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心要点</strong>：全局规划的目标不是“最优”，而是“可行且高效”。在工业现场，90%的路径只要“足够好”就行，不必追求数学上的绝对最优。</p>
+</div>
+
+<p>下面是我常用的全局A星伪代码，注意看启发函数那块：</p>
+
+<pre><code>function globalAStar(start, goal, grid):
+    openSet = PriorityQueue()
+    openSet.add(start, 0)
+    cameFrom = {}
+    gScore = map(default=infinity)
+    gScore[start] = 0
+    fScore = map(default=infinity)
+    fScore[start] = heuristic(start, goal)
+    
+    while not openSet.isEmpty():
+        current = openSet.pop()
+        if current == goal:
+            return reconstructPath(cameFrom, current)
+        
+        for neighbor in getNeighbors(current, grid):
+            // 这里考虑AGV的转弯代价
+            turnCost = getTurnCost(current, neighbor)
+            tentativeG = gScore[current] + dist(current, neighbor) + turnCost
+            
+            if tentativeG < gScore[neighbor]:
+                cameFrom[neighbor] = current
+                gScore[neighbor] = tentativeG
+                fScore[neighbor] = gScore[neighbor] + heuristic(neighbor, goal)
+                if neighbor not in openSet:
+                    openSet.add(neighbor, fScore[neighbor])
+    
+    return failure</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：启发函数heuristic()不要用曼哈顿距离。AGV在工厂里经常需要绕开障碍物，曼哈顿距离会严重高估实际代价，导致搜索效率下降。我用的是带权重的对角距离，权重系数一般取1.2~1.5。</p>
+</div>
+
+<h3>17.2 局部路径规划：实时避坑</h3>
+
+<p>全局路径规划好了，但AGV跑起来后，你会发现——地图上突然多了个箱子、有个人走过来了、另一台AGV堵在路上了。这时候就需要局部路径规划上场了。</p>
+
+<p>局部规划，说白了就是“短视”的规划。它只看AGV周围几米的范围，实时调整路径。A星在这里也能用，但需要做一些改造。</p>
+
+<p><strong>为什么不能直接用全局A星？</strong> 你想想看，全局A星每次规划都要遍历整个地图，计算量太大。局部规划要求毫秒级响应，必须轻量化。</p>
+
+<p>我常用的做法是：</p>
+
+<ul>
+  <li><strong>局部窗口法</strong>：只取AGV周围5米×5米的区域作为搜索空间。这个窗口随着AGV移动而移动。</li>
+  <li><strong>动态障碍物处理</strong>：把传感器检测到的动态障碍物实时更新到局部地图中。注意，这些障碍物只在局部地图中标记，不影响全局地图。</li>
+  <li><strong>路径平滑</strong>：局部规划出来的路径往往有锯齿，需要做平滑处理。我用的是B样条曲线，效果不错。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经在局部规划里直接用全局A星的启发函数，结果AGV在狭窄通道里来回震荡。后来发现，局部规划里启发函数应该用<strong>欧几里得距离</strong>，因为它更符合局部空间的几何特性。</p>
+</div>
+
+<h3>17.3 全局与局部的协同</h3>
+
+<p>全局规划和局部规划不是孤立的，它们需要协同工作。我画了一张图来说明这个关系：</p>
+
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="700" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 全局规划模块 -->
+  <rect x="50" y="50" width="200" height="80" fill="#87ceeb" rx="8" stroke="#4682b4" stroke-width="2"/>
+  <text x="150" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">全局路径规划</text>
+  <text x="150" y="110" text-anchor="middle" font-size="12" fill="#555">A星算法（全地图）</text>
+  
+  <!-- 局部规划模块 -->
+  <rect x="450" y="50" width="200" height="80" fill="#98fb98" rx="8" stroke="#3cb371" stroke-width="2"/>
+  <text x="550" y="85" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">局部路径规划</text>
+  <text x="550" y="110" text-anchor="middle" font-size="12" fill="#555">A星算法（窗口内）</text>
+  
+  <!-- 全局地图 -->
+  <rect x="50" y="200" width="200" height="80" fill="#ffe4b5" rx="8" stroke="#d2691e" stroke-width="2"/>
+  <text x="150" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">全局地图</text>
+  <text x="150" y="260" text-anchor="middle" font-size="12" fill="#555">静态障碍物</text>
+  
+  <!-- 局部地图 -->
+  <rect x="450" y="200" width="200" height="80" fill="#ffb6c1" rx="8" stroke="#dc143c" stroke-width="2"/>
+  <text x="550" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">局部地图</text>
+  <text x="550" y="260" text-anchor="middle" font-size="12" fill="#555">动态障碍物+传感器数据</text>
+  
+  <!-- 箭头：全局规划 -> 局部规划 -->
+  <line x1="250" y1="90" x2="450" y2="90" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  <text x="350" y="80" text-anchor="middle" font-size="12" fill="#333">提供参考路径</text>
+  
+  <!-- 箭头：全局地图 -> 全局规划 -->
+  <line x1="150" y1="200" x2="150" y2="130" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 箭头：局部地图 -> 局部规划 -->
+  <line x1="550" y1="200" x2="550" y2="130" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <!-- 箭头：局部规划 -> 全局规划（反馈） -->
+  <path d="M 450 110 Q 350 140 250 110" fill="none" stroke="#ff6347" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowheadRed)"/>
+  <text x="350" y="145" text-anchor="middle" font-size="11" fill="#ff6347">反馈局部障碍信息</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowheadRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#ff6347"/>
+    </marker>
+  </defs>
+  
+  <!-- AGV图标 -->
+  <circle cx="350" cy="320" r="30" fill="#ffd700" stroke="#daa520" stroke-width="2"/>
+  <text x="350" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">AGV</text>
+  
+  <!-- 从AGV到局部规划的箭头 -->
+  <line x1="350" y1="290" x2="550" y2="200" stroke="#333" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrowhead)"/>
+  <text x="460" y="260" text-anchor="middle" font-size="11" fill="#555">传感器数据</text>
+</svg>
+
+<p>从这张图可以看出：全局规划先生成一条参考路径，然后局部规划沿着这条路径往前走，同时根据传感器数据实时调整。如果局部规划发现前方有障碍物无法通过，它会反馈给全局规划，请求重新规划。</p>
+
+<p><strong>这里有个关键点</strong>：反馈的时机。我建议不要一遇到障碍就重新全局规划，那样计算量太大。可以设置一个阈值，比如局部规划尝试3次都失败，再触发全局重规划。</p>
+
+<h3>17.4 实际项目中的坑与对策</h3>
+
+<p>做了这么多年AGV，我踩过的坑不少。挑几个典型的说说：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+  <tr style="background-color:#e6f3ff;">
+    <th>问题</th>
+    <th>现象</th>
+    <th>对策</th>
+  </tr>
+  <tr>
+    <td>路径锯齿</td>
+    <td>AGV走“之”字形，不流畅</td>
+    <td>在A星代价函数中加入转弯惩罚项</td>
+  </tr>
+  <tr>
+    <td>局部震荡</td>
+    <td>AGV在障碍物前反复横跳</td>
+    <td>增加局部规划的时间一致性约束</td>
+  </tr>
+  <tr>
+    <td>全局重规划频繁</td>
+    <td>AGV频繁停车等待</td>
+    <td>提高重规划触发阈值，增加局部绕行能力</td>
+  </tr>
+  <tr>
+    <td>地图更新延迟</td>
+    <td>AGV撞上已移除的障碍物</td>
+    <td>使用实时传感器数据更新局部地图</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <p><strong>我的小技巧</strong>：在局部规划中，我会给路径加一个“时间戳”。如果某条路径在0.5秒内没有被更新，就认为它已经失效，强制重新规划。这样可以避免AGV使用过时的路径信息。</p>
+</div>
+
+<p>好了，关于A星在AGV中的应用，全局和局部规划就聊这么多。记住一句话：<strong>全局规划看方向，局部规划看细节</strong>。两者配合好了，你的AGV就能在复杂工厂里游刃有余。</p>
+
+<div class="footer-nav">
+            <a href="16DynamicEnvAStar.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18KinematicConstraints.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

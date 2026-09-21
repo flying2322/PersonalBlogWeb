@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 激光SLAM</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="active">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 激光SLAM：Cartographer框架、子图构建、闭环约束、栅格地图</h2>
+
+<p>聊到激光SLAM，Cartographer绝对是个绕不开的名字。我个人习惯把它称为“Google家的扫地僧”——看着低调，但真用起来就知道有多扎实。当年我在做AGV项目时，试过好几个开源方案，最后稳定跑起来的，就是Cartographer。今天咱们就把它拆开，看看里面到底是怎么玩的。</p>
+
+<h3>19.1 Cartographer整体框架</h3>
+
+<p>Cartographer的核心思想，说白了就是“局部先建图，全局再优化”。它不像某些方案一上来就搞全局优化，那样计算量太大，实时性扛不住。Cartographer的做法是：</p>
+
+<ul>
+  <li><strong>前端（Local SLAM）</strong>：实时处理激光数据，构建局部子图</li>
+  <li><strong>后端（Global SLAM）</strong>：定期做闭环检测和全局优化</li>
+</ul>
+
+<p>我画了一张框架图，帮你理清这个流程：</p>
+
+<div style="text-align:center; margin:20px 0;">
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect x="0" y="0" width="700" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 传感器输入 -->
+  <rect x="20" y="20" width="160" height="60" fill="#b0e0e6" stroke="#4682b4" stroke-width="2" rx="8"/>
+  <text x="100" y="55" text-anchor="middle" font-size="14" fill="#333">激光雷达 / IMU / 里程计</text>
+  
+  <!-- 箭头 -->
+  <line x1="180" y1="50" x2="240" y2="50" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 前端 -->
+  <rect x="240" y="20" width="200" height="80" fill="#ffe4b5" stroke="#d2691e" stroke-width="2" rx="8"/>
+  <text x="340" y="50" text-anchor="middle" font-size="16" font-weight="bold" fill="#8b4513">前端：Local SLAM</text>
+  <text x="340" y="75" text-anchor="middle" font-size="12" fill="#555">扫描匹配 → 子图构建 → 位姿估计</text>
+  
+  <!-- 箭头 -->
+  <line x1="440" y1="60" x2="500" y2="60" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 子图 -->
+  <rect x="500" y="20" width="160" height="60" fill="#98fb98" stroke="#3cb371" stroke-width="2" rx="8"/>
+  <text x="580" y="55" text-anchor="middle" font-size="14" fill="#2e8b57">子图（Submap）</text>
+  
+  <!-- 箭头向下 -->
+  <line x1="580" y1="80" x2="580" y2="140" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 后端 -->
+  <rect x="240" y="140" width="420" height="80" fill="#dda0dd" stroke="#9932cc" stroke-width="2" rx="8"/>
+  <text x="450" y="170" text-anchor="middle" font-size="16" font-weight="bold" fill="#4b0082">后端：Global SLAM</text>
+  <text x="450" y="195" text-anchor="middle" font-size="12" fill="#555">闭环检测 → 图优化 → 全局位姿调整</text>
+  
+  <!-- 箭头从子图到后端 -->
+  <line x1="500" y1="80" x2="450" y2="140" stroke="#4682b4" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头从后端到输出 -->
+  <line x1="450" y1="220" x2="450" y2="280" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 输出 -->
+  <rect x="320" y="280" width="260" height="60" fill="#f0e68c" stroke="#b8860b" stroke-width="2" rx="8"/>
+  <text x="450" y="315" text-anchor="middle" font-size="14" fill="#8b4513">全局栅格地图 + 轨迹</text>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4682b4"/>
+    </marker>
+  </defs>
+</svg>
+</div>
+
+<p>你看，整个流程其实很清晰。传感器数据进来，前端先快速构建子图，后端再慢慢做全局优化。这种“前后端分离”的设计，让Cartographer既能跑在嵌入式设备上，又能保证大场景下的精度。</p>
+
+<h3>19.2 子图构建（Submap）</h3>
+
+<p>子图是Cartographer里最核心的概念之一。我刚开始接触时，总觉得“子图”这词有点玄乎。其实说白了，子图就是一小块局部地图，由连续几帧激光数据拼接而成。</p>
+
+<p>具体怎么构建的呢？</p>
+
+<ul>
+  <li><strong>扫描匹配（Scan Matching）</strong>：新来一帧激光数据，先跟当前子图做匹配，找到最优位姿</li>
+  <li><strong>插入子图</strong>：匹配成功后，把这一帧数据“插入”到子图中，更新栅格概率</li>
+  <li><strong>子图完成</strong>：当子图里插入了足够多的帧（比如几十帧），就把它“冻结”，开始构建下一个子图</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>关键点</strong>：子图之间是有重叠的。每个新子图都会跟之前的子图有部分区域重合，这为后面的闭环检测埋下了伏笔。</p>
+</div>
+
+<p>我记得有一次调试AGV，发现地图总是出现“重影”。查了半天，原来是子图构建时，扫描匹配的参数没调好。匹配太松，帧与帧之间对不齐；匹配太紧，又容易陷入局部最优。嗯，这里要注意，<code>ceres_scan_matcher</code> 的权重参数，我建议从 <code>1.0</code> 开始调，别一上来就搞太大。</p>
+
+<h3>19.3 闭环约束（Loop Closure）</h3>
+
+<p>闭环检测，是SLAM里最性感的部分。没有闭环，地图就会像喝醉了一样越飘越远。Cartographer的闭环检测，核心思路是：</p>
+
+<ol>
+  <li><strong>检测候选闭环</strong>：当一个新的子图完成时，把它跟之前所有子图做匹配</li>
+  <li><strong>计算约束</strong>：如果匹配得分足够高，就认为找到了一个闭环，计算相对位姿</li>
+  <li><strong>加入优化</strong>：把这个闭环约束加入后端图优化中，调整所有子图的位姿</li>
+</ol>
+
+<p>这里有个细节：Cartographer用的是<strong>分支定界（Branch and Bound）</strong>加速匹配。为什么？因为暴力匹配太慢了。你想想看，一个子图可能有几万个栅格，跟所有历史子图匹配一遍，计算量爆炸。</p>
+
+<div class="tip">
+  <p><strong>我的经验</strong>：分支定界的搜索窗口大小很关键。设太大，匹配慢；设太小，容易漏掉闭环。我一般设 <code>7m × 7m</code>，角度范围 <code>30°</code>，效果比较均衡。</p>
+</div>
+
+<p>我曾经在一个仓库项目里，AGV跑了半小时后突然“跳变”——地图位置瞬间偏移了半米。排查后发现，是闭环检测的得分阈值设得太低，把假闭环当成真闭环了。后来我把 <code>min_score</code> 从 <code>0.3</code> 提到 <code>0.6</code>，问题就解决了。</p>
+
+<h3>19.4 栅格地图（Occupancy Grid Map）</h3>
+
+<p>最后说说栅格地图。Cartographer用的是<strong>概率栅格地图</strong>，每个格子存的是“被占据的概率”，而不是简单的0或1。</p>
+
+<p>更新规则很简单：</p>
+
+<ul>
+  <li>激光打到的地方，格子概率增加（被占据）</li>
+  <li>激光穿过的区域，格子概率减少（空闲）</li>
+  <li>没被观测到的区域，概率保持0.5（未知）</li>
+</ul>
+
+<p>代码里是这样实现的：</p>
+
+<pre><code>// 栅格概率更新（Cartographer源码简化版）
+void UpdateGrid(Cell* cell, bool is_hit) {
+  float odds = cell-&gt;probability / (1.0f - cell-&gt;probability);
+  if (is_hit) {
+    odds *= kHitOdds;  // 击中更新
+  } else {
+    odds *= kMissOdds; // 穿过更新
+  }
+  cell-&gt;probability = odds / (1.0f + odds);
+}</code></pre>
+
+<p>这里 <code>kHitOdds</code> 和 <code>kMissOdds</code> 是两个超参数。我习惯设 <code>kHitOdds = 2.0</code>，<code>kMissOdds = 0.5</code>。这样更新几次后，地图就能快速收敛。</p>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经把 <code>kHitOdds</code> 设得太大（比如 <code>10.0</code>），结果地图上全是“噪点”——激光稍微有点噪声，格子概率就飙到0.9以上。调参数时，记得先在小场景里验证。</p>
+</div>
+
+<p>栅格地图的分辨率也是个关键。分辨率太高，内存爆炸；分辨率太低，细节丢失。我一般用 <code>0.05m</code>（5厘米），室内AGV够用了。如果是室外大场景，可以降到 <code>0.1m</code>。</p>
+
+<h3>19.5 小结</h3>
+
+<p>Cartographer这套框架，说白了就是“先局部后全局”的思路。子图构建保证了实时性，闭环约束保证了全局一致性，栅格地图提供了可导航的环境表示。三个环节环环相扣，缺一不可。</p>
+
+<p>如果你正在做AGV导航，我建议先从Cartographer的官方demo跑起，把参数调一遍，感受一下每个参数对地图质量的影响。别急着上真车，先在数据集上跑通，再移植到嵌入式平台。嗯，这样能省不少调试时间。</p>
+
+<div class="footer-nav">
+            <a href="18VisualSlam.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20MultiSensorFusionLocalization.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

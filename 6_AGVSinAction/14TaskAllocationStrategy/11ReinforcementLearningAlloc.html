@@ -1,0 +1,333 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 基于强化学习的分配策略</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="active">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 基于强化学习的分配策略：Q-learning基础、状态-动作空间设计、奖励函数设计</h2>
+
+<p>说实话，讲到强化学习，很多做AGV调度的朋友第一反应是：“这玩意儿太学术了，落地难。”<br>
+我以前也这么想。直到三年前，我在一个大型电商仓库的项目里，被传统规则调度逼到墙角——订单量一冲上来，任务分配就乱成一锅粥。那时候我才真正开始研究Q-learning。</p>
+
+<p>今天，我就把这块硬骨头拆开揉碎，跟你聊聊。</p>
+
+<h3>11.1 Q-learning 基础：从“试错”到“最优”</h3>
+
+<p>Q-learning，说白了就是让AGV自己学会“在什么状态下，做什么动作最划算”。<br>
+它不需要环境模型，全靠试错。你想想看，这跟人类学骑自行车是不是很像？摔几次就知道怎么平衡了。</p>
+
+<p>核心公式就一个：</p>
+
+<pre><code>Q(s, a) = Q(s, a) + α * [r + γ * max(Q(s', a')) - Q(s, a)]</code></pre>
+
+<p>参数含义：</p>
+<table>
+  <tr><th>参数</th><th>含义</th><th>我的建议值</th></tr>
+  <tr><td>α (学习率)</td><td>新知识覆盖旧知识的速度</td><td>0.1 ~ 0.3，别太大，容易震荡</td></tr>
+  <tr><td>γ (折扣因子)</td><td>对远期奖励的重视程度</td><td>0.9，让AGV看得远一点</td></tr>
+  <tr><td>r (即时奖励)</td><td>执行动作后立即获得的反馈</td><td>根据场景设计，后面细说</td></tr>
+</table>
+
+<div class="highlight">
+  <p><strong>我个人的习惯：</strong>刚开始调参时，先把α设小一点，让Q表慢慢收敛。等系统稳定了，再逐步调大。别一上来就追求“快速学习”，容易学歪。</p>
+</div>
+
+<h3>11.2 状态-动作空间设计：这是成败的关键</h3>
+
+<p>状态空间怎么设计？我见过太多人一上来就把所有变量都塞进去，结果Q表爆炸，训练到天荒地老都不收敛。</p>
+
+<p>我的经验是：<strong>只保留对决策最有影响的3~5个维度</strong>。</p>
+
+<p>举个例子，在一个典型的AGV调度场景中，我常用的状态设计：</p>
+
+<ul>
+  <li><strong>AGV位置</strong>：离散化成区域编号（比如A区、B区、C区）</li>
+  <li><strong>AGV当前任务状态</strong>：空闲、已接单、执行中、故障</li>
+  <li><strong>最近任务点距离</strong>：近（&lt;10m）、中（10~30m）、远（&gt;30m）</li>
+  <li><strong>任务队列长度</strong>：0、1~3、4~6、&gt;6</li>
+</ul>
+
+<p>动作空间就简单多了：</p>
+<ul>
+  <li><strong>接受任务</strong>：从任务池中领取一个任务</li>
+  <li><strong>拒绝任务</strong>：跳过当前任务，等待下一个</li>
+  <li><strong>切换任务</strong>：放弃当前任务，换一个更优的</li>
+</ul>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑：</strong>动作空间里加了“原地等待”这个动作。结果AGV学会了偷懒——只要奖励函数没设计好，它就一直等。后来我直接把“等待”动作删了，强制它必须做选择。</p>
+</div>
+
+<h3>11.3 奖励函数设计：给AGV“画饼”的艺术</h3>
+
+<p>奖励函数，就是告诉AGV什么行为是好的，什么行为是坏的。<br>
+设计得好，AGV自己就能摸索出最优策略。设计得不好，它可能学会“钻空子”。</p>
+
+<p>我常用的奖励设计框架：</p>
+
+<table>
+  <tr><th>事件</th><th>奖励值</th><th>说明</th></tr>
+  <tr><td>完成任务</td><td>+10</td><td>核心正向激励</td></tr>
+  <tr><td>提前完成</td><td>+5</td><td>鼓励效率</td></tr>
+  <tr><td>任务超时</td><td>-5</td><td>惩罚拖延</td></tr>
+  <tr><td>空跑（无任务移动）</td><td>-1</td><td>减少无效能耗</td></tr>
+  <tr><td>碰撞预警</td><td>-10</td><td>安全第一</td></tr>
+</table>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>奖励值不要跨度太大。比如完成任务给+100，碰撞预警给-1，那AGV会觉得“撞一下也没啥”。我一般把正负奖励控制在同一个数量级内。</p>
+</div>
+
+<h3>11.4 知识体系框架图</h3>
+
+<p>下面这张图，是我自己总结的Q-learning调度策略核心逻辑。你看一眼就能明白整个流程：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">Q-learning 任务分配策略核心流程</text>
+  
+  <!-- 状态感知模块 -->
+  <rect x="50" y="80" width="200" height="80" rx="10" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">状态感知</text>
+  <text x="150" y="140" text-anchor="middle" font-size="12" fill="white">AGV位置 | 任务状态 | 距离</text>
+  
+  <!-- 动作选择模块 -->
+  <rect x="300" y="80" width="200" height="80" rx="10" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">动作选择</text>
+  <text x="400" y="140" text-anchor="middle" font-size="12" fill="white">接受 | 拒绝 | 切换</text>
+  
+  <!-- 环境反馈模块 -->
+  <rect x="550" y="80" width="200" height="80" rx="10" fill="#2ecc71" opacity="0.9"/>
+  <text x="650" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">环境反馈</text>
+  <text x="650" y="140" text-anchor="middle" font-size="12" fill="white">奖励 r | 新状态 s'</text>
+  
+  <!-- 箭头：状态→动作 -->
+  <defs>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+    </marker>
+  </defs>
+  
+  <line x1="250" y1="120" x2="295" y2="120" stroke="#3498db" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  <line x1="500" y1="120" x2="545" y2="120" stroke="#e74c3c" stroke-width="3" marker-end="url(#arrowRed)"/>
+  
+  <!-- Q表更新模块 -->
+  <rect x="300" y="220" width="200" height="80" rx="10" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="255" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Q表更新</text>
+  <text x="400" y="280" text-anchor="middle" font-size="12" fill="white">Q(s,a) += α[r + γmaxQ(s',a') - Q(s,a)]</text>
+  
+  <!-- 箭头：反馈→Q表更新 -->
+  <line x1="650" y1="160" x2="650" y2="220" stroke="#2ecc71" stroke-width="3"/>
+  <line x1="650" y1="220" x2="505" y2="260" stroke="#2ecc71" stroke-width="3" marker-end="url(#arrowGreen)"/>
+  
+  <!-- 策略优化模块 -->
+  <rect x="300" y="360" width="200" height="80" rx="10" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="395" text-anchor="middle" font-size="16" fill="white" font-weight="bold">策略优化</text>
+  <text x="400" y="420" text-anchor="middle" font-size="12" fill="white">ε-贪婪策略 | 探索 vs 利用</text>
+  
+  <!-- 箭头：Q表→策略优化 -->
+  <line x1="400" y1="300" x2="400" y2="355" stroke="#9b59b6" stroke-width="3" marker-end="url(#arrowBlue)"/>
+  
+  <!-- 反馈循环箭头 -->
+  <path d="M 550 400 Q 700 400 700 120" fill="none" stroke="#f39c12" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowRed)"/>
+  <text x="720" y="260" font-size="12" fill="#f39c12" transform="rotate(90,720,260)">持续迭代</text>
+  
+  <!-- 图例 -->
+  <rect x="50" y="440" width="700" height="40" rx="5" fill="#ecf0f1"/>
+  <rect x="70" y="452" width="20" height="15" fill="#3498db"/>
+  <text x="95" y="464" font-size="12" fill="#2c3e50">状态感知</text>
+  <rect x="180" y="452" width="20" height="15" fill="#e74c3c"/>
+  <text x="205" y="464" font-size="12" fill="#2c3e50">动作选择</text>
+  <rect x="290" y="452" width="20" height="15" fill="#2ecc71"/>
+  <text x="315" y="464" font-size="12" fill="#2c3e50">环境反馈</text>
+  <rect x="400" y="452" width="20" height="15" fill="#9b59b6"/>
+  <text x="425" y="464" font-size="12" fill="#2c3e50">Q表更新</text>
+  <rect x="510" y="452" width="20" height="15" fill="#f39c12"/>
+  <text x="535" y="464" font-size="12" fill="#2c3e50">策略优化</text>
+</svg>
+
+<h3>11.5 实战中的避坑指南</h3>
+
+<p>最后，分享几个我亲身踩过的坑，希望能帮你省点时间：</p>
+
+<ol>
+  <li><strong>Q表初始化别用全零</strong>。我一开始图省事，结果AGV探索效率极低。后来改用乐观初始值（比如+5），AGV更愿意尝试新动作。</li>
+  <li><strong>状态离散化粒度要适中</strong>。太粗了学不到细节，太细了Q表太大。我一般先粗后细，逐步调优。</li>
+  <li><strong>别忘了加探索噪声</strong>。纯贪婪策略会让AGV陷入局部最优。我习惯用ε-贪婪，ε从0.5开始，慢慢衰减到0.05。</li>
+  <li><strong>训练时模拟器速度要够快</strong>。真实环境跑一次要几分钟，模拟器里一秒能跑几百步。我都是先在模拟器里训好，再部署到真车上。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>总结一下：</strong>Q-learning做AGV调度，核心就三件事——状态怎么描述、动作怎么选、奖励怎么给。把这三点想透了，剩下的就是调参和耐心。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="10MultiAgvCoopDispatch.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12GeneticAlgoAlloc.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

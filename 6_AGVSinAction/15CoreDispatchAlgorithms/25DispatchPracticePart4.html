@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 AGV调度系统实战（四）</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构</a></li>
+<li><a href="03MapPathPlanningBasics.html" class="">3 地图与路径规划基础</a></li>
+<li><a href="04AStarAlgorithm.html" class="">4 A*算法详解</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多AGV路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07TaskAllocationAlgo.html" class="">7 任务分配算法</a></li>
+<li><a href="08ChargingDispatch.html" class="">8 AGV充电调度</a></li>
+<li><a href="09DeadlockDetectRelease.html" class="">9 死锁检测与解除</a></li>
+<li><a href="10RealtimeDynamicReplan.html" class="">10 实时调度与动态重规划</a></li>
+<li><a href="11PerformanceEvaluation.html" class="">11 调度系统性能评估</a></li>
+<li><a href="12LocalizationNav.html" class="">12 AGV定位与导航</a></li>
+<li><a href="13MultiSensorFusion.html" class="">13 多传感器融合</a></li>
+<li><a href="14KinematicModel.html" class="">14 AGV运动学模型</a></li>
+<li><a href="15TrajectoryTracking.html" class="">15 轨迹跟踪控制</a></li>
+<li><a href="16CommProtocol.html" class="">16 调度系统通信协议</a></li>
+<li><a href="17DatabaseDesign.html" class="">17 调度系统数据库设计</a></li>
+<li><a href="18HighAvailability.html" class="">18 调度系统高可用设计</a></li>
+<li><a href="19SimulationPlatform.html" class="">19 AGV调度仿真平台</a></li>
+<li><a href="20LogAndMonitor.html" class="">20 调度系统日志与监控</a></li>
+<li><a href="21SecurityDesign.html" class="">21 调度系统安全设计</a></li>
+<li><a href="22DispatchPracticePart1.html" class="">22 AGV调度系统实战（一）</a></li>
+<li><a href="23DispatchPracticePart2.html" class="">23 AGV调度系统实战（二）</a></li>
+<li><a href="24DispatchPracticePart3.html" class="">24 AGV调度系统实战（三）</a></li>
+<li><a href="25DispatchPracticePart4.html" class="active">25 AGV调度系统实战（四）</a></li>
+<li><a href="26DispatchPracticePart5.html" class="">26 AGV调度系统实战（五）</a></li>
+<li><a href="27DispatchPracticePart6.html" class="">27 AGV调度系统实战（六）</a></li>
+<li><a href="28DispatchPracticePart7.html" class="">28 AGV调度系统实战（七）</a></li>
+<li><a href="29FrontierTech.html" class="">29 AGV调度系统前沿技术</a></li>
+<li><a href="30SummaryOutlook.html" class="">30 AGV调度系统总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 通信模块与监控模块实现</h2>
+
+<p>各位同学，今天我们来聊聊AGV调度系统里两个最“接地气”的模块——通信模块和监控模块。</p>
+
+<p>说实话，很多刚入行的朋友容易忽略这两个模块。大家总觉得，算法写好了，路径规划出来了，系统就差不多了。但我做了这么多年调度系统，可以负责任地告诉你：<strong>通信和监控，才是决定系统能不能真正跑起来的命门</strong>。</p>
+
+<p>为什么这么说？你想想看，AGV调度系统本质上是一个分布式系统。几十台、上百台AGV同时在车间里跑，每台车都在实时上报位置、状态，调度中心要下发指令、调整任务。这中间要是通信断了、数据丢了、延迟高了，再好的算法也是白搭。</p>
+
+<p>监控模块就更不用说了。没有监控，你就像闭着眼睛开车——出了故障都不知道问题出在哪。我曾经在一个项目里，就因为监控没做好，排查一个偶发性的死锁问题花了整整三天。那滋味，真不好受。</p>
+
+<p>好，咱们直接进入正题。</p>
+
+<h3>一、通信模块的整体架构</h3>
+
+<p>先看一张图，这是我个人习惯用的通信模块架构设计：</p>
+
+<svg width="720" height="420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+    </marker>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F4FD;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D1ECFA;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF3E0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFE0B2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="720" height="420" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#1E293B">AGV调度系统通信模块架构</text>
+
+  <!-- 调度中心层 -->
+  <rect x="60" y="55" width="600" height="70" rx="8" fill="url(#grad1)" stroke="#4A90D9" stroke-width="2"/>
+  <text x="360" y="80" text-anchor="middle" font-size="15" font-weight="bold" fill="#1E3A5F">调度中心层</text>
+  <text x="360" y="100" text-anchor="middle" font-size="12" fill="#475569">任务下发 | 路径规划 | 状态管理 | 异常处理</text>
+  <text x="360" y="115" text-anchor="middle" font-size="11" fill="#64748B">通信协议：Protobuf + MQTT</text>
+
+  <!-- 箭头 -->
+  <line x1="360" y1="125" x2="360" y2="155" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- 通信中间件层 -->
+  <rect x="160" y="155" width="400" height="70" rx="8" fill="url(#grad2)" stroke="#F59E0B" stroke-width="2"/>
+  <text x="360" y="180" text-anchor="middle" font-size="15" font-weight="bold" fill="#92400E">通信中间件层</text>
+  <text x="360" y="200" text-anchor="middle" font-size="12" fill="#78350F">消息队列（RabbitMQ / Kafka）</text>
+  <text x="360" y="215" text-anchor="middle" font-size="11" fill="#92400E">心跳检测 | 消息重试 | 数据持久化</text>
+
+  <!-- 箭头 -->
+  <line x1="360" y1="225" x2="360" y2="255" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+
+  <!-- AGV节点层 -->
+  <rect x="60" y="255" width="600" height="70" rx="8" fill="url(#grad3)" stroke="#22C55E" stroke-width="2"/>
+  <text x="360" y="280" text-anchor="middle" font-size="15" font-weight="bold" fill="#14532D">AGV节点层</text>
+  <text x="360" y="300" text-anchor="middle" font-size="12" fill="#166534">车载控制器 | 传感器 | 执行机构</text>
+  <text x="360" y="315" text-anchor="middle" font-size="11" fill="#15803D">通信协议：MQTT Client + 自定义心跳</text>
+
+  <!-- 底部说明 -->
+  <rect x="60" y="345" width="600" height="55" rx="6" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+  <text x="80" y="365" font-size="12" fill="#475569">关键设计要点：</text>
+  <text x="80" y="383" font-size="11" fill="#64748B">1. 采用分层解耦设计，各层独立演进</text>
+  <text x="380" y="383" font-size="11" fill="#64748B">2. 消息格式统一使用Protobuf序列化</text>
+  <text x="80" y="395" font-size="11" fill="#64748B">3. 支持断线重连和消息幂等处理</text>
+  <text x="380" y="395" font-size="11" fill="#64748B">4. 心跳超时阈值可动态配置</text>
+</svg>
+
+<p>嗯，这张图基本概括了通信模块的核心分层。从上到下分别是调度中心层、通信中间件层和AGV节点层。每一层各司其职，互不干扰。</p>
+
+<h3>二、通信协议选型</h3>
+
+<p>选通信协议，说白了就是选“车和调度中心怎么说话”。我见过不少项目，一开始图省事用HTTP轮询，结果AGV一多，服务器直接被打趴下。</p>
+
+<p>我个人推荐的做法是：</p>
+
+<ul>
+  <li><strong>控制指令</strong>：用MQTT协议。轻量、支持发布/订阅模式、有QoS保证。AGV多的时候，MQTT的吞吐量优势非常明显。</li>
+  <li><strong>状态数据</strong>：用Protobuf序列化。相比JSON，Protobuf的编码体积小30%-50%，解析速度也快得多。AGV每秒上报一次位置，数据量积少成多，这个优化很值得。</li>
+  <li><strong>大文件/日志</strong>：走HTTP/2。比如AGV的固件升级包、历史日志回传，这些不适合走MQTT。</li>
+</ul>
+
+<div class="tip">
+  <strong>小技巧：</strong> 我在项目中遇到过一个问题——AGV在WiFi信号弱的区域频繁断连。后来我们在MQTT客户端里加了“自适应心跳间隔”机制：信号好时心跳间隔3秒，信号差时自动缩短到1秒。这样既保证了及时性，又不会在信号好时浪费带宽。
+</div>
+
+<h3>三、通信模块核心代码实现</h3>
+
+<p>下面这段代码，是我在实际项目中提炼出来的通信模块核心框架。注意看消息的序列化和反序列化部分：</p>
+
+<pre><code>// 通信模块核心类（C++示例）
+class CommunicationModule {
+public:
+    CommunicationModule(const std::string& broker_url, const std::string& client_id)
+        : mqtt_client_(broker_url, client_id) {
+        
+        // 注册回调
+        mqtt_client_.set_connected_callback([this]() {
+            on_connected();
+        });
+        
+        mqtt_client_.set_disconnected_callback([this](int reason) {
+            on_disconnected(reason);
+        });
+        
+        mqtt_client_.set_message_callback([this](const std::string& topic, 
+                                                  const std::vector&lt;uint8_t&gt;& data) {
+            on_message(topic, data);
+        });
+    }
+
+    // 发送AGV状态（使用Protobuf序列化）
+    bool send_agv_status(const AGVStatus& status) {
+        std::vector&lt;uint8_t&gt; buffer;
+        if (!status.SerializeToArray(&amp;buffer)) {
+            log_error("序列化AGV状态失败");
+            return false;
+        }
+        
+        // 发布到MQTT主题
+        std::string topic = "agv/" + status.agv_id() + "/status";
+        return mqtt_client_.publish(topic, buffer, QOS_AT_LEAST_ONCE);
+    }
+
+    // 接收调度指令（使用Protobuf反序列化）
+    bool receive_command(const std::vector&lt;uint8_t&gt;& data, DispatchCommand* cmd) {
+        if (!cmd-&gt;ParseFromArray(data.data(), data.size())) {
+            log_error("反序列化调度指令失败");
+            return false;
+        }
+        return true;
+    }
+
+private:
+    void on_connected() {
+        log_info("MQTT连接成功");
+        // 订阅所有AGV相关的主题
+        mqtt_client_.subscribe("agv/+/status", QOS_AT_LEAST_ONCE);
+        mqtt_client_.subscribe("agv/+/command", QOS_EXACTLY_ONCE);
+    }
+
+    void on_disconnected(int reason) {
+        log_warn("MQTT连接断开，原因码：%d", reason);
+        // 启动重连（指数退避策略）
+        start_reconnect_with_backoff();
+    }
+
+    void on_message(const std::string& topic, const std::vector&lt;uint8_t&gt;& data) {
+        // 根据topic分发消息
+        if (topic.find("/status") != std::string::npos) {
+            AGVStatus status;
+            if (receive_agv_status(data, &amp;status)) {
+                status_callback_(status);
+            }
+        } else if (topic.find("/command") != std::string::npos) {
+            DispatchCommand cmd;
+            if (receive_command(data, &amp;cmd)) {
+                command_callback_(cmd);
+            }
+        }
+    }
+
+    MQTTClient mqtt_client_;
+    std::function&lt;void(const AGVStatus&)&gt; status_callback_;
+    std::function&lt;void(const DispatchCommand&)&gt; command_callback_;
+};</code></pre>
+
+<div class="highlight">
+  <strong>关键点解析：</strong>
+  <ul>
+    <li>QoS级别选择：状态上报用QoS 1（至少一次），指令下发用QoS 2（恰好一次）。为什么？状态丢一帧问题不大，但指令丢了可能出大事故。</li>
+    <li>断线重连用指数退避：第一次重连等1秒，第二次2秒，第三次4秒...最大不超过30秒。避免网络波动时大量客户端同时重连造成“雪崩”。</li>
+    <li>主题命名规范：agv/{agv_id}/{message_type}。这样既方便订阅，也方便后续扩展。</li>
+  </ul>
+</div>
+
+<h3>四、监控模块的设计思路</h3>
+
+<p>监控模块，说白了就是给调度系统装上一双“眼睛”。我见过太多系统，上线第一天跑得挺好，第二天开始出各种诡异问题——AGV突然不动了、任务卡住了、路径死锁了。没有监控，你连问题出在哪都不知道。</p>
+
+<p>监控模块我一般分三层：</p>
+
+<table>
+  <tr>
+    <th>监控层级</th>
+    <th>监控内容</th>
+    <th>采集方式</th>
+    <th>告警阈值</th>
+  </tr>
+  <tr>
+    <td>设备层</td>
+    <td>AGV电量、速度、温度、传感器状态</td>
+    <td>MQTT实时上报</td>
+    <td>电量&lt;20%、温度&gt;60°C</td>
+  </tr>
+  <tr>
+    <td>通信层</td>
+    <td>消息延迟、丢包率、连接状态</td>
+    <td>心跳检测+消息追踪</td>
+    <td>延迟&gt;500ms、丢包率&gt;5%</td>
+  </tr>
+  <tr>
+    <td>业务层</td>
+    <td>任务完成率、路径阻塞、死锁检测</td>
+    <td>调度日志分析</td>
+    <td>完成率&lt;90%、阻塞&gt;30s</td>
+  </tr>
+</table>
+
+<p>嗯，这里要特别说一下业务层的监控。我曾经在一个项目里，AGV数量从20台增加到50台后，系统突然频繁死锁。排查了整整两天，最后发现是路径预留算法在高并发下有个边界条件没处理好。要是当时有完善的死锁监控，这个问题半天就能定位到。</p>
+
+<h3>五、监控模块核心实现</h3>
+
+<p>监控模块的代码，我习惯用“生产者-消费者”模式。AGV上报的数据是生产者，监控分析线程是消费者。中间用无锁队列缓冲，避免阻塞AGV的通信线程。</p>
+
+<pre><code>// 监控模块核心类
+class MonitorModule {
+public:
+    MonitorModule() : running_(false) {}
+
+    void start() {
+        running_ = true;
+        // 启动监控分析线程
+        analyzer_thread_ = std::thread([this]() {
+            while (running_) {
+                analyze();
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        });
+    }
+
+    // 接收AGV上报数据（由通信模块调用）
+    void feed_data(const AGVStatus& status) {
+        std::lock_guard&lt;std::mutex&gt; lock(mutex_);
+        // 更新AGV最新状态
+        agv_status_map_[status.agv_id()] = status;
+        
+        // 记录历史数据（用于趋势分析）
+        if (status_history_.size() &gt; 10000) {
+            status_history_.pop_front();
+        }
+        status_history_.push_back(status);
+    }
+
+private:
+    void analyze() {
+        std::lock_guard&lt;std::mutex&gt; lock(mutex_);
+        
+        auto now = std::chrono::system_clock::now();
+        
+        for (const auto&amp; [agv_id, status] : agv_status_map_) {
+            // 1. 心跳超时检测
+            auto last_heartbeat = status.timestamp();
+            auto elapsed = std::chrono::duration_cast&lt;std::chrono::seconds&gt;(
+                now - last_heartbeat).count();
+            
+            if (elapsed &gt; HEARTBEAT_TIMEOUT_SECONDS) {
+                trigger_alarm(AlarmType::HEARTBEAT_TIMEOUT, 
+                    "AGV " + agv_id + " 心跳超时 " + std::to_string(elapsed) + "秒");
+            }
+            
+            // 2. 电量过低告警
+            if (status.battery_level() &lt; 20.0f) {
+                trigger_alarm(AlarmType::LOW_BATTERY,
+                    "AGV " + agv_id + " 电量不足: " + 
+                    std::to_string(status.battery_level()) + "%");
+            }
+            
+            // 3. 路径阻塞检测
+            if (status.motion_state() == MotionState::BLOCKED) {
+                auto block_duration = std::chrono::duration_cast&lt;std::chrono::seconds&gt;(
+                    now - status.block_start_time()).count();
+                if (block_duration &gt; BLOCK_TIMEOUT_SECONDS) {
+                    trigger_alarm(AlarmType::PATH_BLOCKED,
+                        "AGV " + agv_id + " 路径阻塞 " + 
+                        std::to_string(block_duration) + "秒");
+                }
+            }
+        }
+    }
+
+    void trigger_alarm(AlarmType type, const std::string& message) {
+        // 记录告警日志
+        log_alarm(type, message);
+        
+        // 推送到告警队列（供前端展示）
+        alarm_queue_.push({type, message, std::time(nullptr)});
+        
+        // 严重告警直接触发回调（比如发短信、打电话）
+        if (type == AlarmType::HEARTBEAT_TIMEOUT || 
+            type == AlarmType::PATH_BLOCKED) {
+            if (critical_alarm_callback_) {
+                critical_alarm_callback_(type, message);
+            }
+        }
+    }
+
+    std::atomic&lt;bool&gt; running_;
+    std::thread analyzer_thread_;
+    std::mutex mutex_;
+    std::unordered_map&lt;std::string, AGVStatus&gt; agv_status_map_;
+    std::deque&lt;AGVStatus&gt; status_history_;
+    std::queue&lt;AlarmEvent&gt; alarm_queue_;
+    std::function&lt;void(AlarmType, const std::string&)&gt; critical_alarm_callback_;
+};</code></pre>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经犯过一个错误——监控分析线程里直接调用了外部告警接口（比如发短信API）。结果有一次短信服务挂了，监控线程卡在HTTP调用上，导致整个监控模块“假死”。后来我改成异步告警：监控线程只负责把告警事件丢到队列里，由专门的告警发送线程去处理。这样即使外部服务挂了，也不影响监控核心逻辑。
+</div>
+
+<h3>六、通信与监控的联动</h3>
+
+<p>通信模块和监控模块不是孤立的。它们之间有一个非常重要的联动机制——<strong>自适应降级</strong>。</p>
+
+<p>什么意思呢？当监控模块检测到通信质量下降（比如丢包率超过5%），它会通知调度中心自动降低AGV的运行速度，同时增加安全距离。等通信恢复后，再逐步恢复到正常模式。</p>
+
+<p>这个机制我在一个大型仓储项目里用过。当时仓库的WiFi覆盖有盲区，AGV经过时经常断连。加了自适应降级后，AGV在盲区自动减速到0.5m/s，安全距离从2米扩大到5米。虽然效率降低了，但至少不会撞车。等出了盲区，再自动恢复。</p>
+
+<p>嗯，说白了就是：<strong>通信不好，就别让AGV跑太快</strong>。这个道理很简单，但很多系统就是没做。</p>
+
+<h3>七、总结</h3>
+
+<p>通信模块和监控模块，看起来不像路径规划、任务调度那么“高大上”，但它们是整个调度系统的“地基”。地基不稳，上面盖再漂亮的房子也是白搭。</p>
+
+<p>最后送大家一句话：<strong>好的调度系统，不是算法多牛，而是出了问题能快速发现、快速定位、快速恢复</strong>。而这一切，都离不开扎实的通信和监控设计。</p>
+
+<p>好，今天就讲到这里。代码示例我已经整理好了，大家回去可以跑一跑，有问题随时交流。</p>
+
+<div class="footer-nav">
+            <a href="24DispatchPracticePart3.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26DispatchPracticePart5.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 全局与局部融合架构</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="active">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 全局与局部融合架构：分层规划框架、Map更新机制、重规划触发条件、状态机设计</h2>
+
+<p>各位同学，今天我们来聊聊AGV路径规划里最核心的一个话题——全局与局部融合架构。</p>
+
+<p>说实话，我见过不少团队，全局规划做得漂漂亮亮，局部规划也写得头头是道。但一上路跑，车就撞墙。为什么？因为两者没融合好。全局规划告诉你「走这条路」，局部规划却因为传感器噪声突然拐了个弯，结果全局路径白算了。</p>
+
+<p>所以，融合架构不是简单的「全局+局部」，而是一套完整的协同机制。今天我就把这套机制拆开揉碎了讲给你听。</p>
+
+<h3>16.1 分层规划框架：为什么需要分层？</h3>
+
+<p>先问一个问题：你开车从北京到上海，你会怎么做？</p>
+
+<p>你肯定先看地图，规划一条高速路线。这是全局规划。但上了高速，前面有辆车开得慢，你会变道超车。这是局部规划。你不会因为要超车，就重新规划整个北京到上海的路线吧？</p>
+
+<p>AGV也是这个道理。全局规划负责「宏观路线」，局部规划负责「微观避障」。两者各司其职，才能高效运行。</p>
+
+<p>我习惯把分层规划框架画成三层：</p>
+
+<div class="highlight">
+<strong>分层规划框架（三层结构）</strong><br>
+1. <strong>全局规划层</strong>：基于静态地图，生成从起点到终点的最优路径。频率低（秒级），计算量大。<br>
+2. <strong>局部规划层</strong>：基于传感器数据，在全局路径附近做局部调整。频率高（毫秒级），实时性强。<br>
+3. <strong>执行层</strong>：将局部路径转化为电机控制指令。频率最高（微秒级）。
+</div>
+
+<p>这里有个关键点：全局路径不是一成不变的。它更像一个「参考线」。局部规划器沿着这条参考线走，但允许有小幅度的偏移。</p>
+
+<p>我在项目中遇到过一个问题：全局路径穿过了两个货架之间的狭窄通道，但局部规划器因为传感器噪声，把车往左边偏了5厘米，结果撞上了货架。后来怎么解决的？我们在局部规划里加了一个「走廊约束」——局部路径不能偏离全局路径超过一定阈值。嗯，这个阈值要根据车宽和通道宽度来调，不能一刀切。</p>
+
+<h3>16.2 Map更新机制：地图不是死的</h3>
+
+<p>你想想看，工厂里的环境是动态的。今天这里放了个托盘，明天那里多了个工人。如果地图不更新，全局规划就是「盲人摸象」。</p>
+
+<p>Map更新机制，说白了就是让地图「活起来」。我把它分为两种：</p>
+
+<table>
+    <tr>
+        <th>更新类型</th>
+        <th>触发条件</th>
+        <th>更新内容</th>
+        <th>频率</th>
+    </tr>
+    <tr>
+        <td>静态更新</td>
+        <td>人工导入/手动编辑</td>
+        <td>货架位置、充电站、工作站</td>
+        <td>天级</td>
+    </tr>
+    <tr>
+        <td>动态更新</td>
+        <td>传感器检测到变化</td>
+        <td>临时障碍物、移动物体</td>
+        <td>秒级/毫秒级</td>
+    </tr>
+</table>
+
+<p>动态更新这块，我踩过不少坑。曾经有一次，AGV检测到前方有个纸箱，于是把地图上那个位置标记为「障碍物」。但纸箱很快被工人搬走了，地图上却还留着障碍物标记。结果后面的AGV都绕道走，效率大打折扣。</p>
+
+<div class="warning">
+<strong>避坑指南：</strong>动态障碍物要有「超时清除」机制。比如一个障碍物被检测到后，如果连续3秒没有再次被检测到，就自动从地图上移除。这个超时时间要根据场景来调，仓库里可以长一点，车间里要短一点。
+</div>
+
+<p>另外，我建议把地图分成「全局地图」和「局部地图」两层。全局地图存的是固定结构（墙壁、货架），局部地图存的是动态信息（临时障碍物、行人）。这样更新局部地图不会影响全局地图的稳定性。</p>
+
+<h3>16.3 重规划触发条件：什么时候该重新算路？</h3>
+
+<p>全局路径不是算一次就完事的。什么时候需要重新规划？我总结了几个典型场景：</p>
+
+<ol>
+    <li><strong>路径被完全阻塞</strong>：局部规划尝试了N次都无法通过，说明这条路走不通了。</li>
+    <li><strong>目标点发生变化</strong>：比如任务中途被取消，或者要先去另一个工作站。</li>
+    <li><strong>地图发生重大变化</strong>：比如某个区域被封锁，或者新增了障碍物。</li>
+    <li><strong>路径代价过高</strong>：比如原路径上出现了拥堵，绕行反而更快。</li>
+</ol>
+
+<p>这里有个细节：重规划不是越频繁越好。每次重规划都要消耗计算资源，而且如果规划器不稳定，会导致路径来回跳变。</p>
+
+<p>我曾经遇到过一个案例：AGV在走廊里，前方有个工人站着不动。局部规划尝试绕行，但走廊太窄绕不过去。于是触发了重规划，全局规划算了一条新路径——从走廊另一头绕过去。但工人很快走开了，AGV又触发了一次重规划，回到了原路径。结果AGV就在那里来回折腾，像个无头苍蝇。</p>
+
+<div class="tip">
+<strong>我的经验：</strong>重规划触发后，加一个「冷却时间」。比如触发重规划后，至少等5秒才能再次触发。这样可以避免频繁重规划导致的震荡。另外，重规划前先让局部规划多尝试几次，有时候只是临时障碍物，等一等就过去了。
+</div>
+
+<h3>16.4 状态机设计：让AGV知道自己该干嘛</h3>
+
+<p>状态机，说白了就是AGV的「大脑状态」。它知道自己现在在干嘛，下一步该干嘛。</p>
+
+<p>我设计的状态机一般包含以下几个状态：</p>
+
+<ul>
+    <li><strong>IDLE（空闲）</strong>：等待任务，停在原地。</li>
+    <li><strong>PLANNING（规划中）</strong>：正在计算全局路径。</li>
+    <li><strong>FOLLOWING（跟随中）</strong>：沿着全局路径行驶，局部规划器在实时调整。</li>
+    <li><strong>REPLANNING（重规划中）</strong>：遇到障碍，正在重新计算路径。</li>
+    <li><strong>BLOCKED（阻塞）</strong>：多次重规划失败，需要人工干预。</li>
+    <li><strong>COMPLETED（完成）</strong>：到达目标点，任务结束。</li>
+</ul>
+
+<p>状态之间的转换逻辑是这样的：</p>
+
+<p>IDLE → 收到任务 → PLANNING → 路径计算完成 → FOLLOWING → 遇到障碍 → REPLANNING → 新路径算好 → FOLLOWING → 到达目标 → COMPLETED → IDLE</p>
+
+<p>如果REPLANNING连续失败3次，就进入BLOCKED状态，等待人工处理。</p>
+
+<p>这里我画了一张状态机图，方便你理解：</p>
+
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="700" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 状态节点 -->
+    <ellipse cx="100" cy="80" rx="60" ry="30" fill="#87ceeb" stroke="#4682b4" stroke-width="2"/>
+    <text x="100" y="85" text-anchor="middle" font-size="14" fill="#333">IDLE</text>
+    
+    <ellipse cx="250" cy="80" rx="70" ry="30" fill="#98fb98" stroke="#3cb371" stroke-width="2"/>
+    <text x="250" y="85" text-anchor="middle" font-size="14" fill="#333">PLANNING</text>
+    
+    <ellipse cx="400" cy="80" rx="70" ry="30" fill="#ffd700" stroke="#daa520" stroke-width="2"/>
+    <text x="400" y="85" text-anchor="middle" font-size="14" fill="#333">FOLLOWING</text>
+    
+    <ellipse cx="550" cy="80" rx="75" ry="30" fill="#ffa07a" stroke="#cd5c5c" stroke-width="2"/>
+    <text x="550" y="85" text-anchor="middle" font-size="14" fill="#333">REPLANNING</text>
+    
+    <ellipse cx="400" cy="200" rx="70" ry="30" fill="#ff6347" stroke="#b22222" stroke-width="2"/>
+    <text x="400" y="205" text-anchor="middle" font-size="14" fill="#fff">BLOCKED</text>
+    
+    <ellipse cx="100" cy="200" rx="75" ry="30" fill="#dda0dd" stroke="#9932cc" stroke-width="2"/>
+    <text x="100" y="205" text-anchor="middle" font-size="14" fill="#333">COMPLETED</text>
+    
+    <!-- 箭头 -->
+    <!-- IDLE -> PLANNING -->
+    <line x1="160" y1="80" x2="180" y2="80" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="170" y="70" text-anchor="middle" font-size="10" fill="#666">收到任务</text>
+    
+    <!-- PLANNING -> FOLLOWING -->
+    <line x1="320" y1="80" x2="330" y2="80" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="325" y="70" text-anchor="middle" font-size="10" fill="#666">路径就绪</text>
+    
+    <!-- FOLLOWING -> REPLANNING -->
+    <line x1="470" y1="80" x2="475" y2="80" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="480" y="70" text-anchor="middle" font-size="10" fill="#666">遇到障碍</text>
+    
+    <!-- REPLANNING -> FOLLOWING -->
+    <line x1="550" y1="110" x2="550" y2="140" stroke="#333" stroke-width="2"/>
+    <line x1="550" y1="140" x2="400" y2="140" stroke="#333" stroke-width="2"/>
+    <line x1="400" y1="140" x2="400" y2="110" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="475" y="135" text-anchor="middle" font-size="10" fill="#666">新路径就绪</text>
+    
+    <!-- REPLANNING -> BLOCKED -->
+    <line x1="550" y1="110" x2="550" y2="170" stroke="#333" stroke-width="2"/>
+    <line x1="550" y1="170" x2="470" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="550" y="165" text-anchor="middle" font-size="10" fill="#666">失败3次</text>
+    
+    <!-- FOLLOWING -> COMPLETED -->
+    <line x1="330" y1="80" x2="250" y2="80" stroke="#333" stroke-width="2"/>
+    <line x1="250" y1="80" x2="250" y2="170" stroke="#333" stroke-width="2"/>
+    <line x1="250" y1="170" x2="175" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="250" y="165" text-anchor="middle" font-size="10" fill="#666">到达目标</text>
+    
+    <!-- COMPLETED -> IDLE -->
+    <line x1="100" y1="170" x2="100" y2="110" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="110" y="145" text-anchor="middle" font-size="10" fill="#666">任务结束</text>
+    
+    <!-- BLOCKED -> IDLE -->
+    <line x1="330" y1="200" x2="175" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="250" y="195" text-anchor="middle" font-size="10" fill="#666">人工恢复</text>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>这个状态机看起来简单，但实际落地时有很多细节。比如从FOLLOWING到REPLANNING的转换，不能一遇到障碍就触发。我一般会加一个「尝试次数」计数器——局部规划先尝试绕行，如果连续3次都失败，才触发重规划。</p>
+
+<div class="highlight">
+<strong>核心要点总结：</strong><br>
+1. 分层规划：全局管宏观，局部管微观，两者通过「走廊约束」协同。<br>
+2. Map更新：静态地图和动态地图分开管理，动态障碍物要有超时清除机制。<br>
+3. 重规划触发：不是越频繁越好，加冷却时间，避免路径震荡。<br>
+4. 状态机：明确每个状态的责任，转换条件要清晰，失败处理要兜底。
+</div>
+
+<p>好了，关于全局与局部融合架构，我就讲这么多。这套架构我在多个项目中验证过，效果还不错。你如果自己实现，建议先从状态机入手，把各个状态的行为定义清楚，然后再逐步加入Map更新和重规划逻辑。一步步来，别想一口吃成胖子。</p>
+
+<div class="tip">
+<strong>一个小技巧：</strong>调试阶段，把状态机的状态实时显示在AGV的屏幕上。这样你一眼就能看出AGV当前在干嘛，是卡在PLANNING还是BLOCKED。我当年调试时，就靠这个快速定位问题。
+</div>
+
+        <div class="footer-nav">
+            <a href="15LocalObstacleAvoid.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17FusionKeyIssues.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

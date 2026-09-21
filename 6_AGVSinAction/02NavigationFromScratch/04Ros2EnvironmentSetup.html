@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 ROS2基础与环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="active">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 ROS2基础与环境搭建</h2>
+
+<p>各位同学，欢迎来到第四章。从这一章开始，我们正式进入ROS2的世界。说实话，ROS2的生态比ROS1成熟太多了，尤其是Humble版本，稳定得让人感动。我在2019年刚接触ROS2时，还踩了不少坑，现在回想起来，都是宝贵的经验。</p>
+
+<h3>4.1 ROS2 Humble安装</h3>
+
+<p>ROS2 Humble是Ubuntu 22.04的官方推荐版本。我个人习惯用apt安装，干净利落。先设置软件源：</p>
+
+<pre><code>sudo apt update
+sudo apt install curl gnupg lsb-release
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+sudo apt update
+sudo apt install ros-humble-desktop
+</code></pre>
+
+<p>安装完成后，记得配置环境变量。我建议直接写到.bashrc里：</p>
+
+<pre><code>echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+source ~/.bashrc
+</code></pre>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经遇到过Python版本冲突的问题。ROS2 Humble依赖Python 3.10，如果你系统里装了多个Python版本，记得用<code>update-alternatives</code>设置默认版本。
+</div>
+
+<h3>4.2 工作空间创建</h3>
+
+<p>工作空间是ROS2项目的根目录。我习惯用<code>colcon</code>来构建，比catkin快不少。创建步骤很简单：</p>
+
+<pre><code>mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws
+colcon build
+</code></pre>
+
+<p>构建完成后，你会看到<code>build</code>、<code>install</code>、<code>log</code>三个目录。每次修改代码后，记得重新<code>colcon build</code>。嗯，这里要注意：如果你只改了某个包，可以用<code>colcon build --packages-select 包名</code>来单独编译，省时间。</p>
+
+<h3>4.3 功能包结构</h3>
+
+<p>一个标准的ROS2功能包长这样：</p>
+
+<pre><code>my_package/
+├── CMakeLists.txt
+├── package.xml
+├── src/
+│   └── my_node.cpp
+├── include/
+│   └── my_package/
+├── launch/
+├── msg/
+├── srv/
+└── config/
+</code></pre>
+
+<p><code>package.xml</code>是包的身份证，里面声明了依赖、作者、许可证等信息。<code>CMakeLists.txt</code>是编译规则。我个人习惯把节点代码放在<code>src</code>里，头文件放在<code>include</code>里，这样结构清晰。</p>
+
+<div class="highlight">
+  <strong>核心要点：</strong> 功能包的名字必须和<code>package.xml</code>里的<code>&lt;name&gt;</code>一致，否则colcon会报错。我刚开始写的时候，就因为大小写问题折腾了半小时。
+</div>
+
+<h3>4.4 节点与话题通信</h3>
+
+<p>节点是ROS2的最小执行单元。话题通信是发布-订阅模式，说白了就是一个节点发消息，其他节点收消息。写一个发布节点：</p>
+
+<pre><code># publisher.py
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
+
+class MinimalPublisher(Node):
+    def __init__(self):
+        super().__init__('minimal_publisher')
+        self.publisher_ = self.create_publisher(String, 'topic', 10)
+        timer_period = 0.5
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+
+    def timer_callback(self):
+        msg = String()
+        msg.data = 'Hello, ROS2!'
+        self.publisher_.publish(msg)
+</code></pre>
+
+<p>订阅节点类似，只是用<code>create_subscription</code>。你想想看，这种模式在AGV里多实用——激光雷达发数据，导航模块收数据，各干各的，互不干扰。</p>
+
+<h3>4.5 服务与动作通信</h3>
+
+<p>服务通信是请求-响应模式。适合一次性任务，比如「帮我算个路径」。动作通信则适合长时间任务，比如「导航到A点」，过程中还能反馈进度。</p>
+
+<p>服务定义文件（.srv）：</p>
+
+<pre><code>int64 a
+int64 b
+---
+int64 sum
+</code></pre>
+
+<p>动作定义文件（.action）：</p>
+
+<pre><code># 目标
+geometry_msgs/PoseStamped target_pose
+---
+# 结果
+bool success
+---
+# 反馈
+float32 progress
+</code></pre>
+
+<div class="tip">
+  <strong>我的经验：</strong> 在AGV项目中，服务常用于「获取当前位姿」，动作常用于「执行导航任务」。动作的反馈机制特别好用，你可以实时看到机器人走到哪了。
+</div>
+
+<h3>4.6 Launch文件编写</h3>
+
+<p>Launch文件用来一次性启动多个节点。ROS2的launch文件用Python写，比ROS1的XML灵活多了。看个例子：</p>
+
+<pre><code># my_launch.py
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    return LaunchDescription([
+        Node(
+            package='my_package',
+            executable='my_node',
+            name='my_node',
+            parameters=[{'param1': 'value1'}]
+        ),
+        Node(
+            package='another_package',
+            executable='another_node'
+        )
+    ])
+</code></pre>
+
+<p>启动时用<code>ros2 launch my_package my_launch.py</code>。我个人习惯把launch文件放在功能包的<code>launch</code>目录下，方便管理。</p>
+
+<h3>4.7 ROS2命令行工具</h3>
+
+<p>命令行工具是调试利器。我常用的几个：</p>
+
+<table>
+  <tr>
+    <th>命令</th>
+    <th>用途</th>
+  </tr>
+  <tr>
+    <td><code>ros2 node list</code></td>
+    <td>列出所有节点</td>
+  </tr>
+  <tr>
+    <td><code>ros2 topic list</code></td>
+    <td>列出所有话题</td>
+  </tr>
+  <tr>
+    <td><code>ros2 topic echo /topic_name</code></td>
+    <td>查看话题数据</td>
+  </tr>
+  <tr>
+    <td><code>ros2 service list</code></td>
+    <td>列出所有服务</td>
+  </tr>
+  <tr>
+    <td><code>ros2 action list</code></td>
+    <td>列出所有动作</td>
+  </tr>
+  <tr>
+    <td><code>ros2 bag record -a</code></td>
+    <td>录制所有话题数据</td>
+  </tr>
+</table>
+
+<p>我曾经在调试AGV导航时，用<code>ros2 topic echo /odom</code>发现里程计数据异常，原来是编码器接线松了。你看，命令行工具能帮你快速定位问题。</p>
+
+<h3>4.8 本章知识体系</h3>
+
+<p>下面这张图总结了本章的核心内容，我画成了SVG，方便你理解整体结构：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <rect x="10" y="10" width="780" height="480" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+  
+  <text x="400" y="50" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">ROS2基础与环境搭建知识体系</text>
+  
+  <!-- 安装 -->
+  <rect x="50" y="80" width="200" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="8"/>
+  <text x="150" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">ROS2 Humble安装</text>
+  <text x="150" y="125" text-anchor="middle" font-size="12" fill="#555">apt安装 + 环境配置</text>
+  
+  <!-- 工作空间 -->
+  <rect x="300" y="80" width="200" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="8"/>
+  <text x="400" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">工作空间创建</text>
+  <text x="400" y="125" text-anchor="middle" font-size="12" fill="#555">colcon构建系统</text>
+  
+  <!-- 功能包 -->
+  <rect x="550" y="80" width="200" height="60" fill="#e8f4f8" stroke="#3498db" stroke-width="2" rx="8"/>
+  <text x="650" y="105" text-anchor="middle" font-size="16" font-weight="bold" fill="#2980b9">功能包结构</text>
+  <text x="650" y="125" text-anchor="middle" font-size="12" fill="#555">CMakeLists + package.xml</text>
+  
+  <!-- 箭头 -->
+  <line x1="150" y1="140" x2="150" y2="200" stroke="#3498db" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="400" y1="140" x2="400" y2="200" stroke="#3498db" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="650" y1="140" x2="650" y2="200" stroke="#3498db" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+    </marker>
+  </defs>
+  
+  <!-- 通信方式 -->
+  <rect x="50" y="210" width="220" height="80" fill="#fef9e7" stroke="#f39c12" stroke-width="2" rx="8"/>
+  <text x="160" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#e67e22">节点与话题通信</text>
+  <text x="160" y="255" text-anchor="middle" font-size="12" fill="#555">发布-订阅模式</text>
+  <text x="160" y="275" text-anchor="middle" font-size="12" fill="#555">Publisher / Subscriber</text>
+  
+  <rect x="290" y="210" width="220" height="80" fill="#fef9e7" stroke="#f39c12" stroke-width="2" rx="8"/>
+  <text x="400" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#e67e22">服务与动作通信</text>
+  <text x="400" y="255" text-anchor="middle" font-size="12" fill="#555">请求-响应 / 长时间任务</text>
+  <text x="400" y="275" text-anchor="middle" font-size="12" fill="#555">Service / Action</text>
+  
+  <rect x="530" y="210" width="220" height="80" fill="#fef9e7" stroke="#f39c12" stroke-width="2" rx="8"/>
+  <text x="640" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="#e67e22">Launch文件编写</text>
+  <text x="640" y="255" text-anchor="middle" font-size="12" fill="#555">Python脚本启动节点</text>
+  <text x="640" y="275" text-anchor="middle" font-size="12" fill="#555">参数传递与配置</text>
+  
+  <!-- 箭头 -->
+  <line x1="160" y1="290" x2="160" y2="350" stroke="#f39c12" stroke-width="2" marker-end="url(#arrow2)"/>
+  <line x1="400" y1="290" x2="400" y2="350" stroke="#f39c12" stroke-width="2" marker-end="url(#arrow2)"/>
+  <line x1="640" y1="290" x2="640" y2="350" stroke="#f39c12" stroke-width="2" marker-end="url(#arrow2)"/>
+  
+  <defs>
+    <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f39c12"/>
+    </marker>
+  </defs>
+  
+  <!-- 命令行工具 -->
+  <rect x="200" y="360" width="400" height="60" fill="#eafaf1" stroke="#27ae60" stroke-width="2" rx="8"/>
+  <text x="400" y="385" text-anchor="middle" font-size="16" font-weight="bold" fill="#1e8449">ROS2命令行工具</text>
+  <text x="400" y="405" text-anchor="middle" font-size="12" fill="#555">node list / topic echo / service call / action info / bag record</text>
+  
+  <!-- 底部总结 -->
+  <rect x="100" y="440" width="600" height="40" fill="#f5eef8" stroke="#8e44ad" stroke-width="2" rx="8"/>
+  <text x="400" y="465" text-anchor="middle" font-size="14" fill="#6c3483">从安装到调试，完整掌握ROS2基础，为AGV导航系统打下坚实基础</text>
+</svg>
+
+<p>这张图把本章的知识点串起来了。从安装开始，到工作空间、功能包，再到三种通信方式，最后用命令行工具收尾。你想想看，是不是一条清晰的学习路径？</p>
+
+<div class="highlight">
+  <strong>总结一下：</strong> ROS2 Humble的安装其实不难，关键是理解工作空间和功能包的结构。节点与话题通信是基础，服务和动作是进阶。Launch文件帮你批量启动节点，命令行工具则是调试利器。把这些都掌握了，AGV导航系统的地基就算打牢了。
+</div>
+
+        <div class="footer-nav">
+            <a href="03McuAndSensorSelection.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05Stm32LowLevelDriver.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

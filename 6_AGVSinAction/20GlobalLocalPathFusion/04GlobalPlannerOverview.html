@@ -1,0 +1,506 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>4 全局规划算法概览</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01CourseIntroduction.html" class="">1 课程导论</a></li>
+<li><a href="02KinematicsBasics.html" class="">2 AGV运动学基础</a></li>
+<li><a href="03EnvMapRepresentation.html" class="">3 环境地图表示</a></li>
+<li><a href="04GlobalPlannerOverview.html" class="active">4 全局规划算法概览</a></li>
+<li><a href="05AStarAlgorithm.html" class="">5 A*算法详解</a></li>
+<li><a href="06DijkstraAlgorithm.html" class="">6 Dijkstra算法</a></li>
+<li><a href="07RrtAndRrtStar.html" class="">7 RRT与RRT*</a></li>
+<li><a href="08HybridAStar.html" class="">8 Hybrid A*</a></li>
+<li><a href="09GlobalPathPostprocess.html" class="">9 全局路径后处理</a></li>
+<li><a href="10LocalPlannerOverview.html" class="">10 局部规划算法概览</a></li>
+<li><a href="11DwaAlgorithm.html" class="">11 DWA算法详解</a></li>
+<li><a href="12TebAlgorithm.html" class="">12 TEB算法</a></li>
+<li><a href="13MpcControl.html" class="">13 MPC模型预测控制</a></li>
+<li><a href="14PurePursuitStanley.html" class="">14 Pure Pursuit与Stanley</a></li>
+<li><a href="15LocalObstacleAvoid.html" class="">15 局部路径避障</a></li>
+<li><a href="16GlobalLocalFusionArch.html" class="">16 全局与局部融合架构</a></li>
+<li><a href="17FusionKeyIssues.html" class="">17 融合中的关键问题</a></li>
+<li><a href="18Costmap.html" class="">18 代价地图（Costmap）</a></li>
+<li><a href="19BehaviorPlanning.html" class="">19 行为规划与决策</a></li>
+<li><a href="20DynamicEnvHandling.html" class="">20 动态环境处理</a></li>
+<li><a href="21MultiAgvCoopPlanning.html" class="">21 多AGV协同规划</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 仿真环境搭建</a></li>
+<li><a href="23RosNavStackPractice.html" class="">23 ROS Navigation Stack实战</a></li>
+<li><a href="24SensorFusionLocalization.html" class="">24 传感器融合与定位</a></li>
+<li><a href="25EngineeringOptimize.html" class="">25 工程化与性能优化</a></li>
+<li><a href="26FaultAndSafety.html" class="">26 故障处理与安全机制</a></li>
+<li><a href="27WarehouseAStarDwaCase.html" class="">27 真实项目案例1</a></li>
+<li><a href="28CampusHybridMpcCase.html" class="">28 真实项目案例2</a></li>
+<li><a href="29HumanRobotRrtTebCase.html" class="">29 真实项目案例3</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶方向</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>4 全局规划算法概览：Dijkstra、A*、RRT、RRT*、Hybrid A* 的适用场景与优缺点</h2>
+
+<p>聊到全局路径规划，很多刚入行的朋友容易陷入一个误区：总想找一个「万能算法」。</p>
+<p>我当年也干过这事。拿着A*到处套，结果在非结构化环境里跑得一塌糊涂。后来才明白，<strong>选算法就像选工具——拧螺丝用扳手，切木头用锯子</strong>。没有最好的算法，只有最合适的场景。</p>
+<p>今天咱们就把主流的五个全局规划算法掰开揉碎聊一聊。我会结合自己踩过的坑，帮你理清它们各自该用在哪儿、不该用在哪儿。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>全局规划算法的本质是在「搜索效率」和「路径质量」之间做权衡。Dijkstra 保证最优但慢，RRT 快但不优，Hybrid A* 则是在连续空间里找可行解。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" style="width:100%; max-width:900px; height:auto; margin:20px auto; display:block; background:#f9fafb; border-radius:12px; padding:10px;">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#5b7fa5"/>
+    </marker>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e8f4f8;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#d1e8f0;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef9e7;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#fdebd0;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#eafaf1;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#d5f5e3;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- 标题 -->
+  <text x="450" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">全局规划算法选型图谱</text>
+  
+  <!-- 中心节点 -->
+  <rect x="350" y="65" width="200" height="45" rx="22" fill="#5b7fa5" stroke="#3a5a7a" stroke-width="2"/>
+  <text x="450" y="93" text-anchor="middle" font-size="16" fill="#fff" font-weight="bold">全局路径规划</text>
+  
+  <!-- 分支线 -->
+  <line x1="350" y1="110" x2="200" y2="170" stroke="#5b7fa5" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="450" y1="110" x2="450" y2="170" stroke="#5b7fa5" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="550" y1="110" x2="700" y2="170" stroke="#5b7fa5" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第一层：三大类 -->
+  <rect x="100" y="170" width="200" height="40" rx="10" fill="url(#g1)" stroke="#5b7fa5" stroke-width="1.5"/>
+  <text x="200" y="196" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">图搜索类</text>
+  
+  <rect x="350" y="170" width="200" height="40" rx="10" fill="url(#g2)" stroke="#5b7fa5" stroke-width="1.5"/>
+  <text x="450" y="196" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">采样类</text>
+  
+  <rect x="600" y="170" width="200" height="40" rx="10" fill="url(#g3)" stroke="#5b7fa5" stroke-width="1.5"/>
+  <text x="700" y="196" text-anchor="middle" font-size="14" fill="#2c3e50" font-weight="bold">运动学约束类</text>
+  
+  <!-- 第二层：具体算法 -->
+  <line x1="150" y1="210" x2="130" y2="270" stroke="#5b7fa5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="250" y1="210" x2="270" y2="270" stroke="#5b7fa5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="400" y1="210" x2="370" y2="270" stroke="#5b7fa5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="500" y1="210" x2="530" y2="270" stroke="#5b7fa5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="700" y1="210" x2="700" y2="270" stroke="#5b7fa5" stroke-width="1.5" marker-end="url(#arrow)"/>
+  
+  <rect x="80" y="270" width="100" height="35" rx="8" fill="#d1e8f0" stroke="#5b7fa5" stroke-width="1"/>
+  <text x="130" y="293" text-anchor="middle" font-size="13" fill="#2c3e50">Dijkstra</text>
+  
+  <rect x="220" y="270" width="100" height="35" rx="8" fill="#d1e8f0" stroke="#5b7fa5" stroke-width="1"/>
+  <text x="270" y="293" text-anchor="middle" font-size="13" fill="#2c3e50">A*</text>
+  
+  <rect x="320" y="270" width="100" height="35" rx="8" fill="#fdebd0" stroke="#5b7fa5" stroke-width="1"/>
+  <text x="370" y="293" text-anchor="middle" font-size="13" fill="#2c3e50">RRT</text>
+  
+  <rect x="480" y="270" width="100" height="35" rx="8" fill="#fdebd0" stroke="#5b7fa5" stroke-width="1"/>
+  <text x="530" y="293" text-anchor="middle" font-size="13" fill="#2c3e50">RRT*</text>
+  
+  <rect x="650" y="270" width="100" height="35" rx="8" fill="#d5f5e3" stroke="#5b7fa5" stroke-width="1"/>
+  <text x="700" y="293" text-anchor="middle" font-size="13" fill="#2c3e50">Hybrid A*</text>
+  
+  <!-- 关键特性 -->
+  <line x1="130" y1="305" x2="130" y2="350" stroke="#5b7fa5" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="270" y1="305" x2="270" y2="350" stroke="#5b7fa5" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="370" y1="305" x2="370" y2="350" stroke="#5b7fa5" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="530" y1="305" x2="530" y2="350" stroke="#5b7fa5" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="700" y1="305" x2="700" y2="350" stroke="#5b7fa5" stroke-width="1" stroke-dasharray="4,3"/>
+  
+  <text x="130" y="370" text-anchor="middle" font-size="11" fill="#7f8c8d">最优解</text>
+  <text x="130" y="388" text-anchor="middle" font-size="11" fill="#e74c3c">慢</text>
+  
+  <text x="270" y="370" text-anchor="middle" font-size="11" fill="#7f8c8d">最优解</text>
+  <text x="270" y="388" text-anchor="middle" font-size="11" fill="#27ae60">快</text>
+  
+  <text x="370" y="370" text-anchor="middle" font-size="11" fill="#e74c3c">非最优</text>
+  <text x="370" y="388" text-anchor="middle" font-size="11" fill="#27ae60">极快</text>
+  
+  <text x="530" y="370" text-anchor="middle" font-size="11" fill="#7f8c8d">渐近最优</text>
+  <text x="530" y="388" text-anchor="middle" font-size="11" fill="#f39c12">中等</text>
+  
+  <text x="700" y="370" text-anchor="middle" font-size="11" fill="#7f8c8d">运动学可行</text>
+  <text x="700" y="388" text-anchor="middle" font-size="11" fill="#f39c12">中等</text>
+  
+  <!-- 适用场景 -->
+  <rect x="60" y="410" width="140" height="30" rx="6" fill="#e8f4f8" stroke="#b0c4de" stroke-width="1"/>
+  <text x="130" y="430" text-anchor="middle" font-size="10" fill="#2c3e50">小规模静态地图</text>
+  
+  <rect x="210" y="410" width="140" height="30" rx="6" fill="#e8f4f8" stroke="#b0c4de" stroke-width="1"/>
+  <text x="280" y="430" text-anchor="middle" font-size="10" fill="#2c3e50">栅格地图首选</text>
+  
+  <rect x="300" y="450" width="140" height="30" rx="6" fill="#fef9e7" stroke="#f0d9b5" stroke-width="1"/>
+  <text x="370" y="470" text-anchor="middle" font-size="10" fill="#2c3e50">高维/非结构化</text>
+  
+  <rect x="460" y="450" width="140" height="30" rx="6" fill="#fef9e7" stroke="#f0d9b5" stroke-width="1"/>
+  <text x="530" y="470" text-anchor="middle" font-size="10" fill="#2c3e50">追求路径质量</text>
+  
+  <rect x="630" y="430" width="140" height="30" rx="6" fill="#eafaf1" stroke="#a9dfbf" stroke-width="1"/>
+  <text x="700" y="450" text-anchor="middle" font-size="10" fill="#2c3e50">阿克曼/车辆模型</text>
+</svg>
+
+<h3>4.1 Dijkstra：教科书里的「老实人」</h3>
+
+<p>Dijkstra 算法，说白了就是<strong>地毯式搜索</strong>。它从起点开始，一层一层往外扩，直到找到终点。</p>
+
+<p><strong>优点很明确：</strong></p>
+<ul>
+  <li>保证找到最短路径（如果存在的话）</li>
+  <li>实现简单，逻辑清晰</li>
+  <li>适用于带权图，能处理不同代价的边</li>
+</ul>
+
+<p><strong>缺点也很致命：</strong></p>
+<ul>
+  <li>搜索范围太大，效率低</li>
+  <li>没有启发信息，盲目扩张</li>
+  <li>在大地图上基本没法用</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>Dijkstra 最适合做「基准测试」。我在评估一个新地图的拓扑结构时，会先用 Dijkstra 跑一遍，拿它的结果当「标准答案」，再去对比其他算法的优化效果。</p>
+</div>
+
+<p><strong>适用场景：</strong>小规模静态地图、网络路由、需要绝对最优解且地图不大的情况。</p>
+
+<h3>4.2 A*：工业界的「扛把子」</h3>
+
+<p>A* 在 Dijkstra 的基础上加了一个启发函数。说白了就是<strong>给搜索过程装了个「指南针」</strong>，让它朝着目标方向走，而不是四处乱撞。</p>
+
+<p>核心公式就一句话：<code>f(n) = g(n) + h(n)</code>。g(n) 是起点到当前点的实际代价，h(n) 是当前点到终点的估计代价。</p>
+
+<pre><code>// 伪代码示例：A* 核心逻辑
+openList.add(startNode);
+while (!openList.isEmpty()) {
+    current = openList.getLowestF();
+    if (current == goal) return reconstructPath();
+    
+    openList.remove(current);
+    closedList.add(current);
+    
+    for (neighbor : current.neighbors) {
+        if (closedList.contains(neighbor)) continue;
+        
+        tentativeG = current.g + distance(current, neighbor);
+        if (!openList.contains(neighbor) || tentativeG &lt; neighbor.g) {
+            neighbor.g = tentativeG;
+            neighbor.h = heuristic(neighbor, goal);
+            neighbor.f = neighbor.g + neighbor.h;
+            neighbor.parent = current;
+            if (!openList.contains(neighbor)) openList.add(neighbor);
+        }
+    }
+}</code></pre>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>比 Dijkstra 快得多，尤其在大地图上</li>
+  <li>启发函数设计得好时，能保证最优解</li>
+  <li>栅格地图上的首选算法</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>启发函数设计有讲究——太大会丢失最优性，太小退化成 Dijkstra</li>
+  <li>在动态环境中需要反复重规划</li>
+  <li>对内存要求较高（要维护 open 表和 closed 表）</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个仓库项目里直接用欧几里得距离做启发函数，结果路径拐来拐去特别奇怪。后来换成曼哈顿距离，配合地图的网格特性，路径就顺多了。记住：<strong>启发函数要贴合你的地图结构</strong>。</p>
+</div>
+
+<p><strong>适用场景：</strong>栅格地图、游戏寻路、机器人室内导航。只要地图能离散化成网格，A* 基本是首选。</p>
+
+<h3>4.3 RRT：高维空间的「探险家」</h3>
+
+<p>RRT（快速随机扩展树）的思路很有意思——<strong>在地图里随机撒点，然后从起点开始「长」出一棵树</strong>，直到这棵树碰到终点。</p>
+
+<p>你想想看，如果地图特别大，或者维度特别高（比如机械臂的关节空间），A* 那种穷举式的搜索根本跑不动。这时候 RRT 就派上用场了。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>在高维空间里效率极高</li>
+  <li>不需要显式构建地图，只要有碰撞检测就行</li>
+  <li>实现简单，代码量少</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>路径不是最优的，甚至可能很绕</li>
+  <li>路径不平滑，拐角多</li>
+  <li>具有随机性，同样的地图每次跑出来的路径不一样</li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的习惯：</strong>RRT 适合做「快速可行性验证」。比如一个新项目，我先用 RRT 看看能不能找到一条可行路径，如果能，再换 A* 或 RRT* 去优化。别一上来就上复杂算法，容易白费功夫。</p>
+</div>
+
+<p><strong>适用场景：</strong>高维空间（如机械臂规划）、非结构化环境、对路径质量要求不高的场景。</p>
+
+<h3>4.4 RRT*：RRT 的「升级版」</h3>
+
+<p>RRT* 解决了 RRT 的一个大问题——<strong>路径质量</strong>。它在 RRT 的基础上加了两个关键操作：重新选择父节点和重新布线。</p>
+
+<p>说白了就是：树长出来之后，RRT* 会不断「修剪」这棵树，让路径越来越短。随着采样点增多，路径会<strong>渐近收敛到最优解</strong>。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>渐近最优性——采样越多，路径越好</li>
+  <li>保留了 RRT 在高维空间的优势</li>
+  <li>路径比 RRT 平滑得多</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>计算量比 RRT 大</li>
+  <li>收敛速度慢，需要大量采样才能接近最优</li>
+  <li>实现比 RRT 复杂</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>关键点：</strong>RRT* 的「渐近最优」意味着你可以在时间和质量之间做 trade-off。时间紧就少采样，时间充裕就多采样。这种灵活性在实际项目中非常实用。</p>
+</div>
+
+<p><strong>适用场景：</strong>需要较高质量路径的高维空间规划、无人机航迹规划、有时间做离线计算的场景。</p>
+
+<h3>4.5 Hybrid A*：让路径「开得动」</h3>
+
+<p>前面四个算法有个共同问题：<strong>它们规划出来的路径，车不一定能走</strong>。</p>
+
+<p>举个例子，A* 规划出一条折线路径，每个拐点都是直角。但你的 AGV 是差速驱动或者阿克曼转向，根本没法原地转弯。这时候 Hybrid A* 就来了。</p>
+
+<p>Hybrid A* 在 A* 的基础上，<strong>考虑了车辆的运动学约束</strong>。它不是在栅格节点之间跳转，而是在连续空间里搜索符合车辆运动模型的轨迹。</p>
+
+<p><strong>优点：</strong></p>
+<ul>
+  <li>规划出来的路径车辆可以直接执行</li>
+  <li>特别适合阿克曼转向模型（汽车、卡车）</li>
+  <li>能处理狭窄空间的泊车、掉头等复杂操作</li>
+</ul>
+
+<p><strong>缺点：</strong></p>
+<ul>
+  <li>计算量大，实时性差</li>
+  <li>实现复杂，需要懂车辆运动学</li>
+  <li>不一定保证最优解</li>
+</ul>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中直接用 Hybrid A* 做全局规划，结果发现它在开阔地带跑得特别慢。后来我改成「全局用 A* + 局部用 Hybrid A*」的混合方案，效率提升了好几倍。记住：<strong>Hybrid A* 适合做精细规划，不适合做大范围搜索</strong>。</p>
+</div>
+
+<p><strong>适用场景：</strong>自动驾驶车辆、阿克曼转向的 AGV、需要精确控制车辆姿态的场景（如仓储 AGV 的货架对接）。</p>
+
+<h3>4.6 算法对比一览</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>算法</th>
+      <th>最优性</th>
+      <th>效率</th>
+      <th>运动学约束</th>
+      <th>适用维度</th>
+      <th>实现难度</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Dijkstra</td>
+      <td>✅ 保证最优</td>
+      <td>⭐ 低</td>
+      <td>❌ 不支持</td>
+      <td>低维</td>
+      <td>⭐ 简单</td>
+    </tr>
+    <tr>
+      <td>A*</td>
+      <td>✅ 保证最优（启发函数合适时）</td>
+      <td>⭐⭐⭐ 高</td>
+      <td>❌ 不支持</td>
+      <td>低维</td>
+      <td>⭐⭐ 中等</td>
+    </tr>
+    <tr>
+      <td>RRT</td>
+      <td>❌ 非最优</td>
+      <td>⭐⭐⭐⭐ 很高</td>
+      <td>❌ 不支持</td>
+      <td>高维</td>
+      <td>⭐ 简单</td>
+    </tr>
+    <tr>
+      <td>RRT*</td>
+      <td>✅ 渐近最优</td>
+      <td>⭐⭐ 中等</td>
+      <td>❌ 不支持</td>
+      <td>高维</td>
+      <td>⭐⭐⭐ 较复杂</td>
+    </tr>
+    <tr>
+      <td>Hybrid A*</td>
+      <td>❌ 非最优</td>
+      <td>⭐⭐ 中等</td>
+      <td>✅ 支持</td>
+      <td>低维（状态空间）</td>
+      <td>⭐⭐⭐⭐ 复杂</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>4.7 选型建议：我一般怎么选？</h3>
+
+<p>在实际项目中，我通常会按下面这个思路来选：</p>
+
+<ol>
+  <li><strong>先看地图类型</strong>：如果是栅格地图，直接上 A*。如果是连续空间或高维空间，考虑 RRT 系列。</li>
+  <li><strong>再看车辆模型</strong>：如果是差速驱动（能原地转弯），A* 或 RRT 都行。如果是阿克曼转向，必须上 Hybrid A* 或者至少做路径平滑。</li>
+  <li><strong>最后看实时性要求</strong>：如果要求毫秒级响应，RRT 或 A* 的轻量版本。如果离线计算，RRT* 或 Hybrid A* 慢慢优化。</li>
+</ol>
+
+<div class="tip">
+  <p><strong>一个小技巧：</strong>别把鸡蛋放在一个篮子里。我现在的项目基本都是「全局 A* + 局部 TEB/MPC」的混合架构。全局负责大方向，局部负责避障和运动学约束。这样既保证了效率，又兼顾了可行性。</p>
+</div>
+
+<p>嗯，全局规划算法就聊到这儿。每种算法都有自己的脾气，关键是要摸透它们的性格，用对地方。下一节咱们会深入 A* 的工程实现细节，到时候我会分享一些代码层面的优化技巧。</p>
+
+        <div class="footer-nav">
+            <a href="03EnvMapRepresentation.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="05AStarAlgorithm.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

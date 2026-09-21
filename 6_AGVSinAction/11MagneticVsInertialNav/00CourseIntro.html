@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV磁条导航与惯性导航对比 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV磁条导航与惯性导航对比</h1>
+    <div class="subhead">
+        <span>🔐 系统级实战 · 双技术栈深度解析</span>
+        <span>v2.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV/移动机器人工程师</strong> — 掌握磁条与惯性导航核心原理与选型</li>
+                <li><strong>自动化系统集成商</strong> — 深入导航技术对比，优化项目方案</li>
+                <li><strong>智能制造/仓储物流规划</strong> — 理解导航技术对路径、成本、可靠性的影响</li>
+                <li><strong>嵌入式/导航算法开发者</strong> — 从IMU解算到卡尔曼滤波，从传感器到系统架构</li>
+                <li><strong>高校学生/研究者</strong> — 系统学习AGV导航技术体系与前沿趋势</li>
+                <li><strong>技术决策者/架构师</strong> — 建立导航技术选型决策框架，降低项目风险</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握磁条导航完整技术栈</strong> — 从磁条铺设到传感器信号处理，从系统架构到调试优化</li>
+                <li><strong>精通惯性导航核心原理</strong> — IMU器件、捷联惯导、卡尔曼滤波、误差补偿全链路</li>
+                <li><strong>获得六大维度对比能力</strong> — 精度、成本、可靠性、扩展性、环境适应性、部署维护</li>
+                <li><strong>独立完成导航方案选型</strong> — 基于需求矩阵、成本效益、风险冗余的决策框架</li>
+                <li><strong>掌握混合导航融合策略</strong> — 磁条+惯性融合算法、切换逻辑、实际案例</li>
+                <li><strong>积累30个章节体系化知识</strong> — 从概述到项目案例，从调试到验收，从趋势到展望</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>AGV导航技术概述</strong> <span class="syllabus-desc">AGV定义、AGV发展简史、AGV核心导航技术分类、磁条导航与惯性导航的定位</span></li>
+        <li data-index="2"><strong>磁条导航原理</strong> <span class="syllabus-desc">磁条物理特性、磁导航传感器工作原理、磁条铺设规范、信号采集与处理流程</span></li>
+        <li data-index="3"><strong>惯性导航原理</strong> <span class="syllabus-desc">IMU核心器件（加速度计、陀螺仪）、惯性导航解算原理、捷联惯导系统、误差累积特性</span></li>
+        <li data-index="4"><strong>磁条导航系统架构</strong> <span class="syllabus-desc">磁条路径网络设计、传感器布局方案、控制器与驱动接口、典型硬件选型</span></li>
+        <li data-index="5"><strong>惯性导航系统架构</strong> <span class="syllabus-desc">IMU选型指标、里程计融合方案、卡尔曼滤波框架、嵌入式实现要点</span></li>
+        <li data-index="6"><strong>定位精度对比</strong> <span class="syllabus-desc">磁条导航定位精度分析、惯性导航定位精度分析、影响精度的关键因素、实测数据对比</span></li>
+        <li data-index="7"><strong>路径灵活性对比</strong> <span class="syllabus-desc">磁条导航路径变更成本、惯性导航路径规划灵活性、混合路径场景适应性、柔性制造需求匹配</span></li>
+        <li data-index="8"><strong>环境适应性对比</strong> <span class="syllabus-desc">光照条件影响、地面条件影响、电磁干扰影响、温湿度影响、粉尘油污场景表现</span></li>
+        <li data-index="9"><strong>成本对比分析</strong> <span class="syllabus-desc">磁条导航硬件成本、惯性导航硬件成本、部署与维护成本、全生命周期成本模型</span></li>
+        <li data-index="10"><strong>部署与维护对比</strong> <span class="syllabus-desc">磁条铺设施工流程、惯性导航标定流程、日常维护工作量、故障排查难度</span></li>
+        <li data-index="11"><strong>可靠性对比</strong> <span class="syllabus-desc">磁条导航故障模式、惯性导航故障模式、冗余设计策略、系统MTBF对比</span></li>
+        <li data-index="12"><strong>扩展性对比</strong> <span class="syllabus-desc">磁条导航扩展路径方式、惯性导航扩展区域方式、多车协同扩展、系统升级路径</span></li>
+        <li data-index="13"><strong>磁条导航典型应用场景</strong> <span class="syllabus-desc">仓储物流、生产线物料搬运、洁净室应用、固定路径高频次运输</span></li>
+        <li data-index="14"><strong>惯性导航典型应用场景</strong> <span class="syllabus-desc">动态仓储环境、人机混行场景、不规则路径运输、临时路径调整场景</span></li>
+        <li data-index="15"><strong>混合导航方案</strong> <span class="syllabus-desc">磁条+惯性融合策略、融合定位算法、切换逻辑设计、实际案例分享</span></li>
+        <li data-index="16"><strong>磁条导航关键技术参数</strong> <span class="syllabus-desc">传感器检测距离、磁条宽度与厚度、最小转弯半径、最大运行速度</span></li>
+        <li data-index="17"><strong>惯性导航关键技术参数</strong> <span class="syllabus-desc">IMU零偏稳定性、角度随机游走、加速度计噪声密度、更新频率要求</span></li>
+        <li data-index="18"><strong>磁条导航调试与优化</strong> <span class="syllabus-desc">传感器安装校准、磁条接头处理、路径平滑优化、速度曲线匹配</span></li>
+        <li data-index="19"><strong>惯性导航调试与优化</strong> <span class="syllabus-desc">IMU温漂补偿、零速修正策略、地图构建优化、运动模型调参</span></li>
+        <li data-index="20"><strong>磁条导航常见问题与解决</strong> <span class="syllabus-desc">磁条磨损检测、传感器污染处理、路径偏移修正、交叉路径干扰</span></li>
+        <li data-index="21"><strong>惯性导航常见问题与解决</strong> <span class="syllabus-desc">IMU漂移校正、打滑误差处理、初始化失败处理、长时间运行发散</span></li>
+        <li data-index="22"><strong>磁条导航选型指南</strong> <span class="syllabus-desc">负载能力匹配、速度等级选择、环境等级要求、供应商评估要点</span></li>
+        <li data-index="23"><strong>惯性导航选型指南</strong> <span class="syllabus-desc">IMU性能等级划分、导航计算机选型、算法授权模式、系统集成难度评估</span></li>
+        <li data-index="24"><strong>磁条导航项目案例</strong> <span class="syllabus-desc">某汽车零部件厂AGV项目、某电商仓库分拣AGV项目、某半导体工厂AGV项目</span></li>
+        <li data-index="25"><strong>惯性导航项目案例</strong> <span class="syllabus-desc">某柔性装配线AGV项目、某医院物流AGV项目、某机场行李搬运AGV项目</span></li>
+        <li data-index="26"><strong>磁条导航技术发展趋势</strong> <span class="syllabus-desc">磁条材料创新、传感器集成化、智能路径管理、与5G融合</span></li>
+        <li data-index="27"><strong>惯性导航技术发展趋势</strong> <span class="syllabus-desc">MEMS IMU性能提升、视觉惯性融合、深度学习辅助定位、芯片级导航</span></li>
+        <li data-index="28"><strong>导航技术选型决策框架</strong> <span class="syllabus-desc">需求分析矩阵、技术评估维度、成本效益分析、风险与冗余考量</span></li>
+        <li data-index="29"><strong>AGV导航系统测试与验收</strong> <span class="syllabus-desc">精度测试方法、可靠性测试方案、环境适应性测试、验收标准制定</span></li>
+        <li data-index="30"><strong>课程总结与展望</strong> <span class="syllabus-desc">磁条导航与惯性导航对比总结、未来导航技术趋势、AGV行业发展趋势、学习路径建议</span></li>
+    </ul>
+    
+</div>
+</body>
+</html>

@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>2 RTOS内核基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="active">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>2 RTOS内核基础：任务调度原理、任务状态机、上下文切换机制</h2>
+
+<p>各位同学，咱们今天聊点硬核的。RTOS 内核，说白了就是操作系统的「心脏」。你写的所有应用代码，最后都得靠它来调度。我个人习惯把内核比作一个「交通指挥中心」——任务就是路上的车，调度器就是红绿灯和交警。</p>
+
+<p>很多初学者一上来就写任务，跑起来好像也没问题。但一旦遇到优先级反转、任务卡死、或者系统响应变慢，就抓瞎了。嗯，这时候你才发现，不懂内核原理，调试就像在摸黑走路。</p>
+
+<p>今天这一讲，我带你把这几个核心概念彻底吃透：<strong>任务调度原理</strong>、<strong>任务状态机</strong>、<strong>上下文切换机制</strong>。搞懂它们，你才算真正入了 RTOS 的门。</p>
+
+<h3>2.1 任务调度原理：谁先跑，谁后跑？</h3>
+
+<p>调度器要回答一个核心问题：<strong>「这么多任务，下一个该执行谁？」</strong></p>
+
+<p>RTOS 里最常用的调度策略是<strong>基于优先级的抢占式调度</strong>。什么意思？说白了就是：<strong>优先级高的任务，随时可以打断优先级低的任务</strong>。</p>
+
+<p>举个例子：</p>
+<ul>
+    <li>任务A：优先级5，负责读取传感器数据</li>
+    <li>任务B：优先级3，负责更新显示屏</li>
+</ul>
+
+<p>如果任务B正在跑，任务A就绪了。调度器会立刻暂停任务B，把CPU交给任务A。等任务A跑完（或者主动让出CPU），任务B才能继续。</p>
+
+<div class="highlight">
+    <p><strong>核心原则：</strong> 在任意时刻，CPU永远执行「就绪态」中优先级最高的那个任务。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：有个同事把两个关键任务的优先级设成了相同的值。结果系统运行时，两个任务轮流跑，但响应时间忽快忽慢。后来我告诉他，同优先级任务默认用<strong>时间片轮转</strong>调度——每个任务跑一个固定时间片（比如1ms），时间到了就换下一个。如果你的任务对实时性要求高，千万别这么干。</p>
+
+<h3>2.2 任务状态机：任务的一生</h3>
+
+<p>一个任务从创建到销毁，会经历几个状态。我习惯用「人的一天」来类比：</p>
+
+<ul>
+    <li><strong>就绪态</strong>：早上起床，准备好上班了，但还没轮到你出门。</li>
+    <li><strong>运行态</strong>：正在路上开车，CPU归你。</li>
+    <li><strong>阻塞态</strong>：等红灯、等公交、等外卖——你在等某个事件发生。</li>
+    <li><strong>挂起态</strong>：请假了，暂时不参与调度。</li>
+</ul>
+
+<p>状态之间的转换，是调度器工作的核心。我画了一张图，帮你理清关系：</p>
+
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="700" height="400" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 就绪态 -->
+    <rect x="50" y="150" width="140" height="60" rx="10" fill="#87ceeb" stroke="#4682b4" stroke-width="2"/>
+    <text x="120" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">就绪态</text>
+    
+    <!-- 运行态 -->
+    <rect x="280" y="150" width="140" height="60" rx="10" fill="#98fb98" stroke="#3cb371" stroke-width="2"/>
+    <text x="350" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">运行态</text>
+    
+    <!-- 阻塞态 -->
+    <rect x="510" y="150" width="140" height="60" rx="10" fill="#ffb6c1" stroke="#db7090" stroke-width="2"/>
+    <text x="580" y="185" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">阻塞态</text>
+    
+    <!-- 挂起态 -->
+    <rect x="280" y="300" width="140" height="60" rx="10" fill="#dda0dd" stroke="#9932cc" stroke-width="2"/>
+    <text x="350" y="335" text-anchor="middle" font-size="16" font-weight="bold" fill="#000">挂起态</text>
+    
+    <!-- 箭头：就绪 -> 运行 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+        </marker>
+    </defs>
+    
+    <line x1="190" y1="180" x2="275" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="232" y="170" text-anchor="middle" font-size="12" fill="#333">调度器选择</text>
+    
+    <!-- 箭头：运行 -> 就绪 -->
+    <line x1="280" y1="195" x2="195" y2="195" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="237" y="210" text-anchor="middle" font-size="12" fill="#333">时间片用完/被抢占</text>
+    
+    <!-- 箭头：运行 -> 阻塞 -->
+    <line x1="420" y1="180" x2="505" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="462" y="170" text-anchor="middle" font-size="12" fill="#333">等待事件/资源</text>
+    
+    <!-- 箭头：阻塞 -> 就绪 -->
+    <line x1="510" y1="195" x2="425" y2="195" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="467" y="210" text-anchor="middle" font-size="12" fill="#333">事件发生/资源可用</text>
+    
+    <!-- 箭头：运行 -> 挂起 -->
+    <line x1="350" y1="210" x2="350" y2="295" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="370" y="255" text-anchor="middle" font-size="12" fill="#333">主动挂起</text>
+    
+    <!-- 箭头：挂起 -> 就绪 -->
+    <line x1="350" y1="300" x2="350" y2="215" stroke="#333" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="370" y="280" text-anchor="middle" font-size="12" fill="#333">恢复</text>
+    
+    <!-- 标题 -->
+    <text x="350" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2f4f4f">RTOS 任务状态机</text>
+</svg>
+
+<p>你想想看，任务为什么需要阻塞？最常见的原因就是：<strong>它在等一个信号量、一个消息队列，或者一个延时</strong>。比如你让任务延时100ms，调度器就会把它从运行态踢到阻塞态，等100ms到了再把它拉回就绪态。</p>
+
+<div class="tip">
+    <p><strong>避坑指南：</strong> 我曾经在调试一个AGV控制器时，发现某个任务每隔几秒就卡死一次。查了半天，原来是任务里调了一个阻塞式的延时函数，但延时时间设得太长，导致高优先级任务被饿死。记住：<strong>阻塞态的任务不消耗CPU</strong>，但如果你让高优先级任务频繁阻塞，系统吞吐量会直线下降。</p>
+</div>
+
+<h3>2.3 上下文切换机制：CPU的「变脸」绝技</h3>
+
+<p>上下文切换，是RTOS最底层的魔法。说白了就是：<strong>把当前任务的「现场」保存起来，再恢复下一个任务的「现场」</strong>。</p>
+
+<p>这个「现场」包括什么？</p>
+<ul>
+    <li><strong>CPU寄存器</strong>：程序计数器PC、堆栈指针SP、通用寄存器R0-R15等</li>
+    <li><strong>浮点寄存器</strong>（如果有FPU）</li>
+    <li><strong>系统状态寄存器</strong>：比如ARM的xPSR</li>
+</ul>
+
+<p>这些数据全部保存在任务的<strong>栈空间</strong>里。每个任务都有自己的栈，就像每个人都有自己的储物柜。</p>
+
+<p>切换过程大致分三步：</p>
+<ol>
+    <li><strong>触发切换</strong>：可以是定时器中断（时间片到了），也可以是任务主动调用yield()</li>
+    <li><strong>保存现场</strong>：把当前CPU寄存器的值压入当前任务的栈</li>
+    <li><strong>恢复现场</strong>：从下一个任务的栈里弹出寄存器的值，然后跳转到它的PC地址</li>
+</ol>
+
+<p>我举个例子，用伪代码展示一下核心逻辑：</p>
+
+<pre><code>// 上下文切换的核心函数（简化版）
+void PendSV_Handler(void) {
+    // 1. 保存当前任务上下文
+    __asm volatile(
+        "MRS R0, PSP\n"          // 获取当前任务栈指针
+        "STMDB R0!, {R4-R11}\n"  // 保存R4~R11到栈中
+        "STR R0, [R2]\n"         // 更新当前任务控制块的栈指针
+    );
+
+    // 2. 切换到下一个任务
+    current_task = next_task;
+
+    // 3. 恢复新任务上下文
+    __asm volatile(
+        "LDR R0, [R2]\n"         // 获取新任务栈指针
+        "LDMIA R0!, {R4-R11}\n"  // 恢复R4~R11
+        "MSR PSP, R0\n"          // 更新栈指针
+        "BX LR\n"                // 返回，自动恢复PC
+    );
+}
+</code></pre>
+
+<p>这段代码看着简单，但实际工程里坑很多。我记得有一次移植FreeRTOS到Cortex-M4芯片，发现上下文切换后浮点运算结果全乱了。查了两天才发现，<strong>FPU寄存器没有保存</strong>。Cortex-M4有FPU，默认情况下上下文切换只保存通用寄存器，浮点寄存器需要额外配置LAZY STACKING。</p>
+
+<div class="warning">
+    <p><strong>警告：</strong> 上下文切换是RTOS的「心脏起搏器」。如果切换代码写错了，系统会直接崩溃。常见错误包括：</p>
+    <ul>
+        <li>栈指针没对齐（ARM要求8字节对齐）</li>
+        <li>中断嵌套时重复保存上下文</li>
+        <li>忘记处理FPU寄存器</li>
+    </ul>
+    <p>我曾经在一个项目里，因为栈对齐问题，系统跑了3小时才随机崩溃一次。调试这种bug，简直生不如死。</p>
+</div>
+
+<h3>2.4 调度点：什么时候切换？</h3>
+
+<p>调度器不会无缘无故切换任务。它只在特定的「调度点」触发：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <tr style="background-color:#e6f3ff;">
+        <th>调度点</th>
+        <th>触发原因</th>
+        <th>典型场景</th>
+    </tr>
+    <tr>
+        <td>时间片中断</td>
+        <td>系统滴答定时器（SysTick）触发</td>
+        <td>同优先级任务轮转</td>
+    </tr>
+    <tr>
+        <td>任务主动让出</td>
+        <td>调用 taskYIELD() 或阻塞API</td>
+        <td>任务等待信号量、延时</td>
+    </tr>
+    <tr>
+        <td>中断退出</td>
+        <td>ISR执行完毕后检查是否需要切换</td>
+        <td>中断中释放信号量，唤醒高优先级任务</td>
+    </tr>
+    <tr>
+        <td>任务创建/删除</td>
+        <td>新任务优先级更高</td>
+        <td>动态创建紧急任务</td>
+    </tr>
+</table>
+
+<p>你想想看，为什么中断退出时也要检查调度？因为中断里可能释放了一个信号量，把某个高优先级任务唤醒了。如果不立即切换，这个任务就要等到下一个时间片才能运行，实时性就没了。</p>
+
+<div class="highlight">
+    <p><strong>关键点：</strong> 中断服务函数里，尽量不要做复杂的上下文切换。我一般只在ISR里做两件事：<strong>标记事件</strong>和<strong>释放信号量</strong>。真正的处理逻辑交给任务去干。这样既保证了实时性，又避免了中断嵌套过深导致栈溢出。</p>
+</div>
+
+<h3>2.5 实战经验：如何选择调度策略？</h3>
+
+<p>不同的RTOS，调度策略略有差异。我列个表，帮你快速对比：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <tr style="background-color:#e6f3ff;">
+        <th>RTOS</th>
+        <th>调度策略</th>
+        <th>特点</th>
+    </tr>
+    <tr>
+        <td>FreeRTOS</td>
+        <td>抢占式 + 时间片轮转</td>
+        <td>配置灵活，同优先级可轮转也可不轮转</td>
+    </tr>
+    <tr>
+        <td>uC/OS-III</td>
+        <td>抢占式 + 时间片轮转</td>
+        <td>支持无限优先级，调度开销小</td>
+    </tr>
+    <tr>
+        <td>RT-Thread</td>
+        <td>抢占式 + 时间片轮转</td>
+        <td>支持动态优先级调整</td>
+    </tr>
+    <tr>
+        <td>Zephyr</td>
+        <td>抢占式 + 协作式可选</td>
+        <td>多核调度支持好</td>
+    </tr>
+</table>
+
+<p>我个人习惯是：<strong>关键任务用高优先级，非关键任务用低优先级+时间片轮转</strong>。比如AGV控制器里，电机控制任务优先级最高，通信任务次之，日志打印任务最低。这样即使日志任务卡住了，电机控制也不会受影响。</p>
+
+<div class="tip">
+    <p><strong>小技巧：</strong> 调试阶段，我经常在任务里加一个计数器，打印每个任务获得的CPU时间片数量。如果发现某个任务长时间霸占CPU，说明优先级设置不合理，或者任务里有死循环。这个技巧帮我抓过不少bug。</p>
+</div>
+
+<p>好了，这一讲的内容就到这里。任务调度、状态机、上下文切换，这三者是RTOS的基石。你理解了它们，后面学信号量、消息队列、互斥锁就会轻松很多。记住：<strong>调度器是公平的，但优先级是你定的</strong>。设计好任务的优先级和状态转换，你的系统才能跑得稳、跑得快。</p>
+
+<div class="footer-nav">
+            <a href="01ControllerOverview.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="03PortingEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

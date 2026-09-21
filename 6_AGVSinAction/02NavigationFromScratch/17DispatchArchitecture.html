@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 AGV调度系统架构设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="active">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 AGV调度系统架构设计：调度系统功能需求（任务分配/路径规划/交通管制）、调度系统架构（中心化/去中心化）、RESTful API设计、WebSocket实时通信</h2>
+
+<p>调度系统，说白了就是AGV车队的「大脑」。</p>
+<p>我做了这么多年AGV项目，见过太多「车跑起来了，但调度一塌糊涂」的案例。车多了，没有调度系统，那就是一锅粥。今天咱们就把这个大脑的架构拆开看看。</p>
+
+<h3>17.1 调度系统的三大核心功能</h3>
+
+<p>调度系统要干的事，其实就三件：<strong>任务分配、路径规划、交通管制</strong>。这三件事环环相扣，缺一不可。</p>
+
+<h4>17.1.1 任务分配</h4>
+
+<p>任务分配，就是「谁来干这个活」。系统收到一个搬运指令，比如「把A点的货送到B点」，它得决定派哪台车去。</p>
+<p>我习惯把任务分配策略分为两类：</p>
+<ul>
+    <li><strong>就近分配</strong>：谁离任务起点近，谁去。简单粗暴，但容易造成「热门区域车扎堆」。</li>
+    <li><strong>负载均衡</strong>：看每台车的任务队列长度，谁的任务少，谁去。适合长距离、多任务的场景。</li>
+</ul>
+<p>我在项目中遇到过一个问题：某工厂有30台AGV，用了就近分配，结果仓库门口堵了8台车等着接单，远处的车却闲着。后来改成了「综合评分法」——把距离、电量、当前任务数加权打分，才解决了。</p>
+
+<div class="highlight">
+    <strong>避坑指南</strong>：任务分配时，一定要考虑「电量阈值」。我曾经见过一台车电量只剩10%，还被分配了一个需要跑20分钟的任务，结果半路趴窝，堵了整条产线。
+</div>
+
+<h4>17.1.2 路径规划</h4>
+
+<p>路径规划，就是「怎么走」。注意，这里的路径规划和单车的路径规划不一样。单车规划只考虑自己，调度系统的路径规划要考虑全局。</p>
+<p>调度系统通常维护一张<strong>全局路网图</strong>，所有AGV都在这张图上跑。路径规划的核心算法，我常用的是：</p>
+<ul>
+    <li><strong>A* 算法</strong>：静态路径规划，适合已知环境。计算快，但遇到动态障碍物就抓瞎。</li>
+    <li><strong>D* Lite</strong>：动态路径规划，适合环境变化频繁的场景。我有个项目在电商仓库，货架经常变动，D* Lite 比 A* 好使多了。</li>
+</ul>
+<p>嗯，这里要注意：路径规划的结果不是一成不变的。车走到一半，前面突然有障碍物，调度系统要能<strong>实时重规划</strong>。</p>
+
+<h4>17.1.3 交通管制</h4>
+
+<p>交通管制，是调度系统最头疼的部分。多台AGV在狭窄通道里相遇，谁让谁？</p>
+<p>我总结了几种常见的管制策略：</p>
+<table>
+    <thead>
+        <tr>
+            <th>策略</th>
+            <th>原理</th>
+            <th>适用场景</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>路口互斥锁</td>
+            <td>每个路口一把锁，谁先申请到谁先过</td>
+            <td>简单路口，车流量小</td>
+        </tr>
+        <tr>
+            <td>优先级通行</td>
+            <td>根据任务紧急程度决定谁先走</td>
+            <td>产线对接，有急单时</td>
+        </tr>
+        <tr>
+            <td>死锁检测与恢复</td>
+            <td>检测到死锁后，让某台车倒车让路</td>
+            <td>复杂多岔路口</td>
+        </tr>
+    </tbody>
+</table>
+<p>我曾经在一个项目里，两台AGV在T型路口面对面堵了3分钟，就是因为死锁检测没做好。后来我加了一个「超时回退」机制——如果某台车在路口等待超过5秒，自动后退1米，给对面让路。</p>
+
+<div class="warning">
+    <strong>注意</strong>：交通管制不能只靠单车决策。单车看到对面有车，可能会「礼貌让行」，但两台车互相让，反而堵死了。必须由调度系统统一裁决。
+</div>
+
+<h3>17.2 调度系统架构：中心化 vs 去中心化</h3>
+
+<p>架构选型，是调度系统的「灵魂」。选错了，后面全是坑。</p>
+
+<h4>17.2.1 中心化架构</h4>
+
+<p>中心化架构，就是所有AGV都听一个「中央大脑」的指挥。这个大脑负责所有任务分配、路径规划和交通管制。</p>
+<p>优点很明显：</p>
+<ul>
+    <li>全局最优：大脑能看到所有车的状态，能做出全局最优决策。</li>
+    <li>实现简单：所有逻辑集中在一处，调试方便。</li>
+</ul>
+<p>缺点也致命：</p>
+<ul>
+    <li>单点故障：大脑挂了，所有车都瘫痪。</li>
+    <li>性能瓶颈：车多了（比如超过50台），大脑的CPU和网络带宽可能扛不住。</li>
+</ul>
+<p>我个人的习惯是：<strong>50台以下，用中心化</strong>。简单、稳定、好维护。</p>
+
+<h4>17.2.2 去中心化架构</h4>
+
+<p>去中心化架构，就是每台AGV自己决策，通过「协商」来完成任务。没有中央大脑，每台车都是「小脑」。</p>
+<p>优点：</p>
+<ul>
+    <li>高可用：一台车挂了，其他车不受影响。</li>
+    <li>可扩展：加车容易，不用升级中央服务器。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+    <li>局部最优：每台车只考虑自己，容易产生「囚徒困境」。</li>
+    <li>实现复杂：需要设计复杂的通信协议和协商机制。</li>
+</ul>
+<p>我建议：<strong>100台以上，或者对可用性要求极高的场景（比如港口、机场），考虑去中心化</strong>。但要做好心理准备，调试起来很痛苦。</p>
+
+<div class="tip">
+    <strong>我的经验</strong>：很多项目其实用的是「混合架构」——任务分配和路径规划中心化，交通管制去中心化。这样既保证了全局最优，又避免了单点故障。
+</div>
+
+<h3>17.3 RESTful API 设计</h3>
+
+<p>调度系统不是孤岛，它要和MES、WMS、上位机等系统交互。RESTful API 就是它们之间的「语言」。</p>
+<p>我设计API时，遵循几个原则：</p>
+<ul>
+    <li><strong>资源导向</strong>：每个API对应一个资源，比如 <code>/tasks</code>、<code>/robots</code>、<code>/maps</code>。</li>
+    <li><strong>动词用HTTP方法</strong>：GET查、POST创建、PUT更新、DELETE删除。</li>
+    <li><strong>版本控制</strong>：URL里带版本号，比如 <code>/v1/tasks</code>。</li>
+</ul>
+<p>举个例子，任务相关的API：</p>
+<pre><code>// 创建任务
+POST /v1/tasks
+{
+    "type": "transport",
+    "from": "A01",
+    "to": "B03",
+    "priority": 1
+}
+
+// 查询任务状态
+GET /v1/tasks/{task_id}
+
+// 取消任务
+DELETE /v1/tasks/{task_id}</code></pre>
+<p>嗯，这里要注意：<strong>API的响应要统一格式</strong>。我习惯用：</p>
+<pre><code>{
+    "code": 200,
+    "message": "success",
+    "data": { ... }
+}</code></pre>
+<p>这样前端和第三方系统解析起来就方便多了。</p>
+
+<div class="highlight">
+    <strong>避坑指南</strong>：我曾经见过一个项目，API返回的字段名一会儿用下划线（task_id），一会儿用驼峰（taskId），结果前端解析时各种报错。统一命名规范，很重要。
+</div>
+
+<h3>17.4 WebSocket 实时通信</h3>
+
+<p>RESTful API 适合「一问一答」，但AGV的状态是实时变化的——位置、速度、电量、任务进度……这些信息如果靠前端轮询，效率太低。</p>
+<p>这时候就需要 WebSocket 了。它建立一条长连接，服务端可以主动推送数据给客户端。</p>
+<p>我常用的WebSocket消息格式：</p>
+<pre><code>// 服务端推送AGV位置更新
+{
+    "type": "robot_position",
+    "robot_id": "AGV_001",
+    "x": 12.5,
+    "y": 8.3,
+    "timestamp": 1700000000
+}
+
+// 服务端推送任务状态变更
+{
+    "type": "task_status",
+    "task_id": "TASK_123",
+    "status": "in_progress",
+    "robot_id": "AGV_001"
+}</code></pre>
+<p>WebSocket 的好处是：</p>
+<ul>
+    <li><strong>低延迟</strong>：毫秒级推送，适合实时监控。</li>
+    <li><strong>节省带宽</strong>：不用频繁建立HTTP连接。</li>
+</ul>
+<p>但也要注意：<strong>WebSocket 连接数有限</strong>。如果同时有几十个监控客户端，每个都建立一条WebSocket，服务端压力会很大。我建议用「订阅模式」——客户端只订阅自己关心的数据，比如只订阅某台车的状态。</p>
+
+<div class="tip">
+    <strong>我的习惯</strong>：WebSocket 只推送「变化的数据」。比如AGV位置，如果没变化，就不推送。这样可以大幅减少网络流量。
+</div>
+
+<h3>17.5 知识体系总览</h3>
+
+<p>说了这么多，咱们用一张图把调度系统的核心逻辑串起来：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV调度系统核心架构</text>
+    
+    <!-- 调度系统核心 -->
+    <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+    <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调度系统核心</text>
+    
+    <!-- 三大功能 -->
+    <rect x="50" y="160" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+    <text x="150" y="190" text-anchor="middle" font-size="14" fill="white">任务分配</text>
+    
+    <rect x="300" y="160" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+    <text x="400" y="190" text-anchor="middle" font-size="14" fill="white">路径规划</text>
+    
+    <rect x="550" y="160" width="200" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+    <text x="650" y="190" text-anchor="middle" font-size="14" fill="white">交通管制</text>
+    
+    <!-- 连接线 -->
+    <line x1="400" y1="120" x2="150" y2="160" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="120" x2="400" y2="160" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="120" x2="650" y2="160" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 架构类型 -->
+    <rect x="50" y="260" width="300" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <text x="200" y="290" text-anchor="middle" font-size="14" fill="white">中心化架构（≤50台）</text>
+    
+    <rect x="450" y="260" width="300" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+    <text x="600" y="290" text-anchor="middle" font-size="14" fill="white">去中心化架构（≥100台）</text>
+    
+    <!-- 连接线 -->
+    <line x1="150" y1="210" x2="200" y2="260" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="650" y1="210" x2="600" y2="260" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 通信方式 -->
+    <rect x="50" y="360" width="300" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+    <text x="200" y="390" text-anchor="middle" font-size="14" fill="white">RESTful API（任务下发/查询）</text>
+    
+    <rect x="450" y="360" width="300" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+    <text x="600" y="390" text-anchor="middle" font-size="14" fill="white">WebSocket（实时状态推送）</text>
+    
+    <!-- 连接线 -->
+    <line x1="200" y1="310" x2="200" y2="360" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="600" y1="310" x2="600" y2="360" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="460" text-anchor="middle" font-size="12" fill="#7f8c8d">注：实际项目中常采用混合架构，结合两者优点</text>
+</svg>
+
+<p>这张图把调度系统的核心模块和通信方式都串起来了。你想想看，从任务分配到路径规划，再到交通管制，每一步都离不开架构选型和通信设计。</p>
+
+<p>好了，调度系统架构这块，咱们就聊到这儿。记住一句话：<strong>没有最好的架构，只有最合适的架构</strong>。选型时多想想你的场景——车多不多？环境变不变？可用性要求高不高？想清楚了，再动手。</p>
+
+<div class="footer-nav">
+            <a href="16MultiSensorFusionLocalization.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18TrafficAndCooperation.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

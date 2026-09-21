@@ -1,0 +1,418 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>22 AGV仿真环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="active">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>22 AGV仿真环境搭建</h2>
+
+<p>说实话，做AGV导航最怕什么？不是算法调不通，而是你写了几千行代码，一上真车就把价值几十万的设备撞了。我入行第三年就干过这事——那天晚上调试路径规划，一个参数没设对，AGV直接怼上了货架腿。还好速度不快，但从此以后，我养成了个习惯：<strong>先仿真，再上车</strong>。</p>
+
+<p>这一章，咱们就聊聊怎么搭一套完整的AGV仿真环境。从Gazebo配置、URDF模型编写，到传感器配置、地图构建，最后跑通多车仿真。嗯，内容不少，但每一步我都会把踩过的坑告诉你。</p>
+
+<div class="highlight">
+  <p><strong>核心目标</strong>：搭建一个可复用的AGV仿真测试平台，让算法验证成本降到零。</p>
+</div>
+
+<h3>22.1 Gazebo仿真环境搭建</h3>
+
+<p>Gazebo这东西，说白了就是一个带物理引擎的3D仿真器。它和ROS是天生的搭档——你发布/cmd_vel，它就让小车动起来；小车撞墙了，它会反馈真实的碰撞力。</p>
+
+<p>我个人习惯用Gazebo 9以上的版本，配合ROS Melodic或Noetic。安装其实很简单：</p>
+
+<pre><code>sudo apt-get install ros-noetic-gazebo-ros-pkgs ros-noetic-gazebo-ros-control</code></pre>
+
+<p>装完之后，跑一下<code>gazebo</code>命令，如果能看到一个空荡荡的世界窗口，那就成了。</p>
+
+<p>但这里有个坑——<strong>Gazebo默认的物理引擎是ODE，精度一般</strong>。我在做重载AGV仿真时，发现ODE算出来的轮胎摩擦力总是不对。后来换成了Bullet引擎，效果好了不少。切换方法：</p>
+
+<pre><code>&lt;physics type="bullet"&gt;
+  &lt;max_step_size&gt;0.001&lt;/max_step_size&gt;
+  &lt;real_time_update_rate&gt;1000&lt;/real_time_update_rate&gt;
+&lt;/physics&gt;</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧</strong>：仿真步长设0.001秒，更新率1000Hz，这样碰撞检测才够准。步长设大了，小车可能会“穿模”——直接穿过障碍物。</p>
+</div>
+
+<h3>22.2 AGV模型URDF编写</h3>
+
+<p>URDF是啥？就是描述机器人长什么样的XML文件。轮子多大、底盘多重、传感器装在哪，全写在这里面。</p>
+
+<p>我刚开始写URDF时，总想把所有细节都画进去——螺丝、倒角、散热孔……后来发现完全没必要。Gazebo仿真里，<strong>碰撞模型越简单越好</strong>。你想想看，一个带48个螺丝孔的底盘，碰撞检测要算多久？</p>
+
+<p>下面是一个典型的AGV底盘URDF结构：</p>
+
+<pre><code>&lt;robot name="agv_base"&gt;
+  &lt;link name="base_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;box size="0.8 0.6 0.3"/&gt;
+      &lt;/geometry&gt;
+      &lt;material name="blue"/&gt;
+    &lt;/visual&gt;
+    &lt;collision&gt;
+      &lt;geometry&gt;
+        &lt;box size="0.8 0.6 0.3"/&gt;
+      &lt;/geometry&gt;
+    &lt;/collision&gt;
+    &lt;inertial&gt;
+      &lt;mass value="50.0"/&gt;
+      &lt;inertia ixx="1.0" ixy="0.0" ixz="0.0"
+               iyy="1.0" iyz="0.0" izz="1.0"/&gt;
+    &lt;/inertial&gt;
+  &lt;/link&gt;
+
+  &lt;joint name="left_wheel_joint" type="continuous"&gt;
+    &lt;parent link="base_link"/&gt;
+    &lt;child link="left_wheel"/&gt;
+    &lt;origin xyz="-0.3 0.4 -0.15" rpy="0 0 0"/&gt;
+    &lt;axis xyz="0 1 0"/&gt;
+  &lt;/joint&gt;
+&lt;/robot&gt;</code></pre>
+
+<p>这里要注意几个点：</p>
+<ul>
+  <li><strong>visual和collision要分开</strong>：视觉模型可以精细，碰撞模型用简单几何体包络就行</li>
+  <li><strong>惯性参数别乱填</strong>：质量设对了，惯性矩阵用<code>0.1 * mass * size^2</code>估算</li>
+  <li><strong>关节类型选对</strong>：驱动轮用continuous，转向轮用revolute</li>
+</ul>
+
+<div class="warning">
+  <p><strong>我曾经踩过的坑</strong>：URDF里忘了加<code>&lt;gazebo&gt;</code>标签配置传动，结果小车在仿真里怎么发指令都不动。折腾了两天才发现，原来是少了<code>&lt;transmission&gt;</code>和<code>&lt;hardwareInterface&gt;</code>。</p>
+</div>
+
+<h3>22.3 仿真传感器配置</h3>
+
+<p>AGV导航离不开传感器。最常用的就是激光雷达和IMU。在Gazebo里配置传感器，其实就是在URDF里加对应的<code>&lt;gazebo&gt;</code>插件。</p>
+
+<p>先看激光雷达的配置：</p>
+
+<pre><code>&lt;gazebo reference="laser_link"&gt;
+  &lt;sensor type="ray" name="head_laser"&gt;
+    &lt;pose&gt;0 0 0.2 0 0 0&lt;/pose&gt;
+    &lt;visualize&gt;true&lt;/visualize&gt;
+    &lt;update_rate&gt;10&lt;/update_rate&gt;
+    &lt;ray&gt;
+      &lt;scan&gt;
+        &lt;horizontal&gt;
+          &lt;samples&gt;360&lt;/samples&gt;
+          &lt;resolution&gt;1&lt;/resolution&gt;
+          &lt;min_angle&gt;-3.14159&lt;/min_angle&gt;
+          &lt;max_angle&gt;3.14159&lt;/max_angle&gt;
+        &lt;/horizontal&gt;
+      &lt;/scan&gt;
+      &lt;range&gt;
+        &lt;min&gt;0.1&lt;/min&gt;
+        &lt;max&gt;30.0&lt;/max&gt;
+        &lt;resolution&gt;0.01&lt;/resolution&gt;
+      &lt;/range&gt;
+      &lt;noise&gt;
+        &lt;type&gt;gaussian&lt;/type&gt;
+        &lt;mean&gt;0.0&lt;/mean&gt;
+        &lt;stddev&gt;0.01&lt;/stddev&gt;
+      &lt;/noise&gt;
+    &lt;/ray&gt;
+  &lt;/sensor&gt;
+&lt;/gazebo&gt;</code></pre>
+
+<p>这里有个细节——<strong>噪声模型一定要加</strong>。我见过很多人在仿真里用完美传感器数据，算法跑得飞起，一上真车就崩。为什么？因为真实激光雷达是有噪声的，距离越远噪声越大。加上高斯噪声，才能模拟真实场景。</p>
+
+<p>IMU的配置相对简单：</p>
+
+<pre><code>&lt;gazebo reference="imu_link"&gt;
+  &lt;sensor type="imu" name="imu_sensor"&gt;
+    &lt;pose&gt;0 0 0 0 0 0&lt;/pose&gt;
+    &lt;update_rate&gt;100&lt;/update_rate&gt;
+    &lt;imu&gt;
+      &lt;noise&gt;
+        &lt;type&gt;gaussian&lt;/type&gt;
+        &lt;rate&gt;
+          &lt;mean&gt;0.0&lt;/mean&gt;
+          &lt;stddev&gt;0.0002&lt;/stddev&gt;
+        &lt;/rate&gt;
+      &lt;/noise&gt;
+    &lt;/imu&gt;
+  &lt;/sensor&gt;
+&lt;/gazebo&gt;</code></pre>
+
+<div class="tip">
+  <p><strong>我的建议</strong>：传感器更新率别设太高。激光雷达10Hz、IMU 100Hz就够用了。设太高了，CPU扛不住，仿真就跑不动了。</p>
+</div>
+
+<h3>22.4 仿真地图构建</h3>
+
+<p>地图是导航的基础。Gazebo里建地图有两种方式：</p>
+<ol>
+  <li><strong>用Building Editor手绘</strong>：适合简单场景，拖拽墙壁、添加障碍物</li>
+  <li><strong>导入CAD模型</strong>：适合工厂级场景，把真实的厂房布局导进来</li>
+</ol>
+
+<p>我个人更推荐第二种。为什么？因为仿真最终要服务于真车部署。你拿一张和真实工厂一模一样的地图来测算法，测出来的结果才有参考价值。</p>
+
+<p>下面是一个简单的地图文件示例（world格式）：</p>
+
+<pre><code>&lt;sdf version="1.6"&gt;
+  &lt;world name="warehouse"&gt;
+    &lt;include&gt;
+      &lt;uri&gt;model://sun&lt;/uri&gt;
+    &lt;/include&gt;
+    &lt;include&gt;
+      &lt;uri&gt;model://ground_plane&lt;/uri&gt;
+    &lt;/include&gt;
+    &lt;model name="wall_01"&gt;
+      &lt;static&gt;true&lt;/static&gt;
+      &lt;link name="body"&gt;
+        &lt;collision name="collision"&gt;
+          &lt;geometry&gt;
+            &lt;box size="10 0.2 2"/&gt;
+          &lt;/geometry&gt;
+        &lt;/collision&gt;
+        &lt;visual name="visual"&gt;
+          &lt;geometry&gt;
+            &lt;box size="10 0.2 2"/&gt;
+          &lt;/geometry&gt;
+        &lt;/visual&gt;
+      &lt;/link&gt;
+      &lt;pose&gt;0 5 1 0 0 0&lt;/pose&gt;
+    &lt;/model&gt;
+  &lt;/world&gt;
+&lt;/sdf&gt;</code></pre>
+
+<p>地图建好后，记得用<code>map_server</code>生成栅格地图。这一步很多人会忘——Gazebo里跑的是3D世界，但导航算法用的是2D代价地图。你需要把3D世界投影成2D栅格，算法才能用。</p>
+
+<h3>22.5 多AGV仿真测试</h3>
+
+<p>单台AGV跑通了，接下来就是多车协同。这才是真正考验系统的地方。</p>
+
+<p>多AGV仿真，核心要解决三个问题：</p>
+<ul>
+  <li><strong>命名空间隔离</strong>：每台AGV的topic不能冲突，比如<code>/agv1/cmd_vel</code>、<code>/agv2/cmd_vel</code></li>
+  <li><strong>碰撞避免</strong>：多车在同一场景里跑，不能互相撞上</li>
+  <li><strong>资源调度</strong>：交叉路口、狭窄通道，谁先过谁后过</li>
+</ul>
+
+<p>启动多车仿真的launch文件大概长这样：</p>
+
+<pre><code>&lt;launch&gt;
+  &lt;group ns="agv1"&gt;
+    &lt;include file="$(find agv_description)/launch/spawn_agv.launch"&gt;
+      &lt;arg name="x" value="0.0"/&gt;
+      &lt;arg name="y" value="0.0"/&gt;
+      &lt;arg name="yaw" value="0.0"/&gt;
+    &lt;/include&gt;
+  &lt;/group&gt;
+
+  &lt;group ns="agv2"&gt;
+    &lt;include file="$(find agv_description)/launch/spawn_agv.launch"&gt;
+      &lt;arg name="x" value="2.0"/&gt;
+      &lt;arg name="y" value="0.0"/&gt;
+      &lt;arg name="yaw" value="0.0"/&gt;
+    &lt;/include&gt;
+  &lt;/group&gt;
+&lt;/launch&gt;</code></pre>
+
+<p>这里有个关键点——<strong>每台AGV的初始位置不能重叠</strong>。我曾经犯过这个错，两台车刷在同一个坐标上，结果Gazebo物理引擎直接炸了，两台车疯狂抖动，最后飞出了地图。</p>
+
+<div class="highlight">
+  <p><strong>多车仿真的核心逻辑</strong>：</p>
+  <svg width="700" height="300" viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+    <rect x="10" y="10" width="680" height="280" fill="#f0f8ff" stroke="#4a90d9" stroke-width="2" rx="10"/>
+    <text x="350" y="40" text-anchor="middle" font-size="16" font-weight="bold" fill="#333">多AGV仿真系统架构</text>
+    <!-- 主控节点 -->
+    <rect x="250" y="60" width="200" height="40" rx="8" fill="#4a90d9" stroke="#2a6fb0" stroke-width="2"/>
+    <text x="350" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">调度中心</text>
+    <!-- AGV1 -->
+    <rect x="50" y="140" width="160" height="40" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+    <text x="130" y="165" text-anchor="middle" font-size="13" fill="white">AGV1 导航栈</text>
+    <!-- AGV2 -->
+    <rect x="270" y="140" width="160" height="40" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+    <text x="350" y="165" text-anchor="middle" font-size="13" fill="white">AGV2 导航栈</text>
+    <!-- AGV3 -->
+    <rect x="490" y="140" width="160" height="40" rx="8" fill="#5cb85c" stroke="#3d8b3d" stroke-width="2"/>
+    <text x="570" y="165" text-anchor="middle" font-size="13" fill="white">AGV3 导航栈</text>
+    <!-- Gazebo -->
+    <rect x="150" y="220" width="400" height="40" rx="8" fill="#f0ad4e" stroke="#d58512" stroke-width="2"/>
+    <text x="350" y="245" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Gazebo 物理仿真引擎</text>
+    <!-- 连线 -->
+    <line x1="350" y1="100" x2="130" y2="140" stroke="#666" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="350" y1="100" x2="350" y2="140" stroke="#666" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="350" y1="100" x2="570" y2="140" stroke="#666" stroke-width="2" stroke-dasharray="5,3"/>
+    <line x1="130" y1="180" x2="250" y2="220" stroke="#666" stroke-width="2"/>
+    <line x1="350" y1="180" x2="350" y2="220" stroke="#666" stroke-width="2"/>
+    <line x1="570" y1="180" x2="450" y2="220" stroke="#666" stroke-width="2"/>
+    <!-- 标注 -->
+    <text x="60" y="205" font-size="11" fill="#888">命名空间隔离</text>
+    <text x="460" y="205" font-size="11" fill="#888">碰撞检测</text>
+  </svg>
+</div>
+
+<p>多车仿真调试时，我建议先用<code>rqt_graph</code>看看节点和topic的连接关系。如果发现<code>/agv1/odom</code>被<code>/agv2</code>的节点订阅了，那肯定有问题——命名空间没隔离干净。</p>
+
+<div class="warning">
+  <p><strong>重要提醒</strong>：多车仿真对电脑性能要求很高。每增加一台AGV，CPU占用率大概涨15%-20%。我一般最多同时跑4台车，再多就卡成PPT了。如果非要跑更多，可以考虑用分布式仿真——把不同AGV分配到不同电脑上跑。</p>
+</div>
+
+<p>好了，仿真环境搭好了，接下来就可以愉快地调算法了。记住一句话：<strong>仿真里跑不通的，真车上一定跑不通；仿真里跑得通的，真车上也不一定跑得通</strong>。但至少，仿真能帮你过滤掉80%的低级错误。</p>
+
+<div class="footer-nav">
+            <a href="21SafetyAndException.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="23SystemIntegration.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

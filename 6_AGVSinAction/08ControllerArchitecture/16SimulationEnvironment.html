@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 仿真环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02CoreHardwareSelection.html" class="">2 AGV核心硬件选型</a></li>
+<li><a href="03SoftwareArchitecture.html" class="">3 AGV软件架构总览</a></li>
+<li><a href="04TaskSchedulingModule.html" class="">4 任务调度模块设计</a></li>
+<li><a href="05PathPlanningModule.html" class="">5 路径规划模块设计</a></li>
+<li><a href="06MotionControlModule.html" class="">6 运动控制模块设计</a></li>
+<li><a href="07LocalizationMappingModule.html" class="">7 定位与建图模块设计</a></li>
+<li><a href="08SensorFusionModule.html" class="">8 传感器融合模块设计</a></li>
+<li><a href="09CommunicationModule.html" class="">9 通信模块设计</a></li>
+<li><a href="10SafetyExceptionModule.html" class="">10 安全与异常处理模块设计</a></li>
+<li><a href="11HmiModule.html" class="">11 人机交互模块设计</a></li>
+<li><a href="12DispatchMultiAgv.html" class="">12 调度系统与多车协同</a></li>
+<li><a href="13ChargingManageModule.html" class="">13 充电管理模块设计</a></li>
+<li><a href="14PersistenceAndLog.html" class="">14 数据持久化与日志模块</a></li>
+<li><a href="15OtaUpgradeModule.html" class="">15 OTA远程升级模块设计</a></li>
+<li><a href="16SimulationEnvironment.html" class="active">16 仿真环境搭建</a></li>
+<li><a href="17Ros2AgvIntegration.html" class="">17 ROS2基础与AGV集成</a></li>
+<li><a href="18StateMachineDesign.html" class="">18 AGV控制器的状态机设计</a></li>
+<li><a href="19CodeSpecUnitTest.html" class="">19 代码规范与单元测试</a></li>
+<li><a href="20PerformanceRealtime.html" class="">20 性能优化与实时性保障</a></li>
+<li><a href="21DebugAndDiagnosis.html" class="">21 AGV控制器调试与诊断</a></li>
+<li><a href="22FirmwareArchitecture.html" class="">22 AGV控制器固件架构</a></li>
+<li><a href="23InterfaceDesign.html" class="">23 AGV控制器接口设计</a></li>
+<li><a href="24PowerManagement.html" class="">24 AGV控制器电源管理</a></li>
+<li><a href="25EmcReliability.html" class="">25 AGV控制器EMC与可靠性设计</a></li>
+<li><a href="26ProductionAndTest.html" class="">26 AGV控制器生产与测试</a></li>
+<li><a href="27BomCostControl.html" class="">27 AGV控制器BOM与成本控制</a></li>
+<li><a href="28ProjectReqDesign.html" class="">28 AGV控制器项目实战（一）</a></li>
+<li><a href="29ProjectCodeTest.html" class="">29 AGV控制器项目实战（二）</a></li>
+<li><a href="30ProjectDeployDelivery.html" class="">30 AGV控制器项目实战（三）</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 仿真环境搭建</h2>
+
+<p>各位同学，今天我们来聊聊仿真环境搭建。说实话，我在AGV领域摸爬滚打这么多年，最深的体会就是：<strong>仿真做得好，实车调试少</strong>。很多新手一上来就怼实车，结果撞坏几个传感器、烧了几块驱动板之后，才老老实实回来搭仿真环境。</p>
+
+<p>我个人习惯是：<strong>先仿真跑通，再实车验证</strong>。这样既省钱又省时间。今天我们就从Gazebo仿真环境开始，一步步把AGV的仿真环境搭起来。</p>
+
+<h3>16.1 Gazebo仿真环境概览</h3>
+
+<p>Gazebo是什么？说白了就是一个3D机器人仿真器。它和ROS是天生一对，配合起来非常默契。你可以在里面建地图、加传感器、跑算法，效果和实车差不多。</p>
+
+<p>我建议你安装Gazebo 9或11版本。为什么？因为这两个版本和ROS Melodic、Noetic兼容性最好。我在项目中遇到过用Gazebo 7死活跑不起来的情况，后来换成9就一切正常了。</p>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>Gazebo + ROS = 仿真黄金搭档</p>
+  <ul>
+    <li>Gazebo负责物理引擎和3D渲染</li>
+    <li>ROS负责通信和算法调度</li>
+    <li>两者通过<code>gazebo_ros_pkgs</code>桥接</li>
+  </ul>
+</div>
+
+<p>安装命令很简单：</p>
+
+<pre><code>sudo apt-get install ros-melodic-gazebo-ros-pkgs ros-melodic-gazebo-ros-control</code></pre>
+
+<p>嗯，这里要注意：<strong>版本一定要匹配</strong>。Melodic对应Gazebo 9，Noetic对应Gazebo 11。别搞混了。</p>
+
+<h3>16.2 AGV模型URDF配置</h3>
+
+<p>URDF是啥？Unified Robot Description Format，统一机器人描述格式。说白了就是用一个XML文件描述你的AGV长什么样、有多重、轮子在哪。</p>
+
+<p>我刚开始写URDF时，总觉得这东西很玄乎。后来发现，其实就是把AGV拆成几个部分：</p>
+
+<ul>
+  <li><strong>底盘</strong>：车体主体，一般是个长方体</li>
+  <li><strong>轮子</strong>：驱动轮、万向轮</li>
+  <li><strong>传感器支架</strong>：激光雷达、摄像头的位置</li>
+</ul>
+
+<p>来看一个简单的AGV URDF示例：</p>
+
+<pre><code>&lt;robot name="my_agv"&gt;
+  &lt;!-- 底盘 --&gt;
+  &lt;link name="base_link"&gt;
+    &lt;visual&gt;
+      &lt;geometry&gt;
+        &lt;box size="0.5 0.4 0.15"/&gt;
+      &lt;/geometry&gt;
+    &lt;/visual&gt;
+    &lt;collision&gt;
+      &lt;geometry&gt;
+        &lt;box size="0.5 0.4 0.15"/&gt;
+      &lt;/geometry&gt;
+    &lt;/collision&gt;
+  &lt;/link&gt;
+
+  &lt;!-- 左驱动轮 --&gt;
+  &lt;joint name="left_wheel_joint" type="continuous"&gt;
+    &lt;parent link="base_link"/&gt;
+    &lt;child link="left_wheel"/&gt;
+    &lt;origin xyz="0.2 0.25 0" rpy="0 0 0"/&gt;
+    &lt;axis xyz="0 1 0"/&gt;
+  &lt;/joint&gt;
+&lt;/robot&gt;</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>URDF里<code>&lt;collision&gt;</code>和<code>&lt;visual&gt;</code>最好保持一致。我曾经偷懒只写了visual，结果Gazebo里碰撞检测一塌糊涂，AGV直接穿模了。</p>
+</div>
+
+<h3>16.3 仿真传感器配置</h3>
+
+<p>AGV上常用的传感器就那几种：激光雷达、深度相机、IMU。在Gazebo里配置传感器，其实就是加几个插件。</p>
+
+<p>拿激光雷达举例：</p>
+
+<pre><code>&lt;gazebo reference="laser_link"&gt;
+  &lt;sensor type="ray" name="head_laser"&gt;
+    &lt;pose&gt;0 0 0 0 0 0&lt;/pose&gt;
+    &lt;visualize&gt;true&lt;/visualize&gt;
+    &lt;update_rate&gt;10&lt;/update_rate&gt;
+    &lt;ray&gt;
+      &lt;scan&gt;
+        &lt;horizontal&gt;
+          &lt;samples&gt;360&lt;/samples&gt;
+          &lt;resolution&gt;1&lt;/resolution&gt;
+          &lt;min_angle&gt;-3.14159&lt;/min_angle&gt;
+          &lt;max_angle&gt;3.14159&lt;/max_angle&gt;
+        &lt;/horizontal&gt;
+      &lt;/scan&gt;
+      &lt;range&gt;
+        &lt;min&gt;0.1&lt;/min&gt;
+        &lt;max&gt;10.0&lt;/max&gt;
+      &lt;/range&gt;
+    &lt;/ray&gt;
+  &lt;/sensor&gt;
+&lt;/gazebo&gt;</code></pre>
+
+<p>你想想看，这个配置和真实激光雷达的参数是不是很像？<code>samples</code>对应线数，<code>min_angle</code>和<code>max_angle</code>对应扫描范围。说白了就是把真实传感器的参数填进去。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经把<code>update_rate</code>设成100Hz，结果Gazebo直接卡死。仿真环境不是越快越好，10-20Hz就够用了。真实激光雷达也就10-15Hz。</p>
+</div>
+
+<h3>16.4 仿真与实车切换</h3>
+
+<p>这是很多同学关心的问题：怎么在仿真和实车之间无缝切换？</p>
+
+<p>我的做法是：<strong>用命名空间和参数服务器</strong>。说白了就是写一个launch文件，通过参数控制启动仿真还是实车。</p>
+
+<pre><code>&lt;launch&gt;
+  &lt;arg name="use_sim" default="true"/&gt;
+
+  &lt;!-- 仿真模式 --&gt;
+  &lt;group if="$(arg use_sim)"&gt;
+    &lt;include file="$(find my_agv)/launch/gazebo.launch"/&gt;
+    &lt;node name="fake_odom" pkg="fake_localization" type="fake_localization"/&gt;
+  &lt;/group&gt;
+
+  &lt;!-- 实车模式 --&gt;
+  &lt;group unless="$(arg use_sim)"&gt;
+    &lt;include file="$(find my_agv)/launch/real_robot.launch"/&gt;
+    &lt;node name="odom" pkg="robot_localization" type="ekf_localization"/&gt;
+  &lt;/group&gt;
+
+  &lt;!-- 公共部分 --&gt;
+  &lt;node name="move_base" pkg="move_base" type="move_base"/&gt;
+&lt;/launch&gt;</code></pre>
+
+<p>启动时只需要加一个参数：</p>
+
+<pre><code># 仿真模式
+roslaunch my_agv start.launch use_sim:=true
+
+# 实车模式
+roslaunch my_agv start.launch use_sim:=false</code></pre>
+
+<div class="highlight">
+  <p><strong>核心思想：</strong>仿真和实车共用一套算法代码，只切换底层驱动和传感器数据源。这样你写的导航、避障算法，在仿真里调好了，直接拿到实车上就能跑。</p>
+</div>
+
+<h3>16.5 本章知识体系</h3>
+
+<p>下面这张图展示了仿真环境搭建的整体流程：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">仿真环境搭建知识体系</text>
+
+  <!-- 第一层：三大模块 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">Gazebo仿真环境</text>
+
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">AGV模型URDF</text>
+
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="650" y="100" text-anchor="middle" font-size="14" fill="white" font-weight="bold">仿真传感器配置</text>
+
+  <!-- 箭头：第一层到第二层 -->
+  <line x1="150" y1="120" x2="150" y2="170" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="120" x2="400" y2="170" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="650" y1="120" x2="650" y2="170" stroke="#e74c3c" stroke-width="2"/>
+
+  <!-- 第二层：具体内容 -->
+  <rect x="30" y="170" width="240" height="120" rx="8" fill="#ebf5fb" stroke="#3498db" stroke-width="2"/>
+  <text x="150" y="195" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">安装配置</text>
+  <text x="150" y="215" text-anchor="middle" font-size="12" fill="#555">gazebo_ros_pkgs</text>
+  <text x="150" y="235" text-anchor="middle" font-size="12" fill="#555">物理引擎设置</text>
+  <text x="150" y="255" text-anchor="middle" font-size="12" fill="#555">世界文件加载</text>
+  <text x="150" y="275" text-anchor="middle" font-size="12" fill="#555">插件管理</text>
+
+  <rect x="280" y="170" width="240" height="120" rx="8" fill="#eafaf1" stroke="#2ecc71" stroke-width="2"/>
+  <text x="400" y="195" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">模型描述</text>
+  <text x="400" y="215" text-anchor="middle" font-size="12" fill="#555">link/joint定义</text>
+  <text x="400" y="235" text-anchor="middle" font-size="12" fill="#555">碰撞与视觉</text>
+  <text x="400" y="255" text-anchor="middle" font-size="12" fill="#555">惯性参数</text>
+  <text x="400" y="275" text-anchor="middle" font-size="12" fill="#555">传动系统</text>
+
+  <rect x="530" y="170" width="240" height="120" rx="8" fill="#fdedec" stroke="#e74c3c" stroke-width="2"/>
+  <text x="650" y="195" text-anchor="middle" font-size="13" fill="#2c3e50" font-weight="bold">传感器插件</text>
+  <text x="650" y="215" text-anchor="middle" font-size="12" fill="#555">激光雷达ray</text>
+  <text x="650" y="235" text-anchor="middle" font-size="12" fill="#555">深度相机</text>
+  <text x="650" y="255" text-anchor="middle" font-size="12" fill="#555">IMU配置</text>
+  <text x="650" y="275" text-anchor="middle" font-size="12" fill="#555">里程计模拟</text>
+
+  <!-- 汇聚箭头 -->
+  <line x1="150" y1="290" x2="150" y2="340" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="290" x2="400" y2="340" stroke="#2ecc71" stroke-width="2"/>
+  <line x1="650" y1="290" x2="650" y2="340" stroke="#e74c3c" stroke-width="2"/>
+
+  <line x1="150" y1="340" x2="400" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+  <line x1="650" y1="340" x2="400" y2="340" stroke="#7f8c8d" stroke-width="2"/>
+
+  <!-- 第三层：切换机制 -->
+  <rect x="250" y="340" width="300" height="50" rx="8" fill="#9b59b6" opacity="0.9"/>
+  <text x="400" y="370" text-anchor="middle" font-size="14" fill="white" font-weight="bold">仿真 ↔ 实车切换</text>
+
+  <!-- 箭头到最终 -->
+  <line x1="400" y1="390" x2="400" y2="430" stroke="#9b59b6" stroke-width="2"/>
+
+  <!-- 最终输出 -->
+  <rect x="200" y="430" width="400" height="50" rx="25" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="460" text-anchor="middle" font-size="15" fill="white" font-weight="bold">AGV控制器仿真验证平台</text>
+</svg>
+
+<p>从这张图可以看出来，整个仿真环境搭建其实就三步：<strong>搭环境、建模型、配传感器</strong>。最后通过一个切换机制，让仿真和实车共用同一套算法。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>刚开始做仿真时，别追求完美。先让AGV在Gazebo里动起来，哪怕只是原地转圈。然后再慢慢加传感器、调参数。一口吃不成胖子，仿真也是迭代出来的。</p>
+</div>
+
+<p>好了，这一章的内容就到这里。记住一句话：<strong>仿真不是目的，是手段</strong>。我们的最终目标是在实车上跑出好效果，仿真只是帮我们更快、更安全地达到这个目标。</p>
+
+<div class="footer-nav">
+            <a href="15OtaUpgradeModule.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17Ros2AgvIntegration.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

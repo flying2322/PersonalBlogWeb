@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>13 地图构建实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02NavigationTechBasics.html" class="">2 导航技术基础</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04SensorPrinciples.html" class="">4 传感器原理</a></li>
+<li><a href="05SensorDataProcessing.html" class="">5 传感器数据处理</a></li>
+<li><a href="06PerceptionFeatureExtract.html" class="">6 环境感知与特征提取</a></li>
+<li><a href="07SlamOverview.html" class="">7 SLAM技术概论</a></li>
+<li><a href="08LaserSlamPart1.html" class="">8 激光SLAM（上）</a></li>
+<li><a href="09LaserSlamPart2.html" class="">9 激光SLAM（下）</a></li>
+<li><a href="10VisualSlamPart1.html" class="">10 视觉SLAM（上）</a></li>
+<li><a href="11VisualSlamPart2.html" class="">11 视觉SLAM（下）</a></li>
+<li><a href="12MultiSensorFusionSlam.html" class="">12 多传感器融合SLAM</a></li>
+<li><a href="13MapBuildingPractice.html" class="active">13 地图构建实战</a></li>
+<li><a href="14MapOptimizePostprocess.html" class="">14 地图优化与后处理</a></li>
+<li><a href="15LocalizationBasics.html" class="">15 定位技术基础</a></li>
+<li><a href="16MonteCarloLocalization.html" class="">16 蒙特卡洛定位（MCL）</a></li>
+<li><a href="17AmclAlgorithm.html" class="">17 AMCL算法</a></li>
+<li><a href="18GraphOptimizeLocalization.html" class="">18 基于图优化的定位</a></li>
+<li><a href="19VisualLocalization.html" class="">19 视觉定位</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21PathPlanningBasics.html" class="">21 路径规划基础</a></li>
+<li><a href="22DynamicEnvPathPlanning.html" class="">22 动态环境下的路径规划</a></li>
+<li><a href="23ControlAndTracking.html" class="">23 控制与跟踪</a></li>
+<li><a href="24RosNavStack.html" class="">24 ROS导航栈</a></li>
+<li><a href="25SystemIntegration.html" class="">25 AGV系统集成</a></li>
+<li><a href="26DispatchSystem.html" class="">26 AGV调度系统</a></li>
+<li><a href="27SimulationEnvironment.html" class="">27 仿真环境搭建</a></li>
+<li><a href="28PerformanceEvalTest.html" class="">28 性能评估与测试</a></li>
+<li><a href="29EngineeringDeploy.html" class="">29 工程化与部署</a></li>
+<li><a href="30FrontierOutlook.html" class="">30 前沿趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>13 地图构建实战——使用ROS与Cartographer构建室内环境地图</h2>
+
+<p>好，到了真正动手的时候了。</p>
+<p>前面我们聊了那么多理论，什么概率栅格、粒子滤波、图优化……说实话，光看公式确实有点枯燥。但今天不一样，今天我们要让机器人真正跑起来，把一张室内地图给“画”出来。</p>
+<p>我个人习惯用Cartographer来做这件事。为什么？因为它稳定，而且对传感器要求没那么苛刻。你想想看，一个实验室里，不是每个人都有64线激光雷达的。Cartographer用2D激光雷达就能干出不错的活，这点很实在。</p>
+
+<div class="highlight">
+  <p><strong>本章核心目标：</strong>用一台搭载2D激光雷达的移动机器人，在室内环境下，通过ROS + Cartographer实时构建出可用的栅格地图。</p>
+</div>
+
+<h3>13.1 环境准备：别让工具坑了你</h3>
+
+<p>我记得第一次搭Cartographer的时候，光编译就折腾了大半天。嗯，这里要注意，版本问题最容易踩坑。</p>
+
+<p><strong>你需要准备的东西：</strong></p>
+<ul>
+  <li><strong>ROS版本：</strong>Melodic 或 Noetic（我建议用Noetic，支持周期更长）</li>
+  <li><strong>Cartographer：</strong>官方ROS集成版（cartographer_ros）</li>
+  <li><strong>传感器：</strong>2D激光雷达（比如RPLIDAR A1/A2，或者Hokuyo系列）</li>
+  <li><strong>机器人平台：</strong>差速底盘，能发布/odom和/tf就行</li>
+</ul>
+
+<p>安装Cartographer其实不复杂，但有几个坑我曾经踩过：</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经因为用了系统自带的protobuf版本，导致Cartographer编译报错。后来发现必须用<code>wstool</code>拉取指定版本的依赖。记住，别偷懒用<code>apt-get install</code>装protobuf，老老实实按官方教程走。</p>
+</div>
+
+<p>安装命令（简版）：</p>
+<pre><code># 创建工作空间
+mkdir -p ~/cartographer_ws/src
+cd ~/cartographer_ws
+wstool init src
+wstool merge -t src https://raw.githubusercontent.com/cartographer-project/cartographer_ros/master/cartographer_ros.rosinstall
+wstool update -t src
+
+# 安装依赖
+rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
+
+# 编译
+catkin_make_isolated --install --use-ninja
+source install_isolated/setup.bash</code></pre>
+
+<h3>13.2 核心流程：一张图看懂Cartographer在干什么</h3>
+
+<p>说白了，Cartographer干的事就两件：<strong>局部匹配</strong>和<strong>全局优化</strong>。</p>
+<p>局部匹配负责“当前这一帧激光跟上一帧怎么对齐”，全局优化负责“走了一圈回来发现门没对齐，赶紧修正”。</p>
+
+<p>下面这张图是我自己总结的流程，你一看就明白：</p>
+
+<div style="text-align:center; margin:20px 0;">
+<svg width="700" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="700" height="400" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 传感器输入 -->
+  <rect x="50" y="30" width="160" height="60" rx="8" fill="#b0e0e6" stroke="#4682b4" stroke-width="2"/>
+  <text x="130" y="65" text-anchor="middle" font-size="14" fill="#333">激光雷达数据</text>
+  
+  <rect x="50" y="110" width="160" height="60" rx="8" fill="#b0e0e6" stroke="#4682b4" stroke-width="2"/>
+  <text x="130" y="145" text-anchor="middle" font-size="14" fill="#333">里程计/IMU数据</text>
+  
+  <!-- 箭头 -->
+  <line x1="210" y1="60" x2="280" y2="60" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="210" y1="140" x2="280" y2="140" stroke="#4682b4" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 局部SLAM -->
+  <rect x="280" y="40" width="180" height="120" rx="8" fill="#ffe4b5" stroke="#d2691e" stroke-width="2"/>
+  <text x="370" y="75" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">局部SLAM</text>
+  <text x="370" y="100" text-anchor="middle" font-size="12" fill="#555">扫描匹配（CSM）</text>
+  <text x="370" y="120" text-anchor="middle" font-size="12" fill="#555">子图构建</text>
+  <text x="370" y="140" text-anchor="middle" font-size="12" fill="#555">位姿外推器</text>
+  
+  <!-- 箭头 -->
+  <line x1="460" y1="100" x2="530" y2="100" stroke="#d2691e" stroke-width="2" marker-end="url(#arrow2)"/>
+  
+  <!-- 全局SLAM -->
+  <rect x="530" y="40" width="150" height="120" rx="8" fill="#98fb98" stroke="#3cb371" stroke-width="2"/>
+  <text x="605" y="75" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">全局SLAM</text>
+  <text x="605" y="100" text-anchor="middle" font-size="12" fill="#555">闭环检测</text>
+  <text x="605" y="120" text-anchor="middle" font-size="12" fill="#555">位姿图优化</text>
+  <text x="605" y="140" text-anchor="middle" font-size="12" fill="#555">（后台线程）</text>
+  
+  <!-- 输出 -->
+  <rect x="530" y="200" width="150" height="60" rx="8" fill="#dda0dd" stroke="#8b008b" stroke-width="2"/>
+  <text x="605" y="235" text-anchor="middle" font-size="14" fill="#333">输出栅格地图</text>
+  
+  <line x1="605" y1="160" x2="605" y2="200" stroke="#3cb371" stroke-width="2" marker-end="url(#arrow3)"/>
+  
+  <!-- 箭头标记定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4682b4"/>
+    </marker>
+    <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#d2691e"/>
+    </marker>
+    <marker id="arrow3" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3cb371"/>
+    </marker>
+  </defs>
+  
+  <!-- 说明文字 -->
+  <text x="370" y="210" text-anchor="middle" font-size="12" fill="#888">局部SLAM实时输出子图</text>
+  <text x="370" y="230" text-anchor="middle" font-size="12" fill="#888">全局SLAM后台优化并修正</text>
+  
+  <!-- 数据流标注 -->
+  <text x="250" y="50" font-size="11" fill="#888">传感器输入</text>
+  <text x="490" y="90" font-size="11" fill="#888">子图</text>
+</svg>
+</div>
+
+<p>看到没？左边是传感器数据进来，中间是局部SLAM在做实时匹配，右边是全局SLAM在后台默默纠错。这两个线程互不干扰，这也是Cartographer高明的地方。</p>
+
+<h3>13.3 配置文件：调参才是真功夫</h3>
+
+<p>很多人以为装好Cartographer就能跑，其实不然。配置文件才是灵魂。我见过太多人拿着默认参数去跑，结果地图歪歪扭扭。</p>
+
+<p>这里给出一份我常用的2D激光雷达配置（<code>my_robot.lua</code>）：</p>
+
+<pre><code>include "map_builder.lua"
+include "trajectory_builder.lua"
+
+options = {
+  map_builder = MAP_BUILDER,
+  trajectory_builder = TRAJECTORY_BUILDER,
+  map_frame = "map",
+  tracking_frame = "base_link",
+  published_frame = "base_link",
+  odom_frame = "odom",
+  provide_odom_frame = true,
+  publish_frame_projected_to_2d = false,
+  use_odometry = true,
+  use_nav_sat = false,
+  use_landmarks = false,
+  num_laser_scans = 1,
+  num_multi_echo_laser_scans = 0,
+  num_subdivisions_per_laser_scan = 1,
+  num_point_clouds = 0,
+  lookup_transform_timeout_sec = 0.2,
+  submap_publish_period_sec = 0.3,
+  pose_publish_period_sec = 5e-3,
+  trajectory_publish_period_sec = 30e-3,
+  rangefinder_sampling_ratio = 1.,
+  odometry_sampling_ratio = 1.,
+  fixed_frame_pose_sampling_ratio = 1.,
+  imu_sampling_ratio = 1.,
+  landmarks_sampling_ratio = 1.,
+}
+
+MAP_BUILDER.use_trajectory_builder_2d = true
+
+TRAJECTORY_BUILDER_2D.submaps.num_range_data = 35
+TRAJECTORY_BUILDER_2D.min_range = 0.3
+TRAJECTORY_BUILDER_2D.max_range = 12.
+TRAJECTORY_BUILDER_2D.missing_data_ray_length = 5.
+TRAJECTORY_BUILDER_2D.use_imu_data = false
+TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.linear_search_window = 0.1
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.translation_delta_cost_weight = 1e-1
+TRAJECTORY_BUILDER_2D.real_time_correlative_scan_matcher.rotation_delta_cost_weight = 1e-1
+
+POSE_GRAPH.optimize_every_n_nodes = 90
+POSE_GRAPH.constraint_builder.sampling_ratio = 0.3
+POSE_GRAPH.constraint_builder.min_score = 0.55
+POSE_GRAPH.constraint_builder.global_localization_min_score = 0.6
+
+return options</code></pre>
+
+<div class="tip">
+  <p><strong>调参小技巧：</strong>如果你发现地图出现重影，试着把<code>submaps.num_range_data</code>调小到25左右。如果发现闭环后地图突然跳变，把<code>optimize_every_n_nodes</code>调大到120，让优化更稀疏一些。</p>
+</div>
+
+<h3>13.4 启动建图：让机器人动起来</h3>
+
+<p>配置写好了，接下来就是启动。我个人习惯把启动文件分成三层：</p>
+
+<ol>
+  <li><strong>底层驱动层：</strong>启动激光雷达和底盘</li>
+  <li><strong>SLAM层：</strong>启动Cartographer</li>
+  <li><strong>可视化层：</strong>启动RViz</li>
+</ol>
+
+<p>启动命令大概长这样：</p>
+
+<pre><code># 终端1：启动机器人底层
+roslaunch my_robot_bringup robot.launch
+
+# 终端2：启动Cartographer
+roslaunch cartographer_ros my_robot.launch
+
+# 终端3：启动RViz
+roslaunch cartographer_ros demo_backpack_2d.launch
+# 或者自己配置一个rviz文件加载</code></pre>
+
+<p>嗯，这里要注意，RViz的显示配置很重要。你至少要把<code>Map</code>、<code>LaserScan</code>、<code>PoseArray</code>这几个显示项加上去，不然你什么都看不到。</p>
+
+<h3>13.5 建图过程中的实战技巧</h3>
+
+<p>我记得第一次带学生做实验，有个同学推着机器人走太快，结果地图直接崩了。Cartographer虽然稳定，但也不是万能的。</p>
+
+<p><strong>建图时的几个要点：</strong></p>
+<ul>
+  <li><strong>速度控制：</strong>别超过0.3m/s，转弯时更慢。你想想看，激光雷达一帧数据就那么多，走太快匹配就丢了。</li>
+  <li><strong>闭环策略：</strong>尽量走“8”字形路线，让机器人多次经过同一个区域。闭环越多，地图越准。</li>
+  <li><strong>光照影响：</strong>虽然激光雷达不怕暗，但如果你用了视觉辅助，注意光照均匀。</li>
+  <li><strong>地面材质：</strong>光滑地砖容易导致里程计打滑，这时候<code>use_odometry = true</code>反而会引入误差。我建议如果地面太滑，把里程计权重调低。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>曾经踩过的坑：</strong>有一次在走廊建图，走到尽头掉头时，Cartographer突然把地图扭曲了。后来发现是走廊太窄（只有1.2米），激光点云特征太少，匹配失败。解决办法是加了一个短距离的超声波传感器做辅助，或者干脆走慢一点，让每一帧的重叠率更高。</p>
+</div>
+
+<h3>13.6 保存地图：别白忙活一场</h3>
+
+<p>建完图之后，最重要的一步就是保存。我见过有人建了半小时的图，结果忘了保存，直接关终端……</p>
+
+<p>保存命令很简单：</p>
+
+<pre><code># 保存当前地图
+rosservice call /write_state "{filename: '${HOME}/maps/my_office.pbstream'}"
+
+# 如果需要导出为PGM/YAML格式（用于导航）
+rosrun cartographer_ros cartographer_pbstream_to_ros_map \
+  -pbstream_filename=${HOME}/maps/my_office.pbstream \
+  -map_filestem=${HOME}/maps/my_office</code></pre>
+
+<p>这样你会得到三个文件：<code>.pbstream</code>（Cartographer原生格式）、<code>.pgm</code>（栅格图片）、<code>.yaml</code>（地图元信息）。</p>
+
+<div class="highlight">
+  <p><strong>重要提醒：</strong>.pbstream文件包含了完整的位姿图信息，如果你以后想做地图编辑或者重优化，一定要保留这个文件。.pgm只是导出给导航用的“快照”。</p>
+</div>
+
+<h3>13.7 常见问题与排查</h3>
+
+<p>最后，我把这些年遇到的高频问题整理成了一张表，你遇到问题可以先来这里翻翻：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; background:#fff;">
+  <tr style="background:#b0e0e6;">
+    <th>现象</th>
+    <th>可能原因</th>
+    <th>解决办法</th>
+  </tr>
+  <tr>
+    <td>地图出现重影/双影</td>
+    <td>闭环检测没触发，或者子图数量太多</td>
+    <td>调小<code>num_range_data</code>，增加闭环检测频率</td>
+  </tr>
+  <tr>
+    <td>地图突然跳变</td>
+    <td>闭环优化时位姿图调整过大</td>
+    <td>调大<code>optimize_every_n_nodes</code>，让优化更平滑</td>
+  </tr>
+  <tr>
+    <td>建图过程中TF报错</td>
+    <td>odom到base_link的变换没发布</td>
+    <td>检查底盘驱动是否正常发布/tf</td>
+  </tr>
+  <tr>
+    <td>地图边缘模糊</td>
+    <td>激光雷达最大距离设置太小</td>
+    <td>调大<code>max_range</code>，但注意不要超过雷达实际量程</td>
+  </tr>
+  <tr>
+    <td>CPU占用过高</td>
+    <td>全局优化线程太频繁</td>
+    <td>调大<code>optimize_every_n_nodes</code>到150以上</td>
+  </tr>
+</table>
+
+<p>好了，地图构建实战就讲到这里。Cartographer这套工具，说白了就是“配置调得好，地图建得早”。你多跑几次，多调几次参数，慢慢就有感觉了。</p>
+
+<p>记住，建图不是一次就能成功的。我当年第一次建图，跑了五遍才拿到一张能用的地图。别怕失败，多试几次就好。</p>
+
+<div class="footer-nav">
+            <a href="12MultiSensorFusionSlam.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="14MapOptimizePostprocess.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

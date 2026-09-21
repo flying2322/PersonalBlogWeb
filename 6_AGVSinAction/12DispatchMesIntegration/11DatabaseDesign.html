@@ -1,0 +1,445 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>11 数据库设计</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvMesOverview.html" class="">1 AGV与MES概述</a></li>
+<li><a href="02CommProtocolBasics.html" class="">2 通信协议基础</a></li>
+<li><a href="03InterfaceSpecDesign.html" class="">3 接口规范设计</a></li>
+<li><a href="04DataModelDefine.html" class="">4 数据模型定义</a></li>
+<li><a href="05MesTaskDispatch.html" class="">5 MES下发任务</a></li>
+<li><a href="06AgvStatusReport.html" class="">6 AGV状态上报</a></li>
+<li><a href="07TaskDispatchStrategy.html" class="">7 任务调度策略</a></li>
+<li><a href="08PathPlanningNav.html" class="">8 路径规划与导航</a></li>
+<li><a href="09ExceptionHandling.html" class="">9 异常处理机制</a></li>
+<li><a href="10MessageQueue.html" class="">10 消息队列集成</a></li>
+<li><a href="11DatabaseDesign.html" class="active">11 数据库设计</a></li>
+<li><a href="12LogAndMonitor.html" class="">12 日志与监控</a></li>
+<li><a href="13SecurityMechanism.html" class="">13 安全机制</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同</a></li>
+<li><a href="15MesWmsLinkage.html" class="">15 MES与WMS联动</a></li>
+<li><a href="16DeployAndOps.html" class="">16 系统部署与运维</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18TestStrategy.html" class="">18 测试策略</a></li>
+<li><a href="19DataSync.html" class="">19 数据同步机制</a></li>
+<li><a href="20VersionCompatibility.html" class="">20 版本升级与兼容</a></li>
+<li><a href="21AutoPlantMesCase.html" class="">21 行业案例1</a></li>
+<li><a href="22EcommerceWmsCase.html" class="">22 行业案例2</a></li>
+<li><a href="23SemiconductorMesCase.html" class="">23 行业案例3</a></li>
+<li><a href="24PharmaGmpMesCase.html" class="">24 行业案例4</a></li>
+<li><a href="25PortTosMesCase.html" class="">25 行业案例5</a></li>
+<li><a href="26SecondaryDevExtend.html" class="">26 二次开发与扩展</a></li>
+<li><a href="27SimulatorDev.html" class="">27 模拟器开发</a></li>
+<li><a href="28ProjectManagement.html" class="">28 项目管理与实施</a></li>
+<li><a href="29TroubleshootingOps.html" class="">29 故障排查与运维</a></li>
+<li><a href="30FutureTrendsOutlook.html" class="">30 未来趋势与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>11 数据库设计：MySQL/PostgreSQL表结构设计、Redis缓存应用、时序数据库（InfluxDB）存储AGV轨迹</h2>
+
+<p>各位同行，今天我们来聊聊AGV调度系统与MES对接时，数据库这块到底该怎么设计。说实话，我见过不少项目，系统跑着跑着就卡死了，查来查去，十有八九是数据库没设计好。你想想看，AGV调度系统每秒要处理多少位置数据？MES那边又不断下发任务，这数据量可不是闹着玩的。</p>
+
+<p>我个人习惯把数据库设计分成三层：<strong>关系型数据库</strong>管业务逻辑，<strong>缓存数据库</strong>扛高并发，<strong>时序数据库</strong>存轨迹数据。这三兄弟各司其职，缺一不可。</p>
+
+<h3>11.1 关系型数据库：MySQL还是PostgreSQL？</h3>
+
+<p>先说说关系型数据库。MySQL和PostgreSQL我都用过，说实话，各有千秋。但如果你问我个人偏好，我倾向于PostgreSQL。为什么？因为AGV调度系统里有很多复杂的地理位置查询，PostgreSQL的PostGIS扩展简直是神器。</p>
+
+<p>不过，如果你的团队对MySQL更熟悉，用MySQL也完全没问题。关键是把表结构设计好。</p>
+
+<h4>11.1.1 核心表结构设计</h4>
+
+<p>我直接上干货，这是我在多个项目中沉淀下来的表结构。先看任务表：</p>
+
+<pre><code>-- 任务主表
+CREATE TABLE agv_task (
+    task_id BIGSERIAL PRIMARY KEY,
+    task_code VARCHAR(64) NOT NULL UNIQUE,  -- 任务编号，如 TASK20240101001
+    task_type INT NOT NULL,                 -- 任务类型：1-搬运 2-充电 3-维修
+    priority INT DEFAULT 5,                 -- 优先级 1-10，数字越小优先级越高
+    source_point VARCHAR(32) NOT NULL,      -- 起点编码
+    target_point VARCHAR(32) NOT NULL,      -- 终点编码
+    status INT DEFAULT 0,                   -- 状态：0-待分配 1-已分配 2-执行中 3-已完成 4-异常
+    create_time TIMESTAMP DEFAULT NOW(),
+    update_time TIMESTAMP DEFAULT NOW(),
+    complete_time TIMESTAMP,
+    mes_order_id VARCHAR(64),               -- MES工单ID
+    remark TEXT
+);
+
+-- 任务执行记录表
+CREATE TABLE agv_task_execution (
+    exec_id BIGSERIAL PRIMARY KEY,
+    task_id BIGINT NOT NULL REFERENCES agv_task(task_id),
+    agv_id INT NOT NULL,                    -- 执行AGV编号
+    start_time TIMESTAMP,
+    end_time TIMESTAMP,
+    distance FLOAT,                         -- 行驶距离（米）
+    energy_consumed FLOAT,                  -- 能耗（kWh）
+    error_code INT DEFAULT 0,               -- 异常码
+    error_msg TEXT
+);
+</code></pre>
+
+<p>这里有个坑，我必须要提醒你。任务编号千万别用自增ID，MES那边传过来的工单号可能是字符串格式的。我曾经在一个项目里直接用自增ID做关联，结果MES系统升级后，两边对不上号，排查了整整两天。</p>
+
+<div class="warning">
+    <strong>避坑指南：</strong>任务表一定要加唯一索引，而且建议用业务编码做主键关联。MES和AGV系统之间的任务ID映射，最好单独建一张映射表。
+</div>
+
+<h4>11.1.2 AGV车辆表与站点表</h4>
+
+<p>AGV车辆表相对简单，但有几个字段我建议一定要加上：</p>
+
+<pre><code>CREATE TABLE agv_vehicle (
+    agv_id SERIAL PRIMARY KEY,
+    agv_code VARCHAR(32) NOT NULL UNIQUE,   -- AGV编号
+    vehicle_type INT NOT NULL,              -- 车型：1-潜伏式 2-叉车式 3-牵引式
+    battery_level FLOAT DEFAULT 100.0,      -- 当前电量百分比
+    status INT DEFAULT 0,                   -- 状态：0-空闲 1-执行任务 2-充电 3-离线 4-故障
+    current_point VARCHAR(32),              -- 当前位置编码
+    last_heartbeat TIMESTAMP,               -- 最后心跳时间
+    software_version VARCHAR(32),           -- 软件版本
+    total_mileage FLOAT DEFAULT 0           -- 总行驶里程
+);
+</code></pre>
+
+<p>站点表我习惯用分层设计。物理站点和逻辑站点分开：</p>
+
+<pre><code>CREATE TABLE agv_station (
+    station_id SERIAL PRIMARY KEY,
+    station_code VARCHAR(32) NOT NULL UNIQUE,
+    station_type INT NOT NULL,              -- 1-充电站 2-上下料点 3-暂存区 4-维修区
+    x_coord FLOAT NOT NULL,                 -- X坐标（米）
+    y_coord FLOAT NOT NULL,                 -- Y坐标（米）
+    angle FLOAT DEFAULT 0,                  -- 朝向角度
+    is_enabled BOOLEAN DEFAULT TRUE,
+    max_queue INT DEFAULT 1,                -- 最大排队数量
+    current_queue INT DEFAULT 0             -- 当前排队数量
+);
+</code></pre>
+
+<h3>11.2 Redis缓存应用：扛住高并发</h3>
+
+<p>说实话，没有Redis的AGV调度系统，我都不敢想象怎么扛住高峰期。MES下发任务的时候，那可是毫秒级的响应要求。你想想看，一条产线几十台AGV同时请求任务，如果每次都查MySQL，数据库不崩才怪。</p>
+
+<h4>11.2.1 缓存什么？</h4>
+
+<p>我总结了几类必须缓存的数据：</p>
+
+<ul>
+    <li><strong>任务队列</strong>：待分配的任务列表，用Redis的List结构</li>
+    <li><strong>AGV状态</strong>：每台AGV的实时状态，用Hash结构</li>
+    <li><strong>路径规划结果</strong>：高频路径缓存，用String结构，设置TTL</li>
+    <li><strong>站点占用状态</strong>：用Set或Bitmap，快速判断站点是否可用</li>
+</ul>
+
+<p>举个实际例子，任务队列的Redis设计：</p>
+
+<pre><code>// 任务队列 - 按优先级排序
+// Key: agv:task:queue:{priority}
+// Value: 任务ID列表（有序集合）
+ZADD agv:task:queue:1 100 "TASK20240101001"
+ZADD agv:task:queue:1 95  "TASK20240101002"
+
+// AGV实时状态
+// Key: agv:status:{agv_id}
+// Value: Hash
+HSET agv:status:AGV001 status "idle" battery 85.5 point "A01"
+</code></pre>
+
+<div class="tip">
+    <strong>经验之谈：</strong>Redis的Key命名一定要规范。我习惯用「业务域:对象:属性」的格式，这样后期维护起来特别清晰。另外，记得给缓存设置合理的过期时间，别让垃圾数据占着内存。
+</div>
+
+<h4>11.2.2 缓存与数据库的一致性</h4>
+
+<p>这个问题我踩过坑。有一次AGV状态更新了，但Redis没及时同步，导致调度系统分配了重复任务。后来我采用了「先更新数据库，再删除缓存」的策略。说白了，就是保证数据库是权威数据源，缓存只是加速用的。</p>
+
+<pre><code>// 伪代码示例
+public void updateAgvStatus(AgvStatus status) {
+    // 1. 先更新数据库
+    database.updateAgvStatus(status);
+    
+    // 2. 再删除缓存
+    redis.delete("agv:status:" + status.getAgvId());
+    
+    // 3. 下次查询时自动回填缓存
+}
+</code></pre>
+
+<h3>11.3 时序数据库：InfluxDB存储AGV轨迹</h3>
+
+<p>AGV的轨迹数据，说白了就是时间序列数据。每台AGV每隔几百毫秒上报一次位置，一天下来就是几百万条记录。用MySQL存？我试过，查询最近一小时轨迹要等好几秒，根本没法用。</p>
+
+<p>InfluxDB就是专门干这个的。它的设计理念就是「写多读少」，写入速度极快，压缩率也高。</p>
+
+<h4>11.3.1 数据模型设计</h4>
+
+<p>InfluxDB的数据模型和关系型数据库不太一样。它没有表的概念，而是用「Measurement」来组织数据。我一般这样设计：</p>
+
+<pre><code>-- Measurement: agv_trajectory
+-- Tags: agv_id, task_id (用于快速过滤)
+-- Fields: x, y, angle, speed, battery (实际数值)
+-- Time: 时间戳（自动生成）
+
+-- 写入示例（Line Protocol格式）
+agv_trajectory,agv_id=AGV001,task_id=TASK001 x=12.5,y=34.2,angle=90.0,speed=1.2,battery=85.3 1704067200000000000
+agv_trajectory,agv_id=AGV001,task_id=TASK001 x=12.8,y=34.5,angle=92.0,speed=1.3,battery=85.2 1704067200500000000
+</code></pre>
+
+<p>这里有个关键点：<strong>Tag的基数不能太高</strong>。Tag是InfluxDB的索引，如果Tag值太多（比如把坐标也做成Tag），性能会急剧下降。我一般只把AGV编号和任务编号作为Tag，其他都放Fields里。</p>
+
+<h4>11.3.2 查询实战</h4>
+
+<p>查询最近10分钟AGV001的轨迹：</p>
+
+<pre><code>SELECT x, y, angle, speed 
+FROM agv_trajectory 
+WHERE agv_id = 'AGV001' 
+  AND time > now() - 10m
+ORDER BY time
+</code></pre>
+
+<p>查询某台AGV在某个时间段内的平均速度：</p>
+
+<pre><code>SELECT MEAN(speed) AS avg_speed 
+FROM agv_trajectory 
+WHERE agv_id = 'AGV001' 
+  AND time >= '2024-01-01T00:00:00Z' 
+  AND time <= '2024-01-01T01:00:00Z'
+</code></pre>
+
+<div class="highlight">
+    <strong>核心要点：</strong>InfluxDB的保留策略（Retention Policy）一定要设置好。我一般设置原始数据保留7天，聚合数据保留30天。这样既能保证实时查询的速度，又能满足历史分析的需求。
+</div>
+
+<h3>11.4 三种数据库的协同工作流</h3>
+
+<p>说了这么多，这三种数据库到底怎么配合？我画了一张图，你看完就明白了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV调度系统数据库协同架构</text>
+    
+    <!-- MES系统 -->
+    <rect x="50" y="80" width="180" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="140" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">MES系统</text>
+    
+    <!-- 箭头：MES -> 任务队列 -->
+    <line x1="230" y1="110" x2="310" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="270" y="100" text-anchor="middle" font-size="12" fill="#e74c3c">下发任务</text>
+    
+    <!-- Redis缓存层 -->
+    <rect x="310" y="80" width="180" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="400" y="105" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Redis缓存</text>
+    <text x="400" y="125" text-anchor="middle" font-size="12" fill="white">任务队列 / AGV状态</text>
+    
+    <!-- 箭头：Redis -> 调度引擎 -->
+    <line x1="490" y1="110" x2="570" y2="110" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="530" y="100" text-anchor="middle" font-size="12" fill="#27ae60">读取任务</text>
+    
+    <!-- 调度引擎 -->
+    <rect x="570" y="80" width="180" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+    <text x="660" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调度引擎</text>
+    
+    <!-- 箭头：调度引擎 -> AGV -->
+    <line x1="660" y1="140" x2="660" y2="200" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="680" y="175" text-anchor="middle" font-size="12" fill="#8e44ad">下发指令</text>
+    
+    <!-- AGV -->
+    <rect x="570" y="200" width="180" height="60" rx="8" fill="#8e44ad" opacity="0.9"/>
+    <text x="660" y="235" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV车队</text>
+    
+    <!-- 箭头：AGV -> InfluxDB -->
+    <line x1="570" y1="230" x2="490" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="530" y="220" text-anchor="middle" font-size="12" fill="#e67e22">上报轨迹</text>
+    
+    <!-- InfluxDB -->
+    <rect x="310" y="200" width="180" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+    <text x="400" y="225" text-anchor="middle" font-size="16" fill="white" font-weight="bold">InfluxDB</text>
+    <text x="400" y="245" text-anchor="middle" font-size="12" fill="white">轨迹数据存储</text>
+    
+    <!-- 箭头：InfluxDB -> MySQL -->
+    <line x1="310" y1="230" x2="230" y2="230" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="270" y="220" text-anchor="middle" font-size="12" fill="#2980b9">归档分析</text>
+    
+    <!-- MySQL -->
+    <rect x="50" y="200" width="180" height="60" rx="8" fill="#2980b9" opacity="0.9"/>
+    <text x="140" y="225" text-anchor="middle" font-size="16" fill="white" font-weight="bold">MySQL/PostgreSQL</text>
+    <text x="140" y="245" text-anchor="middle" font-size="12" fill="white">业务数据持久化</text>
+    
+    <!-- 箭头：MySQL -> Redis -->
+    <line x1="140" y1="260" x2="140" y2="320" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="160" y="295" text-anchor="middle" font-size="12" fill="#e74c3c">数据同步</text>
+    
+    <!-- Redis回写 -->
+    <rect x="50" y="320" width="180" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="140" y="345" text-anchor="middle" font-size="16" fill="white" font-weight="bold">Redis持久化</text>
+    <text x="140" y="365" text-anchor="middle" font-size="12" fill="white">定期回写MySQL</text>
+    
+    <!-- 箭头标记定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+        </marker>
+    </defs>
+    
+    <!-- 图例 -->
+    <rect x="50" y="420" width="700" height="60" rx="8" fill="#ecf0f1" stroke="#bdc3c7"/>
+    <text x="70" y="445" font-size="14" font-weight="bold" fill="#2c3e50">图例说明：</text>
+    <rect x="160" y="432" width="20" height="20" rx="4" fill="#3498db"/>
+    <text x="185" y="447" font-size="12" fill="#2c3e50">MES系统</text>
+    <rect x="260" y="432" width="20" height="20" rx="4" fill="#e74c3c"/>
+    <text x="285" y="447" font-size="12" fill="#2c3e50">Redis缓存</text>
+    <rect x="360" y="432" width="20" height="20" rx="4" fill="#27ae60"/>
+    <text x="385" y="447" font-size="12" fill="#2c3e50">调度引擎</text>
+    <rect x="460" y="432" width="20" height="20" rx="4" fill="#8e44ad"/>
+    <text x="485" y="447" font-size="12" fill="#2c3e50">AGV车队</text>
+    <rect x="560" y="432" width="20" height="20" rx="4" fill="#e67e22"/>
+    <text x="585" y="447" font-size="12" fill="#2c3e50">InfluxDB</text>
+    <rect x="660" y="432" width="20" height="20" rx="4" fill="#2980b9"/>
+    <text x="685" y="447" font-size="12" fill="#2c3e50">MySQL</text>
+</svg>
+
+<p>你看，整个数据流是这样的：MES下发任务到Redis队列，调度引擎从Redis取任务分配给AGV。AGV执行过程中，实时位置上报到InfluxDB。同时，关键业务数据定期从Redis同步到MySQL做持久化。这样各司其职，系统才能跑得稳。</p>
+
+<div class="tip">
+    <strong>我的建议：</strong>刚开始做的时候，别想着一步到位。先把MySQL和Redis搭起来跑通，等轨迹数据量上来了，再引入InfluxDB。我见过太多人一开始就搞得很复杂，结果连基础功能都没跑通。
+</div>
+
+<p>好了，数据库设计这块就聊到这儿。记住一句话：<strong>没有最好的数据库，只有最合适的组合</strong>。根据你的实际场景，灵活搭配才是王道。</p>
+
+<div class="footer-nav">
+            <a href="10MessageQueue.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="12LogAndMonitor.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 移植环境搭建</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="active">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 移植环境搭建：交叉编译工具链配置、调试器环境搭建、工程模板创建</h2>
+
+<p>好，咱们进入第三章。说实话，环境搭建这事儿，看着简单，但坑是真不少。我见过太多人卡在第一步，工具链没配好，后面全白搭。今天咱们就把这块彻底捋清楚。</p>
+
+<h3>3.1 交叉编译工具链配置</h3>
+
+<p>先说说交叉编译。你想想看，咱们的PC是x86架构，但AGV控制器里跑的是ARM Cortex-M或者Cortex-R系列。PC上编译出来的程序，得让ARM芯片能认识，这就得靠交叉编译工具链。</p>
+
+<p>我个人习惯用<strong>ARM GCC</strong>，也就是<code>gcc-arm-none-eabi</code>。为啥不用厂商自带的？因为开源、免费，而且社区活跃，遇到问题好查。</p>
+
+<h4>3.1.1 下载与安装</h4>
+
+<p>去ARM官网下载最新版，或者用包管理器：</p>
+
+<pre><code># Ubuntu/Debian
+sudo apt-get install gcc-arm-none-eabi
+
+# macOS (用brew)
+brew install gcc-arm-none-eabi
+
+# Windows
+# 直接下载.exe安装包，记得勾选"Add to PATH"
+</code></pre>
+
+<p>安装完验证一下：</p>
+
+<pre><code>arm-none-eabi-gcc --version
+</code></pre>
+
+<p>看到版本号就对了。嗯，这里要注意：版本别太老，也别追最新。我建议用<strong>10.3-2021.10</strong>这个版本，稳定，踩坑少。</p>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在Windows上装完没重启，结果PATH没生效，折腾了半小时。装完记得重启终端，或者手动刷新环境变量。
+</div>
+
+<h4>3.1.2 工具链组件说明</h4>
+
+<p>工具链里都有啥？我列个表，你心里有个数：</p>
+
+<table>
+  <tr>
+    <th>组件</th>
+    <th>作用</th>
+    <th>常用命令</th>
+  </tr>
+  <tr>
+    <td>编译器</td>
+    <td>把C/C++代码编译成汇编</td>
+    <td><code>arm-none-eabi-gcc</code></td>
+  </tr>
+  <tr>
+    <td>汇编器</td>
+    <td>把汇编转成机器码</td>
+    <td><code>arm-none-eabi-as</code></td>
+  </tr>
+  <tr>
+    <td>链接器</td>
+    <td>把目标文件链接成可执行文件</td>
+    <td><code>arm-none-eabi-ld</code></td>
+  </tr>
+  <tr>
+    <td>调试器</td>
+    <td>GDB调试用</td>
+    <td><code>arm-none-eabi-gdb</code></td>
+  </tr>
+  <tr>
+    <td>二进制工具</td>
+    <td>生成hex/bin、反汇编等</td>
+    <td><code>arm-none-eabi-objcopy</code></td>
+  </tr>
+</table>
+
+<p>说白了，你平时最常用的就是<code>gcc</code>和<code>objcopy</code>。编译完用<code>objcopy</code>转成.bin或.hex，才能烧到芯片里。</p>
+
+<h3>3.2 调试器环境搭建</h3>
+
+<p>调试器这块，咱们主要讲<strong>J-Link</strong>和<strong>ST-Link</strong>。AGV控制器上，我见过用ST-Link的居多，因为STM32芯片便宜又好用。但J-Link功能更强，调试RTOS时特别顺手。</p>
+
+<h4>3.2.1 J-Link配置</h4>
+
+<p>去SEGGER官网下载<strong>J-Link Software Pack</strong>。安装完你会得到：</p>
+
+<ul>
+  <li><code>JLinkExe</code>：命令行工具，烧录、调试都靠它</li>
+  <li><code>JLinkGDBServer</code>：GDB服务器，配合IDE或命令行调试</li>
+  <li><code>JFlash</code>：图形化烧录工具</li>
+</ul>
+
+<p>我个人习惯用命令行，因为自动化脚本方便。连接好J-Link后，试试：</p>
+
+<pre><code>JLinkExe -device STM32F407VG -if SWD -speed 4000 -autoconnect 1
+</code></pre>
+
+<p>看到<code>Connected successfully</code>就对了。这里有个小技巧：SWD接口只用两根线（SWDIO和SWCLK），比JTAG省引脚，AGV控制器上一般都用SWD。</p>
+
+<div class="tip">
+  <strong>经验之谈：</strong> 我在项目中遇到过J-Link连不上，最后发现是线太长，信号衰减。SWD线别超过20cm，实在不行降速到1000kHz。
+</div>
+
+<h4>3.2.2 ST-Link配置</h4>
+
+<p>ST-Link更简单，装个<strong>STM32CubeProgrammer</strong>或者<strong>OpenOCD</strong>就行。我推荐OpenOCD，开源、灵活，配合GDB用起来很爽。</p>
+
+<p>安装OpenOCD：</p>
+
+<pre><code># Ubuntu
+sudo apt-get install openocd
+
+# Windows
+# 去官网下载，解压到C:\openocd，加PATH
+</code></pre>
+
+<p>连接ST-Link后，启动GDB服务器：</p>
+
+<pre><code>openocd -f interface/stlink.cfg -f target/stm32f4x.cfg
+</code></pre>
+
+<p>看到<code>Listening on port 3333</code>就成功了。然后另开终端，用GDB连上去：</p>
+
+<pre><code>arm-none-eabi-gdb
+(gdb) target remote localhost:3333
+(gdb) monitor reset halt
+</code></pre>
+
+<p>嗯，这里要注意：ST-Link的固件版本别太旧。我曾经被V2的老固件坑过，死活连不上，更新固件后就好了。</p>
+
+<h3>3.3 工程模板创建</h3>
+
+<p>环境搭好了，咱们得建个工程模板。以后每个项目都从模板开始，省时省力。我习惯用<strong>Makefile</strong>管理，不用IDE，因为自动化程度高，CI/CD也好集成。</p>
+
+<h4>3.3.1 目录结构</h4>
+
+<p>我的模板长这样：</p>
+
+<pre><code>agv_rtos_template/
+├── build/          # 编译输出
+├── src/            # 源代码
+│   ├── main.c
+│   ├── startup/    # 启动文件
+│   ├── drivers/    # 外设驱动
+│   └── rtos/       # RTOS源码
+├── inc/            # 头文件
+├── ld/             # 链接脚本
+├── Makefile
+└── README.md
+</code></pre>
+
+<p>你想想看，这样分是不是很清楚？源码、头文件、链接脚本各归各类，找东西方便。</p>
+
+<h4>3.3.2 Makefile核心内容</h4>
+
+<p>Makefile是模板的灵魂。我贴个精简版，你感受一下：</p>
+
+<pre><code># 工具链
+CC = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
+OBJCOPY = arm-none-eabi-objcopy
+
+# 芯片型号
+MCU = cortex-m4
+FPU = -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
+# 编译选项
+CFLAGS = -mcpu=$(MCU) $(FPU) -mthumb -O2 -g
+CFLAGS += -I./inc -I./src/rtos/include
+
+# 链接脚本
+LDFLAGS = -T ./ld/stm32f407vg.ld
+
+# 源文件
+SRCS = $(wildcard src/*.c src/startup/*.c src/drivers/*.c)
+OBJS = $(SRCS:.c=.o)
+
+# 目标
+all: firmware.bin
+
+firmware.elf: $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
+firmware.bin: firmware.elf
+	$(OBJCOPY) -O binary $< $@
+
+clean:
+	rm -f build/*.o *.elf *.bin
+</code></pre>
+
+<p>这个模板我用了好几年，改改芯片型号和链接脚本就能用。说白了，你只要会改<code>MCU</code>和<code>LDFLAGS</code>，就能适配不同芯片。</p>
+
+<div class="highlight">
+  <strong>核心要点：</strong> 链接脚本（.ld文件）是移植的关键。它告诉编译器代码放哪、数据放哪、堆栈多大。我建议直接从芯片厂商的SDK里拿，自己写容易出错。
+</div>
+
+<h4>3.3.3 启动文件与链接脚本</h4>
+
+<p>启动文件（startup_xxx.s）负责初始化堆栈、中断向量表，然后跳转到<code>main()</code>。链接脚本（.ld）定义内存布局。这两兄弟配合好了，RTOS才能跑起来。</p>
+
+<p>我举个例子，STM32F407的链接脚本片段：</p>
+
+<pre><code>MEMORY
+{
+    FLASH (rx) : ORIGIN = 0x08000000, LENGTH = 1024K
+    RAM (rwx)  : ORIGIN = 0x20000000, LENGTH = 128K
+}
+
+SECTIONS
+{
+    .text : {
+        *(.isr_vector)
+        *(.text)
+        *(.rodata)
+    } > FLASH
+
+    .data : {
+        *(.data)
+    } > RAM AT > FLASH
+
+    .bss : {
+        *(.bss)
+    } > RAM
+}
+</code></pre>
+
+<p>嗯，这里要注意：<code>.isr_vector</code>必须放在最前面，因为芯片上电后从0x08000000取中断向量表。顺序错了，程序直接跑飞。</p>
+
+<h3>3.4 知识体系总览</h3>
+
+<p>为了让你看得更清楚，我画了张图，把本章的知识结构串起来：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 主标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">移植环境搭建知识体系</text>
+  
+  <!-- 三个核心模块 -->
+  <!-- 模块1：交叉编译工具链 -->
+  <rect x="50" y="70" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="150" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">交叉编译工具链</text>
+  
+  <rect x="50" y="130" width="200" height="120" rx="5" fill="#ebf5fb" stroke="#3498db" stroke-width="1"/>
+  <text x="60" y="155" font-size="13" fill="#2c3e50">• ARM GCC安装</text>
+  <text x="60" y="175" font-size="13" fill="#2c3e50">• 版本选择（10.3）</text>
+  <text x="60" y="195" font-size="13" fill="#2c3e50">• PATH环境变量</text>
+  <text x="60" y="215" font-size="13" fill="#2c3e50">• 组件：gcc/ld/objcopy</text>
+  <text x="60" y="235" font-size="13" fill="#2c3e50">• 验证：--version</text>
+  
+  <!-- 模块2：调试器 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">调试器环境搭建</text>
+  
+  <rect x="300" y="130" width="200" height="160" rx="5" fill="#fdedec" stroke="#e74c3c" stroke-width="1"/>
+  <text x="310" y="155" font-size="13" fill="#2c3e50">• J-Link配置</text>
+  <text x="310" y="175" font-size="13" fill="#2c3e50">  - JLinkExe/GDB Server</text>
+  <text x="310" y="195" font-size="13" fill="#2c3e50">  - SWD接口（2线）</text>
+  <text x="310" y="215" font-size="13" fill="#2c3e50">• ST-Link配置</text>
+  <text x="310" y="235" font-size="13" fill="#2c3e50">  - OpenOCD + GDB</text>
+  <text x="310" y="255" font-size="13" fill="#2c3e50">  - 固件版本检查</text>
+  <text x="310" y="275" font-size="13" fill="#2c3e50">• 连接验证</text>
+  
+  <!-- 模块3：工程模板 -->
+  <rect x="550" y="70" width="200" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="650" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">工程模板创建</text>
+  
+  <rect x="550" y="130" width="200" height="160" rx="5" fill="#e8f8f5" stroke="#27ae60" stroke-width="1"/>
+  <text x="560" y="155" font-size="13" fill="#2c3e50">• 目录结构设计</text>
+  <text x="560" y="175" font-size="13" fill="#2c3e50">• Makefile编写</text>
+  <text x="560" y="195" font-size="13" fill="#2c3e50">• 启动文件配置</text>
+  <text x="560" y="215" font-size="13" fill="#2c3e50">• 链接脚本编写</text>
+  <text x="560" y="235" font-size="13" fill="#2c3e50">• 编译验证</text>
+  <text x="560" y="255" font-size="13" fill="#2c3e50">• 烧录测试</text>
+  
+  <!-- 连接箭头 -->
+  <line x1="250" y1="95" x2="300" y2="95" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="500" y1="95" x2="550" y2="95" stroke="#7f8c8d" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#7f8c8d"/>
+    </marker>
+  </defs>
+  
+  <!-- 底部总结 -->
+  <rect x="150" y="320" width="500" height="60" rx="10" fill="#f39c12" opacity="0.8"/>
+  <text x="400" y="345" text-anchor="middle" font-size="15" fill="white" font-weight="bold">最终目标：能编译、能烧录、能调试</text>
+  <text x="400" y="365" text-anchor="middle" font-size="13" fill="white">工具链 → 调试器 → 模板 → 跑通第一个LED闪烁程序</text>
+  
+  <!-- 常见问题 -->
+  <rect x="100" y="400" width="600" height="80" rx="8" fill="#fff3cd" stroke="#ffc107" stroke-width="1"/>
+  <text x="120" y="425" font-size="14" font-weight="bold" fill="#856404">常见问题排查</text>
+  <text x="120" y="445" font-size="13" fill="#856404">1. 工具链找不到 → 检查PATH和终端重启</text>
+  <text x="120" y="465" font-size="13" fill="#856404">2. 调试器连不上 → 检查驱动、线长、固件版本</text>
+  <text x="120" y="485" font-size="13" fill="#856404">3. 编译报错 → 检查链接脚本和芯片型号是否匹配</text>
+</svg>
+
+<h3>3.5 验证与测试</h3>
+
+<p>环境搭完，得验证一下。我习惯写个最简单的LED闪烁程序，编译、烧录、跑起来，三步验证：</p>
+
+<ol>
+  <li><strong>编译验证</strong>：<code>make</code>，看有没有报错</li>
+  <li><strong>烧录验证</strong>：用JLinkExe或OpenOCD烧录.bin文件</li>
+  <li><strong>运行验证</strong>：看LED闪不闪，闪了就说明环境OK</li>
+</ol>
+
+<div class="tip">
+  <strong>小技巧：</strong> 第一次跑通后，把整个模板打个tar包存起来。以后新项目直接解压，改改芯片型号就能用。我电脑里存了十几个不同芯片的模板，随用随取。
+</div>
+
+<p>好了，环境搭建这块就到这。工具链、调试器、模板，三件套配齐了，后面移植RTOS才有底气。记住，环境搭得越稳，后面越省心。</p>
+
+<div class="footer-nav">
+            <a href="02RtosKernelBasics.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04StartupAndLinker.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

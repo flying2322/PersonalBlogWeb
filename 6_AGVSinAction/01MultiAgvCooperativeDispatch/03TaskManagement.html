@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>3 任务管理模块</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="active">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>3 任务管理模块：任务生成、任务分配、任务优先级、任务状态机</h2>
+
+<p>任务管理模块，说白了就是整个AGV调度系统的「大脑中枢」。我做了这么多年调度系统，见过太多系统在任务管理上栽跟头——要么任务分配不合理导致车辆空跑，要么优先级混乱让紧急订单活活等死。今天咱们就把这块掰开揉碎了讲清楚。</p>
+
+<h3>3.1 任务生成：从业务需求到调度指令</h3>
+
+<p>任务生成是第一步。它负责把上层业务系统（比如MES、WMS）发来的指令，翻译成AGV能理解的「任务」。我个人习惯把任务生成分成两个阶段：</p>
+
+<ul>
+<li><strong>原始任务接收</strong>：接收来自ERP、WMS的工单，格式可能是JSON、XML甚至文本</li>
+<li><strong>任务标准化</strong>：转换成内部统一的任务结构体</li>
+</ul>
+
+<p>举个例子，WMS发来一条指令：「把A库位的托盘搬到B库位」。系统收到后，会生成这样一个任务对象：</p>
+
+<pre><code>{
+  "task_id": "T20240315001",
+  "type": "TRANSPORT",
+  "source": {"x": 10.5, "y": 23.8, "floor": 1},
+  "target": {"x": 45.2, "y": 67.1, "floor": 1},
+  "priority": 2,
+  "create_time": 1710489600,
+  "status": "PENDING"
+}
+</code></pre>
+
+<p>嗯，这里要注意：<strong>任务ID必须全局唯一</strong>。我曾经在一个项目里见过用时间戳+随机数生成ID，结果高并发下重复了，两台AGV抢同一个任务，差点撞车。后来我改用「日期+自增序列+机器码」的方式，再没出过问题。</p>
+
+<h3>3.2 任务分配：谁有空谁来干</h3>
+
+<p>任务分配是调度系统的核心难点。说白了就是：<strong>来了一个任务，该派哪台车去？</strong></p>
+
+<p>我常用的分配策略有三种：</p>
+
+<table>
+  <tr>
+    <th>策略名称</th>
+    <th>适用场景</th>
+    <th>优点</th>
+    <th>缺点</th>
+  </tr>
+  <tr>
+    <td>最近车辆优先</td>
+    <td>任务密集、距离短</td>
+    <td>响应快、能耗低</td>
+    <td>可能造成局部拥堵</td>
+  </tr>
+  <tr>
+    <td>空闲时间最长优先</td>
+    <td>负载均衡要求高</td>
+    <td>车辆磨损均匀</td>
+    <td>响应时间可能变长</td>
+  </tr>
+  <tr>
+    <td>综合评分法</td>
+    <td>复杂场景</td>
+    <td>考虑因素全面</td>
+    <td>计算量大</td>
+  </tr>
+</table>
+
+<p>我个人最推荐综合评分法。它把距离、电量、当前任务数、路径拥堵程度都算进去，给每台车打个分，选最高的派活。你想想看，如果一台车电量只剩10%，你还派它去跑远路，那不是坑人吗？</p>
+
+<div class="highlight">
+  <p><strong>核心逻辑</strong>：任务分配不是「谁近谁干」，而是「谁最合适谁干」。</p>
+</div>
+
+<h3>3.3 任务优先级：紧急的插队，不急的等着</h3>
+
+<p>任务优先级，说白了就是排队规则。我见过最蠢的设计是「先来先服务」，结果紧急订单被普通订单堵死，产线直接停摆。</p>
+
+<p>我一般把优先级分成4级：</p>
+
+<ul>
+  <li><strong>P0（紧急）</strong>：产线故障、安全事件，必须立即处理</li>
+  <li><strong>P1（高）</strong>：生产节拍任务，延迟会影响产出</li>
+  <li><strong>P2（普通）</strong>：常规搬运任务</li>
+  <li><strong>P3（低）</strong>：维护任务、非紧急补货</li>
+</ul>
+
+<p>这里有个坑：<strong>优先级不能无限插队</strong>。我曾经遇到一个客户，所有任务都标P0，结果优先级系统形同虚设。后来我强制规定：P0任务每天不超过总任务量的5%，超出部分自动降级为P1。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在某个项目中，P0任务一直插队，导致P2任务永远执行不了。后来我加了「老化机制」——一个任务等待超过30分钟，自动提升一级优先级。这样既保证了紧急任务，又不会饿死普通任务。</p>
+</div>
+
+<h3>3.4 任务状态机：从生到死的完整生命周期</h3>
+
+<p>任务状态机，就是描述一个任务从创建到完成的全过程。我习惯用6个状态：</p>
+
+<pre><code>PENDING → ASSIGNED → EXECUTING → COMPLETED
+    ↓          ↓           ↓
+  CANCELLED  FAILED     PAUSED
+</code></pre>
+
+<p>每个状态的含义：</p>
+
+<ul>
+  <li><strong>PENDING</strong>：任务已生成，等待分配</li>
+  <li><strong>ASSIGNED</strong>：已分配给某台AGV，但还没开始执行</li>
+  <li><strong>EXECUTING</strong>：AGV正在执行中</li>
+  <li><strong>COMPLETED</strong>：任务完成</li>
+  <li><strong>FAILED</strong>：执行失败（比如AGV故障、路径不通）</li>
+  <li><strong>PAUSED</strong>：暂停（比如等待人工干预）</li>
+  <li><strong>CANCELLED</strong>：被取消</li>
+</ul>
+
+<p>状态转换的规则要严格定义。比如：<strong>只有PENDING状态的任务才能被取消</strong>，已经ASSIGNED的任务必须先释放车辆再取消。我见过一个系统，任务在EXECUTING状态被强行取消，结果AGV停在半路，后面的车全堵死了。</p>
+
+<div class="warning">
+  <p><strong>注意</strong>：状态机一定要做「非法状态转换」的校验。比如从PENDING直接跳到COMPLETED，这明显是数据错误，必须拦截。</p>
+</div>
+
+<h3>3.5 核心流程图：任务管理模块全景</h3>
+
+<p>下面这张图，是我自己画的任务管理模块核心流程。你看一遍就能明白整个逻辑：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">任务管理模块核心流程图</text>
+  
+  <!-- 任务生成 -->
+  <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="90" text-anchor="middle" font-size="14" fill="white" font-weight="bold">任务生成</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 任务池 -->
+  <rect x="300" y="140" width="200" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="170" text-anchor="middle" font-size="14" fill="white" font-weight="bold">任务池（PENDING）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="190" x2="400" y2="220" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 优先级排序 -->
+  <rect x="300" y="220" width="200" height="50" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-size="14" fill="white" font-weight="bold">优先级排序</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="270" x2="400" y2="300" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 任务分配 -->
+  <rect x="300" y="300" width="200" height="50" rx="8" fill="#27ae60" stroke="#229954" stroke-width="2"/>
+  <text x="400" y="330" text-anchor="middle" font-size="14" fill="white" font-weight="bold">任务分配（ASSIGNED）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="350" x2="400" y2="380" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 执行中 -->
+  <rect x="300" y="380" width="200" height="50" rx="8" fill="#8e44ad" stroke="#7d3c98" stroke-width="2"/>
+  <text x="400" y="410" text-anchor="middle" font-size="14" fill="white" font-weight="bold">执行中（EXECUTING）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="430" x2="400" y2="460" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 完成 -->
+  <rect x="300" y="460" width="200" height="30" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="480" text-anchor="middle" font-size="14" fill="white" font-weight="bold">完成（COMPLETED）</text>
+  
+  <!-- 右侧分支：失败/取消 -->
+  <line x1="500" y1="405" x2="580" y2="405" stroke="#e74c3c" stroke-width="2" stroke-dasharray="5,5"/>
+  <text x="540" y="395" text-anchor="middle" font-size="12" fill="#e74c3c">失败/取消</text>
+  
+  <rect x="580" y="385" width="150" height="40" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="655" y="410" text-anchor="middle" font-size="13" fill="white">FAILED/CANCELLED</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>这张图展示了任务从生成到完成的完整生命周期。你注意看右侧的失败分支——<strong>任何阶段都可能出问题</strong>，所以异常处理一定要做扎实。</p>
+
+<h3>3.6 实战经验：任务管理模块的常见坑</h3>
+
+<p>最后分享几个我踩过的坑：</p>
+
+<ol>
+  <li><strong>任务ID重复</strong>：高并发下自增ID可能重复，建议用UUID或雪花算法</li>
+  <li><strong>状态机死锁</strong>：比如任务在PAUSED状态，没有超时机制，永远卡在那。我一般加一个「最大暂停时间」，超时自动FAILED</li>
+  <li><strong>优先级反转</strong>：低优先级任务占着资源，高优先级任务进不去。解决方案是「优先级继承」——低优先级任务临时提升优先级</li>
+  <li><strong>任务分配震荡</strong>：两台AGV来回抢同一个任务。我加了一个「分配锁定」机制，任务分配后30秒内不允许重新分配</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>总结一句话</strong>：任务管理模块的核心就四个字——<strong>生成、分配、排队、跟踪</strong>。把这四个环节做扎实了，调度系统就稳了八成。</p>
+</div>
+
+<div class="footer-nav">
+            <a href="02DispatchArchitecture.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="04PathPlanningBasics.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>14 地图表示方法</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="active">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>14 地图表示方法：占据栅格地图、TSDF地图、ESDF地图、OctoMap八叉树地图</h2>
+
+<p>做SLAM这么多年，我越来越觉得一个道理：<strong>地图就是机器人的世界观</strong>。你给它什么样的地图，它就怎么理解这个世界。</p>
+
+<p>打个比方，你让一个AGV去仓库送货。如果地图是稀疏的，它可能只知道「这里有墙，那里有空」。但如果地图是稠密的，它还能知道「这个货架离我0.5米，那个柱子离我1.2米」。不同的任务，需要不同的地图。</p>
+
+<p>今天咱们就把四种主流地图掰开揉碎讲清楚。嗯，这四种地图我都在实际项目里用过，踩过的坑也不少。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>没有最好的地图，只有最合适的地图。导航、避障、规划、建图，每个环节对地图的要求都不一样。</p>
+</div>
+
+<!-- SVG 知识体系图 -->
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg" style="display:block; margin:20px auto; background:#f9f9f9; border-radius:12px;">
+  <rect x="10" y="10" width="780" height="380" fill="#f0f8ff" stroke="#b0d4f1" stroke-width="2" rx="10"/>
+  <text x="400" y="50" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">四种地图表示方法对比</text>
+  
+  <!-- 中心节点 -->
+  <rect x="300" y="80" width="200" height="50" rx="25" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="110" text-anchor="middle" font-size="16" fill="white" font-weight="bold">地图表示方法</text>
+  
+  <!-- 分支1：占据栅格地图 -->
+  <rect x="30" y="180" width="160" height="60" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="110" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">占据栅格地图</text>
+  <text x="110" y="225" text-anchor="middle" font-size="11" fill="#ffeaa7">概率模型，2D/3D</text>
+  <line x1="190" y1="210" x2="300" y2="130" stroke="#e74c3c" stroke-width="2"/>
+  
+  <!-- 分支2：TSDF地图 -->
+  <rect x="220" y="180" width="160" height="60" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="300" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">TSDF地图</text>
+  <text x="300" y="225" text-anchor="middle" font-size="11" fill="#ffeaa7">截断符号距离</text>
+  <line x1="300" y1="180" x2="300" y2="130" stroke="#2ecc71" stroke-width="2"/>
+  
+  <!-- 分支3：ESDF地图 -->
+  <rect x="420" y="180" width="160" height="60" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="500" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">ESDF地图</text>
+  <text x="500" y="225" text-anchor="middle" font-size="11" fill="#ffeaa7">欧几里得符号距离</text>
+  <line x1="500" y1="180" x2="500" y2="130" stroke="#f39c12" stroke-width="2"/>
+  
+  <!-- 分支4：OctoMap -->
+  <rect x="610" y="180" width="160" height="60" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="690" y="205" text-anchor="middle" font-size="14" fill="white" font-weight="bold">OctoMap</text>
+  <text x="690" y="225" text-anchor="middle" font-size="11" fill="#ffeaa7">八叉树结构</text>
+  <line x1="690" y1="180" x2="500" y2="130" stroke="#9b59b6" stroke-width="2"/>
+  
+  <!-- 底部说明 -->
+  <text x="400" y="300" text-anchor="middle" font-size="13" fill="#555">应用场景</text>
+  <text x="110" y="330" text-anchor="middle" font-size="12" fill="#777">2D导航、避障</text>
+  <text x="300" y="330" text-anchor="middle" font-size="12" fill="#777">3D重建、SLAM</text>
+  <text x="500" y="330" text-anchor="middle" font-size="12" fill="#777">运动规划、避障</text>
+  <text x="690" y="330" text-anchor="middle" font-size="12" fill="#777">大场景、3D建图</text>
+  
+  <line x1="110" y1="310" x2="110" y2="240" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="300" y1="310" x2="300" y2="240" stroke="#2ecc71" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="500" y1="310" x2="500" y2="240" stroke="#f39c12" stroke-width="1" stroke-dasharray="4"/>
+  <line x1="690" y1="310" x2="690" y2="240" stroke="#9b59b6" stroke-width="1" stroke-dasharray="4"/>
+</svg>
+
+<h3>14.1 占据栅格地图（Occupancy Grid Map）</h3>
+
+<p>这是最经典、最基础的地图表示方法。说白了，就是把空间划分成一个个小格子，每个格子存一个概率值，表示这个格子被占用的可能性。</p>
+
+<p>我最早接触SLAM时用的就是这种地图。那时候做扫地机器人，2D激光雷达扫一圈，每个格子要么是0（空闲），要么是1（占用），要么是0.5（未知）。简单粗暴，但够用。</p>
+
+<p><strong>核心公式：</strong></p>
+<pre><code>// 对数几率更新
+l(m_i | z_{1:t}) = l(m_i | z_{1:t-1}) + l(m_i | z_t) - l(m_i)
+
+// 其中 l(m_i) = log( p(m_i) / (1 - p(m_i)) )</code></pre>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>实际项目中，我习惯把初始概率设为0.5（完全未知）。每次激光打到某个格子，就更新它的概率。如果连续多次观测到同一个格子是空闲，概率会趋近0；反之趋近1。这样做的好处是抗干扰能力强——偶尔一次误检测不会导致地图崩掉。</p>
+</div>
+
+<p><strong>优缺点：</strong></p>
+<ul>
+  <li><strong>优点：</strong>实现简单、计算快、内存占用固定（提前分配好数组就行）</li>
+  <li><strong>缺点：</strong>分辨率固定，无法自适应。你想想看，如果格子设成1cm，100m×100m的地图就要1亿个格子，内存直接爆炸</li>
+</ul>
+
+<h3>14.2 TSDF地图（Truncated Signed Distance Function）</h3>
+
+<p>TSDF，全称是截断符号距离函数。这个名字听着吓人，其实核心思想很简单：<strong>每个体素存一个距离值，表示这个体素到最近物体表面的距离</strong>。正数表示在物体外面，负数表示在物体里面，0就是表面。</p>
+
+<p>为什么要「截断」？因为离表面太远的地方，距离值就没意义了。我们只关心表面附近的一小段范围，比如±10cm。超出这个范围，直接截断掉。</p>
+
+<p>我在做RGB-D SLAM时用过TSDF。那时候用Kinect扫一个房间，TSDF地图重建出来的墙面非常平滑，比占据栅格地图细腻多了。</p>
+
+<pre><code>// TSDF更新伪代码
+for each voxel v:
+    // 计算体素到传感器光心的距离
+    d_voxel = distance(v, sensor_origin)
+    // 计算体素在深度图上的投影点
+    d_proj = depth_image(project(v))
+    // 计算符号距离
+    sdf = d_proj - d_voxel
+    // 截断
+    if sdf > truncation_threshold:
+        tsdf = 1
+    elif sdf < -truncation_threshold:
+        tsdf = -1
+    else:
+        tsdf = sdf / truncation_threshold
+    // 加权融合
+    tsdf_avg = (tsdf_avg * weight + tsdf) / (weight + 1)
+    weight += 1</code></pre>
+
+<div class="warning">
+  <p><strong>注意：</strong>TSDF地图对传感器精度要求比较高。我曾经用低成本的深度相机做TSDF建图，结果表面全是噪点，根本没法用。后来换了高精度激光雷达，效果才起来。所以，传感器不行的话，别硬上TSDF。</p>
+</div>
+
+<h3>14.3 ESDF地图（Euclidean Signed Distance Field）</h3>
+
+<p>ESDF和TSDF有点像，但目的完全不同。TSDF是为了<strong>建图</strong>，ESDF是为了<strong>规划</strong>。</p>
+
+<p>ESDF地图里，每个格子存的是到最近障碍物的欧几里得距离。你想想看，这对路径规划有多重要？机器人想知道「我离墙还有多远」，直接查一下ESDF就知道，不用实时计算碰撞检测。</p>
+
+<p>我做过一个AGV项目，在仓库里用ESDF做全局路径规划。效果出奇的好——机器人能贴着货架走，但永远不会撞上。因为ESDF给了它一个「安全距离」的直觉。</p>
+
+<p><strong>ESDF的计算方法：</strong></p>
+<ol>
+  <li>先从占据栅格地图或TSDF地图出发</li>
+  <li>用快速行进法（Fast Marching Method）或波前传播算法</li>
+  <li>从障碍物边界开始，向外一层层扩散距离值</li>
+</ol>
+
+<pre><code>// 波前传播算法（简化版）
+queue = all obstacle boundary cells
+while queue is not empty:
+    cell = queue.pop()
+    for each neighbor of cell:
+        new_dist = cell.distance + 1  // 假设格子大小为1
+        if new_dist < neighbor.distance:
+            neighbor.distance = new_dist
+            queue.push(neighbor)</code></pre>
+
+<div class="highlight">
+  <p><strong>关键区别：</strong>TSDF存的是到<strong>表面</strong>的距离（有正负），ESDF存的是到<strong>最近障碍物</strong>的距离（只有正数）。TSDF用于重建，ESDF用于规划。</p>
+</div>
+
+<h3>14.4 OctoMap八叉树地图</h3>
+
+<p>终于说到OctoMap了。这是我最喜欢的地图表示方法之一，因为它解决了占据栅格地图的致命问题——<strong>内存爆炸</strong>。</p>
+
+<p>OctoMap的思路很聪明：用八叉树来存储空间。如果一个区域全是空闲或者全是占用，就不往下细分了。只有那些包含边界的区域，才递归细分到最高分辨率。</p>
+
+<p>举个例子，一个100m×100m×10m的仓库，如果用1cm分辨率的占据栅格地图，需要10亿个体素，内存至少4GB。但用OctoMap，可能只需要几十MB，因为大部分空间都是空的。</p>
+
+<p><strong>OctoMap的核心操作：</strong></p>
+<ul>
+  <li><strong>插入观测：</strong>从根节点开始，沿着树往下走，更新每个节点的占据概率</li>
+  <li><strong>剪枝：</strong>如果一个节点的所有子节点状态相同，就把子节点删掉，合并到父节点</li>
+  <li><strong>查询：</strong>给定一个3D点，从根节点往下找，直到叶子节点，返回占据概率</li>
+</ul>
+
+<pre><code>// OctoMap插入观测伪代码
+function insert_observation(node, point, sensor_origin):
+    if node.is_leaf():
+        node.update_probability(point, sensor_origin)
+        return
+    child_index = get_child_index(point, node.center)
+    insert_observation(node.children[child_index], point, sensor_origin)
+    // 剪枝检查
+    if all children have same state:
+        node.merge_children()</code></pre>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你做的是大场景3D建图，比如室外园区或者大型仓库，OctoMap几乎是唯一的选择。ROS里也有现成的octomap库，直接拿来用就行。不过要注意，OctoMap的更新速度比占据栅格地图慢一些，因为涉及树的遍历和剪枝。</p>
+</div>
+
+<h3>14.5 四种地图的对比总结</h3>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:20px 0;">
+  <tr style="background:#3498db; color:white;">
+    <th>特性</th>
+    <th>占据栅格地图</th>
+    <th>TSDF地图</th>
+    <th>ESDF地图</th>
+    <th>OctoMap</th>
+  </tr>
+  <tr>
+    <td>数据结构</td>
+    <td>2D/3D数组</td>
+    <td>3D体素网格</td>
+    <td>3D体素网格</td>
+    <td>八叉树</td>
+  </tr>
+  <tr>
+    <td>存储内容</td>
+    <td>占据概率</td>
+    <td>截断符号距离</td>
+    <td>欧几里得距离</td>
+    <td>占据概率</td>
+  </tr>
+  <tr>
+    <td>内存效率</td>
+    <td>低（固定分辨率）</td>
+    <td>中</td>
+    <td>中</td>
+    <td>高（自适应）</td>
+  </tr>
+  <tr>
+    <td>主要用途</td>
+    <td>2D导航、避障</td>
+    <td>3D重建、SLAM</td>
+    <td>运动规划</td>
+    <td>大场景3D建图</td>
+  </tr>
+  <tr>
+    <td>更新速度</td>
+    <td>快</td>
+    <td>中</td>
+    <td>慢（需全局计算）</td>
+    <td>中</td>
+  </tr>
+  <tr>
+    <td>ROS支持</td>
+    <td>map_server, costmap_2d</td>
+    <td>voxblox, chisel</td>
+    <td>voxblox, fiesta</td>
+    <td>octomap_server</td>
+  </tr>
+</table>
+
+<p>嗯，看到这里你应该明白了。没有哪种地图是万能的。做2D导航，占据栅格地图就够了。做3D重建，TSDF是首选。做路径规划，ESDF最顺手。做大场景，OctoMap最省内存。</p>
+
+<p>我个人习惯是：<strong>先根据任务选地图，再根据地图选算法</strong>。别一上来就想着用最炫酷的，适合的才是最好的。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目里，用TSDF地图去做路径规划，结果发现每次查距离都要遍历整个体素网格，慢得要死。后来换成ESDF，速度提升了10倍。所以，<strong>建图用TSDF，规划用ESDF</strong>，这个原则别搞混了。</p>
+</div>
+
+<p>好了，这四种地图就讲到这里。每种地图都有它的脾气，摸透了就好用。下次你遇到地图选型的问题，不妨回头看看这张对比表，应该能帮你少走不少弯路。</p>
+        <div class="footer-nav">
+            <a href="13MultiSensorFusionSlam.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="15MapProcessOptimize.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

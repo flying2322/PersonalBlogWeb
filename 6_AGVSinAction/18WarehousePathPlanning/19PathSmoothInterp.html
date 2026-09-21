@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>19 路径平滑与插值</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="active">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>19 路径平滑与插值：贝塞尔曲线、B样条曲线、多项式插值</h2>
+
+<p>各位做AGV的同行，你们有没有遇到过这种情况？</p>
+<p>规划出来的路径，明明起点到终点都对了，但车子跑起来就是一顿一顿的。拐弯的时候，要么急停急转，要么直接撞货架。嗯，说白了，就是路径不够平滑。</p>
+<p>我入行第三年的时候，给一个大型电商仓库做项目。AGV在巷道里转弯，每次都要停下来原地旋转，效率低得让人抓狂。后来我才明白，问题出在路径规划只给了折线，没有做平滑处理。今天我们就聊聊怎么让AGV走得更顺溜。</p>
+
+<h3>为什么需要路径平滑？</h3>
+<p>AGV的运动学模型决定了它不能像理想质点那样瞬间改变方向。你想想看，差速轮也好，麦克纳姆轮也罢，都有最小转弯半径和加速度限制。如果路径上出现尖锐的拐角，AGV要么减速到零再转向，要么产生剧烈抖动。</p>
+<p>我在项目中遇到过最典型的情况：规划出的路径由一系列离散点组成，点与点之间用直线连接。AGV跑到拐点处，控制器突然给出一个很大的角速度指令，电机嗡嗡响，货物差点甩出去。这就是典型的「路径不平滑病」。</p>
+
+<div class="highlight">
+  <strong>核心目标：</strong> 在保证路径通过关键点的前提下，让路径曲率连续变化，且满足AGV的运动学约束。
+</div>
+
+<h3>三种主流平滑方法</h3>
+<p>我个人习惯把平滑方法分成三类：贝塞尔曲线、B样条曲线、多项式插值。它们各有各的脾气，选对了事半功倍。</p>
+
+<h4>1. 贝塞尔曲线</h4>
+<p>贝塞尔曲线是法国工程师皮埃尔·贝塞尔在雷诺汽车公司搞出来的。说白了，就是用几个控制点来「拉」出一条光滑曲线。</p>
+<p>它的数学形式很简单：</p>
+<pre><code>B(t) = Σ P_i * B_{i,n}(t),  t ∈ [0,1]
+
+其中 B_{i,n}(t) 是伯恩斯坦基函数：
+B_{i,n}(t) = C(n,i) * t^i * (1-t)^(n-i)</code></pre>
+
+<p>我建议初学者先从三次贝塞尔曲线入手。四个控制点，两个端点固定，中间两个点用来调节弯曲程度。在仓储场景中，我常用它来做转弯处的平滑过渡。</p>
+
+<div class="tip">
+  <strong>实战技巧：</strong> 贝塞尔曲线有个特点——它不通过中间控制点，只通过首尾两点。所以如果你要求路径必须经过某些关键位置（比如货架通道口），需要分段拼接贝塞尔曲线。
+</div>
+
+<p>举个例子，AGV要从A点走到B点，中间经过一个90度转弯。我会在转弯处插入两个控制点，让曲线平滑地绕过拐角。代码实现大致是这样：</p>
+<pre><code>def bezier_curve(p0, p1, p2, p3, num_points=100):
+    t = np.linspace(0, 1, num_points)
+    # 三次贝塞尔公式
+    B = (1-t)**3 * p0 + 3*(1-t)**2*t * p1 + 3*(1-t)*t**2 * p2 + t**3 * p3
+    return B</code></pre>
+
+<p>不过要注意，贝塞尔曲线是全局控制的。你动一个控制点，整条曲线都会变。这在某些场景下不太灵活。</p>
+
+<h4>2. B样条曲线</h4>
+<p>B样条曲线是贝塞尔曲线的升级版。它解决了全局控制的问题——每个控制点只影响局部区域。</p>
+<p>我记得有一次做密集存储仓库的项目，货架间距只有1.2米，AGV需要在狭窄通道里频繁变道。用贝塞尔曲线调了半天，总是顾此失彼。换成B样条后，问题迎刃而解。</p>
+
+<p>B样条的数学定义：</p>
+<pre><code>C(u) = Σ N_{i,p}(u) * P_i
+
+其中 N_{i,p}(u) 是p次B样条基函数，由节点向量 U 决定。</code></pre>
+
+<p>它的核心优势有三个：</p>
+<ul>
+  <li><strong>局部性：</strong> 移动一个控制点，只影响附近几段曲线</li>
+  <li><strong>连续性：</strong> 可以控制到C2连续（曲率连续）</li>
+  <li><strong>凸包性：</strong> 曲线始终在控制点形成的凸包内，不会乱跑</li>
+</ul>
+
+<div class="warning">
+  <strong>避坑指南：</strong> 我曾经在一条路径上用了均匀B样条，结果在路径末端出现了奇怪的抖动。后来发现是节点向量分布不合理。建议在路径曲率变化大的地方，适当加密节点。
+</div>
+
+<p>实际应用中，我常用三次B样条（p=3）。它既能保证C2连续，计算量又不大。代码示例：</p>
+<pre><code>def bspline_curve(control_points, degree=3, num_points=200):
+    # 生成节点向量（这里用均匀节点）
+    n = len(control_points)
+    knots = np.concatenate([
+        np.zeros(degree),
+        np.linspace(0, 1, n - degree + 1),
+        np.ones(degree)
+    ])
+    # 计算曲线上的点
+    t = np.linspace(0, 1, num_points)
+    curve = []
+    for ti in t:
+        # 找到ti所在的节点区间
+        span = find_span(n, degree, ti, knots)
+        # 计算基函数值
+        basis = basis_function(span, ti, degree, knots)
+        # 加权求和
+        point = np.sum([basis[i] * control_points[span - degree + i] for i in range(degree+1)], axis=0)
+        curve.append(point)
+    return np.array(curve)</code></pre>
+
+<h4>3. 多项式插值</h4>
+<p>多项式插值是最直接的方法——给定一系列路径点，找一个多项式函数穿过所有点。</p>
+<p>但这里有个坑：高次多项式容易产生龙格现象，也就是在端点附近剧烈振荡。我刚开始做的时候吃过这个亏，用10次多项式插值，结果路径在中间段扭成了麻花。</p>
+
+<p>所以我现在更推荐分段低次多项式插值，比如三次样条插值。它把路径分成若干段，每段用三次多项式，保证连接处一阶、二阶导数连续。</p>
+
+<pre><code>def cubic_spline_interpolation(x, y):
+    # 三次样条插值
+    n = len(x)
+    h = np.diff(x)
+    # 构建三对角矩阵求解系数
+    A = np.zeros((n, n))
+    b = np.zeros(n)
+    # ... 求解过程略
+    # 返回每段的多项式系数
+    return coefficients</code></pre>
+
+<div class="highlight">
+  <strong>我的选择建议：</strong>
+  <ul>
+    <li>简单场景（2-3个控制点）：用贝塞尔曲线，直观好调</li>
+    <li>复杂路径（多个控制点，需要局部调整）：用B样条曲线</li>
+    <li>要求严格通过所有给定点：用三次样条插值</li>
+  </ul>
+</div>
+
+<h3>知识体系总览</h3>
+<p>下面这张图是我自己整理的路径平滑方法对比，帮你快速建立整体认知：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">路径平滑与插值方法对比</text>
+  
+  <!-- 三个主分支 -->
+  <!-- 贝塞尔曲线 -->
+  <rect x="30" y="70" width="220" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="140" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="white">贝塞尔曲线</text>
+  
+  <rect x="30" y="130" width="220" height="120" rx="5" fill="#e8f4fd" stroke="#3498db" stroke-width="1"/>
+  <text x="140" y="155" text-anchor="middle" font-size="14" fill="#2c3e50">特点：全局控制</text>
+  <text x="140" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">通过首尾端点</text>
+  <text x="140" y="195" text-anchor="middle" font-size="14" fill="#2c3e50">适合：简单转弯</text>
+  <text x="140" y="215" text-anchor="middle" font-size="14" fill="#2c3e50">连续性：C1</text>
+  
+  <!-- B样条曲线 -->
+  <rect x="290" y="70" width="220" height="50" rx="8" fill="#e74c3c" opacity="0.9"/>
+  <text x="400" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="white">B样条曲线</text>
+  
+  <rect x="290" y="130" width="220" height="120" rx="5" fill="#fde8e8" stroke="#e74c3c" stroke-width="1"/>
+  <text x="400" y="155" text-anchor="middle" font-size="14" fill="#2c3e50">特点：局部控制</text>
+  <text x="400" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">不通过控制点</text>
+  <text x="400" y="195" text-anchor="middle" font-size="14" fill="#2c3e50">适合：复杂路径</text>
+  <text x="400" y="215" text-anchor="middle" font-size="14" fill="#2c3e50">连续性：C2</text>
+  
+  <!-- 多项式插值 -->
+  <rect x="550" y="70" width="220" height="50" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="660" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="white">多项式插值</text>
+  
+  <rect x="550" y="130" width="220" height="120" rx="5" fill="#e8f8f0" stroke="#27ae60" stroke-width="1"/>
+  <text x="660" y="155" text-anchor="middle" font-size="14" fill="#2c3e50">特点：严格通过点</text>
+  <text x="660" y="175" text-anchor="middle" font-size="14" fill="#2c3e50">分段低次更稳定</text>
+  <text x="660" y="195" text-anchor="middle" font-size="14" fill="#2c3e50">适合：精确路径</text>
+  <text x="660" y="215" text-anchor="middle" font-size="14" fill="#2c3e50">连续性：C2</text>
+  
+  <!-- 连接线 -->
+  <line x1="140" y1="250" x2="140" y2="300" stroke="#3498db" stroke-width="2"/>
+  <line x1="400" y1="250" x2="400" y2="300" stroke="#e74c3c" stroke-width="2"/>
+  <line x1="660" y1="250" x2="660" y2="300" stroke="#27ae60" stroke-width="2"/>
+  
+  <!-- 共同目标 -->
+  <rect x="200" y="300" width="400" height="50" rx="10" fill="#f39c12" opacity="0.9"/>
+  <text x="400" y="330" text-anchor="middle" font-size="18" font-weight="bold" fill="white">共同目标：曲率连续 + 运动学约束</text>
+  
+  <!-- 应用场景 -->
+  <rect x="100" y="380" width="600" height="100" rx="8" fill="#f5f5f5" stroke="#bdc3c7" stroke-width="1"/>
+  <text x="400" y="405" text-anchor="middle" font-size="16" font-weight="bold" fill="#2c3e50">典型应用场景</text>
+  <text x="400" y="430" text-anchor="middle" font-size="14" fill="#555">货架间转弯 → 贝塞尔曲线</text>
+  <text x="400" y="450" text-anchor="middle" font-size="14" fill="#555">多段路径拼接 → B样条曲线</text>
+  <text x="400" y="470" text-anchor="middle" font-size="14" fill="#555">精确通过站点 → 三次样条插值</text>
+</svg>
+
+<h3>实际项目中的选择策略</h3>
+<p>说了这么多理论，到底怎么选？我分享几个实战经验：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background-color:#3498db; color:white;">
+    <th>场景</th>
+    <th>推荐方法</th>
+    <th>原因</th>
+  </tr>
+  <tr>
+    <td>AGV在通道内直线行驶后转弯</td>
+    <td>贝塞尔曲线</td>
+    <td>控制点少，计算快，转弯平滑</td>
+  </tr>
+  <tr>
+    <td>多AGV协同，路径频繁调整</td>
+    <td>B样条曲线</td>
+    <td>局部调整不影响全局，实时性好</td>
+  </tr>
+  <tr>
+    <td>AGV需要精确停靠在货架前</td>
+    <td>三次样条插值</td>
+    <td>保证路径通过指定位置</td>
+  </tr>
+  <tr>
+    <td>高速运行（>2m/s）</td>
+    <td>B样条曲线</td>
+    <td>C2连续，加速度无突变</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <strong>我的个人习惯：</strong> 在项目初期，先用贝塞尔曲线快速验证路径可行性。等系统稳定后，再根据实际运行数据，切换到B样条或样条插值做精细化调优。别一上来就搞复杂的，容易把自己绕进去。
+</div>
+
+<p>最后说一句，路径平滑不是越光滑越好。你想想看，如果曲率变化太小，AGV转弯半径会很大，反而浪费仓库空间。关键是在平滑度和路径长度之间找到平衡点。这个度，得靠实际跑出来的数据慢慢调。</p>
+
+<hr style="border:1px solid #eee; margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="18DistributedPathPlanning.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="20VelocityPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

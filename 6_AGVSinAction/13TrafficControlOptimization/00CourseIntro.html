@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>AGV调度系统交通管制与优化 · 课程介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0e1a;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+            color: #1e1e2f;
+        }
+        .course-card {
+            max-width: 1280px;
+            width: 100%;
+            background: #f9faff;
+            border-radius: 2.5rem;
+            padding: 3rem 3.5rem;
+            position: relative;
+            box-shadow: 0 0 0 6px rgba(255, 50, 50, 0.25), 0 0 0 12px rgba(255, 80, 80, 0.08);
+        }
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: -12px;
+            border-radius: calc(2.5rem + 12px);
+            background: linear-gradient(145deg, #ff3b3b, #d9001a, #b3001a, #ff4d4d);
+            z-index: -1;
+            opacity: 0.35;
+            filter: blur(2px);
+        }
+        .course-title {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #b31b1b, #e62e2e, #ff5e5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+            border-left: 8px solid #e62e2e;
+            padding-left: 1.5rem;
+        }
+        .subhead {
+            font-size: 1.1rem;
+            color: #4a4a6a;
+            margin-bottom: 2.5rem;
+            padding-left: 2.3rem;
+            border-bottom: 1px solid rgba(200, 50, 50, 0.15);
+            padding-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead span {
+            background: #f0e6e6;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #a52a2a;
+        }
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1.2rem 0;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 2px solid rgba(230, 46, 46, 0.25);
+            padding-bottom: 0.5rem;
+        }
+        .section-title i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #e62e2e;
+            border-radius: 50%;
+        }
+        .section-title small {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #6b6b8a;
+            margin-left: 0.5rem;
+        }
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 1rem 0;
+        }
+        .info-block {
+            background: rgba(255, 245, 245, 0.6);
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 46, 46, 0.15);
+        }
+        .info-block h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #b31b1b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .info-block ul {
+            list-style: none;
+            padding: 0;
+        }
+        .info-block li {
+            padding: 0.4rem 0 0.4rem 1.8rem;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23e62e2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>') left center no-repeat;
+            background-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: #2d2d44;
+        }
+        .info-block li strong {
+            color: #a02929;
+        }
+        .syllabus-list {
+            margin: 1.8rem 0;
+            padding: 0;
+            list-style: none;
+        }
+        .syllabus-list li {
+            padding: 0.9rem 0 0.9rem 2.8rem;
+            border-bottom: 1px solid rgba(200, 60, 60, 0.08);
+            font-size: 1.05rem;
+            position: relative;
+            line-height: 1.6;
+        }
+        .syllabus-list li:last-child {
+            border-bottom: none;
+        }
+        .syllabus-list li::before {
+            content: attr(data-index);
+            position: absolute;
+            left: 0.2rem;
+            top: 0.9rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #c92a2a;
+            background: rgba(230, 46, 46, 0.08);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+        }
+        .syllabus-list li strong {
+            color: #b31b1b;
+            font-weight: 600;
+        }
+        .syllabus-desc {
+            display: block;
+            margin-top: 0.1rem;
+            font-size: 0.95rem;
+            color: #4b4b68;
+            letter-spacing: 0.01em;
+        }
+        .footer {
+            margin-top: 3.5rem;
+            padding-top: 1.8rem;
+            border-top: 2px solid rgba(230, 46, 46, 0.2);
+            text-align: center;
+        }
+        .footer a {
+            display: inline-block;
+            background: linear-gradient(135deg, #fce8e8, #fff);
+            padding: 0.9rem 2.8rem;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #a02929;
+            text-decoration: none;
+            border: 1px solid rgba(200, 50, 50, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(200, 30, 30, 0.08);
+        }
+        .footer a:hover {
+            background: linear-gradient(135deg, #ffd9d9, #ffe6e6);
+            border-color: #c92a2a;
+            box-shadow: 0 8px 18px rgba(200, 30, 30, 0.15);
+            transform: scale(1.01);
+            color: #8a1f1f;
+        }
+        @media (max-width: 800px) {
+            .course-card { padding: 2rem 1.5rem; }
+            .course-title { font-size: 2.4rem; }
+            .grid-2col { grid-template-columns: 1fr; gap: 1.2rem; }
+            .section-title { font-size: 1.6rem; }
+            .syllabus-list li { padding-left: 2.4rem; font-size: 0.98rem; }
+            .footer a { padding: 0.7rem 1.5rem; width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .course-card { padding: 1.5rem 1rem; border-radius: 2rem; }
+            .course-title { font-size: 2rem; border-left-width: 6px; padding-left: 0.8rem; }
+            .subhead { font-size: 0.9rem; padding-left: 1rem; flex-wrap: wrap; }
+            .info-block { padding: 1.2rem 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="course-card">
+    <h1 class="course-title">AGV调度系统交通管制与优化</h1>
+    <div class="subhead">
+        <span>🚦 智能调度 · 系统级实战</span>
+        <span>v2.0 · 30 章体系</span>
+    </div>
+    <div class="grid-2col">
+        <div class="info-block">
+            <h3>🎯 受益人群</h3>
+            <ul>
+                <li><strong>AGV/AMR 开发工程师</strong> — 深入调度与交通管制核心</li>
+                <li><strong>智能物流系统架构师</strong> — 构建高效多AGV协同系统</li>
+                <li><strong>机器人算法工程师</strong> — 路径规划、死锁检测与避碰</li>
+                <li><strong>自动化/物联网开发者</strong> — 通信协议、地图建模与部署</li>
+                <li><strong>高校学生/研究者</strong> — 运筹优化、机器学习在机器人中的应用</li>
+                <li><strong>智能制造/仓储项目经理</strong> — 系统设计、测试与运维全流程</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3>📈 学员收益</h3>
+            <ul>
+                <li><strong>掌握AGV交通管制完整体系</strong> — 从基础概念到前沿技术</li>
+                <li><strong>独立实现路径规划与死锁解除</strong> — Dijkstra/A*、死锁检测算法</li>
+                <li><strong>设计多AGV协同调度策略</strong> — 时间窗、资源预留、混合管制</li>
+                <li><strong>搭建仿真平台并验证算法</strong> — MATLAB/Simulink、Gazebo实战</li>
+                <li><strong>深入机器学习与数字孪生应用</strong> — 冲突预测、强化学习调度</li>
+                <li><strong>获得完整项目实战经验</strong> — 需求分析到部署运维全流程</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section-title">
+        <i></i> 课程大纲 <small>· 30 大章节，体系化进阶</small>
+    </div>
+    <ul class="syllabus-list">
+        <li data-index="1"><strong>AGV系统概述：</strong>AGV定义与发展历程、AGV在智能物流中的核心作用、AGV系统组成与分类。</li>
+        <li data-index="2"><strong>交通管制基础：</strong>交通管制概念与必要性、AGV路径冲突类型分析、交通管制核心目标。</li>
+        <li data-index="3"><strong>路径规划算法：</strong>Dijkstra算法原理与实现、A*算法原理与实现、动态路径规划策略。</li>
+        <li data-index="4"><strong>死锁检测与解除：</strong>死锁产生条件与模型、死锁检测算法、死锁解除策略与恢复机制。</li>
+        <li data-index="5"><strong>交通管制策略：</strong>基于时间窗的管制策略、基于资源预留的管制策略、混合管制策略设计。</li>
+        <li data-index="6"><strong>多AGV协同调度：</strong>任务分配与调度模型、协同避碰机制、多AGV系统性能评估指标。</li>
+        <li data-index="7"><strong>交通管制系统架构：</strong>集中式架构设计、分布式架构设计、混合式架构对比分析。</li>
+        <li data-index="8"><strong>通信协议与数据交互：</strong>AGV与上位机通信协议、实时数据交互机制、通信延迟处理策略。</li>
+        <li data-index="9"><strong>地图建模与环境感知：</strong>栅格地图建模方法、拓扑地图建模方法、动态环境感知与更新。</li>
+        <li data-index="10"><strong>任务调度与优先级管理：</strong>任务优先级定义与动态调整、任务调度算法（FIFO、EDF、SJF）、紧急任务抢占机制。</li>
+        <li data-index="11"><strong>路径冲突预测与预防：</strong>基于机器学习的冲突预测模型、预防性路径调整策略、冲突热点区域识别。</li>
+        <li data-index="12"><strong>交通管制仿真平台搭建：</strong>仿真工具选型（MATLAB/Simulink、Gazebo）、仿真场景构建、仿真结果分析。</li>
+        <li data-index="13"><strong>AGV定位与导航技术：</strong>磁条导航、激光SLAM导航、二维码导航、多传感器融合定位。</li>
+        <li data-index="14"><strong>交通管制中的安全机制：</strong>安全距离计算模型、紧急制动策略、故障容错与冗余设计。</li>
+        <li data-index="15"><strong>交通管制性能优化：</strong>吞吐量优化、平均等待时间优化、路径长度优化、能耗优化。</li>
+        <li data-index="16"><strong>动态障碍物避让：</strong>动态障碍物检测方法、避让路径重规划、避让优先级策略。</li>
+        <li data-index="17"><strong>交通管制规则库设计：</strong>规则定义与存储、规则推理引擎、规则动态更新机制。</li>
+        <li data-index="18"><strong>多区域交通管制：</strong>区域划分策略、区域间交接协议、全局与局部管制协调。</li>
+        <li data-index="19"><strong>交通管制系统测试与验证：</strong>单元测试方法、集成测试策略、压力测试与稳定性评估。</li>
+        <li data-index="20"><strong>AGV充电调度与交通管制：</strong>充电站布局优化、充电任务调度策略、充电与运输任务协同。</li>
+        <li data-index="21"><strong>交通管制中的机器学习应用：</strong>强化学习在路径规划中的应用、深度学习在冲突预测中的应用、迁移学习在跨场景应用。</li>
+        <li data-index="22"><strong>交通管制系统接口设计：</strong>RESTful API设计、WebSocket实时通信接口、数据库接口设计。</li>
+        <li data-index="23"><strong>交通管制日志与监控：</strong>日志记录规范、实时监控仪表盘设计、异常告警与处理流程。</li>
+        <li data-index="24"><strong>交通管制系统部署与运维：</strong>系统部署架构、容器化部署（Docker）、运维监控与自动化运维。</li>
+        <li data-index="25"><strong>交通管制系统安全与权限管理：</strong>用户认证与授权、数据加密与传输安全、系统安全审计。</li>
+        <li data-index="26"><strong>交通管制系统标准化与合规：</strong>行业标准（如VDA 5050）、安全规范（如ISO 3691-4）、合规性检查。</li>
+        <li data-index="27"><strong>交通管制系统案例分析：</strong>电商仓储AGV调度案例、制造业AGV调度案例、港口AGV调度案例。</li>
+        <li data-index="28"><strong>交通管制系统前沿技术：</strong>5G在AGV调度中的应用、边缘计算在交通管制中的应用、数字孪生技术。</li>
+        <li data-index="29"><strong>交通管制系统项目实战：</strong>需求分析、系统设计、编码实现、测试部署全流程。</li>
+        <li data-index="30"><strong>交通管制系统未来展望：</strong>AGV调度系统发展趋势、人工智能与交通管制深度融合、人机协作调度模式。</li>
+    </ul>
+    
+</div>
+</body>
+</html>

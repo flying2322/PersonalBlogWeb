@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>26 项目实战</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="active">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>26 仓储AGV任务调度与多车协同、上位机集成</h2>
+
+<p>各位同学，今天我们来聊聊仓储AGV项目中最核心、也最让人头疼的部分——任务调度与多车协同。说实话，我在这个领域摸爬滚打了十几年，见过太多AGV在仓库里“打架”的场景。有一次在华南某大型电商仓，12台AGV同时运行，结果有3台在同一个巷道里堵了整整20分钟，现场主管差点把对讲机摔了。嗯，从那以后，我对调度算法的敬畏心就特别重。</p>
+
+<h3>1.1 任务调度的本质：不是“谁有空谁干”</h3>
+
+<p>很多人以为任务调度就是“哪个车空闲，就把任务派给谁”。其实没那么简单。你想想看，仓库里几十台AGV，有的在充电，有的在搬运，有的在待命。如果单纯按空闲分配，很可能出现“近车不干活，远车跑断腿”的情况。</p>
+
+<p>我个人习惯把任务调度拆成三个层次：</p>
+
+<ul>
+  <li><strong>任务分配层</strong>：决定哪个任务由哪台车执行</li>
+  <li><strong>路径规划层</strong>：为每台车规划无冲突的行驶路径</li>
+  <li><strong>交通管理层</strong>：实时处理多车交汇、死锁等问题</li>
+</ul>
+
+<p>这三个层次缺一不可。我曾经在一个项目中只做了任务分配，忽略了路径规划，结果两台车在同一个货架前“面面相觑”，谁也动不了。那场面，尴尬得很。</p>
+
+<h3>1.2 多车协同的核心：避免“死锁”与“碰撞”</h3>
+
+<p>多车协同说白了就是两件事：别撞上，别堵死。但实现起来，坑特别多。</p>
+
+<div class="highlight">
+  <p><strong>核心原则：</strong>任何时刻，任何两台AGV的行驶路径不能有交集，除非它们有明确的优先级规则。</p>
+</div>
+
+<p>我常用的方法是“预留路径段”策略。每台AGV在行驶前，会向调度系统申请一段路径的独占权。系统批准后，其他AGV就不能进入这段路径。等AGV通过了，再释放这段路径。</p>
+
+<p>这里有个关键点：路径段的粒度。粒度太粗，比如整条巷道，那其他车就得等很久；粒度太细，比如每米一个段，那系统通信开销就爆炸了。我个人建议按AGV车身长度的1.5倍来划分，既安全又高效。</p>
+
+<h3>1.3 上位机集成的那些事</h3>
+
+<p>上位机，就是仓库管理系统（WMS）或者制造执行系统（MES）。AGV调度系统需要和它对接，接收任务指令，反馈执行状态。</p>
+
+<p>我见过最坑的集成方式是“轮询”。上位机每隔几秒问一次“有任务吗？”，AGV调度系统再问每台车“你忙完了吗？”——这延迟简直没法看。正确的做法是“事件驱动+消息队列”。</p>
+
+<p>下面是我常用的一个集成接口示例：</p>
+
+<pre><code>// 任务下发接口（上位机 -> AGV调度系统）
+POST /api/v1/tasks
+{
+  "task_id": "TASK20240101_001",
+  "type": "PICKUP",        // 取货
+  "source": "A-01-02",     // 起始货架
+  "destination": "B-03-01", // 目标货架
+  "priority": 1,           // 优先级，1最高
+  "deadline": 3600         // 超时时间（秒）
+}
+
+// 状态反馈接口（AGV调度系统 -> 上位机）
+POST /api/v1/status
+{
+  "agv_id": "AGV_003",
+  "task_id": "TASK20240101_001",
+  "status": "EXECUTING",   // 状态：IDLE/EXECUTING/COMPLETED/FAILED
+  "position": {"x": 12.5, "y": 8.3},
+  "battery": 78,
+  "timestamp": 1704067200
+}</code></pre>
+
+<div class="tip">
+  <p><strong>小技巧：</strong>状态反馈一定要带上时间戳。我曾经遇到上位机因为网络延迟，把旧状态当成新状态处理，导致任务重复下发。加上时间戳后，调度系统可以判断消息是否过期。</p>
+</div>
+
+<h3>1.4 任务调度算法：从简单到复杂</h3>
+
+<p>任务调度算法有很多种，我按实战经验给大家排个序：</p>
+
+<table>
+  <tr>
+    <th>算法</th>
+    <th>适用场景</th>
+    <th>复杂度</th>
+    <th>我的评价</th>
+  </tr>
+  <tr>
+    <td>先来先服务（FCFS）</td>
+    <td>任务少、车少</td>
+    <td>低</td>
+    <td>入门级，但容易饿死</td>
+  </tr>
+  <tr>
+    <td>最短路径优先（SPF）</td>
+    <td>任务均匀分布</td>
+    <td>中</td>
+    <td>比FCFS好，但会忽略优先级</td>
+  </tr>
+  <tr>
+    <td>拍卖算法</td>
+    <td>多车、多任务</td>
+    <td>高</td>
+    <td>我项目中最常用的，灵活</td>
+  </tr>
+  <tr>
+    <td>遗传算法</td>
+    <td>超大规模调度</td>
+    <td>极高</td>
+    <td>效果好，但实时性差，慎用</td>
+  </tr>
+</table>
+
+<p>我个人最推荐拍卖算法。每台AGV根据自身位置、电量、当前任务状态，对每个新任务“报价”。调度系统选择“性价比最高”的AGV来执行。这样既考虑了距离，也考虑了负载均衡。</p>
+
+<div class="warning">
+  <p><strong>避坑指南：</strong>我曾经在一个项目中用了遗传算法，结果每次调度计算要花3-5秒。仓库里任务密集的时候，AGV经常停在原地等指令。后来我换成了拍卖算法，计算时间降到50毫秒以内。所以，实时性要求高的场景，别碰遗传算法。</p>
+</div>
+
+<h3>1.5 多车协同的实战经验</h3>
+
+<p>多车协同最怕什么？死锁。两台车在交叉口互相等待，谁也不让谁。我遇到过最离谱的一次，4台车在十字路口形成了一个“完美闭环”，每台车都在等前车让路，结果全堵死了。</p>
+
+<p>解决死锁，我总结了三个方法：</p>
+
+<ol>
+  <li><strong>资源预分配</strong>：每台车在进入交叉口前，先申请所有需要的路径段。申请不到就原地等待，不进入交叉口。</li>
+  <li><strong>优先级回退</strong>：给每台车一个动态优先级。等待时间越长，优先级越高。这样死锁时，等待最久的车会获得通行权。</li>
+  <li><strong>人工干预接口</strong>：留一个手动解锁的API。万一算法失效，操作员可以手动指定哪台车先走。</li>
+</ol>
+
+<p>嗯，这里要注意，方法3是最后的保底手段。我一般只在调试阶段用，正式上线后很少用到。</p>
+
+<h3>1.6 上位机集成的关键点</h3>
+
+<p>上位机集成，说白了就是“对上位机说人话”。很多AGV调度系统喜欢用自己定义的协议，结果上位机那边对接起来痛苦得要命。我建议直接用RESTful API，JSON格式，简单明了。</p>
+
+<p>另外，一定要做“心跳检测”。AGV调度系统每隔5秒向上位机发送一次心跳，上位机如果连续3次没收到，就认为调度系统挂了，触发报警。这个机制救过我很多次。</p>
+
+<p>下面是一个心跳的示例：</p>
+
+<pre><code>// 心跳请求（AGV调度系统 -> 上位机）
+GET /api/v1/heartbeat
+Response:
+{
+  "status": "OK",
+  "agv_count": 15,
+  "active_tasks": 23,
+  "system_load": 0.65
+}</code></pre>
+
+<div class="highlight">
+  <p><strong>核心要点：</strong>心跳里带上系统负载信息，上位机可以根据负载动态调整任务下发频率。负载高的时候少发任务，负载低的时候多发。这样整个系统会更稳定。</p>
+</div>
+
+<h3>1.7 本章知识体系总览</h3>
+
+<p>为了让大家更直观地理解本章的知识结构，我画了一张流程图：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">仓储AGV任务调度与多车协同知识体系</text>
+  
+  <!-- 第一层：上位机 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">上位机（WMS/MES）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：任务调度 -->
+  <rect x="250" y="160" width="300" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="400" y="190" text-anchor="middle" font-size="16" fill="white" font-weight="bold">任务调度层（分配+优先级+拍卖）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="210" x2="400" y2="250" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：路径规划 -->
+  <rect x="250" y="250" width="300" height="50" rx="8" fill="#27ae60" stroke="#229954" stroke-width="2"/>
+  <text x="400" y="280" text-anchor="middle" font-size="16" fill="white" font-weight="bold">路径规划层（预留路径段）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="300" x2="400" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：交通管理 -->
+  <rect x="250" y="340" width="300" height="50" rx="8" fill="#f39c12" stroke="#e67e22" stroke-width="2"/>
+  <text x="400" y="370" text-anchor="middle" font-size="16" fill="white" font-weight="bold">交通管理层（死锁+碰撞+心跳）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="390" x2="400" y2="430" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第五层：AGV车队 -->
+  <rect x="250" y="430" width="300" height="50" rx="8" fill="#8e44ad" stroke="#7d3c98" stroke-width="2"/>
+  <text x="400" y="460" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV车队（多车协同执行）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边说明 -->
+  <text x="600" y="100" font-size="12" fill="#7f8c8d">事件驱动+消息队列</text>
+  <text x="600" y="190" font-size="12" fill="#7f8c8d">拍卖算法（推荐）</text>
+  <text x="600" y="280" font-size="12" fill="#7f8c8d">路径段粒度：1.5倍车长</text>
+  <text x="600" y="370" font-size="12" fill="#7f8c8d">优先级回退+人工干预</text>
+  <text x="600" y="460" font-size="12" fill="#7f8c8d">心跳检测（5秒间隔）</text>
+</svg>
+
+<p>这张图把整个调度流程串起来了。从上位机下发任务，到任务调度层分配，再到路径规划层规划路线，最后交通管理层确保多车安全运行。每一层都有它的职责，缺一不可。</p>
+
+<p>好了，本章的内容就到这里。任务调度与多车协同是个大话题，我们后面还会深入讲具体的算法实现和代码调试。记住一句话：调度系统做得好不好，直接决定了AGV车队是“高效协作”还是“互相添乱”。</p>
+
+<div class="footer-nav">
+            <a href="25WarehouseAgvNavMapping.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="27WarehouseAgvTestOptimize.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

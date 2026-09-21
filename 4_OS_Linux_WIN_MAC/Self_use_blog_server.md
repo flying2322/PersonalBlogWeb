@@ -18,4 +18,12 @@ Then check whether the docsify was installed successfully.
 - pure.css
 - dolphin.css
 
+---
+
+## Production deploy (Docsify + AGVS HTML)
+
+See **[deploy/README.md](../deploy/README.md)** and sample Nginx config **[deploy/nginx-personal-blog.conf](../deploy/nginx-personal-blog.conf)**.
+
+`6_AGVSinAction/` is static HTML — no extra Nginx location needed if `root` points at the repo.
+
 

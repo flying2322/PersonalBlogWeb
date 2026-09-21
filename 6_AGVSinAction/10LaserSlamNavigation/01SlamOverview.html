@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 SLAM技术概述</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01SlamOverview.html" class="active">1 SLAM技术概述</a></li>
+<li><a href="02RosEnvironment.html" class="">2 ROS环境搭建</a></li>
+<li><a href="03LidarSelectionDriver.html" class="">3 激光雷达选型与驱动</a></li>
+<li><a href="04CoordinateTransform.html" class="">4 坐标变换基础</a></li>
+<li><a href="05OdometerModel.html" class="">5 里程计模型</a></li>
+<li><a href="06SensorFusionBasics.html" class="">6 传感器融合基础</a></li>
+<li><a href="07GmappingPrinciple.html" class="">7 Gmapping算法原理</a></li>
+<li><a href="08GmappingMapping.html" class="">8 Gmapping建图实战</a></li>
+<li><a href="09CartographerPrinciple.html" class="">9 Cartographer算法原理</a></li>
+<li><a href="10CartographerMapping.html" class="">10 Cartographer建图实战</a></li>
+<li><a href="11HectorSlam.html" class="">11 Hector SLAM原理</a></li>
+<li><a href="12KartoSlam.html" class="">12 Karto SLAM原理</a></li>
+<li><a href="13MultiSensorFusionSlam.html" class="">13 多传感器融合SLAM</a></li>
+<li><a href="14MapRepresentation.html" class="">14 地图表示方法</a></li>
+<li><a href="15MapProcessOptimize.html" class="">15 地图处理与优化</a></li>
+<li><a href="16GlobalPathPlanning.html" class="">16 全局路径规划</a></li>
+<li><a href="17LocalPathPlanning.html" class="">17 局部路径规划</a></li>
+<li><a href="18MoveBaseFramework.html" class="">18 move_base框架</a></li>
+<li><a href="19AmclPrinciple.html" class="">19 AMCL定位原理</a></li>
+<li><a href="20AmclTuning.html" class="">20 AMCL实战调优</a></li>
+<li><a href="21NavStackPractice.html" class="">21 导航栈综合实战</a></li>
+<li><a href="22DynamicObstacleAvoid.html" class="">22 动态障碍物避障</a></li>
+<li><a href="23MultiAgvCoopNav.html" class="">23 多AGV协同导航</a></li>
+<li><a href="24NavPerformanceEval.html" class="">24 导航性能评估</a></li>
+<li><a href="25SlamAlgoCompare.html" class="">25 SLAM算法对比选型</a></li>
+<li><a href="26IndustrialAgvCase.html" class="">26 工业AGV实战案例</a></li>
+<li><a href="27ServiceRobotNavCase.html" class="">27 服务机器人导航案例</a></li>
+<li><a href="28OutdoorAgvNav.html" class="">28 室外AGV导航</a></li>
+<li><a href="29SlamFrontierTech.html" class="">29 SLAM前沿技术</a></li>
+<li><a href="30CourseSummaryDefense.html" class="">30 课程总结与项目答辩</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 SLAM技术概述：AGV导航需求分析、SLAM技术发展史、激光SLAM vs 视觉SLAM、课程项目总览</h2>
+
+<h3>1.1 为什么AGV需要SLAM？——从实际需求说起</h3>
+
+<p>大家好，我是你们这门课的主讲。先聊聊AGV导航这件事。</p>
+
+<p>你想想看，一台AGV要在工厂里跑，它得知道三件事：<strong>我在哪？我要去哪？怎么去？</strong> 说白了，就是定位、规划、控制。但这里有个核心问题——<strong>环境是未知的</strong>。</p>
+
+<p>我2016年刚入行时，跟过一个项目。客户要求AGV在2000平米的仓库里自主运行，但现场没有铺设磁条，也没有二维码。当时我们试过惯性导航，结果跑了半小时就偏了半米。嗯，那会儿我就意识到：<strong>没有地图，AGV就是个瞎子</strong>。</p>
+
+<p>AGV导航需求，我总结下来就四点：</p>
+
+<ul>
+  <li><strong>高精度定位</strong>：±5cm以内，甚至更高。货架对接时差1cm就撞上了。</li>
+  <li><strong>实时性</strong>：控制周期10Hz以上，定位更新不能滞后。</li>
+  <li><strong>鲁棒性</strong>：光照变化、动态障碍物、地面打滑，都不能丢定位。</li>
+  <li><strong>低成本</strong>：工业场景下，传感器成本是硬约束。</li>
+</ul>
+
+<p>这些需求，传统导航方式（磁条、二维码、UWB）很难同时满足。于是，SLAM技术就登场了。</p>
+
+<div class="highlight">
+  <p><strong>核心观点</strong>：SLAM不是炫技，是AGV在未知环境中自主导航的刚需。没有SLAM，AGV只能活在「温室」里。</p>
+</div>
+
+<h3>1.2 SLAM技术发展史——从理论到落地</h3>
+
+<p>SLAM这个概念，最早是1986年ICRA会议上提出的。当时大家还在用卡尔曼滤波做机器人定位。我读研时翻过那篇经典论文，说实话，公式推导看得头皮发麻。</p>
+
+<p>但技术的发展，往往是「理论先行，工程滞后」。SLAM真正在AGV上大规模应用，也就是近七八年的事。</p>
+
+<p>我按时间线梳理一下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>阶段</th>
+      <th>时间</th>
+      <th>代表方法</th>
+      <th>特点</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>萌芽期</td>
+      <td>1986-2000</td>
+      <td>EKF-SLAM</td>
+      <td>理论奠基，计算量大，只能处理小场景</td>
+    </tr>
+    <tr>
+      <td>发展期</td>
+      <td>2000-2010</td>
+      <td>FastSLAM、GraphSLAM</td>
+      <td>粒子滤波、图优化，精度提升</td>
+    </tr>
+    <tr>
+      <td>成熟期</td>
+      <td>2010-2016</td>
+      <td>ORB-SLAM、LOAM</td>
+      <td>视觉/激光SLAM各自成熟，开源框架涌现</td>
+    </tr>
+    <tr>
+      <td>落地期</td>
+      <td>2016-至今</td>
+      <td>Cartographer、VINS-Mono</td>
+      <td>工程化、多传感器融合、低成本方案</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人印象最深的是2016年Google开源Cartographer。那会儿我正好在做一个仓储AGV项目，之前用GMapping建图，回环检测一直搞不定。换了Cartographer后，2000平米的地图，闭环误差从30cm降到了5cm以内。嗯，这就是开源的力量。</p>
+
+<div class="tip">
+  <p><strong>避坑指南</strong>：我曾经在项目里迷信「最新算法」，结果发现ORB-SLAM在低纹理仓库里根本跑不起来。选算法，一定要看场景，别追新。</p>
+</div>
+
+<h3>1.3 激光SLAM vs 视觉SLAM——怎么选？</h3>
+
+<p>这是AGV选型时最常被问到的问题。我直接说结论：<strong>没有绝对的好坏，只有适不适合</strong>。</p>
+
+<p>先看对比：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>维度</th>
+      <th>激光SLAM</th>
+      <th>视觉SLAM</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>传感器</td>
+      <td>单线/多线激光雷达</td>
+      <td>单目/双目/深度相机</td>
+    </tr>
+    <tr>
+      <td>精度</td>
+      <td>高（毫米级）</td>
+      <td>中（厘米级）</td>
+    </tr>
+    <tr>
+      <td>鲁棒性</td>
+      <td>不受光照影响</td>
+      <td>受光照、纹理影响大</td>
+    </tr>
+    <tr>
+      <td>成本</td>
+      <td>高（单线雷达千元起）</td>
+      <td>低（相机百元级）</td>
+    </tr>
+    <tr>
+      <td>地图表达</td>
+      <td>2D栅格/3D点云</td>
+      <td>稀疏/半稠密点云</td>
+    </tr>
+    <tr>
+      <td>典型场景</td>
+      <td>室内结构化环境</td>
+      <td>室内外、有纹理环境</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>我个人的经验是：</p>
+<ul>
+  <li><strong>室内AGV</strong>（工厂、仓库）：首选激光SLAM。精度高、稳定，晚上关灯也能跑。</li>
+  <li><strong>室外AGV</strong>（园区、港口）：考虑视觉SLAM或激光+视觉融合。激光在室外受天气影响大。</li>
+  <li><strong>成本敏感</strong>：视觉SLAM是出路，但要做好光照补偿和纹理增强。</li>
+</ul>
+
+<p>你可能会问：能不能两个都用？当然可以。我做过一个项目，激光SLAM做主定位，视觉做辅助回环检测。效果不错，但代价是计算量翻倍。嗯，这里要注意：<strong>多传感器融合不是简单叠加，而是冗余与互补的平衡</strong>。</p>
+
+<div class="warning">
+  <p><strong>警告</strong>：别以为视觉SLAM便宜就无脑上。我曾经在一个全是白墙的仓库里试过单目SLAM，结果跑了10分钟就丢了。视觉SLAM对纹理的依赖，比你想象的大得多。</p>
+</div>
+
+<h3>1.4 课程项目总览——我们要做什么？</h3>
+
+<p>这门课不是纯理论课。我们最终要落地一个<strong>完整的AGV激光SLAM导航系统</strong>。</p>
+
+<p>我画了一张图，帮你理清整个知识体系：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">AGV激光SLAM导航技术体系</text>
+  
+  <!-- 顶层：传感器 -->
+  <rect x="300" y="70" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="16" fill="white" font-weight="bold">传感器层</text>
+  <text x="400" y="115" text-anchor="middle" font-size="12" fill="#ecf0f1">激光雷达 + IMU + 里程计</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="120" x2="400" y2="160" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第二层：SLAM前端 -->
+  <rect x="250" y="160" width="300" height="50" rx="8" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="400" y="185" text-anchor="middle" font-size="16" fill="white" font-weight="bold">SLAM前端</text>
+  <text x="400" y="200" text-anchor="middle" font-size="12" fill="#ecf0f1">扫描匹配 · 特征提取 · 帧间位姿估计</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="210" x2="400" y2="250" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第三层：SLAM后端 -->
+  <rect x="250" y="250" width="300" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="400" y="275" text-anchor="middle" font-size="16" fill="white" font-weight="bold">SLAM后端</text>
+  <text x="400" y="290" text-anchor="middle" font-size="12" fill="#ecf0f1">图优化 · 回环检测 · 全局地图构建</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="300" x2="400" y2="340" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 第四层：导航 -->
+  <rect x="250" y="340" width="300" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="400" y="365" text-anchor="middle" font-size="16" fill="white" font-weight="bold">导航规划</text>
+  <text x="400" y="380" text-anchor="middle" font-size="12" fill="#ecf0f1">全局路径规划 · 局部避障 · 运动控制</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="390" x2="400" y2="430" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底层：应用 -->
+  <rect x="250" y="430" width="300" height="50" rx="8" fill="#1abc9c" stroke="#16a085" stroke-width="2"/>
+  <text x="400" y="455" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV应用层</text>
+  <text x="400" y="470" text-anchor="middle" font-size="12" fill="#ecf0f1">任务调度 · 状态监控 · 人机交互</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#2c3e50"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边标注 -->
+  <text x="120" y="185" text-anchor="middle" font-size="14" fill="#7f8c8d" transform="rotate(-90,120,185)">第2-5章</text>
+  <text x="120" y="275" text-anchor="middle" font-size="14" fill="#7f8c8d" transform="rotate(-90,120,275)">第6-10章</text>
+  <text x="120" y="365" text-anchor="middle" font-size="14" fill="#7f8c8d" transform="rotate(-90,120,365)">第11-15章</text>
+  <text x="120" y="455" text-anchor="middle" font-size="14" fill="#7f8c8d" transform="rotate(-90,120,455)">第16-20章</text>
+</svg>
+
+<p>整个课程分四个模块：</p>
+<ol>
+  <li><strong>传感器与ROS基础</strong>（第2-5章）：激光雷达驱动、IMU标定、里程计模型。这部分我会带你手写一个激光雷达驱动节点。</li>
+  <li><strong>SLAM建图与定位</strong>（第6-10章）：GMapping、Cartographer、Hector SLAM的源码级解析。我们会对比三种算法的优劣。</li>
+  <li><strong>导航规划与控制</strong>（第11-15章）：A*全局路径规划、DWA局部避障、PID运动控制。我会分享一个实际项目中的避障调参经验。</li>
+  <li><strong>系统集成与实战</strong>（第16-20章）：多传感器融合、地图管理、任务调度。最终我们会跑通一个完整的AGV导航Demo。</li>
+</ol>
+
+<div class="highlight">
+  <p><strong>课程目标</strong>：学完这门课，你能独立搭建一套AGV激光SLAM导航系统。从传感器选型到算法调优，再到系统集成，全链路打通。</p>
+</div>
+
+<p>好了，第一章就到这里。下一章我们开始动手——先搞定ROS环境搭建和激光雷达驱动。嗯，到时候记得把Ubuntu装好，我们直接上代码。</p>
+
+<div class="tip">
+  <p><strong>课后思考</strong>：你现在的AGV项目，用的是哪种导航方式？如果换成SLAM，你觉得最大的挑战是什么？欢迎在评论区留言，我会挑几个典型问题在后续章节中解答。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02RosEnvironment.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

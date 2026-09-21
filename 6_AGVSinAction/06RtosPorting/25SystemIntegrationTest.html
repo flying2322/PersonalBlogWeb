@@ -1,0 +1,410 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>25 系统集成测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01ControllerOverview.html" class="">1 AGV控制器概述</a></li>
+<li><a href="02RtosKernelBasics.html" class="">2 RTOS内核基础</a></li>
+<li><a href="03PortingEnvironment.html" class="">3 移植环境搭建</a></li>
+<li><a href="04StartupAndLinker.html" class="">4 启动文件与链接脚本</a></li>
+<li><a href="05RtosClockTimer.html" class="">5 RTOS时钟与定时器</a></li>
+<li><a href="06TaskCreateManage.html" class="">6 任务创建与管理</a></li>
+<li><a href="07SchedulerImplementation.html" class="">7 调度器实现</a></li>
+<li><a href="08InterruptManagement.html" class="">8 中断管理</a></li>
+<li><a href="09SyncAndCommunication.html" class="">9 同步与通信机制</a></li>
+<li><a href="10MemoryManagement.html" class="">10 内存管理</a></li>
+<li><a href="11CpuPortInterface.html" class="">11 移植层接口（CPU Port）</a></li>
+<li><a href="12BspDevelopment.html" class="">12 板级支持包（BSP）开发</a></li>
+<li><a href="13AgvPeripheralDriver.html" class="">13 AGV专用外设驱动</a></li>
+<li><a href="14CanBusCommunication.html" class="">14 CAN总线通信</a></li>
+<li><a href="15WifiEthernet.html" class="">15 Wi-Fi/以太网通信</a></li>
+<li><a href="16FileSystemPorting.html" class="">16 文件系统移植</a></li>
+<li><a href="17SystemBootFlow.html" class="">17 系统启动流程</a></li>
+<li><a href="18DebugPerformance.html" class="">18 调试与性能分析</a></li>
+<li><a href="19LowPowerManagement.html" class="">19 低功耗管理</a></li>
+<li><a href="20SafetyReliability.html" class="">20 安全与可靠性</a></li>
+<li><a href="21MotionControlTask.html" class="">21 AGV运动控制任务</a></li>
+<li><a href="22SensorFusionTask.html" class="">22 传感器融合任务</a></li>
+<li><a href="23PathPlanningTask.html" class="">23 路径规划任务</a></li>
+<li><a href="24InterTaskDataflow.html" class="">24 任务间数据流设计</a></li>
+<li><a href="25SystemIntegrationTest.html" class="active">25 系统集成测试</a></li>
+<li><a href="26BootloaderDesign.html" class="">26 Bootloader设计</a></li>
+<li><a href="27ParameterTuning.html" class="">27 参数调优</a></li>
+<li><a href="28CommonIssues.html" class="">28 常见问题与解决方案</a></li>
+<li><a href="29FirmwareBuildPractice.html" class="">29 项目实战</a></li>
+<li><a href="30CourseSummaryAdvanced.html" class="">30 课程总结与进阶</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>25 系统集成测试：单元测试框架（Unity/CMock）、硬件在环（HIL）测试、压力测试</h2>
+
+<p>系统集成测试，说白了就是把所有零件拼起来，看看能不能跑得转。我见过太多项目，每个模块单独测都没问题，一合起来就崩。嗯，这里要讲的就是怎么避免这种尴尬。</p>
+
+<h3>25.1 单元测试框架：Unity + CMock</h3>
+
+<p>先说说单元测试。很多人觉得嵌入式搞单元测试太麻烦，我一开始也这么想。直到有一次，一个定时器中断的bug让我调了三天，最后发现是某个状态机跳转条件写反了。从那以后，我再也不敢跳过单元测试。</p>
+
+<h4>Unity：轻量级测试框架</h4>
+
+<p>Unity是专门为嵌入式设计的测试框架，说白了就是一套宏定义，帮你做断言和测试管理。我习惯把它直接放到工程目录下，不依赖任何操作系统。</p>
+
+<pre><code>// 一个简单的Unity测试用例
+#include "unity.h"
+#include "motor_controller.h"
+
+void setUp(void) {
+    // 每个测试用例执行前调用
+    motor_init();
+}
+
+void tearDown(void) {
+    // 每个测试用例执行后调用
+    motor_deinit();
+}
+
+void test_motor_set_speed_should_set_correct_pwm(void) {
+    motor_set_speed(50);
+    TEST_ASSERT_EQUAL_UINT16(500, pwm_get_duty());
+}
+
+void test_motor_set_speed_should_clamp_to_max(void) {
+    motor_set_speed(150);  // 超出范围
+    TEST_ASSERT_EQUAL_UINT16(1000, pwm_get_duty());
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_motor_set_speed_should_set_correct_pwm);
+    RUN_TEST(test_motor_set_speed_should_clamp_to_max);
+    return UNITY_END();
+}</code></pre>
+
+<p>你看，代码量不大，但能覆盖边界情况。我遇到过最坑的一次，就是速度值没做限幅，电机直接满速转，差点把测试台掀了。</p>
+
+<h4>CMock：自动生成桩函数</h4>
+
+<p>CMock是配合Unity用的，专门处理模块间的依赖。比如你的电机模块调用了ADC，测试时总不能真去采样吧？CMock会自动生成ADC的桩函数。</p>
+
+<pre><code>// 使用CMock生成的桩函数
+void test_motor_should_stop_when_adc_reading_high(void) {
+    // 模拟ADC返回高值
+    adc_read_ExpectAndReturn(ADC_CHANNEL_CURRENT, 3000);
+    
+    motor_update();
+    
+    TEST_ASSERT_EQUAL_UINT16(0, pwm_get_duty());
+}</code></pre>
+
+<p>我个人习惯是，每个模块至少写5个测试用例：正常值、边界值、异常值、空指针、超时。别嫌多，这些测试在后期能救你命。</p>
+
+<div class="tip">
+    <strong>小技巧：</strong> 测试用例命名用"模块_功能_预期行为"的格式，比如 motor_set_speed_should_clamp_to_max。这样看测试报告时一目了然。
+</div>
+
+<h3>25.2 硬件在环（HIL）测试</h3>
+
+<p>单元测试跑完了，但代码最终是要跑在硬件上的。HIL测试就是把真实控制器连到仿真环境里，模拟各种工况。说白了，就是让控制器以为自己在真车上跑。</p>
+
+<h4>HIL测试架构</h4>
+
+<p>我参与过一个AGV项目，HIL测试平台长这样：</p>
+
+<pre><code>+------------------+       CAN/IO       +------------------+
+|   AGV控制器       | &lt;----------------&gt; |   HIL仿真器       |
+|   (真实硬件)       |                   |   (实时仿真模型)   |
++------------------+                   +------------------+
+        |                                       |
+        | 调试串口                               | 上位机
+        v                                       v
+   +----------+                          +----------+
+   | 调试终端  |                          | 监控界面  |
+   +----------+                          +----------+</code></pre>
+
+<p>HIL仿真器里跑的是车辆动力学模型、传感器模型、执行器模型。控制器发一个PWM信号，仿真器就计算电机转速、车轮位置，再通过CAN总线把编码器值返回给控制器。</p>
+
+<div class="highlight">
+    <strong>关键点：</strong> HIL测试必须保证实时性。仿真步长通常设为1ms，如果仿真器计算超时，整个测试就废了。我遇到过仿真器CPU过载导致时序错乱，查了两天才发现是模型里有个死循环。
+</div>
+
+<h4>HIL测试用例设计</h4>
+
+<p>我一般把HIL测试分成三类：</p>
+
+<ul>
+    <li><strong>功能测试：</strong> 验证基本控制逻辑，比如直线行驶、原地转弯</li>
+    <li><strong>故障注入：</strong> 模拟传感器断线、电机堵转、通信超时</li>
+    <li><strong>极限工况：</strong> 满载爬坡、急刹车、连续颠簸路面</li>
+</ul>
+
+<p>举个例子，故障注入测试：</p>
+
+<pre><code>// HIL测试脚本片段（Python）
+def test_encoder_failure():
+    # 正常行驶
+    hil.set_motor_speed(1000)
+    time.sleep(2)
+    
+    # 注入编码器故障
+    hil.inject_fault("encoder_left", FAULT_DISCONNECT)
+    time.sleep(1)
+    
+    # 检查控制器是否进入安全模式
+    assert hil.get_controller_state() == STATE_SAFE_STOP
+    assert hil.get_alarm_code() == ALARM_ENCODER_LOST</code></pre>
+
+<p>我曾经在HIL测试中发现一个bug：编码器断线后，控制器没有立即停车，而是继续用最后一次有效值推算位置，结果车子跑偏了半米才触发保护。这个bug要是到真车上才暴露，后果不堪设想。</p>
+
+<div class="warning">
+    <strong>注意：</strong> HIL测试不能完全替代实车测试。仿真模型再精确，也模拟不了真实的轮胎磨损、路面摩擦系数变化。HIL的作用是提前暴露逻辑错误，而不是验证物理特性。
+</div>
+
+<h3>25.3 压力测试</h3>
+
+<p>压力测试，说白了就是往死里整你的系统。看看它在极限负载下会不会崩，崩了之后能不能自己恢复。</p>
+
+<h4>压力测试类型</h4>
+
+<table>
+    <tr>
+        <th>测试类型</th>
+        <th>测试方法</th>
+        <th>通过标准</th>
+    </tr>
+    <tr>
+        <td>CPU负载测试</td>
+        <td>同时运行所有任务，最高优先级任务占满CPU</td>
+        <td>低优先级任务不饿死，系统不崩溃</td>
+    </tr>
+    <tr>
+        <td>内存压力测试</td>
+        <td>反复申请释放内存，模拟内存碎片</td>
+        <td>无内存泄漏，无野指针</td>
+    </tr>
+    <tr>
+        <td>通信压力测试</td>
+        <td>CAN总线满负载发送，模拟总线冲突</td>
+        <td>关键消息不丢失，延迟在容忍范围内</td>
+    </tr>
+    <tr>
+        <td>长时间运行测试</td>
+        <td>连续运行72小时以上</td>
+        <td>无死机，无看门狗复位</td>
+    </tr>
+</table>
+
+<p>我印象最深的一次，是给一个AGV控制器做72小时压力测试。跑到第48小时，系统突然死机了。查日志发现是某个定时器任务里有个除法操作，除数为0导致硬件异常。这个bug在正常测试中根本不会触发，因为除数为0的条件极其罕见。但压力测试下，各种极端情况都出现了。</p>
+
+<h4>压力测试脚本示例</h4>
+
+<pre><code>// 内存压力测试
+void memory_stress_test(void) {
+    uint32_t *ptr;
+    uint32_t total_alloc = 0;
+    
+    while (1) {
+        // 随机大小申请内存
+        uint32_t size = rand() % 1024 + 1;
+        ptr = (uint32_t *)malloc(size * sizeof(uint32_t));
+        
+        if (ptr != NULL) {
+            // 写入并校验
+            for (uint32_t i = 0; i &lt; size; i++) {
+                ptr[i] = 0xDEADBEEF;
+            }
+            total_alloc += size;
+            
+            // 随机释放
+            if (rand() % 2) {
+                free(ptr);
+                total_alloc -= size;
+            }
+        }
+        
+        // 打印内存使用情况
+        if (total_alloc &gt; 100000) {
+            printf("Memory allocated: %lu bytes\n", total_alloc);
+        }
+        
+        // 延时防止看门狗复位
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+}</code></pre>
+
+<p>这个脚本看起来简单，但跑起来能暴露很多问题。我遇到过malloc返回NULL后没有处理，导致后续代码直接写空指针。也遇到过内存碎片化严重，明明总空闲内存还有，但就是申请不到连续大块。</p>
+
+<div class="tip">
+    <strong>建议：</strong> 压力测试最好在开发早期就开始跑。别等到所有功能都做完了再测，那时候改代码的成本太高了。我习惯每个迭代都跑一次72小时压力测试，虽然费时间，但能省下后期排查问题的精力。
+</div>
+
+<h3>25.4 测试报告与问题追踪</h3>
+
+<p>测试做完了，得有个报告。我一般用表格记录每个测试用例的结果：</p>
+
+<table>
+    <tr>
+        <th>测试ID</th>
+        <th>测试名称</th>
+        <th>结果</th>
+        <th>备注</th>
+    </tr>
+    <tr>
+        <td>UT-001</td>
+        <td>电机速度设置-正常值</td>
+        <td>通过</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>UT-002</td>
+        <td>电机速度设置-超限值</td>
+        <td>通过</td>
+        <td>-</td>
+    </tr>
+    <tr>
+        <td>HIL-001</td>
+        <td>编码器断线故障注入</td>
+        <td>失败</td>
+        <td>控制器未及时进入安全模式，已修复</td>
+    </tr>
+    <tr>
+        <td>STR-001</td>
+        <td>72小时长时间运行</td>
+        <td>通过</td>
+        <td>第48小时出现一次看门狗复位，已修复</td>
+    </tr>
+</table>
+
+<p>每个失败的测试用例，我都会记录根因分析和修复方案。这样下次回归测试时，能快速定位问题是否复发。</p>
+
+<div class="highlight">
+    <strong>总结：</strong> 单元测试保证代码质量，HIL测试验证系统集成，压力测试暴露极限问题。三者缺一不可。我见过太多项目只做单元测试，结果集成时崩得一塌糊涂。也见过只做HIL测试，结果代码里一堆低级bug。记住，测试不是走过场，是帮你省时间的。
+</div>
+
+<div class="footer-nav">
+            <a href="24InterTaskDataflow.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="26BootloaderDesign.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

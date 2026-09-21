@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>29 安全与合规</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01DispatchSystemOverview.html" class="">1 AGV调度系统概述</a></li>
+<li><a href="02TaskModelDataStruct.html" class="">2 任务建模与数据结构</a></li>
+<li><a href="03ShortestPathTopology.html" class="">3 最短路径与地图拓扑</a></li>
+<li><a href="04SingleTaskAllocation.html" class="">4 单任务分配策略</a></li>
+<li><a href="05BatchTaskAllocation.html" class="">5 多任务批量分配策略</a></li>
+<li><a href="06TimeWindowAllocation.html" class="">6 时间窗约束下的分配</a></li>
+<li><a href="07DynamicTaskInsert.html" class="">7 动态任务插入策略</a></li>
+<li><a href="08LoadBalance.html" class="">8 负载均衡策略</a></li>
+<li><a href="09DeadlockConflictAvoid.html" class="">9 死锁与冲突避免</a></li>
+<li><a href="10MultiAgvCoopDispatch.html" class="">10 多AGV协同调度</a></li>
+<li><a href="11ReinforcementLearningAlloc.html" class="">11 基于强化学习的分配策略</a></li>
+<li><a href="12GeneticAlgoAlloc.html" class="">12 基于遗传算法的分配优化</a></li>
+<li><a href="13ParticleSwarmAlloc.html" class="">13 基于粒子群算法的分配优化</a></li>
+<li><a href="14TaskPriority.html" class="">14 任务优先级策略</a></li>
+<li><a href="15ChargeAndTaskDispatch.html" class="">15 充电与任务联合调度</a></li>
+<li><a href="16ExceptionFaultTolerance.html" class="">16 异常处理与容错机制</a></li>
+<li><a href="17SimulationEnvironment.html" class="">17 仿真环境搭建</a></li>
+<li><a href="18PerformanceMetrics.html" class="">18 性能评估指标</a></li>
+<li><a href="19GoodsToPersonCase.html" class="">19 实际案例</a></li>
+<li><a href="20FactoryLineDispatchCase.html" class="">20 实际案例</a></li>
+<li><a href="21PortContainerCase.html" class="">21 实际案例</a></li>
+<li><a href="22RealtimeAllocOptimize.html" class="">22 任务分配策略的实时性优化</a></li>
+<li><a href="23CommDataSync.html" class="">23 通信与数据同步</a></li>
+<li><a href="24DynamicMapUpdate.html" class="">24 地图动态更新</a></li>
+<li><a href="25MultiObjectiveAlloc.html" class="">25 多目标优化分配</a></li>
+<li><a href="26TaskSplitMerge.html" class="">26 任务拆分与合并策略</a></li>
+<li><a href="27HumanMachineCoop.html" class="">27 人机协同调度</a></li>
+<li><a href="28SystemScalability.html" class="">28 系统可扩展性设计</a></li>
+<li><a href="29SafetyCompliance.html" class="active">29 安全与合规</a></li>
+<li><a href="30FutureFrontier.html" class="">30 未来趋势与前沿</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>29 安全与合规：AGV安全标准（ISO 3691-4）、紧急停止逻辑、安全区域划分</h2>
+
+<p>各位同行，今天我们来聊聊AGV调度系统里最不能含糊的一块——安全与合规。</p>
+
+<p>说实话，我见过太多项目，调度算法写得花里胡哨，结果现场验收时被安全评审卡住。为什么？因为安全不是功能，安全是底线。你想想看，一台几吨重的AGV在车间里跑，万一出点事，那可不是闹着玩的。</p>
+
+<p>我个人习惯，做任何AGV项目，第一件事不是写代码，而是先翻安全标准。今天我们就从ISO 3691-4讲起，把紧急停止和安全区域划分这两个核心逻辑掰开揉碎。</p>
+
+<h3>一、ISO 3691-4：AGV安全的“宪法”</h3>
+
+<p>ISO 3691-4，全称是“工业车辆 安全要求和验证 第4部分：无人驾驶工业车辆及其系统”。说白了，这就是AGV行业的“交规”。</p>
+
+<p>我记得2016年第一次接触这个标准时，觉得它又厚又绕。但后来发现，它其实就管三件事：</p>
+
+<ul>
+  <li><strong>AGV本体安全</strong>：车本身不能有机械伤害、电气风险</li>
+  <li><strong>功能安全</strong>：控制系统出故障时，车必须能安全停下来</li>
+  <li><strong>系统级安全</strong>：多车协同、人机交互时的安全策略</li>
+</ul>
+
+<p>这里有个关键点——ISO 3691-4要求AGV必须达到<strong>PLr（性能等级要求）</strong>。具体来说，紧急停止和安全相关的控制功能，至少要达到<strong>PL d</strong>级别。</p>
+
+<div class="highlight">
+  <p><strong>核心指标：</strong></p>
+  <ul>
+    <li>PL d：每小时危险失效概率在10⁻⁷到10⁻⁶之间</li>
+    <li>Category 3：单点故障不会导致安全功能丧失</li>
+    <li>DCavg（平均诊断覆盖率）≥ 90%</li>
+  </ul>
+</div>
+
+<p>我在项目中遇到过，有些厂商为了省钱，用普通继电器做急停回路。结果呢？现场测试时，急停按钮按下去，车还在滑行。这就是典型的PL等级不够。</p>
+
+<h3>二、紧急停止逻辑：不是按个按钮那么简单</h3>
+
+<p>紧急停止，大家觉得不就是按个红色蘑菇头按钮吗？其实没那么简单。</p>
+
+<p>真正的急停逻辑，要满足三个层次：</p>
+
+<ol>
+  <li><strong>硬件急停</strong>：独立于控制器的硬线回路，直接切断动力</li>
+  <li><strong>软件急停</strong>：通过安全PLC或安全继电器，执行安全停止程序</li>
+  <li><strong>系统急停</strong>：调度系统收到急停信号后，通知所有相关AGV停止</li>
+</ol>
+
+<p>我曾经在一个汽车零部件工厂踩过坑。当时只做了硬件急停，没做软件急停。结果有一次，AGV在转弯时急停，因为惯性，货物直接甩出去了。后来我们加了软件急停的减速曲线，才解决这个问题。</p>
+
+<div class="tip">
+  <p><strong>我的建议：</strong></p>
+  <p>急停逻辑一定要做“双通道”。什么意思？就是急停信号同时走两条独立的路径，一条到驱动控制器，一条到安全PLC。这样即使一条路径坏了，另一条还能工作。</p>
+</div>
+
+<p>下面是一个典型的急停逻辑流程图，我习惯用这种方式来梳理：</p>
+
+<svg width="720" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+    <style>
+      .box { fill: #e8f4f8; stroke: #2c3e50; stroke-width: 2; rx: 8; ry: 8; }
+      .box-red { fill: #fce4e4; stroke: #c0392b; stroke-width: 2; rx: 8; ry: 8; }
+      .box-green { fill: #e8f8e8; stroke: #27ae60; stroke-width: 2; rx: 8; ry: 8; }
+      .text { font-family: Arial, sans-serif; font-size: 14px; fill: #2c3e50; text-anchor: middle; }
+      .text-small { font-family: Arial, sans-serif; font-size: 12px; fill: #7f8c8d; text-anchor: middle; }
+      .line { stroke: #2c3e50; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .line-dash { stroke: #95a5a6; stroke-width: 1.5; fill: none; stroke-dasharray: 5,5; marker-end: url(#arrowhead); }
+    </style>
+  </defs>
+
+  <!-- 标题 -->
+  <text x="360" y="30" class="text" font-size="18" font-weight="bold">AGV紧急停止逻辑流程图</text>
+
+  <!-- 急停按钮 -->
+  <rect x="280" y="50" width="160" height="45" class="box-red"/>
+  <text x="360" y="78" class="text" fill="#c0392b" font-weight="bold">急停按钮按下</text>
+
+  <!-- 箭头 -->
+  <line x1="360" y1="95" x2="360" y2="125" class="line"/>
+
+  <!-- 判断 -->
+  <polygon points="360,125 440,160 360,195 280,160" fill="#fef9e7" stroke="#f39c12" stroke-width="2"/>
+  <text x="360" y="163" class="text" font-size="12">硬件回路</text>
+  <text x="360" y="178" class="text" font-size="12">是否断开？</text>
+
+  <!-- 是 -->
+  <text x="450" y="155" class="text-small" fill="#27ae60">是</text>
+  <line x1="440" y1="160" x2="520" y2="160" class="line"/>
+
+  <!-- 切断动力 -->
+  <rect x="520" y="140" width="160" height="40" class="box-green"/>
+  <text x="600" y="165" class="text" fill="#27ae60">切断动力电源</text>
+
+  <!-- 箭头向下 -->
+  <line x1="600" y1="180" x2="600" y2="210" class="line"/>
+
+  <!-- 安全PLC -->
+  <rect x="520" y="210" width="160" height="40" class="box"/>
+  <text x="600" y="235" class="text">安全PLC执行</text>
+
+  <!-- 箭头 -->
+  <line x1="600" y1="250" x2="600" y2="280" class="line"/>
+
+  <!-- 减速停止 -->
+  <rect x="520" y="280" width="160" height="40" class="box"/>
+  <text x="600" y="305" class="text">减速停止程序</text>
+
+  <!-- 箭头 -->
+  <line x1="600" y1="320" x2="600" y2="350" class="line"/>
+
+  <!-- 通知调度 -->
+  <rect x="520" y="350" width="160" height="40" class="box"/>
+  <text x="600" y="375" class="text">通知调度系统</text>
+
+  <!-- 否分支 -->
+  <text x="450" y="195" class="text-small" fill="#c0392b">否</text>
+  <line x1="360" y1="195" x2="360" y2="230" class="line-dash"/>
+
+  <!-- 软件急停 -->
+  <rect x="280" y="230" width="160" height="40" class="box"/>
+  <text x="360" y="255" class="text">软件急停触发</text>
+
+  <!-- 箭头 -->
+  <line x1="360" y1="270" x2="360" y2="300" class="line"/>
+
+  <!-- 安全停止 -->
+  <rect x="280" y="300" width="160" height="40" class="box"/>
+  <text x="360" y="325" class="text">安全停止程序</text>
+
+  <!-- 箭头 -->
+  <line x1="360" y1="340" x2="360" y2="370" class="line"/>
+
+  <!-- 合并 -->
+  <line x1="360" y1="370" x2="600" y2="370" class="line"/>
+</svg>
+
+<div class="warning">
+  <p><strong>⚠️ 重要提醒：</strong></p>
+  <p>急停复位后，AGV不能自动恢复运行。必须手动确认，并且要有一个“上电安全”机制——就是断电后重新上电，AGV不能自己动起来。</p>
+</div>
+
+<h3>三、安全区域划分：给AGV画个“安全圈”</h3>
+
+<p>安全区域划分，说白了就是给AGV的活动范围画圈。不同区域，安全要求不一样。</p>
+
+<p>我一般把安全区域分成三类：</p>
+
+<table>
+  <tr>
+    <th>区域类型</th>
+    <th>定义</th>
+    <th>安全要求</th>
+    <th>典型场景</th>
+  </tr>
+  <tr>
+    <td><strong>安全保护区</strong></td>
+    <td>AGV前方和周围的危险区域</td>
+    <td>必须安装激光雷达或安全触边，检测到障碍物立即停车</td>
+    <td>AGV行驶路径前方</td>
+  </tr>
+  <tr>
+    <td><strong>警告区</strong></td>
+    <td>安全保护区外围的预警区域</td>
+    <td>检测到障碍物时减速或发出声光报警</td>
+    <td>AGV转弯区域、交叉口</td>
+  </tr>
+  <tr>
+    <td><strong>禁止进入区</strong></td>
+    <td>AGV绝对不允许进入的区域</td>
+    <td>通过物理围栏或电子围栏实现，双重保护</td>
+    <td>人员通道、消防设备前</td>
+  </tr>
+</table>
+
+<p>这里有个细节——安全保护区的形状不是固定的。我记得在做一个物流仓库项目时，AGV要经过一个窄通道。如果按标准的安全保护区，AGV根本过不去。后来我们用了<strong>动态安全区域</strong>技术：AGV在直行时用矩形保护区，转弯时用扇形保护区。这样既安全，又保证了通行效率。</p>
+
+<div class="highlight">
+  <p><strong>动态安全区域配置示例（YAML格式）：</strong></p>
+  <pre><code>safety_zones:
+  forward_zone:
+    shape: rectangle
+    length: 1.5m   # 前方1.5米
+    width: 1.2m    # 车宽+0.4米
+    speed_limit: 0.8m/s
+  turn_zone:
+    shape: sector
+    radius: 2.0m
+    angle: 120°
+    speed_limit: 0.3m/s
+  warning_zone:
+    shape: rectangle
+    length: 3.0m
+    width: 2.0m
+    action: decelerate_to_0.5m/s</code></pre>
+</div>
+
+<h3>四、避坑指南：我踩过的三个坑</h3>
+
+<p>做AGV安全这么多年，我总结了几条血泪教训：</p>
+
+<ul>
+  <li><strong>坑一：安全区域和导航地图混在一起</strong>。我曾经把安全区域直接画在地图文件里，结果地图更新时，安全区域也跟着变了。后来我强制要求：安全区域必须独立存储，且只有安全工程师能修改。</li>
+  <li><strong>坑二：急停按钮位置不合理</strong>。有个项目，急停按钮装在AGV尾部。结果操作员站在车头，遇到紧急情况根本够不到。现在我的标准是：AGV前后各装一个急停按钮，且高度在1.2米到1.5米之间。</li>
+  <li><strong>坑三：忽视安全测试</strong>。有些团队做完安全功能就完事了，不做压力测试。我见过一个案例，AGV连续运行8小时后，安全PLC过热导致误触发急停。所以我现在要求：安全测试必须包含72小时连续运行测试。</li>
+</ul>
+
+<h3>五、总结</h3>
+
+<p>安全与合规，不是写在文档里的条款，而是刻在代码里的习惯。</p>
+
+<p>ISO 3691-4给了我们框架，紧急停止逻辑给了我们底线，安全区域划分给了我们空间。这三者缺一不可。</p>
+
+<p>嗯，今天就聊到这里。记住一句话：<strong>安全不是成本，是投资</strong>。你花在安全上的每一分钱，都会在关键时刻救你一命。</p>
+
+<div class="tip">
+  <p><strong>个人小贴士：</strong></p>
+  <p>每次做安全评审时，我都会问自己三个问题：</p>
+  <ol>
+    <li>如果AGV失控，最坏情况是什么？</li>
+    <li>如果安全功能失效，有没有备份？</li>
+    <li>现场操作员，能不能在3秒内让AGV停下来？</li>
+  </ol>
+  <p>这三个问题答不上来，说明安全还没做到位。</p>
+</div>
+
+        <div class="footer-nav">
+            <a href="28SystemScalability.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="30FutureFrontier.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

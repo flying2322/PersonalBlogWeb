@@ -1,0 +1,480 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>7 车辆管理模块</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02DispatchArchitecture.html" class="">2 调度系统架构设计</a></li>
+<li><a href="03TaskManagement.html" class="">3 任务管理模块</a></li>
+<li><a href="04PathPlanningBasics.html" class="">4 路径规划基础</a></li>
+<li><a href="05MultiAgvPathPlanning.html" class="">5 多车路径规划</a></li>
+<li><a href="06TrafficControlStrategy.html" class="">6 交通管制策略</a></li>
+<li><a href="07VehicleManagement.html" class="active">7 车辆管理模块</a></li>
+<li><a href="08CommunicationProtocol.html" class="">8 通信协议设计</a></li>
+<li><a href="09DataStorage.html" class="">9 数据存储方案</a></li>
+<li><a href="10DispatchAlgorithmBasics.html" class="">10 调度算法基础</a></li>
+<li><a href="11AdvancedDispatchAlgorithms.html" class="">11 高级调度算法</a></li>
+<li><a href="12RealtimeMonitorVisualization.html" class="">12 实时监控与可视化</a></li>
+<li><a href="13SimulationEnvironment.html" class="">13 仿真环境搭建</a></li>
+<li><a href="14SystemIntegrationTest.html" class="">14 系统集成测试</a></li>
+<li><a href="15DeployAndOps.html" class="">15 部署与运维</a></li>
+<li><a href="16SecurityAndPermission.html" class="">16 安全与权限</a></li>
+<li><a href="17PerformanceOptimization.html" class="">17 性能优化</a></li>
+<li><a href="18FaultRecovery.html" class="">18 故障恢复</a></li>
+<li><a href="19MultiAgvCooperation.html" class="">19 多车协同策略</a></li>
+<li><a href="20MesWmsIntegration.html" class="">20 与MES/WMS集成</a></li>
+<li><a href="21AgvNavigationTech.html" class="">21 AGV导航技术</a></li>
+<li><a href="22LocalizationAndMapping.html" class="">22 定位与地图构建</a></li>
+<li><a href="23MotionControlBasics.html" class="">23 运动控制基础</a></li>
+<li><a href="24MultiSensorFusion.html" class="">24 多传感器融合</a></li>
+<li><a href="25EdgeCloudCollaboration.html" class="">25 边缘计算与云端协同</a></li>
+<li><a href="26DigitalTwin.html" class="">26 数字孪生技术</a></li>
+<li><a href="27IndustryCaseAnalysis.html" class="">27 行业案例解析</a></li>
+<li><a href="28OpensourcePractice.html" class="">28 开源项目实践</a></li>
+<li><a href="29ProjectDeliveryPractice.html" class="">29 项目实战</a></li>
+<li><a href="30FutureTrends.html" class="">30 未来趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>7 车辆管理模块——注册、监控、电量与异常处理</h2>
+
+<p>车辆管理模块，说白了就是AGV调度系统的“户口本”加“体检中心”。</p>
+
+<p>一辆AGV要能干活，首先得在系统里有个合法身份。跑起来之后，你得盯着它别出乱子。电量低了要提醒，出故障了要处理。这些事，都归车辆管理模块管。</p>
+
+<p>我个人习惯把这块拆成四个核心功能：<strong>车辆注册、状态监控、电量管理、异常处理</strong>。咱们一个一个说。</p>
+
+<h3>7.1 车辆注册——给AGV上户口</h3>
+
+<p>新买回来的AGV，不能直接让它满厂跑。你得先在系统里登记一下。就像新员工入职，得录入工号、姓名、部门一样。</p>
+
+<p>注册时，系统会分配一个唯一的<strong>车辆ID</strong>。这个ID很重要，后续所有的调度指令、状态上报、日志记录，都靠它来识别是哪辆车。</p>
+
+<p>我建议注册信息至少包含以下几项：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>字段</th>
+            <th>说明</th>
+            <th>示例</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>vehicle_id</td>
+            <td>车辆唯一标识</td>
+            <td>AGV-001</td>
+        </tr>
+        <tr>
+            <td>vehicle_type</td>
+            <td>车型（如潜伏式、叉车式）</td>
+            <td>潜伏式</td>
+        </tr>
+        <tr>
+            <td>max_speed</td>
+            <td>最大速度（m/s）</td>
+            <td>1.5</td>
+        </tr>
+        <tr>
+            <td>battery_capacity</td>
+            <td>电池容量（Ah）</td>
+            <td>200</td>
+        </tr>
+        <tr>
+            <td>ip_address</td>
+            <td>通信IP地址</td>
+            <td>192.168.1.101</td>
+        </tr>
+        <tr>
+            <td>register_time</td>
+            <td>注册时间戳</td>
+            <td>2025-01-15 10:30:00</td>
+        </tr>
+    </tbody>
+</table>
+
+<p>注册接口的设计，我一般用RESTful风格。简单直接：</p>
+
+<pre><code>POST /api/v1/vehicles/register
+{
+    "vehicle_type": "潜伏式",
+    "max_speed": 1.5,
+    "battery_capacity": 200,
+    "ip_address": "192.168.1.101"
+}
+
+// 返回示例
+{
+    "code": 0,
+    "message": "success",
+    "data": {
+        "vehicle_id": "AGV-001",
+        "status": "idle"
+    }
+}
+</code></pre>
+
+<div class="tip">
+    <strong>小提示：</strong>注册时最好做一次“心跳测试”。确认AGV能正常通信，再把它标记为可用。不然注册了一堆离线车，调度系统会懵。
+</div>
+
+<h3>7.2 状态监控——实时盯着每一辆车</h3>
+
+<p>车辆注册好了，接下来就是监控。AGV跑起来之后，状态是实时变化的。你得知道它当前在哪儿、在干嘛、有没有出问题。</p>
+
+<p>状态监控的核心，是<strong>周期性上报</strong>。AGV每隔几百毫秒，就会向调度系统发一次状态包。我见过有些系统用1秒上报一次，其实太慢了。AGV跑得快的时候，1秒能跑出去好几米，位置误差会很大。</p>
+
+<p>我个人建议上报频率设在200~500ms之间。状态包的内容大概长这样：</p>
+
+<pre><code>{
+    "vehicle_id": "AGV-001",
+    "timestamp": 1705300000123,
+    "x": 12.5,
+    "y": 8.3,
+    "angle": 90.0,
+    "speed": 1.2,
+    "battery_level": 85,
+    "status": "moving",
+    "error_code": 0
+}
+</code></pre>
+
+<p>这里有个坑，我得提醒你。状态上报的数据量很大，如果每辆车每秒发2~5个包，100辆车就是每秒200~500个包。后端处理不过来怎么办？</p>
+
+<p>我曾经在一个项目里吃过这个亏。当时用的单线程处理，结果消息队列直接爆了。后来改成<strong>多线程+环形缓冲区</strong>的方案，才算稳住。</p>
+
+<div class="warning">
+    <strong>注意：</strong>状态监控模块一定要做“超时判断”。如果某辆车超过3秒没上报状态，系统应该自动标记为“通信异常”，并触发告警。别傻等着。
+</div>
+
+<h3>7.3 电量管理——别让AGV半路趴窝</h3>
+
+<p>AGV是电动的，没电了就跑不动。电量管理看似简单，其实挺考验策略。</p>
+
+<p>最基本的做法是：当电量低于某个阈值（比如20%），系统自动给这辆车下发“回充电桩”的任务。但这里有个问题——如果多辆车同时低电量，充电桩不够用怎么办？</p>
+
+<p>嗯，这就涉及到<strong>充电调度策略</strong>了。我常用的策略是：</p>
+
+<ul>
+    <li><strong>优先级排队</strong>：电量越低，优先级越高。低于10%的，插队也要先充。</li>
+    <li><strong>动态阈值</strong>：高峰期，把充电阈值降到15%，让车多跑几趟。低谷期，提到30%，提前回充。</li>
+    <li><strong>换电模式</strong>：有些场景用换电池的方式，比充电快得多。系统要支持电池更换后的电量重置。</li>
+</ul>
+
+<p>电量上报的字段，一般包含当前电量和电压：</p>
+
+<pre><code>{
+    "vehicle_id": "AGV-001",
+    "battery_level": 18,
+    "voltage": 23.5,
+    "is_charging": false
+}
+</code></pre>
+
+<div class="highlight">
+    <strong>核心原则：</strong>电量管理不是单纯看百分比。要结合任务队列、充电桩状态、当前时段综合决策。说白了，就是让AGV在“干活”和“充电”之间找到平衡。
+</div>
+
+<h3>7.4 异常处理——出事了怎么办</h3>
+
+<p>AGV在工厂里跑，难免遇到各种意外。撞到障碍物、轮子打滑、通信中断、急停被按下……这些都属于异常。</p>
+
+<p>异常处理模块，就是用来兜底的。我把它分为三个层级：</p>
+
+<h4>7.4.1 异常检测</h4>
+<p>AGV自身会检测异常。比如电机过流、激光雷达被遮挡、安全触边被触发。检测到后，AGV会立即停车，并上报异常码。</p>
+
+<p>常见的异常码：</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>异常码</th>
+            <th>含义</th>
+            <th>处理方式</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1001</td>
+            <td>电机过流</td>
+            <td>停车，等待人工复位</td>
+        </tr>
+        <tr>
+            <td>1002</td>
+            <td>激光雷达异常</td>
+            <td>停车，检查传感器</td>
+        </tr>
+        <tr>
+            <td>1003</td>
+            <td>通信超时</td>
+            <td>尝试重连，重连失败则停车</td>
+        </tr>
+        <tr>
+            <td>1004</td>
+            <td>安全触边触发</td>
+            <td>急停，需人工确认</td>
+        </tr>
+        <tr>
+            <td>1005</td>
+            <td>定位丢失</td>
+            <td>停车，尝试重新定位</td>
+        </tr>
+    </tbody>
+</table>
+
+<h4>7.4.2 自动恢复</h4>
+<p>有些异常是可以自动恢复的。比如通信超时，AGV会自动重连。定位丢失，AGV会尝试重新匹配地图特征点。</p>
+
+<p>我建议给每种异常配置一个“自动恢复策略”。比如：</p>
+
+<ul>
+    <li>通信超时：重试3次，间隔1秒。失败则停车。</li>
+    <li>定位丢失：尝试重新定位，超时30秒失败则停车。</li>
+    <li>电机过流：不允许自动恢复，必须人工介入。</li>
+</ul>
+
+<h4>7.4.3 人工介入</h4>
+<p>对于无法自动恢复的异常，系统要能通知运维人员。通知方式可以是弹窗、短信、或者对接企业的告警平台。</p>
+
+<p>我曾经遇到过一个场景：AGV在货架底下卡住了，自动恢复策略试了三次都动不了。最后运维人员远程查看视频，发现是一块包装膜缠住了轮子。派人过去清理一下就好了。</p>
+
+<p>所以，异常处理模块最好能附带<strong>现场快照</strong>——比如AGV当前的位置、周围环境的截图、最近的日志。这样运维人员能快速判断问题，不用跑到现场去看。</p>
+
+<div class="warning">
+    <strong>避坑指南：</strong>异常处理千万别做成“死循环”。有些AGV卡住之后，反复尝试前进后退，结果把地面磨出一道沟。我曾经见过这样的案例……嗯，后来我们加了一个“尝试次数上限”，超过上限就彻底停车，等人来处理。
+</div>
+
+<h3>知识体系总览</h3>
+
+<p>下面这张图，把车辆管理模块的核心逻辑串起来了。你可以对照着看：</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 主标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">车辆管理模块核心逻辑</text>
+    
+    <!-- 四个核心模块 -->
+    <!-- 车辆注册 -->
+    <rect x="50" y="80" width="160" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="130" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">车辆注册</text>
+    
+    <!-- 状态监控 -->
+    <rect x="240" y="80" width="160" height="60" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="320" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">状态监控</text>
+    
+    <!-- 电量管理 -->
+    <rect x="430" y="80" width="160" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+    <text x="510" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">电量管理</text>
+    
+    <!-- 异常处理 -->
+    <rect x="620" y="80" width="160" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="700" y="115" text-anchor="middle" font-size="16" fill="white" font-weight="bold">异常处理</text>
+    
+    <!-- 连接线 -->
+    <line x1="210" y1="110" x2="240" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="400" y1="110" x2="430" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    <line x1="590" y1="110" x2="620" y2="110" stroke="#bdc3c7" stroke-width="2"/>
+    
+    <!-- 向下箭头 -->
+    <line x1="130" y1="140" x2="130" y2="180" stroke="#3498db" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    <line x1="320" y1="140" x2="320" y2="180" stroke="#2ecc71" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <line x1="510" y1="140" x2="510" y2="180" stroke="#e67e22" stroke-width="2" marker-end="url(#arrowOrange)"/>
+    <line x1="700" y1="140" x2="700" y2="180" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrowRed)"/>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#3498db"/>
+        </marker>
+        <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#2ecc71"/>
+        </marker>
+        <marker id="arrowOrange" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#e67e22"/>
+        </marker>
+        <marker id="arrowRed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+        </marker>
+    </defs>
+    
+    <!-- 子功能 -->
+    <!-- 车辆注册子项 -->
+    <rect x="30" y="190" width="200" height="100" rx="6" fill="#ebf5fb" stroke="#3498db" stroke-width="1.5"/>
+    <text x="130" y="215" text-anchor="middle" font-size="13" fill="#2c3e50">• 分配唯一ID</text>
+    <text x="130" y="238" text-anchor="middle" font-size="13" fill="#2c3e50">• 录入车型参数</text>
+    <text x="130" y="261" text-anchor="middle" font-size="13" fill="#2c3e50">• 通信地址绑定</text>
+    <text x="130" y="284" text-anchor="middle" font-size="13" fill="#2c3e50">• 心跳测试验证</text>
+    
+    <!-- 状态监控子项 -->
+    <rect x="220" y="190" width="200" height="100" rx="6" fill="#eafaf1" stroke="#2ecc71" stroke-width="1.5"/>
+    <text x="320" y="215" text-anchor="middle" font-size="13" fill="#2c3e50">• 周期性位置上报</text>
+    <text x="320" y="238" text-anchor="middle" font-size="13" fill="#2c3e50">• 速度/方向更新</text>
+    <text x="320" y="261" text-anchor="middle" font-size="13" fill="#2c3e50">• 超时断线检测</text>
+    <text x="320" y="284" text-anchor="middle" font-size="13" fill="#2c3e50">• 多线程消息处理</text>
+    
+    <!-- 电量管理子项 -->
+    <rect x="410" y="190" width="200" height="100" rx="6" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+    <text x="510" y="215" text-anchor="middle" font-size="13" fill="#2c3e50">• 电量阈值告警</text>
+    <text x="510" y="238" text-anchor="middle" font-size="13" fill="#2c3e50">• 自动回充调度</text>
+    <text x="510" y="261" text-anchor="middle" font-size="13" fill="#2c3e50">• 充电桩排队策略</text>
+    <text x="510" y="284" text-anchor="middle" font-size="13" fill="#2c3e50">• 换电模式支持</text>
+    
+    <!-- 异常处理子项 -->
+    <rect x="600" y="190" width="200" height="100" rx="6" fill="#fdedec" stroke="#e74c3c" stroke-width="1.5"/>
+    <text x="700" y="215" text-anchor="middle" font-size="13" fill="#2c3e50">• 异常码检测上报</text>
+    <text x="700" y="238" text-anchor="middle" font-size="13" fill="#2c3e50">• 自动恢复策略</text>
+    <text x="700" y="261" text-anchor="middle" font-size="13" fill="#2c3e50">• 人工介入通知</text>
+    <text x="700" y="284" text-anchor="middle" font-size="13" fill="#2c3e50">• 现场快照留存</text>
+    
+    <!-- 底部汇总 -->
+    <rect x="150" y="340" width="500" height="60" rx="10" fill="#34495e" opacity="0.9"/>
+    <text x="400" y="370" text-anchor="middle" font-size="16" fill="white" font-weight="bold">车辆管理模块 = 身份管理 + 实时监控 + 能源策略 + 故障兜底</text>
+    
+    <!-- 连接线到汇总 -->
+    <line x1="130" y1="290" x2="250" y2="340" stroke="#bdc3c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <line x1="320" y1="290" x2="350" y2="340" stroke="#bdc3c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <line x1="510" y1="290" x2="450" y2="340" stroke="#bdc3c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+    <line x1="700" y1="290" x2="550" y2="340" stroke="#bdc3c7" stroke-width="1.5" stroke-dasharray="5,3"/>
+    
+    <!-- 底部说明 -->
+    <text x="400" y="440" text-anchor="middle" font-size="13" fill="#7f8c8d">四个模块协同工作，缺一不可</text>
+    <text x="400" y="465" text-anchor="middle" font-size="13" fill="#7f8c8d">注册是前提，监控是手段，电量是保障，异常是底线</text>
+</svg>
+
+<p>车辆管理模块，说复杂也复杂，说简单也简单。核心就一句话：<strong>让每辆车在系统里有个清晰的身份，实时掌握它的状态，管好它的电量，出了事能快速响应</strong>。</p>
+
+<p>把这四点做好，你的AGV调度系统就稳了一大半。</p>
+
+<div class="footer-nav">
+            <a href="06TrafficControlStrategy.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="08CommunicationProtocol.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

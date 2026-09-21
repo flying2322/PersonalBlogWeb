@@ -1,0 +1,391 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>9 卡尔曼滤波基础</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01NavigationOverview.html" class="">1 AGV导航概述</a></li>
+<li><a href="02CoordinateAndPose.html" class="">2 坐标系与位姿表示</a></li>
+<li><a href="03OdometerModel.html" class="">3 里程计模型</a></li>
+<li><a href="04Imu.html" class="">4 惯性测量单元(IMU)</a></li>
+<li><a href="05Lidar.html" class="">5 激光雷达(LiDAR)</a></li>
+<li><a href="06VisualSensor.html" class="">6 视觉传感器</a></li>
+<li><a href="07Encoder.html" class="">7 编码器</a></li>
+<li><a href="08UltrasonicInfrared.html" class="">8 超声波与红外传感器</a></li>
+<li><a href="09KalmanFilterBasics.html" class="active">9 卡尔曼滤波基础</a></li>
+<li><a href="10ExtendedKalmanFilter.html" class="">10 扩展卡尔曼滤波(EKF)</a></li>
+<li><a href="11UnscentedKalmanFilter.html" class="">11 无迹卡尔曼滤波(UKF)</a></li>
+<li><a href="12ParticleFilter.html" class="">12 粒子滤波(PF)</a></li>
+<li><a href="13MultiSensorTimeSync.html" class="">13 多传感器时间同步</a></li>
+<li><a href="14SensorCalibration.html" class="">14 传感器标定</a></li>
+<li><a href="15DataPreprocessing.html" class="">15 数据预处理</a></li>
+<li><a href="16FeatureExtraction.html" class="">16 特征提取</a></li>
+<li><a href="17ScanMatching.html" class="">17 扫描匹配</a></li>
+<li><a href="18VisualSlam.html" class="">18 视觉SLAM</a></li>
+<li><a href="19LaserSlam.html" class="">19 激光SLAM</a></li>
+<li><a href="20MultiSensorFusionLocalization.html" class="">20 多传感器融合定位</a></li>
+<li><a href="21MapBuilding.html" class="">21 地图构建</a></li>
+<li><a href="22PathPlanningBasics.html" class="">22 路径规划基础</a></li>
+<li><a href="23MotionControl.html" class="">23 运动控制</a></li>
+<li><a href="24RosIntegration.html" class="">24 ROS系统集成</a></li>
+<li><a href="25SimulationEnvironment.html" class="">25 仿真环境搭建</a></li>
+<li><a href="26HardwarePlatform.html" class="">26 硬件平台搭建</a></li>
+<li><a href="27RealtimeOptimization.html" class="">27 实时性优化</a></li>
+<li><a href="28FaultDiagnosisTolerance.html" class="">28 故障诊断与容错</a></li>
+<li><a href="29PerformanceMetrics.html" class="">29 性能评估指标</a></li>
+<li><a href="30NavigationFusionProject.html" class="">30 综合项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>9 卡尔曼滤波基础：状态空间模型、预测与更新步骤、一维卡尔曼滤波实现</h2>
+
+<p>各位同学，欢迎来到传感器融合的核心章节。说实话，卡尔曼滤波这玩意儿，是每个做AGV导航的工程师都绕不开的坎。我记得刚入行那会儿，看着满屏的矩阵公式，头都大了。但后来在实际项目中摸爬滚打，才发现它其实没那么神秘。</p>
+
+<p>说白了，卡尔曼滤波就是一套“猜-测-修正”的循环。你猜一下系统下一步会怎样，然后用传感器测一下，最后把猜的和测的揉在一起，得出一个更靠谱的结果。今天我们就从最基础的状态空间模型讲起，一步步拆解预测和更新步骤，最后手撸一个一维的卡尔曼滤波。</p>
+
+<h3>9.1 状态空间模型：系统的“数学画像”</h3>
+
+<p>做融合的第一步，你得先给系统画个像。这个像，就是状态空间模型。它用数学语言描述系统内部的状态是怎么变的，以及传感器是怎么观测到这些状态的。</p>
+
+<p>一个标准的离散时间状态空间模型长这样：</p>
+
+<pre><code>状态方程：x(k) = A * x(k-1) + B * u(k-1) + w(k-1)
+观测方程：z(k) = H * x(k) + v(k)</code></pre>
+
+<p>别被字母吓到，咱们一个个拆开看：</p>
+
+<ul>
+  <li><strong>x(k)</strong>：k时刻的系统状态。比如AGV的位置、速度。这是我们要估计的“真值”。</li>
+  <li><strong>A</strong>：状态转移矩阵。它描述了状态从上一时刻到这一时刻是怎么变的。比如匀速运动，位置 = 位置 + 速度 * dt。</li>
+  <li><strong>B</strong>：控制输入矩阵。它描述了外部控制量（比如电机油门）对状态的影响。</li>
+  <li><strong>u(k-1)</strong>：控制输入。比如你给AGV的加速度指令。</li>
+  <li><strong>w(k-1)</strong>：过程噪声。这是模型的不确定性，比如风阻、打滑。我们假设它服从高斯分布，均值为0，协方差为Q。</li>
+  <li><strong>z(k)</strong>：观测值。比如激光雷达测到的距离、IMU测到的加速度。</li>
+  <li><strong>H</strong>：观测矩阵。它把状态映射到观测空间。比如你状态是位置，观测也是位置，那H就是1。</li>
+  <li><strong>v(k)</strong>：观测噪声。传感器本身的误差。同样假设高斯分布，均值为0，协方差为R。</li>
+</ul>
+
+<div class="highlight">
+  <p><strong>核心思想</strong>：状态空间模型把系统分成了“内部状态”和“外部观测”两层。我们永远无法直接知道真实状态，只能通过带噪声的观测去反推。卡尔曼滤波干的就是这个反推的活儿。</p>
+</div>
+
+<p>我在项目中遇到过一个问题：一开始把过程噪声Q设得太小，觉得模型很准。结果AGV一遇到颠簸路面，滤波结果直接飘了。后来才明白，Q是给模型留的“容错空间”，太小了模型就太自信，反而容易出问题。</p>
+
+<h3>9.2 预测与更新：卡尔曼滤波的两步舞</h3>
+
+<p>卡尔曼滤波的核心就两个步骤：预测（Predict）和更新（Update）。它们像跳双人舞一样，交替进行。</p>
+
+<h4>9.2.1 预测步骤（Time Update）</h4>
+
+<p>这一步，我们完全依赖模型，猜一下系统现在可能在哪。说白了就是“盲猜”。</p>
+
+<pre><code>// 预测状态
+x_pred = A * x_est + B * u
+
+// 预测误差协方差
+P_pred = A * P_est * A^T + Q</code></pre>
+
+<ul>
+  <li><strong>x_pred</strong>：先验估计。基于上一时刻的最优估计，猜出来的当前状态。</li>
+  <li><strong>P_pred</strong>：先验误差协方差。它衡量了我们对这个猜测的“不确信度”。P越大，说明我们越没底。</li>
+</ul>
+
+<p>你想想看，如果模型很准（Q小），那P_pred增长就慢。如果模型不准（Q大），P_pred会迅速变大，告诉后面的更新步骤：“我猜的不可靠，你得多信传感器。”</p>
+
+<h4>9.2.2 更新步骤（Measurement Update）</h4>
+
+<p>这一步，我们用传感器观测值来修正之前的猜测。核心是计算一个“卡尔曼增益”。</p>
+
+<pre><code>// 计算卡尔曼增益
+K = P_pred * H^T * (H * P_pred * H^T + R)^(-1)
+
+// 更新状态估计
+x_est = x_pred + K * (z - H * x_pred)
+
+// 更新误差协方差
+P_est = (I - K * H) * P_pred</code></pre>
+
+<ul>
+  <li><strong>K</strong>：卡尔曼增益。它是整个滤波器的灵魂。K决定了我们更相信模型还是更相信传感器。</li>
+  <li><strong>z - H * x_pred</strong>：观测残差（也叫新息）。它表示“传感器看到的”和“模型猜的”之间的差距。</li>
+</ul>
+
+<div class="tip">
+  <p><strong>个人经验</strong>：卡尔曼增益K的取值范围在0到1之间。K接近0时，我们更相信模型预测，更新幅度小。K接近1时，我们更相信传感器观测，更新幅度大。我建议刚开始调参时，先固定R，然后慢慢调Q，观察K的变化趋势。</p>
+</div>
+
+<p>为什么会这样？因为K的分子是P_pred（模型的不确信度），分母是P_pred + R（总的不确定性）。如果模型不准（P_pred大），K就大，我们多信传感器。如果传感器噪声大（R大），K就小，我们多信模型。这个逻辑非常直观。</p>
+
+<h3>9.3 一维卡尔曼滤波实现：从理论到代码</h3>
+
+<p>理论讲完了，咱们直接上代码。我以一个AGV的一维位置估计为例。假设AGV在直线上匀速运动，我们用激光雷达测距（带噪声），用卡尔曼滤波来估计真实位置。</p>
+
+<p>先定义模型参数：</p>
+
+<pre><code>// 状态：位置和速度
+// x = [位置, 速度]^T
+
+// 状态转移矩阵（匀速模型，dt=1秒）
+A = [[1, 1],
+     [0, 1]]
+
+// 观测矩阵（只观测位置）
+H = [[1, 0]]
+
+// 过程噪声协方差（调参重点）
+Q = [[0.1, 0],
+     [0,   0.1]]
+
+// 观测噪声协方差（根据传感器手册）
+R = [[1]]</code></pre>
+
+<p>然后实现滤波循环：</p>
+
+<pre><code>import numpy as np
+
+class KalmanFilter1D:
+    def __init__(self, A, H, Q, R):
+        self.A = A
+        self.H = H
+        self.Q = Q
+        self.R = R
+        self.x = np.zeros((2, 1))  # 初始状态
+        self.P = np.eye(2) * 100   # 初始协方差，设大一点表示不确定
+
+    def predict(self, u=0):
+        # 预测步骤
+        self.x = self.A @ self.x
+        self.P = self.A @ self.P @ self.A.T + self.Q
+        return self.x
+
+    def update(self, z):
+        # 更新步骤
+        y = z - self.H @ self.x          # 观测残差
+        S = self.H @ self.P @ self.H.T + self.R  # 残差协方差
+        K = self.P @ self.H.T @ np.linalg.inv(S) # 卡尔曼增益
+        self.x = self.x + K @ y
+        self.P = (np.eye(2) - K @ self.H) @ self.P
+        return self.x
+
+# 模拟数据
+true_positions = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+measurements = [0.5, 1.2, 1.8, 3.5, 3.9, 5.1, 6.3, 7.2, 8.1, 9.4]
+
+kf = KalmanFilter1D(A, H, Q, R)
+estimates = []
+
+for z in measurements:
+    kf.predict()
+    est = kf.update(np.array([[z]]))
+    estimates.append(est[0, 0])
+
+print("真实位置:", true_positions)
+print("观测值:", measurements)
+print("估计值:", estimates)</code></pre>
+
+<div class="warning">
+  <p><strong>避坑指南</strong>：我曾经在初始化P矩阵时设得太小（比如0.1），结果滤波器一开始完全不相信观测，收敛极慢。后来我习惯把初始P设大一些（比如100），让滤波器先“虚心学习”，再慢慢收敛。另外，Q和R的比值决定了滤波器的“性格”，这个需要根据实际传感器噪声来标定。</p>
+</div>
+
+<h3>9.4 知识体系总览</h3>
+
+<p>为了让你更直观地理解本章的知识结构，我画了一张流程图。它展示了从状态空间模型到一维实现的完整逻辑链条。</p>
+
+<svg width="720" height="400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="400" fill="#f0f8ff" rx="10"/>
+
+  <!-- 标题 -->
+  <text x="360" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">卡尔曼滤波知识体系</text>
+
+  <!-- 状态空间模型 -->
+  <rect x="50" y="60" width="180" height="60" rx="8" fill="#3498db" opacity="0.9"/>
+  <text x="140" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">状态空间模型</text>
+  <text x="140" y="105" text-anchor="middle" font-size="11" fill="white">x(k)=Ax(k-1)+Bu+w</text>
+
+  <!-- 箭头 -->
+  <line x1="230" y1="90" x2="290" y2="90" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 预测步骤 -->
+  <rect x="290" y="60" width="180" height="60" rx="8" fill="#e67e22" opacity="0.9"/>
+  <text x="380" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">预测步骤</text>
+  <text x="380" y="105" text-anchor="middle" font-size="11" fill="white">x_pred, P_pred</text>
+
+  <!-- 箭头 -->
+  <line x1="470" y1="90" x2="530" y2="90" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- 更新步骤 -->
+  <rect x="530" y="60" width="160" height="60" rx="8" fill="#27ae60" opacity="0.9"/>
+  <text x="610" y="85" text-anchor="middle" font-size="14" fill="white" font-weight="bold">更新步骤</text>
+  <text x="610" y="105" text-anchor="middle" font-size="11" fill="white">K, x_est, P_est</text>
+
+  <!-- 循环箭头 -->
+  <path d="M 610 120 L 610 160 L 380 160 L 380 120" fill="none" stroke="#2c3e50" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="500" y="155" text-anchor="middle" font-size="11" fill="#7f8c8d">循环迭代</text>
+
+  <!-- 核心参数 -->
+  <rect x="50" y="200" width="200" height="100" rx="8" fill="#ecf0f1" stroke="#bdc3c7"/>
+  <text x="150" y="225" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">核心参数</text>
+  <text x="70" y="245" font-size="11" fill="#2c3e50">• Q：过程噪声协方差</text>
+  <text x="70" y="265" font-size="11" fill="#2c3e50">• R：观测噪声协方差</text>
+  <text x="70" y="285" font-size="11" fill="#2c3e50">• P：误差协方差</text>
+
+  <!-- 一维实现 -->
+  <rect x="300" y="200" width="200" height="100" rx="8" fill="#ecf0f1" stroke="#bdc3c7"/>
+  <text x="400" y="225" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">一维实现</text>
+  <text x="320" y="245" font-size="11" fill="#2c3e50">• 状态：位置+速度</text>
+  <text x="320" y="265" font-size="11" fill="#2c3e50">• 观测：激光雷达测距</text>
+  <text x="320" y="285" font-size="11" fill="#2c3e50">• 输出：平滑估计值</text>
+
+  <!-- 应用场景 -->
+  <rect x="550" y="200" width="150" height="100" rx="8" fill="#ecf0f1" stroke="#bdc3c7"/>
+  <text x="625" y="225" text-anchor="middle" font-size="13" font-weight="bold" fill="#2c3e50">应用场景</text>
+  <text x="570" y="245" font-size="11" fill="#2c3e50">• AGV定位</text>
+  <text x="570" y="265" font-size="11" fill="#2c3e50">• 传感器融合</text>
+  <text x="570" y="285" font-size="11" fill="#2c3e50">• 目标跟踪</text>
+
+  <!-- 箭头连接 -->
+  <line x1="150" y1="200" x2="150" y2="170" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="400" y1="200" x2="400" y2="170" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <line x1="625" y1="200" x2="625" y2="170" stroke="#2c3e50" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>嗯，这张图把本章的核心脉络串起来了。从左上角的状态空间模型出发，经过预测和更新两个步骤，形成一个闭环。下面三个模块分别对应核心参数调优、一维代码实现和实际应用场景。你写代码的时候，可以对照这张图，确保每一步的逻辑都没跑偏。</p>
+
+<p>最后说一句，卡尔曼滤波的调参是个手艺活。我建议你先用仿真数据跑通流程，再换真实传感器数据。别一上来就上真车，容易翻车。好了，这一章的内容就到这儿，你先把一维的代码跑通，后面多维的就好理解了。</p>
+
+<div class="footer-nav">
+            <a href="08UltrasonicInfrared.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="10ExtendedKalmanFilter.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

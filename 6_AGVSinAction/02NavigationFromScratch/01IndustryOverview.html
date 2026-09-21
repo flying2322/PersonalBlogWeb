@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>1 AGV行业全景与课程导论</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="active">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>1 AGV行业全景与课程导论</h2>
+
+<p>大家好，我是你们的老朋友。做AGV这行十几年了，从最早的磁带导航做到现在的激光SLAM，踩过的坑比走过的路还多。今天咱们开篇，先不急着写代码，我带大家看看这个行业到底长什么样。</p>
+
+<p>说实话，很多人一上来就问我：“老师，激光SLAM是不是最牛的？” 我通常会反问一句：“你打算把车用在哪儿？” 这个问题，其实就决定了你选什么导航技术。</p>
+
+<h3>1.1 AGV发展史：从磁条到智能</h3>
+
+<p>AGV这东西，最早是1953年美国人搞出来的。那时候就是个拖车，沿着地上的电线走。你想想看，那会儿连单片机都没有，全靠继电器控制。</p>
+
+<p>我入行那会儿，正好赶上磁条导航的黄金期。2010年左右，国内电商爆发，仓库里全是磁条AGV。那时候一台车卖十几万，现在想想真是暴利。但问题也很明显——磁条容易磨损，路径改起来要重新铺条，工厂停产一天损失几十万。</p>
+
+<p>后来二维码导航火了一阵。2015年，我参与过一个项目，给某知名手机厂做产线配送。二维码确实灵活，贴个码就能改路径。但车间地面油污多，二维码一脏就识别不了。我记得有一次，一台车在产线中间停了半小时，后面堵了一长串，厂长差点骂娘。</p>
+
+<p>再后来就是激光SLAM和视觉SLAM的天下了。2018年之后，算力便宜了，传感器也降价了，自然导航才真正落地。</p>
+
+<div class="highlight">
+  <p><strong>核心观点：</strong>导航技术的演进，本质上是“从依赖环境改造，到依赖环境感知”的转变。磁条和二维码是“我改造环境”，激光和视觉是“我理解环境”。</p>
+</div>
+
+<h3>1.2 行业应用场景：仓储、工厂、医院</h3>
+
+<p>不同场景对导航的要求，天差地别。我给大家拆开讲讲。</p>
+
+<h4>仓储场景</h4>
+<p>仓储是AGV最大的应用市场。亚马逊的Kiva机器人大家都知道，那是二维码导航的经典案例。但国内仓储环境复杂，货架密集，通道窄。我个人习惯，仓储场景首选激光SLAM，因为不需要贴码，部署快，而且能动态避障。</p>
+<p>我曾经在一个电商仓库做过项目，3000平米的场地，要求48小时完成部署。用二维码的话，光贴码就得两天。最后我们上了激光SLAM，当天部署，第二天就跑起来了。</p>
+
+<h4>工厂场景</h4>
+<p>工厂环境更苛刻。地面有油污、有震动、有粉尘。我建议工厂场景优先考虑混合导航——激光SLAM为主，磁条或二维码做辅助定位。为什么？因为工厂里金属物体多，激光容易产生噪点，纯SLAM有时候会飘。</p>
+<p>避坑指南：我曾经在一个汽车焊装车间吃过亏。车间里全是金属框架，激光雷达扫出来的点云全是反射噪点，定位直接崩了。后来加了反光柱做辅助，才稳住。</p>
+
+<h4>医院场景</h4>
+<p>医院这两年需求涨得很快。送药、送标本、送餐。医院的特点是：人流量大，通道窄，而且对安全性要求极高。视觉SLAM在这里有优势，因为能识别行人、推车、轮椅。但视觉的弱点是光照——走廊里灯光一暗，视觉就抓瞎。</p>
+<p>我个人的经验是：医院场景，激光+视觉融合最靠谱。激光保证定位精度，视觉保证避障安全。</p>
+
+<h3>1.3 主流导航技术对比</h3>
+
+<p>咱们直接上干货。我把四种主流导航技术拉出来比一比。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>导航方式</th>
+      <th>精度</th>
+      <th>部署成本</th>
+      <th>灵活性</th>
+      <th>环境适应性</th>
+      <th>典型场景</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>磁条导航</td>
+      <td>±10mm</td>
+      <td>低（但维护高）</td>
+      <td>极低（改路径需重铺）</td>
+      <td>差（磁条易损）</td>
+      <td>简单固定路线</td>
+    </tr>
+    <tr>
+      <td>二维码导航</td>
+      <td>±5mm</td>
+      <td>中（贴码人工贵）</td>
+      <td>中（改路径需重贴码）</td>
+      <td>一般（怕脏怕遮挡）</td>
+      <td>仓储、产线</td>
+    </tr>
+    <tr>
+      <td>激光SLAM</td>
+      <td>±10~30mm</td>
+      <td>高（传感器贵）</td>
+      <td>高（无需改造环境）</td>
+      <td>强（不怕光照、不怕脏）</td>
+      <td>工厂、仓储、医院</td>
+    </tr>
+    <tr>
+      <td>视觉SLAM</td>
+      <td>±20~50mm</td>
+      <td>中（摄像头便宜）</td>
+      <td>高（但依赖纹理）</td>
+      <td>一般（怕光照变化）</td>
+      <td>医院、服务机器人</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>别迷信任何一种技术。磁条虽然老，但用在固定路线、环境干净的场景，性价比极高。激光SLAM虽好，但传感器贵，小公司不一定扛得住。选型的时候，先算账，再谈技术。</p>
+</div>
+
+<h3>1.4 课程项目总览：从零搭建一台激光SLAM AGV</h3>
+
+<p>这个课程，咱们不玩虚的。30章内容，全部围绕一个目标：<strong>从零搭建一台能跑起来的激光SLAM AGV</strong>。</p>
+
+<p>我给大家画了一张图，把整个课程的知识体系串起来。你一看就明白我们要干什么。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="500" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="#2c3e50">激光SLAM AGV 知识体系</text>
+  
+  <!-- 顶层：硬件 -->
+  <rect x="50" y="70" width="700" height="80" rx="8" fill="#e8f5e9" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="100" text-anchor="middle" font-size="18" font-weight="bold" fill="#2e7d32">硬件层</text>
+  <text x="400" y="125" text-anchor="middle" font-size="14" fill="#555">激光雷达 | 底盘电机 | 编码器 | IMU | 工控机 | 电池</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="150" x2="400" y2="190" stroke="#999" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 中层：算法 -->
+  <rect x="50" y="190" width="700" height="120" rx="8" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="220" text-anchor="middle" font-size="18" font-weight="bold" fill="#1565c0">算法层</text>
+  <text x="400" y="245" text-anchor="middle" font-size="14" fill="#555">传感器数据处理 → 前端里程计 → 后端优化 → 回环检测</text>
+  <text x="400" y="270" text-anchor="middle" font-size="14" fill="#555">→ 地图构建 → 全局路径规划 → 局部路径规划 → 运动控制</text>
+  <text x="400" y="295" text-anchor="middle" font-size="14" fill="#555">（Cartographer / GMapping / AMCL / DWA / TEB）</text>
+  
+  <!-- 箭头 -->
+  <line x1="400" y1="310" x2="400" y2="350" stroke="#999" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 底层：系统 -->
+  <rect x="50" y="350" width="700" height="80" rx="8" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="380" text-anchor="middle" font-size="18" font-weight="bold" fill="#e65100">系统层</text>
+  <text x="400" y="405" text-anchor="middle" font-size="14" fill="#555">ROS2 通信框架 | 多传感器融合 | TF坐标变换 | 状态机调度</text>
+  
+  <!-- 箭头标记 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#999"/>
+    </marker>
+  </defs>
+  
+  <!-- 侧边标注 -->
+  <text x="30" y="420" font-size="12" fill="#999" transform="rotate(-90,30,420)">从底层到顶层</text>
+</svg>
+
+<p>这张图就是咱们课程的骨架。你看，从硬件选型开始，到算法实现，再到系统集成，一层一层往上搭。我当年带团队做第一台AGV的时候，就是按这个顺序来的。</p>
+
+<p>具体来说，咱们会做这些事：</p>
+
+<ul>
+  <li><strong>硬件篇（第2-5章）：</strong>激光雷达怎么选？底盘怎么设计？电机怎么驱动？编码器数据怎么读？这些我都会手把手教。</li>
+  <li><strong>算法篇（第6-20章）：</strong>这是重头戏。从最基础的ICP配准，到完整的Cartographer建图，再到AMCL定位、DWA路径规划，每个算法我都会带着你写一遍。</li>
+  <li><strong>系统篇（第21-28章）：</strong>ROS2怎么搭？多传感器怎么融合？状态机怎么写？这些工程化的问题，我会把我在项目中踩过的坑全告诉你。</li>
+  <li><strong>实战篇（第29-30章）：</strong>最后两章，咱们把代码烧到真车上，跑起来。看着自己写的代码驱动一台AGV在房间里自主导航，那种成就感，比打游戏爽多了。</li>
+</ul>
+
+<div class="warning">
+  <p><strong>注意：</strong>这个课程不是纯理论课。每一章都有可运行的代码示例。我建议你准备一台Linux电脑（Ubuntu 20.04以上），跟着我一起敲。光看不练，等于白学。</p>
+</div>
+
+<p>好了，开篇就到这里。咱们下一章直接上手硬件选型。我会告诉你，为什么我推荐用某款激光雷达，而不是另一款——那都是真金白银换来的教训。</p>
+
+<div class="footer-nav">
+            <a href="javascript:void(0)">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="02HardwareChassisDesign.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>17 集中式路径规划</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvOverview.html" class="">1 AGV概述</a></li>
+<li><a href="02WarehouseSceneAnalysis.html" class="">2 仓储场景分析</a></li>
+<li><a href="03MapBuildingBasics.html" class="">3 地图构建基础</a></li>
+<li><a href="04CoordinateAndLocalization.html" class="">4 坐标系与定位</a></li>
+<li><a href="05PathPlanningProblem.html" class="">5 路径规划问题定义</a></li>
+<li><a href="06EnvironmentModeling.html" class="">6 环境建模</a></li>
+<li><a href="07DijkstraAlgorithm.html" class="">7 Dijkstra算法</a></li>
+<li><a href="08AStarAlgorithm.html" class="">8 A*算法</a></li>
+<li><a href="09AStarOptimization.html" class="">9 A*算法优化</a></li>
+<li><a href="10RrtAlgorithm.html" class="">10 RRT算法</a></li>
+<li><a href="11RrtStarInformed.html" class="">11 RRT*与Informed RRT*</a></li>
+<li><a href="12DynamicWindowApproach.html" class="">12 动态窗口法（DWA）</a></li>
+<li><a href="13TebAlgorithm.html" class="">13 TEB算法</a></li>
+<li><a href="14MultiAgvCooperation.html" class="">14 多AGV协同问题</a></li>
+<li><a href="15TrafficControlStrategy.html" class="">15 交通管制策略</a></li>
+<li><a href="16PriorityBasedDispatch.html" class="">16 基于优先级的调度</a></li>
+<li><a href="17CentralizedPathPlanning.html" class="active">17 集中式路径规划</a></li>
+<li><a href="18DistributedPathPlanning.html" class="">18 分布式路径规划</a></li>
+<li><a href="19PathSmoothInterp.html" class="">19 路径平滑与插值</a></li>
+<li><a href="20VelocityPlanning.html" class="">20 速度规划</a></li>
+<li><a href="21TaskPathCoupling.html" class="">21 任务分配与路径耦合</a></li>
+<li><a href="22ChargingManage.html" class="">22 充电管理策略</a></li>
+<li><a href="23SimulationEnvironment.html" class="">23 仿真环境搭建</a></li>
+<li><a href="24AlgorithmEvalMetrics.html" class="">24 算法评估指标</a></li>
+<li><a href="25RealSceneDeploy.html" class="">25 真实场景部署</a></li>
+<li><a href="26GoodsToPersonCase.html" class="">26 案例1</a></li>
+<li><a href="27LineSideWarehouseCase.html" class="">27 案例2</a></li>
+<li><a href="28ColdChainWarehouseCase.html" class="">28 案例3</a></li>
+<li><a href="29FrontierTrends.html" class="">29 前沿趋势</a></li>
+<li><a href="30SummaryPrototypeProject.html" class="">30 课程总结与项目实战</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>17 集中式路径规划：多AGV A*、CBS（基于冲突的搜索）原理</h2>
+
+<p>各位工程师朋友，今天我们来聊聊多AGV路径规划里最经典的两个方法：多AGV A*和CBS。说实话，我在刚入行那会儿，觉得单台AGV能跑起来就挺厉害了。后来项目一上量，十几台车在仓库里同时跑，我才发现——真正的坑，全在“多车协同”上。</p>
+
+<h3>17.1 为什么需要集中式规划？</h3>
+
+<p>先问大家一个问题：如果每台AGV都自己算自己的路径，会发生什么？</p>
+
+<p>我在一个电商仓库项目里就吃过这个亏。当时用的是分布式规划，每台车独立跑A*。结果呢？两台车在同一个巷道里面对面堵死了。一个要往东，一个要往西，谁也不让谁。最后靠人工去搬货，场面一度非常尴尬。</p>
+
+<p>集中式规划的核心思路很简单：<strong>有一个中央大脑，同时为所有AGV规划路径</strong>。这个大脑知道每台车的起点、终点、当前状态，然后统一算出一套“不打架”的路径方案。</p>
+
+<div class="highlight">
+  <p><strong>集中式 vs 分布式：</strong></p>
+  <ul>
+    <li><strong>集中式</strong>：全局最优，但计算量大，适合车数不多（通常≤30台）的场景</li>
+    <li><strong>分布式</strong>：计算快，但容易死锁，需要额外的协调机制</li>
+  </ul>
+</div>
+
+<h3>17.2 多AGV A*：把多车问题变成单车问题</h3>
+
+<p>多AGV A*的思路，说白了就是“<strong>按顺序规划，后车避让前车</strong>”。</p>
+
+<p>具体怎么做呢？我习惯这样操作：</p>
+
+<ol>
+  <li>给所有AGV排个优先级（比如任务紧急的先走）</li>
+  <li>用A*给第一台车算路径</li>
+  <li>把第一台车的路径占用的时空信息，标记为“障碍”</li>
+  <li>用A*给第二台车算路径，避开这些时空障碍</li>
+  <li>重复直到所有车都规划完</li>
+</ol>
+
+<p>听起来很简单对吧？但这里有个大坑——<strong>顺序依赖</strong>。你想想看，如果优先级排错了，后面的车可能绕一大圈，甚至无路可走。</p>
+
+<div class="tip">
+  <p><strong>我的经验：</strong>我曾经在一个项目里，把充电返回的AGV优先级设得很高。结果它慢悠悠往回走，把后面急着送货的车全堵死了。后来我改成“任务截止时间越近，优先级越高”，情况就好多了。</p>
+</div>
+
+<p>下面是一个简化的多AGV A*伪代码，大家可以感受一下：</p>
+
+<pre><code>function multiAGV_AStar(agents, map):
+    // agents: 所有AGV的列表，每个包含起点、终点
+    // map: 栅格地图
+    
+    paths = []
+    reserved = {}  // 时空占用表：{时间步: [坐标列表]}
+    
+    // 按优先级排序
+    sorted_agents = sort_by_priority(agents)
+    
+    for agent in sorted_agents:
+        // 把已占用的时空点作为动态障碍
+        dynamic_obstacles = get_dynamic_obstacles(reserved, agent.start_time)
+        
+        // 调用单AGV A*，避开动态障碍
+        path = AStar(map, agent.start, agent.goal, dynamic_obstacles)
+        
+        if path is None:
+            return FAIL  // 无解，需要重新调度
+        
+        // 记录这条路径的时空占用
+        for t, pos in enumerate(path):
+            reserved[agent.start_time + t] = pos
+        
+        paths.append(path)
+    
+    return paths</code></pre>
+
+<h3>17.3 CBS：更优雅的冲突解决方式</h3>
+
+<p>多AGV A*虽然简单，但有个硬伤：<strong>它假设先规划的路径是“神圣不可侵犯”的</strong>。后车只能绕着走，不能要求前车改道。</p>
+
+<p>这就引出了CBS（Conflict-Based Search）。我第一次接触CBS是在读一篇论文时，当时觉得这算法真聪明——<strong>它把多车路径规划拆成了两层</strong>：</p>
+
+<ul>
+  <li><strong>高层</strong>：检测冲突，给冲突的车加约束（比如“车A在时间t不能出现在坐标(x,y)”）</li>
+  <li><strong>低层</strong>：每台车在约束条件下，各自跑A*算路径</li>
+</ul>
+
+<p>这两层反复迭代，直到所有车的路径都没有冲突为止。</p>
+
+<div class="highlight">
+  <p><strong>CBS的核心思想：</strong>与其让后车一味忍让，不如让冲突双方都做出调整。这就像两个人过独木桥——不是一个人永远让着另一个人，而是双方各退一步，找到都能接受的方案。</p>
+</div>
+
+<h3>17.4 CBS的工作流程</h3>
+
+<p>我画了一张流程图，帮大家理解CBS的迭代过程：</p>
+
+<svg width="720" height="480" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="720" height="480" fill="#f0f8ff" rx="10"/>
+  
+  <!-- 标题 -->
+  <text x="360" y="35" text-anchor="middle" font-size="18" font-weight="bold" fill="#2c3e50">CBS算法流程</text>
+  
+  <!-- 步骤1：初始规划 -->
+  <rect x="260" y="60" width="200" height="50" rx="8" fill="#3498db" stroke="#2980b9" stroke-width="2"/>
+  <text x="360" y="90" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤1：初始规划</text>
+  
+  <!-- 箭头1 -->
+  <line x1="360" y1="110" x2="360" y2="145" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 步骤2：检测冲突 -->
+  <rect x="260" y="150" width="200" height="50" rx="8" fill="#e67e22" stroke="#d35400" stroke-width="2"/>
+  <text x="360" y="180" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤2：检测冲突</text>
+  
+  <!-- 箭头2 -->
+  <line x1="360" y1="200" x2="360" y2="235" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  
+  <!-- 菱形判断 -->
+  <polygon points="360,240 440,280 360,320 280,280" fill="#2ecc71" stroke="#27ae60" stroke-width="2"/>
+  <text x="360" y="275" text-anchor="middle" font-size="12" fill="white" font-weight="bold">有冲突？</text>
+  
+  <!-- 箭头3：无冲突 -->
+  <line x1="440" y1="280" x2="520" y2="280" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="480" y="270" text-anchor="middle" font-size="12" fill="#27ae60" font-weight="bold">无</text>
+  
+  <!-- 步骤3：输出结果 -->
+  <rect x="525" y="255" width="160" height="50" rx="8" fill="#9b59b6" stroke="#8e44ad" stroke-width="2"/>
+  <text x="605" y="285" text-anchor="middle" font-size="14" fill="white" font-weight="bold">输出路径方案</text>
+  
+  <!-- 箭头4：有冲突 -->
+  <line x1="360" y1="320" x2="360" y2="365" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="380" y="345" text-anchor="middle" font-size="12" fill="#e74c3c" font-weight="bold">有</text>
+  
+  <!-- 步骤4：添加约束 -->
+  <rect x="260" y="370" width="200" height="50" rx="8" fill="#e74c3c" stroke="#c0392b" stroke-width="2"/>
+  <text x="360" y="400" text-anchor="middle" font-size="14" fill="white" font-weight="bold">步骤4：添加约束</text>
+  
+  <!-- 箭头5：回到低层 -->
+  <line x1="260" y1="395" x2="100" y2="395" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="100" y1="395" x2="100" y2="85" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="100" y1="85" x2="255" y2="85" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="110" y="240" text-anchor="middle" font-size="12" fill="#7f8c8d" transform="rotate(-90, 110, 240)">重新规划</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2c3e50"/>
+    </marker>
+  </defs>
+</svg>
+
+<p>嗯，这张图其实已经说得很清楚了。我再补充几个关键点：</p>
+
+<h3>17.5 CBS中的冲突类型</h3>
+
+<p>在实际项目中，我遇到的冲突主要有两种：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse:collapse; width:100%; margin:15px 0;">
+  <tr style="background-color:#3498db; color:white;">
+    <th>冲突类型</th>
+    <th>描述</th>
+    <th>约束示例</th>
+  </tr>
+  <tr>
+    <td><strong>顶点冲突</strong></td>
+    <td>两车在同一时间到达同一位置</td>
+    <td>车A在时间t不能到(x,y)</td>
+  </tr>
+  <tr>
+    <td><strong>边冲突</strong></td>
+    <td>两车在同一时间交换位置（迎面相遇）</td>
+    <td>车A在时间t不能从(x1,y1)到(x2,y2)</td>
+  </tr>
+</table>
+
+<div class="warning">
+  <p><strong>注意：</strong>边冲突比顶点冲突更难处理。我曾经在一个窄巷道仓库里，两台车在通道中间迎面相遇，CBS花了7轮迭代才找到解。后来我加了一条规则——窄巷道强制单向通行，问题就简单多了。</p>
+</div>
+
+<h3>17.6 CBS的优缺点</h3>
+
+<p>我用了这么多年CBS，总结下来就是：</p>
+
+<ul>
+  <li><strong>优点：</strong>
+    <ul>
+      <li>能找到最优解（如果低层A*用的是最优算法）</li>
+      <li>比多AGV A*更灵活，冲突双方都能调整</li>
+      <li>适合车数较少（≤20台）的场景</li>
+    </ul>
+  </li>
+  <li><strong>缺点：</strong>
+    <ul>
+      <li>计算时间可能很长（最坏情况是指数级）</li>
+      <li>对地图大小敏感，地图越大，搜索空间越大</li>
+      <li>不适合动态变化的环境（比如突然有新的任务插入）</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="tip">
+  <p><strong>我的建议：</strong>如果你车数少于10台，CBS是很好的选择。如果车数在10-30台之间，可以考虑用改进版的ICBS（Improved CBS），它加入了优先级启发式，收敛更快。超过30台？嗯，我建议你考虑分层规划或者交通管制方案。</p>
+</div>
+
+<h3>17.7 实际项目中的选择</h3>
+
+<p>最后，我想说说在实际项目中怎么选。我个人的经验是：</p>
+
+<ul>
+  <li><strong>场景一：小仓库，5-8台AGV</strong> → 用CBS，追求最优路径</li>
+  <li><strong>场景二：中型仓库，10-20台AGV</strong> → 用多AGV A*，配合合理的优先级策略</li>
+  <li><strong>场景三：大型仓库，30+台AGV</strong> → 别用集中式了，考虑分区规划或交通管制</li>
+</ul>
+
+<p>我记得有一次，一个客户非要让50台AGV用CBS跑。我劝了半天没用，结果算法跑了3分钟还没出结果。最后我改成区域管制——把仓库分成4个区，每个区独立规划，区之间用缓冲区过渡。效果立竿见影，响应时间降到了2秒以内。</p>
+
+<p>所以说，算法再好，也要看场景。做工程嘛，实用才是硬道理。</p>
+
+<div class="footer-nav">
+            <a href="16PriorityBasedDispatch.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="18DistributedPathPlanning.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

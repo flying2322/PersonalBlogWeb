@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>23 AGV系统集成与联调</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01IndustryOverview.html" class="">1 AGV行业全景与课程导论</a></li>
+<li><a href="02HardwareChassisDesign.html" class="">2 AGV核心硬件选型与底盘设计</a></li>
+<li><a href="03McuAndSensorSelection.html" class="">3 嵌入式主控与传感器选型</a></li>
+<li><a href="04Ros2EnvironmentSetup.html" class="">4 ROS2基础与环境搭建</a></li>
+<li><a href="05Stm32LowLevelDriver.html" class="">5 AGV底层驱动开发（STM32）</a></li>
+<li><a href="06Ros2McuCommunication.html" class="">6 ROS2与底层MCU通信</a></li>
+<li><a href="07KinematicsAndOdometer.html" class="">7 AGV运动学模型与里程计推算</a></li>
+<li><a href="08LidarDataAndMapping.html" class="">8 激光雷达数据处理与建图基础</a></li>
+<li><a href="09CartographerMapping.html" class="">9 Cartographer建图算法实战</a></li>
+<li><a href="10Navigation2Framework.html" class="">10 导航框架Navigation2详解</a></li>
+<li><a href="11GlobalPathPlanning.html" class="">11 全局路径规划算法</a></li>
+<li><a href="12LocalPathPlanning.html" class="">12 局部路径规划算法</a></li>
+<li><a href="13CostmapDeepDive.html" class="">13 代价地图（Costmap）深入解析</a></li>
+<li><a href="14BehaviorTreeApplication.html" class="">14 行为树（Behavior Tree）在AGV中的应用</a></li>
+<li><a href="15AmclLocalization.html" class="">15 AMCL定位算法</a></li>
+<li><a href="16MultiSensorFusionLocalization.html" class="">16 AGV多传感器融合定位</a></li>
+<li><a href="17DispatchArchitecture.html" class="">17 AGV调度系统架构设计</a></li>
+<li><a href="18TrafficAndCooperation.html" class="">18 AGV交通管制与多车协同</a></li>
+<li><a href="19TaskAndStateMachine.html" class="">19 AGV任务管理与状态机</a></li>
+<li><a href="20AutoChargingDock.html" class="">20 AGV充电对接与自动充电</a></li>
+<li><a href="21SafetyAndException.html" class="">21 AGV安全机制与异常处理</a></li>
+<li><a href="22SimulationEnvironment.html" class="">22 AGV仿真环境搭建</a></li>
+<li><a href="23SystemIntegration.html" class="active">23 AGV系统集成与联调</a></li>
+<li><a href="24HostMonitorSystem.html" class="">24 AGV上位机监控系统开发</a></li>
+<li><a href="25MapEditAndManage.html" class="">25 AGV地图编辑与管理</a></li>
+<li><a href="26PerformanceTestOptimize.html" class="">26 AGV性能测试与优化</a></li>
+<li><a href="27DeployAndOps.html" class="">27 AGV部署与运维</a></li>
+<li><a href="28IndustryStandards.html" class="">28 AGV行业标准与认证</a></li>
+<li><a href="29ProjectCaseStudy.html" class="">29 AGV项目实战案例</a></li>
+<li><a href="30FrontierTrends.html" class="">30 AGV前沿技术与发展趋势</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>23 AGV系统集成与联调</h2>
+
+<p>系统集成，说白了就是把一堆零件拼成一台能跑的车。</p>
+<p>但这里头门道很深。我见过太多团队，硬件选型都挺好，软件框架也漂亮，结果一联调就崩。为什么？因为集成不是简单的「插上线、烧个固件」就完事。</p>
+<p>这一章，我把硬件集成、软件集成、联调流程、常见问题排查，一条线给你捋清楚。</p>
+
+<h3>23.1 硬件集成：底盘、主控、传感器</h3>
+
+<p>硬件集成是地基。地基不稳，上层软件再牛也白搭。</p>
+
+<h4>23.1.1 底盘集成</h4>
+
+<p>底盘是AGV的腿。常见的底盘类型有：</p>
+<ul>
+    <li><strong>差速底盘</strong>：两个驱动轮+两个万向轮。结构简单，转向灵活。我早期做的小型AGV基本都是这种。</li>
+    <li><strong>舵轮底盘</strong>：一个或两个舵轮+从动轮。负载能力强，适合重载场景。</li>
+    <li><strong>麦克纳姆轮底盘</strong>：四个全向轮。可以横向移动，但地面要求高，效率也低一些。</li>
+</ul>
+
+<p>集成时要注意什么？</p>
+<ul>
+    <li><strong>电机驱动器通信</strong>：我习惯用CAN总线。抗干扰强，实时性好。RS485也行，但注意总线终端电阻要匹配。</li>
+    <li><strong>编码器信号</strong>：差分信号比单端信号靠谱。我踩过坑——单端编码器线长了，信号衰减导致里程计漂移。</li>
+    <li><strong>急停回路</strong>：硬件急停必须独立于主控。主控死机了，急停还能用。这是安全底线。</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>核心原则</strong>：底盘集成时，先确认电机驱动器的控制模式（速度模式/位置模式/力矩模式）。AGV导航一般用速度模式。</p>
+</div>
+
+<h4>23.1.2 主控集成</h4>
+
+<p>主控是AGV的大脑。选型上，我推荐：</p>
+<ul>
+    <li><strong>工业级ARM主板</strong>：比如RK3588、树莓派CM4。性价比高，生态好。</li>
+    <li><strong>x86工控机</strong>：算力强，适合跑SLAM和路径规划。但功耗和体积大一些。</li>
+    <li><strong>MCU+MPU组合</strong>：MCU负责底层实时控制，MPU负责上层算法。这种架构最稳。</li>
+</ul>
+
+<p>集成要点：</p>
+<ul>
+    <li><strong>电源管理</strong>：主控、电机驱动器、传感器要分开供电。我见过一次，电机启动瞬间电压跌落，主控直接重启。</li>
+    <li><strong>接口预留</strong>：至少留2个USB、1个以太网、1个CAN口。别问我为什么——后期调试时你就知道了。</li>
+    <li><strong>散热</strong>：主控装在底盘上，别忘了散热。我有一台AGV，夏天跑半小时就过热降频，导航直接卡顿。</li>
+</ul>
+
+<h4>23.1.3 传感器集成</h4>
+
+<p>传感器是AGV的眼睛和耳朵。常见的传感器有：</p>
+<table>
+    <tr>
+        <th>传感器类型</th>
+        <th>用途</th>
+        <th>集成注意事项</th>
+    </tr>
+    <tr>
+        <td>激光雷达（2D/3D）</td>
+        <td>建图、定位、避障</td>
+        <td>安装高度要避开底盘遮挡。2D雷达注意扫描平面水平。</td>
+    </tr>
+    <tr>
+        <td>IMU（惯性测量单元）</td>
+        <td>姿态估计、辅助定位</td>
+        <td>安装位置靠近底盘中心。远离电机磁场干扰。</td>
+    </tr>
+    <tr>
+        <td>编码器</td>
+        <td>里程计</td>
+        <td>差分信号传输。线缆用屏蔽双绞线。</td>
+    </tr>
+    <tr>
+        <td>超声波/红外</td>
+        <td>近距离避障</td>
+        <td>注意探测角度和盲区。多个传感器要避免串扰。</td>
+    </tr>
+</table>
+
+<div class="tip">
+    <p><strong>我的经验</strong>：传感器集成时，先做「裸数据验证」。比如激光雷达，先单独接电脑看点云是否正常。别等全部装好了再查问题，那会非常痛苦。</p>
+</div>
+
+<h3>23.2 软件集成：底层驱动、ROS2、调度</h3>
+
+<p>软件集成是灵魂。硬件装好了，软件跑不起来，那就是一堆废铁。</p>
+
+<h4>23.2.1 底层驱动集成</h4>
+
+<p>底层驱动负责和硬件打交道。我一般分三层：</p>
+<ul>
+    <li><strong>MCU固件层</strong>：跑在STM32或类似芯片上。负责电机控制、编码器读取、IO控制。用FreeRTOS做实时调度。</li>
+    <li><strong>通信协议层</strong>：MCU和主控之间用自定义协议。我习惯用「帧头+长度+命令+数据+校验」的结构。简单可靠。</li>
+    <li><strong>ROS2驱动层</strong>：在主控上写一个ROS2节点，解析MCU发来的数据，发布成/cmd_vel、/odom等话题。</li>
+</ul>
+
+<pre><code>// 底层通信协议示例（简化版）
+typedef struct {
+    uint8_t  header;      // 0xAA
+    uint8_t  length;      // 数据长度
+    uint8_t  cmd;         // 命令类型
+    int16_t  data[4];     // 数据内容
+    uint8_t  checksum;    // 校验和
+} AGV_Frame_t;</code></pre>
+
+<div class="warning">
+    <p><strong>注意</strong>：底层驱动和ROS2之间的通信延迟要控制在10ms以内。否则导航控制会感觉「肉肉的」，反应迟钝。</p>
+</div>
+
+<h4>23.2.2 ROS2集成</h4>
+
+<p>ROS2是AGV软件的核心框架。集成步骤：</p>
+<ol>
+    <li><strong>搭建ROS2工作空间</strong>：创建src目录，放你的功能包。</li>
+    <li><strong>编写节点</strong>：至少要有底盘驱动节点、传感器驱动节点、导航节点。</li>
+    <li><strong>配置TF树</strong>：base_link -> odom -> map。TF树错了，定位全乱。</li>
+    <li><strong>集成导航栈</strong>：Nav2或者自己写的路径规划器。我建议先用Nav2，稳定后再定制。</li>
+</ol>
+
+<p>集成时容易踩的坑：</p>
+<ul>
+    <li><strong>话题命名冲突</strong>：多个传感器都用/cmd_vel？那不乱套了。命名空间要规划好。</li>
+    <li><strong>QoS设置不匹配</strong>：发布者和订阅者的QoS要一致。我遇到过，激光雷达数据收不到，查了半天发现是QoS不匹配。</li>
+    <li><strong>时间同步</strong>：多个传感器的时间戳要对齐。用ROS2的time_synchronizer或者message_filters。</li>
+</ul>
+
+<h4>23.2.3 调度系统集成</h4>
+
+<p>调度系统是AGV的大脑。它负责：</p>
+<ul>
+    <li><strong>任务分配</strong>：哪台AGV去执行哪个任务。</li>
+    <li><strong>路径规划</strong>：全局路径规划，避免AGV之间打架。</li>
+    <li><strong>交通管理</strong>：交叉路口、狭窄通道的通行控制。</li>
+</ul>
+
+<p>集成方式：</p>
+<ul>
+    <li><strong>调度系统和AGV之间用MQTT或HTTP通信</strong>。我推荐MQTT，轻量级，支持QoS，适合工业场景。</li>
+    <li><strong>AGV上报状态</strong>：位置、电量、任务状态、故障信息。</li>
+    <li><strong>调度系统下发指令</strong>：去A点、去B点、充电、暂停、恢复。</li>
+</ul>
+
+<div class="highlight">
+    <p><strong>关键点</strong>：调度系统和AGV之间的通信要设计心跳机制。AGV每隔1秒发一次心跳，调度系统3秒没收到就判定AGV离线，自动重新分配任务。</p>
+</div>
+
+<h3>23.3 系统联调流程</h3>
+
+<p>联调不是一蹴而就的。我一般分四步走：</p>
+
+<h4>23.3.1 单机调试</h4>
+<p>先调一台AGV。确认底盘能动、传感器能采数据、ROS2节点能跑通。这一步别急，稳扎稳打。</p>
+
+<h4>23.3.2 导航调试</h4>
+<p>建图、定位、路径规划、避障。让AGV在已知地图里跑一圈，看轨迹是否平滑，定位是否漂移。</p>
+
+<h4>23.3.3 多机联调</h4>
+<p>两台AGV同时跑。看调度系统能不能正确分配任务，交通管理能不能避免碰撞。我遇到过，两台AGV在路口互让，结果死锁了。</p>
+
+<h4>23.3.4 压力测试</h4>
+<p>满负荷运行。连续跑8小时、24小时。看系统稳定性、电池续航、通信可靠性。</p>
+
+<div class="tip">
+    <p><strong>我的习惯</strong>：联调时一定要有日志系统。每个关键节点都打日志，出问题才能快速定位。别靠肉眼观察，那太原始了。</p>
+</div>
+
+<h3>23.4 常见问题排查</h3>
+
+<p>联调过程中，问题层出不穷。我列几个高频问题：</p>
+
+<table>
+    <tr>
+        <th>问题现象</th>
+        <th>可能原因</th>
+        <th>排查方法</th>
+    </tr>
+    <tr>
+        <td>AGV不走直线</td>
+        <td>左右轮编码器不一致、电机PID参数不对</td>
+        <td>先校准编码器，再调PID</td>
+    </tr>
+    <tr>
+        <td>定位漂移</td>
+        <td>IMU未校准、激光雷达安装倾斜、里程计误差累积</td>
+        <td>重新校准IMU，检查雷达安装水平度，加入回环检测</td>
+    </tr>
+    <tr>
+        <td>通信断连</td>
+        <td>WiFi信号弱、MQTT心跳超时、CAN总线终端电阻缺失</td>
+        <td>检查网络信号强度，调整心跳间隔，确认CAN总线匹配电阻</td>
+    </tr>
+    <tr>
+        <td>避障失效</td>
+        <td>传感器盲区、探测角度不对、避障算法参数不合理</td>
+        <td>调整传感器安装位置，增大探测范围，优化避障参数</td>
+    </tr>
+</table>
+
+<div class="warning">
+    <p><strong>我曾经踩过的坑</strong>：有一次AGV在某个区域总是定位失败。查了三天，最后发现是那个区域的地面反光太强，激光雷达点云全是噪点。后来换了吸光材料的地面贴纸，问题解决。</p>
+</div>
+
+<p>嗯，系统集成与联调，说白了就是「把对的零件，用对的方式，组合在一起」。每一步都有坑，但每一步也都有解法。多调试、多总结，慢慢就有感觉了。</p>
+
+<svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#4A90D9"/>
+        </marker>
+    </defs>
+    
+    <!-- 背景 -->
+    <rect width="800" height="500" fill="#F0F8FF" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2C3E50">AGV系统集成与联调知识体系</text>
+    
+    <!-- 顶层：系统集成 -->
+    <rect x="250" y="60" width="300" height="50" rx="8" fill="#4A90D9" stroke="#2C3E50" stroke-width="2"/>
+    <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">AGV系统集成与联调</text>
+    
+    <!-- 箭头 -->
+    <line x1="400" y1="110" x2="400" y2="140" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- 第二层：两大分支 -->
+    <rect x="100" y="145" width="250" height="45" rx="8" fill="#5DADE2" stroke="#2C3E50" stroke-width="2"/>
+    <text x="225" y="173" text-anchor="middle" font-size="14" fill="white" font-weight="bold">硬件集成</text>
+    
+    <rect x="450" y="145" width="250" height="45" rx="8" fill="#5DADE2" stroke="#2C3E50" stroke-width="2"/>
+    <text x="575" y="173" text-anchor="middle" font-size="14" fill="white" font-weight="bold">软件集成</text>
+    
+    <!-- 箭头 -->
+    <line x1="225" y1="190" x2="225" y2="220" stroke="#5DADE2" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="575" y1="190" x2="575" y2="220" stroke="#5DADE2" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- 第三层：硬件子项 -->
+    <rect x="30" y="225" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="95" y="250" text-anchor="middle" font-size="12" fill="#2C3E50">底盘集成</text>
+    
+    <rect x="180" y="225" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="245" y="250" text-anchor="middle" font-size="12" fill="#2C3E50">主控集成</text>
+    
+    <rect x="330" y="225" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="395" y="250" text-anchor="middle" font-size="12" fill="#2C3E50">传感器集成</text>
+    
+    <!-- 第三层：软件子项 -->
+    <rect x="450" y="225" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="515" y="250" text-anchor="middle" font-size="12" fill="#2C3E50">底层驱动</text>
+    
+    <rect x="600" y="225" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="665" y="250" text-anchor="middle" font-size="12" fill="#2C3E50">ROS2集成</text>
+    
+    <rect x="450" y="280" width="130" height="40" rx="6" fill="#85C1E9" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="515" y="305" text-anchor="middle" font-size="12" fill="#2C3E50">调度系统</text>
+    
+    <!-- 箭头到联调 -->
+    <line x1="225" y1="265" x2="225" y2="350" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="575" y1="320" x2="575" y2="350" stroke="#4A90D9" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- 第四层：联调流程 -->
+    <rect x="100" y="355" width="600" height="45" rx="8" fill="#E74C3C" stroke="#2C3E50" stroke-width="2"/>
+    <text x="400" y="383" text-anchor="middle" font-size="14" fill="white" font-weight="bold">系统联调流程</text>
+    
+    <!-- 箭头 -->
+    <line x1="400" y1="400" x2="400" y2="430" stroke="#E74C3C" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- 第五层：联调步骤 -->
+    <rect x="30" y="435" width="140" height="35" rx="6" fill="#F1948A" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="100" y="457" text-anchor="middle" font-size="11" fill="#2C3E50">单机调试</text>
+    
+    <rect x="190" y="435" width="140" height="35" rx="6" fill="#F1948A" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="260" y="457" text-anchor="middle" font-size="11" fill="#2C3E50">导航调试</text>
+    
+    <rect x="350" y="435" width="140" height="35" rx="6" fill="#F1948A" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="420" y="457" text-anchor="middle" font-size="11" fill="#2C3E50">多机联调</text>
+    
+    <rect x="510" y="435" width="140" height="35" rx="6" fill="#F1948A" stroke="#2C3E50" stroke-width="1.5"/>
+    <text x="580" y="457" text-anchor="middle" font-size="11" fill="#2C3E50">压力测试</text>
+    
+    <!-- 箭头连接步骤 -->
+    <line x1="170" y1="452" x2="190" y2="452" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+    <line x1="330" y1="452" x2="350" y2="452" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+    <line x1="490" y1="452" x2="510" y2="452" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+</svg>
+
+        <div class="footer-nav">
+            <a href="22SimulationEnvironment.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="24HostMonitorSystem.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>

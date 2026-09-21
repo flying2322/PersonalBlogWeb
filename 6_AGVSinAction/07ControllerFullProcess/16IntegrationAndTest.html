@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>16 系统集成与测试</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background: linear-gradient(135deg, #e8f4f8 0%, #d1e9f0 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 20px;
+        }
+        /* 双边框设计：外边框 + 内阴影 */
+        .double-border {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 2px solid #f1c40f;
+            border-radius: 24px;
+            box-shadow: 0 20px 30px -15px rgba(0,0,0,0.2), inset 0 1px 0 0 #fff8e0;
+            overflow: hidden;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            gap: 0;
+        }
+        .sidebar {
+            background: #fefcf5;
+            border-right: 2px solid #fdebb3;
+            padding: 24px 16px;
+        }
+        .sidebar h3 {
+            font-size: 1.4rem;
+            color: #b45f06;
+            border-left: 5px solid #f39c12;
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .chapter-list {
+            list-style: none;
+        }
+        .chapter-list li {
+            margin-bottom: 6px;
+        }
+        .chapter-list a {
+            display: block;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: #2c3e50;
+            border-radius: 12px;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .chapter-list a:hover {
+            background: #fdebd0;
+            transform: translateX(3px);
+        }
+        .chapter-list .active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 5px rgba(59,130,246,0.3);
+        }
+        .main-content {
+            padding: 30px 35px;
+            background: white;
+        }
+        .footer-nav {
+            margin-top: 45px;
+            padding-top: 20px;
+            border-top: 2px solid #f0e6d2;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-nav a {
+            padding: 8px 24px;
+            background: #f1f5f9;
+            text-decoration: none;
+            color: #1e40af;
+            border-radius: 40px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .footer-nav a:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            color: #64748b;
+            border-top: 1px dashed #e2e8f0;
+            font-size: 0.9rem;
+        }
+        h2 { color: #1e3a8a; border-left: 6px solid #f59e0b; padding-left: 15px; margin: 20px 0 15px; }
+        h3 { color: #2c3e50; margin: 20px 0 10px; }
+        pre {
+            background: #2d2f36; color: #f8f8f2; padding: 15px; border-radius: 12px;
+            overflow-x: auto; font-family: 'JetBrains Mono', monospace; margin: 15px 0;
+        }
+        table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; background: #fefce8;
+        }
+        th, td {
+            border: 1px solid #fcd34d; padding: 10px; text-align: left;
+        }
+        th { background: #fffbeb; }
+        .tip, .warning, .highlight {
+            padding: 12px 18px; border-radius: 16px; margin: 15px 0;
+        }
+        .tip { background: #e0f2fe; border-left: 6px solid #0ea5e9; }
+        .warning { background: #fee2e2; border-left: 6px solid #ef4444; }
+        .highlight { background: #fef9c3; border: 1px solid #facc15; }
+    </style>
+</head>
+<body>
+<div class="double-border">
+<div class="container">
+    <div class="sidebar">
+        <h3>📚 课程目录</h3>
+        <ul class="chapter-list">
+            <li><a href="01AgvSystemOverview.html" class="">1 AGV系统概述</a></li>
+<li><a href="02HardwareSelection.html" class="">2 控制器硬件选型</a></li>
+<li><a href="03DevEnvironment.html" class="">3 开发环境搭建</a></li>
+<li><a href="04GpioTimerDriver.html" class="">4 基础驱动开发（GPIO与定时器）</a></li>
+<li><a href="05MotorControlBasics.html" class="">5 电机控制基础</a></li>
+<li><a href="06SensorDataAcquire.html" class="">6 传感器数据采集</a></li>
+<li><a href="07CommunicationProtocol.html" class="">7 通信协议实现</a></li>
+<li><a href="08TaskSchedulingRealtime.html" class="">8 任务调度与实时性</a></li>
+<li><a href="09KinematicModel.html" class="">9 运动学模型</a></li>
+<li><a href="10PathPlanningBasics.html" class="">10 路径规划基础</a></li>
+<li><a href="11LocalizationAndMapping.html" class="">11 定位与建图</a></li>
+<li><a href="12ControlAlgorithmAdvanced.html" class="">12 控制算法进阶</a></li>
+<li><a href="13SafetyMechanism.html" class="">13 安全机制设计</a></li>
+<li><a href="14StateMachineTask.html" class="">14 状态机与任务管理</a></li>
+<li><a href="15HostHmiDev.html" class="">15 上位机与HMI开发</a></li>
+<li><a href="16IntegrationAndTest.html" class="active">16 系统集成与测试</a></li>
+<li><a href="17PowerManagement.html" class="">17 电源管理与低功耗</a></li>
+<li><a href="18FirmwareOta.html" class="">18 固件升级与OTA</a></li>
+<li><a href="19LogAndDebug.html" class="">19 日志与调试</a></li>
+<li><a href="20EmcReliability.html" class="">20 EMC与可靠性设计</a></li>
+<li><a href="21ManufacturingSupport.html" class="">21 生产与制造支持</a></li>
+<li><a href="22IndustryStandards.html" class="">22 行业标准与认证</a></li>
+<li><a href="23WarehouseAgvReqArch.html" class="">23 项目实战</a></li>
+<li><a href="24WarehouseAgvDriverComm.html" class="">24 项目实战</a></li>
+<li><a href="25WarehouseAgvNavMapping.html" class="">25 项目实战</a></li>
+<li><a href="26WarehouseAgvDispatchHmi.html" class="">26 项目实战</a></li>
+<li><a href="27WarehouseAgvTestOptimize.html" class="">27 项目实战</a></li>
+<li><a href="28FrontierTech.html" class="">28 前沿技术</a></li>
+<li><a href="29CareerDevelopment.html" class="">29 职业发展</a></li>
+<li><a href="30CourseSummaryOutlook.html" class="">30 课程总结与展望</a></li>
+        </ul>
+    </div>
+    <div class="main-content">
+        <h2>16 系统集成与测试：硬件在环（HIL）测试、单元测试框架（Unity/CMock）、集成测试用例设计</h2>
+
+<p>各位同学，咱们今天聊点硬核的——系统集成与测试。说实话，很多做AGV开发的工程师，代码写得飞起，一到测试环节就头大。我见过太多项目，开发阶段顺风顺水，联调时直接翻车。为什么？因为测试没做到位。</p>
+
+<p>我个人习惯，把测试分成三个层次：单元测试、集成测试、系统测试。今天重点讲前两个，再加上硬件在环（HIL）测试。这三个东西，说白了就是给你的AGV控制器上三道保险。</p>
+
+<h3>16.1 单元测试框架：Unity/CMock</h3>
+
+<p>先说说单元测试。很多嵌入式工程师觉得单元测试是“浪费时间”，我刚开始也这么想。直到有一次，我在一个AGV的电机控制模块里，发现了一个极其隐蔽的溢出bug——那个bug在仿真环境里根本跑不出来，但实际跑起来，电机偶尔会抽风。从那以后，我再也不敢跳过单元测试了。</p>
+
+<p>嵌入式C语言的单元测试，我推荐Unity + CMock。Unity是测试框架，CMock是模拟框架。为什么选它们？轻量、无依赖、纯C实现，跑在MCU上毫无压力。</p>
+
+<h4>16.1.1 Unity 基础用法</h4>
+
+<p>Unity的用法极其简单。你只需要包含一个头文件，然后写测试用例就行。看个例子：</p>
+
+<pre><code>#include "unity.h"
+#include "motor_control.h"
+
+void setUp(void) {
+    // 每个测试用例执行前调用
+    motor_init();
+}
+
+void tearDown(void) {
+    // 每个测试用例执行后调用
+    motor_deinit();
+}
+
+void test_motor_set_speed_normal(void) {
+    // 正常速度设置
+    TEST_ASSERT_EQUAL(MOTOR_OK, motor_set_speed(1000));
+    TEST_ASSERT_EQUAL(1000, motor_get_current_speed());
+}
+
+void test_motor_set_speed_overflow(void) {
+    // 超速限制测试
+    TEST_ASSERT_EQUAL(MOTOR_ERROR, motor_set_speed(99999));
+}
+
+int main(void) {
+    UNITY_BEGIN();
+    RUN_TEST(test_motor_set_speed_normal);
+    RUN_TEST(test_motor_set_speed_overflow);
+    return UNITY_END();
+}
+</code></pre>
+
+<p>嗯，这里要注意：<code>setUp</code>和<code>tearDown</code>是Unity自动调用的，你不需要手动调用。每个测试用例之间是隔离的，这一点非常重要。</p>
+
+<div class="tip">
+    <strong>我的小技巧：</strong> 测试用例的命名，我习惯用“test_模块名_功能_场景”的格式。比如 test_motor_set_speed_overflow，一看就知道测的是电机模块、设置速度功能、溢出场景。这样后期维护时，找问题快得多。
+</div>
+
+<h4>16.1.2 CMock 模拟外部依赖</h4>
+
+<p>AGV控制器不可能孤立运行。它要读传感器、写PWM、和上位机通信。这些外部依赖，在单元测试里必须被“模拟”掉。CMock就是干这个的。</p>
+
+<p>举个例子，你的电机控制模块依赖一个I2C驱动来读写寄存器。测试时你不想真的去操作I2C总线，对吧？用CMock生成一个模拟的I2C驱动：</p>
+
+<pre><code>// 假设你的I2C接口定义在 i2c_driver.h 中
+// 用CMock生成模拟版本
+// 命令行：ruby cmock.rb -o i2c_driver.h
+
+#include "mock_i2c_driver.h"
+
+void test_motor_read_register(void) {
+    // 设置模拟返回值
+    i2c_read_ExpectAndReturn(0x50, 0x01, 0x55);
+    
+    // 执行被测函数
+    uint8_t value = motor_read_register(0x01);
+    
+    // 验证结果
+    TEST_ASSERT_EQUAL(0x55, value);
+}
+</code></pre>
+
+<p>你看，CMock会自动生成<code>ExpectAndReturn</code>这样的函数。你只需要告诉它：“我期望调用i2c_read，参数是0x50和0x01，然后返回0x55”。如果实际代码没有按预期调用，测试就会失败。</p>
+
+<div class="warning">
+    <strong>我曾经踩过的坑：</strong> CMock生成的模拟函数，默认是“严格模式”——参数必须完全匹配。但有时候你并不关心某些参数，比如超时时间。这时候可以用 <code>Ignore</code> 系列函数来忽略特定参数。否则测试用例会写得非常痛苦。
+</div>
+
+<h3>16.2 硬件在环（HIL）测试</h3>
+
+<p>单元测试跑完了，代码逻辑没问题。但你的AGV控制器真的能在真实硬件上跑吗？不一定。这就是HIL测试要解决的问题。</p>
+
+<p>HIL测试，说白了就是把你的控制器代码，跑在一个模拟真实硬件的环境里。这个环境通常包含：</p>
+
+<ul>
+    <li><strong>实时仿真机</strong>：模拟电机、传感器、电池等物理设备</li>
+    <li><strong>信号接口</strong>：PWM、CAN、GPIO等真实电气信号</li>
+    <li><strong>故障注入</strong>：模拟短路、断线、过压等异常情况</li>
+</ul>
+
+<p>我参与过一个项目，AGV在仓库里跑得好好的，一到电梯口就死机。后来HIL测试发现，是电梯的电磁干扰导致CAN总线偶尔丢帧。如果没有HIL，这种问题在现场排查，成本高得吓人。</p>
+
+<h4>16.2.1 HIL测试架构</h4>
+
+<p>下面这张图，是我自己总结的HIL测试架构。你看一眼就明白了：</p>
+
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;height:auto;margin:20px auto;display:block;">
+    <!-- 背景 -->
+    <rect x="0" y="0" width="800" height="500" fill="#f0f8ff" rx="10"/>
+    
+    <!-- 标题 -->
+    <text x="400" y="40" text-anchor="middle" font-size="20" font-weight="bold" fill="#2c3e50">AGV控制器HIL测试架构</text>
+    
+    <!-- 测试管理 -->
+    <rect x="300" y="60" width="200" height="50" rx="8" fill="#3498db" opacity="0.9"/>
+    <text x="400" y="90" text-anchor="middle" font-size="16" fill="white" font-weight="bold">测试管理平台</text>
+    
+    <!-- 箭头 -->
+    <line x1="400" y1="110" x2="400" y2="140" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 被测对象 -->
+    <rect x="250" y="140" width="300" height="60" rx="8" fill="#e74c3c" opacity="0.9"/>
+    <text x="400" y="165" text-anchor="middle" font-size="16" fill="white" font-weight="bold">被测控制器（ECU）</text>
+    <text x="400" y="185" text-anchor="middle" font-size="12" fill="white">真实硬件：STM32H7 + 驱动板</text>
+    
+    <!-- 信号接口 -->
+    <rect x="100" y="230" width="200" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="200" y="260" text-anchor="middle" font-size="14" fill="white">信号调理/接口板</text>
+    
+    <rect x="500" y="230" width="200" height="50" rx="8" fill="#2ecc71" opacity="0.9"/>
+    <text x="600" y="260" text-anchor="middle" font-size="14" fill="white">故障注入模块</text>
+    
+    <!-- 箭头 -->
+    <line x1="350" y1="200" x2="200" y2="230" stroke="#2c3e50" stroke-width="2"/>
+    <line x1="450" y1="200" x2="600" y2="230" stroke="#2c3e50" stroke-width="2"/>
+    
+    <!-- 实时仿真机 -->
+    <rect x="200" y="310" width="400" height="60" rx="8" fill="#9b59b6" opacity="0.9"/>
+    <text x="400" y="335" text-anchor="middle" font-size="16" fill="white" font-weight="bold">实时仿真机（NI PXI / dSPACE）</text>
+    <text x="400" y="355" text-anchor="middle" font-size="12" fill="white">电机模型 | 传感器模型 | 环境模型</text>
+    
+    <!-- 箭头 -->
+    <line x1="200" y1="280" x2="300" y2="310" stroke="#2c3e50" stroke-width="2"/>
+    <line x1="600" y1="280" x2="500" y2="310" stroke="#2c3e50" stroke-width="2"/>
+    
+    <!-- 监控与分析 -->
+    <rect x="250" y="400" width="300" height="50" rx="8" fill="#f39c12" opacity="0.9"/>
+    <text x="400" y="430" text-anchor="middle" font-size="14" fill="white">数据采集 &amp; 实时分析</text>
+    
+    <line x1="400" y1="370" x2="400" y2="400" stroke="#2c3e50" stroke-width="2" marker-end="url(#arrow)"/>
+    
+    <!-- 箭头定义 -->
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#2c3e50"/>
+        </marker>
+    </defs>
+</svg>
+
+<p>你看，整个架构分四层：测试管理平台下发指令，被测控制器执行，信号接口板做电气适配，实时仿真机模拟物理世界。数据采集模块全程监控，记录所有信号。</p>
+
+<h4>16.2.2 HIL测试用例设计</h4>
+
+<p>HIL测试用例，我一般分三类：</p>
+
+<table border="1" cellpadding="8" cellspacing="0" style="width:100%;border-collapse:collapse;margin:15px 0;">
+    <tr style="background-color:#3498db;color:white;">
+        <th>测试类型</th>
+        <th>测试内容</th>
+        <th>典型用例</th>
+    </tr>
+    <tr>
+        <td>功能测试</td>
+        <td>验证基本控制逻辑</td>
+        <td>直线行驶、原地转弯、加减速</td>
+    </tr>
+    <tr>
+        <td>边界测试</td>
+        <td>验证极限工况</td>
+        <td>最大速度、最小转弯半径、满载爬坡</td>
+    </tr>
+    <tr>
+        <td>故障测试</td>
+        <td>验证异常处理</td>
+        <td>电机堵转、传感器断线、通信超时</td>
+    </tr>
+</table>
+
+<p>举个例子，故障测试的用例可以这样写：</p>
+
+<pre><code>// 故障测试：左轮电机编码器断线
+void HIL_Test_LeftEncoderFault(void) {
+    // 1. 初始化：AGV以0.5m/s直线行驶
+    HIL_SetSpeed(0.5);
+    HIL_SetSteeringAngle(0);
+    
+    // 2. 等待2秒，让系统稳定
+    HIL_Delay(2000);
+    
+    // 3. 注入故障：断开左轮编码器信号
+    HIL_FaultInject(FAULT_LEFT_ENCODER, FAULT_TYPE_OPEN);
+    
+    // 4. 等待500ms，观察控制器响应
+    HIL_Delay(500);
+    
+    // 5. 验证：控制器应检测到故障并进入安全模式
+    TEST_ASSERT_EQUAL(SAFE_MODE_ACTIVE, HIL_GetControllerState());
+    TEST_ASSERT_TRUE(HIL_GetMotorSpeed(LEFT_MOTOR) &lt; 0.1);
+}
+</code></pre>
+
+<div class="highlight">
+    <strong>关键点：</strong> HIL测试的“实时性”非常重要。你的仿真机必须能在微秒级响应控制器的输出。如果仿真步长太大，测出来的结果没有意义。我个人建议仿真步长不超过100微秒。
+</div>
+
+<h3>16.3 集成测试用例设计</h3>
+
+<p>单元测试测的是单个函数，HIL测试测的是整个系统。那集成测试呢？它测的是模块之间的接口和交互。</p>
+
+<p>我举个例子。AGV的导航模块和电机控制模块之间，通过一个速度指令接口通信。单元测试时，这两个模块各自都测过了。但合在一起时，导航模块发的指令，电机模块能不能正确解析？会不会有时序问题？这就是集成测试要干的活。</p>
+
+<h4>16.3.1 集成测试策略</h4>
+
+<p>我常用的集成测试策略是“自底向上”+“关键路径优先”：</p>
+
+<ol>
+    <li><strong>先测底层驱动</strong>：比如I2C、SPI、CAN驱动，确保数据能正确收发</li>
+    <li><strong>再测中间层</strong>：比如传感器数据融合、电机控制算法</li>
+    <li><strong>最后测应用层</strong>：比如路径规划、任务调度</li>
+</ol>
+
+<p>但这里有个坑：如果完全按顺序测，周期太长。所以我一般会先挑“关键路径”来测。什么是关键路径？就是一旦出问题，整个AGV就趴窝的那些功能。比如“刹车指令”这条路径，必须优先测。</p>
+
+<h4>16.3.2 集成测试用例示例</h4>
+
+<p>下面是一个集成测试用例，测的是“导航模块下发速度指令 -> 电机控制模块执行”这条路径：</p>
+
+<pre><code>// 集成测试：导航到电机指令传递
+void Integration_Test_NavToMotor(void) {
+    // 1. 初始化两个模块
+    nav_init();
+    motor_init();
+    
+    // 2. 导航模块计算目标速度
+    nav_set_target(10.0, 5.0);  // 目标位置 (10m, 5m)
+    nav_update();               // 计算控制指令
+    
+    // 3. 获取导航模块输出的速度指令
+    float target_speed = nav_get_output_speed();
+    float target_steering = nav_get_output_steering();
+    
+    // 4. 将指令传递给电机模块
+    motor_set_speed(target_speed);
+    motor_set_steering(target_steering);
+    
+    // 5. 验证电机模块正确接收
+    TEST_ASSERT_FLOAT_WITHIN(0.01, target_speed, motor_get_current_speed());
+    TEST_ASSERT_FLOAT_WITHIN(0.01, target_steering, motor_get_current_steering());
+    
+    // 6. 验证执行结果（通过编码器反馈）
+    HIL_Delay(100);  // 等待一个控制周期
+    float actual_speed = motor_get_encoder_speed();
+    TEST_ASSERT_FLOAT_WITHIN(0.05, target_speed, actual_speed);
+}
+</code></pre>
+
+<div class="tip">
+    <strong>我的经验：</strong> 集成测试最容易忽略的是“时序问题”。两个模块各自都正常，但一个模块更新数据的频率是10Hz，另一个是50Hz，中间就可能丢数据。我建议在集成测试里，故意制造一些时序抖动，看看系统能不能扛住。
+</div>
+
+<h3>16.4 测试覆盖率与持续集成</h3>
+
+<p>测试写完了，怎么知道测够了没有？看覆盖率。我一般关注三个指标：</p>
+
+<ul>
+    <li><strong>语句覆盖率</strong>：每行代码都被执行过吗？目标≥90%</li>
+    <li><strong>分支覆盖率</strong>：每个if-else分支都走到过吗？目标≥85%</li>
+    <li><strong>MC/DC覆盖率</strong>：每个条件独立影响结果吗？目标≥80%（安全关键功能要求100%）</li>
+</ul>
+
+<p>这些覆盖率数据，可以用gcov、lcov等工具自动生成。我习惯把覆盖率检查集成到CI流水线里，每次提交代码自动跑。如果覆盖率下降，构建直接失败。</p>
+
+<div class="warning">
+    <strong>注意：</strong> 覆盖率不是万能的。100%覆盖率不代表没有bug。我见过一个项目，覆盖率95%以上，但现场还是出了严重问题——因为测试数据全是“正常数据”，从来没测过异常数据。所以，测试用例的质量比数量更重要。
+</div>
+
+<p>好了，关于系统集成与测试，我就讲这么多。记住：测试不是开发完成后的“附加工作”，而是开发过程中不可或缺的一部分。你投入在测试上的每一分钟，都会在后期调试中加倍回报给你。</p>
+
+<hr style="border:1px solid #ddd;margin:30px 0;">
+
+        <div class="footer-nav">
+            <a href="15HostHmiDev.html">← 上一章</a>
+            <a href="index.html">📖 返回目录</a>
+            <a href="17PowerManagement.html">下一章 →</a>
+        </div>
+        
+    </div>
+</div>
+</div>
+</body>
+</html>
