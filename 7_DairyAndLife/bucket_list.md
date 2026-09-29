@@ -5,12 +5,14 @@
 > This is a bucket list written for myself. Not to show off, but to remind myself of how much is left undone when I feel lost, and to push myself forward when I feel slack. Every checkmark is one step closer to the complete version of myself.
 
 ---
+
+
 ## I. 🌍 Travel the World: Countries & Regions
 *Goal: Set foot in every country and region in the world (Continuously updating)*
 ### China (All Provincial-Level Administrative Regions)
 - [x] Henan: Xinxiang/Zhengzhou/Luoyang/Kaifeng/Dengfeng/Nanyang
 - [x] Beijing: Haidian/Yizhuang/Daxing
-- [ ] Tianjin: Hohai, Tianjin University, Nankai University, Italian Style Town
+- [x] Tianjin: Hohai, Tianjin University, Nankai University, Italian Style Town
 - [ ] Shanghai: Oriental Pearl Tower
 - [x] Guangdong: Shenzhen/Guangzhou/Zhuhai/Shunde/Foshan/Zhongshan
 - [x] Hong Kong: Victoria Harbour
@@ -90,9 +92,9 @@
 - [x] Luxembourg
 - [x] Switzerland
 - [x] Austria
-- [ ] Liechtenstein
-- [ ] Ireland
-- [ ] Iceland
+- [ ] Liechtenstein列支敦士登
+- [ ] Ireland爱尔兰
+- [ ] Iceland冰岛
 - [x] Denmark
 - [x] Norway
 - [x] Sweden
@@ -104,7 +106,7 @@
 - [ ] Greece
 - [ ] Croatia
 - [ ] Slovenia
-- [ ] Bosnia and Herzegovina
+- [ ] Bosnia and Herzegovina波黑(波斯尼亚和黑塞哥维那)
 - [x] Serbia
 - [ ] Montenegro
 - [ ] North Macedonia
@@ -201,7 +203,7 @@
 - [ ] Saint Lucia
 - [ ] Saint Vincent and the Grenadines
 - [ ] Grenada
-### South America
+### South America(0/12)
 - [ ] Colombia
 - [ ] Venezuela
 - [ ] Guyana
@@ -214,7 +216,7 @@
 - [ ] Argentina
 - [ ] Paraguay
 - [ ] Uruguay
-### Oceania
+### Oceania(0/14)
 - [ ] Australia
 - [ ] New Zealand
 - [ ] Papua New Guinea
